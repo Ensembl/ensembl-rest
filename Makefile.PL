@@ -26,6 +26,7 @@ requires 'Catalyst::View::JSON';
 requires 'Catalyst::View::TT';
 requires 'JSON::XS';
 requires 'Log::Log4perl::Catalyst';
+requires 'Hash::Merge';
 
 # Transient dependencies from Ensembl
 requires 'Parse::RecDescent';
