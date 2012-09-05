@@ -36,7 +36,7 @@ has '_registry' => ( is => 'ro', lazy => 0, default => sub {
     );
   }
   else {
-    confess "Cannot instatiate a registry. Please consult your configuration file and try again"
+    confess "Cannot instantiate a registry. Please consult your configuration file and try again"
   }
   $self->_set_connection_policies($class, $cfg);
   return $class;
