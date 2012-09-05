@@ -57,6 +57,22 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 							<tr><td><a href='http://en.wikipedia.org/wiki/YAML'>YAML</a></td><td><tt>text/x-yaml</tt></td><td>-</td></tr>
 						</table>
 						
+						<h2>Fair Usage Policy</h2>
+						<p>The Ensembl REST API public services operate a fair usage policy to ensure a suitable level of service for all users. Should you find the following policy too restrictive then please look into installing your own copy of <a href='http://www.ensembl.org/info/docs/webcode/install/ensembl-data.html'>Ensembl databases locally</a> and the REST API. Also consider using our Amazon Web Services public data sets which can help to reduce the time required for generating a service.</p>
+						<p>
+						  When using the service you should adhere to the following rules:
+						  <ul>
+						    <li>Limit your requests to 3 per second</li>
+						    <ul>
+						      <li>You can run 3 parallel processes each requesting 1 item per second</li>
+						      <li>Or 1 process limiting itself to 3 requests per second</li>
+						    </ul>
+						    <liExcessive program-driven use is not permitted</li>
+						    <li>If you plan to use the service in a manner you think may be excessive please contact <a href='mailto:helpdesk@ensembl.org'>Ensembl</a></li>
+						  </ul>
+						  
+						  Failure to comply will result in restriction of access.
+						</p>
 						
 						<h2>Citing</h2>
 						<p>If you would like to include a general reference to the Ensembl system in your work, we recommend citing the most recent overview article. Details of which can be found <a href='http://www.ensembl.org/info/about/publications.html'>on Ensembl's publication page</a>.</p>
