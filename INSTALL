@@ -207,7 +207,7 @@ Open ensembl_rest.conf in a text editor & edit the <Registry> section as so:
 
 This will tell the API to use the public databases held on our USEast server. You could have used ensembldb.ensembl.org instead which would point to our European based database servers.
 
-2). Application Debuging
+2). Application Debugging
 
 Since this is your first time with the REST API you will want to configure debug messages to appear to screen as this will aid in problem solving if they occur.
 
