@@ -253,7 +253,7 @@ This will start up a server with the output looking like:
   2012/09/05 11:01:54 (0) Catalyst.pm 1184> EnsEMBL::REST powered by Catalyst 5.90015 
   HTTP::Server::PSGI: Accepting connections at http://0:3000/
 
-See module errors if you get an include issues appearing.
+See "Errors & Tips", specifically lib errors, if you have any issues when starting up the server.
 
 Navigate to the specified address and if everything has worked you should see the main REST page appearing.
 
@@ -300,6 +300,24 @@ The database supports the following IDs:
 2). Lib cannot be found
 
 If you have this issue then please make sure you have run the Makefile.PL file and installed all additional libraries using your package manager of choice.
+
+3). Couldn't instantiate component "EnsEMBL::REST::Model::Registry"
+
+This normally points to an error in your database setup. You should see a second message in the stack trace:
+
+"Cannot instantiate a registry. Please consult your configuration file and try again"
+
+Make sure your Host, Port and User attributes are set in your .conf file. If you are using a Registry file then ensure this is correctly configured and in the place it should be. If you want to use a relative path e.g. my/dir/reg.pm consider using the built-in Catalyst substitution macros. 
+
+  reg = my/dir/reg.pm
+
+Becomes:
+
+  reg = _path_to(my/dir/reg.pm)__ 
+
+More information is available from
+
+  https://metacpan.org/module/Catalyst::Plugin::ConfigLoader
 
 3). More information on Catalyst
 
