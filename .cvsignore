@@ -10,3 +10,5 @@ MYMETA.yml
 MYMETA.json
 Makefile
 reg.pm
+.project
+.includepath
