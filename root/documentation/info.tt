@@ -1,0 +1,76 @@
+<h1 id="title">[% template_title %]</h1>
+
+<div class="row">
+<div class="span10">
+<div class="lead">
+  <p>[% endpoint.description %]</p>
+</div>
+
+<h2>Parameters</h2>
+
+[% IF endpoint.params %]
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th><th>Required</th><th>Type</th><th>Description</th><th>Default</th><th>Example Values</th>
+    </tr>
+  </thead>
+    <tbody>
+  	[% FOREACH p IN endpoint.params.pairs %]
+      <tr>
+      <td>[% p.key %]</td>
+      <td>[% IF p.value.required %]<strong>Yes</strong>[% ELSE %]No[% END %]
+      <td><tt>[% p.value.type %]</tt></td>
+      <td>[% p.value.description %]</td>
+      <td><tt>
+        [% IF p.value.default.defined %] [% p.value.default %] [% ELSE %] - [% END %]
+      </tt></td>
+      <td>
+        [% FOREACH eg IN p.value.example %]
+          <tt>[% eg %]<tt><br>
+        [% END %]
+      </td>
+      </tr>
+  	[% END %]
+  	</tbody>
+	</table>
+[% ELSE %]
+	<p>No parameters required</p>
+[% END %]
+
+<h3>Example Requests</h3>
+
+[% example_types = ['perl', 'python', 'ruby', 'curl', 'wget'] %]
+
+[% FOREACH p IN endpoint.examples.pairs %]
+	<h4><a href="[% p.value.uri %]">[% p.value.uri %]</a></h4>
+	<br>
+	<ul class="nav nav-pills">
+	  <li class="active"><a href="#example[% p.value.id %]" data-toggle="tab">Example output</a></li>
+		[% FOREACH e IN example_types %]
+		  <li><a href="#[% e %][% p.value.id %]" data-toggle="tab">[% e.ucfirst %]</a></li>
+		[% END %]
+	</ul>
+	<div class='tab-content'>
+		<div class='tab-pane active' id='example[% p.value.id %]'>
+			<pre class="pre-scrollable prettyprint">[% FILTER html %][% p.value.response %][% END %]</pre>
+		</div>
+		[% FOREACH e IN example_types %]
+		<div class='tab-pane' id='[% e %][% p.value.id %]'>
+			<pre class="pre-scrollable prettyprint linenums">[% FILTER html %][% p.value.$e %][% END %]</pre>
+		</div>
+		[% END %]
+	</div>
+  <br>
+[% END %]
+</div>
+<div class="span2">
+  <h3>Resource Information</h3>
+  <table class="table table-condensed table-striped">
+    <tbody>
+      <tr><td>Methods</td><td>[% endpoint.method %]</td></tr>
+      <tr><td>Response formats</td><td>[% endpoint.output.join('<br>') %]</td></tr>
+    </tbody>
+  </table>
+</div>
+</div>

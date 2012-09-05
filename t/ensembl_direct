@@ -1,0 +1,15 @@
+#!/bin/env perl
+use strict;
+use Test::More qw/no_plan/;
+use Bio::EnsEMBL::DBSQL::DBAdaptor;
+BEGIN { use_ok 'Bio::EnsEMBL::DBSQL::DBAdaptor' }
+my $dba = Bio::EnsEMBL::DBSQL::DBAdaptor->new(
+    -host    => 'mysql-ensembl-mirror.ebi.ac.uk',
+    -user    => 'ensro',
+    -port    => 4240,
+    -dbname  => 'homo_sapiens_core_63_37'
+);
+
+
+
+$dba->get_geneAdaptor;

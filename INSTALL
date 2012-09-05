@@ -1,0 +1,317 @@
+INSTALL
+=======
+
+This guide is split into a number of sections pertaining to the steps required to get the REST service running using the Catalyst built-in scripts. Examples of PSGI setup is available from the root directory and under the configurations directory.
+
+All commands assume a bash environment.
+
+=================
+Required Binaries
+=================
+
+Ensure you have the following binaries available:
+
+- Perl v5.10 upwards
+- cvs
+- bash
+- wget/curl
+
+============================
+Expected Directory Structure
+============================
+
+Your directory structure should look like this after installation:
+.
+  ├── bioperl-1.2.3
+  ├── ensembl
+  ├── ensembl-compara
+  ├── ensembl-external
+  ├── ensembl-functgenomics
+  ├── ensembl-rest
+  ├── ensembl-tools
+  └── ensembl-variation
+
+===================
+Installing Catalyst
+===================
+
+Information on installing Catalyst can be found at:
+
+  http://wiki.catalystframework.org/wiki/installation (basic)
+  
+  http://wiki.catalystframework.org/wiki/installingcatalyst (advanced)
+  
+
+If you are on Debian/Ubuntu you can find all required packages using (remembering you will probably need a C compiler):
+
+  apt-get install build-essential
+  
+  apt-cache search catalyst
+
+If you are on Fedora/RedHat then the following should suffice:
+
+  yum groupinstall "Development Tools"
+  
+  yum install perl-Catalyst-Runtime perl-Catalyst-Devel /usr/bin/catalyst.pl
+
+If you are using CPAN or CPANMINUS with local::lib then you can use:
+
+  cpanm Catalyst::Runtime Catalyst::Devel
+
+
+Please remember that the REST API has more dependencies than the ones mentioned here. Please follow the guide carefully to ensure a good installation.
+
+==========================
+Installing the Ensembl API
+==========================
+
+A number of guides to installing the Ensembl API are available from:
+
+http://www.ensembl.org/info/docs/api/api_installation.html
+
+http://www.ensembl.org/info/docs/api/api_cvs.html
+
+http://www.ensembl.org/info/docs/webcode/install/ensembl-code.html
+
+Should you already have an Ensembl API for the required release then skip to "Installing the REST API".
+
+We will partially work through the second document to install the API.
+
+1). Installing BioPerl 1.2.3
+
+Use one of the following commands to get BioPerl
+
+  wget http://bioperl.org/DIST/old_releases/bioperl-1.2.3.tar.gz
+
+  curl -o bioperl-1.2.3.tar.gz http://bioperl.org/DIST/old_releases/bioperl-1.2.3.tar.gz 
+
+Now untar
+
+  tar zxvf bioperl-1.2.3.tar.gz
+
+2). Installing Ensembl from CVS
+
+First select the version of the API we want. In this example we will use Release 68.
+
+export ENS_RELEASE=68
+
+Log into the Ensembl CVS server:
+
+  cvs -d :pserver:cvsuser@cvs.sanger.ac.uk:/cvsroot/ensembl login
+  CVS password: CVSUSER
+
+Request the API:
+
+  cvs -q -d :pserver:cvsuser@cvs.sanger.ac.uk:/cvsroot/ensembl checkout -r branch-ensembl-$ENS_RELEASE ensembl-api
+
+This will create 6 directories.
+
+=======================
+Installing the REST API
+=======================
+
+1). Installing from CVS
+
+See the above section for logging into the CVS server.
+
+Assuming your Ensembl API is available then checkout the REST API using:
+
+  cvs -q -d :pserver:cvsuser@cvs.sanger.ac.uk:/cvsroot/ensembl checkout -r branch-ensembl-$ENS_RELEASE ensembl-rest
+
+2). Bringing Ensembl onto your PERL5LIB
+
+Using bash we bring each modules directory onto the library path:
+
+  PERL5LIB=${PWD}/bioperl-1.2.3:${PERL5LIB}
+  PERL5LIB=${PWD}/ensembl/modules:${PERL5LIB}
+  PERL5LIB=${PWD}/ensembl-compara/modules:${PERL5LIB}
+  PERL5LIB=${PWD}/ensembl-variation/modules:${PERL5LIB}
+  PERL5LIB=${PWD}/ensembl-functgenomics/modules:${PERL5LIB}
+  export PERL5LIB
+
+3). Setting up Catalyst and Ensembl REST
+
+First cd into the directory:
+
+  cd ensembl-rest
+
+Then run the Makefile.PL:
+
+  perl Makefile.PL
+
+This program will prompt to install CPAN dependencies required for the REST API. If you are on your machine as root and wish to do this into a central machine location then say Y to any prompt. Otherwise use this script as a way of discovering the dependencies for the API. You can use the output in the document as a guide to the required dependencies or look at Makefile.PL's contents.
+
+Makefile.PL will emit output looking like:
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+      include /Users/ayates/tmp/ensembl-rest/inc/Module/Install.pm
+      include inc/Module/Install/Metadata.pm
+      include inc/Module/Install/Base.pm
+      include inc/Module/Install/Makefile.pm
+      include inc/Module/Install/Catalyst.pm
+      include inc/Module/Install/Include.pm
+      include inc/File/Copy/Recursive.pm
+      *** Module::Install::Catalyst
+      Please run "make catalyst_par" to create the PAR package!
+      *** Module::Install::Catalyst finished.
+      include inc/Module/Install/Scripts.pm
+      include inc/Module/Install/AutoInstall.pm
+      include inc/Module/AutoInstall.pm
+      *** Module::AutoInstall version 1.06
+      *** Checking for Perl dependencies...
+      [Core Features]
+      - Test::More                       ...loaded. (0.98 >= 0.88)
+      - Catalyst::Runtime                ...loaded. (5.90015 >= 5.90015)
+      - Catalyst::Plugin::ConfigLoader   ...loaded. (0.30)
+      - Catalyst::Plugin::Static::Simple ...loaded. (0.30)
+      - Catalyst::Action::RenderView     ...loaded. (0.16)
+      - Moose                            ...loaded. (2.0401)
+      - namespace::autoclean             ...loaded. (0.13)
+      - Config::General                  ...loaded. (2.50)
+      - Catalyst::Controller::REST       ...loaded. (1.04)
+      - Catalyst::Plugin::SubRequest     ...loaded. (0.20)
+      - Catalyst::View::TT               ...loaded. (0.39)
+      - JSON::XS                         ...loaded. (2.32)
+      - Log::Log4perl::Catalyst          ...loaded. (undef)
+      - Parse::RecDescent                ...loaded. (1.965001)
+      - XML::Writer                      ...loaded. (0.615)
+      - Plack::Middleware::Assets        ...loaded. (0.0.2)
+      - Plack::Middleware::SizeLimit     ...loaded. (0.04)
+      *** Module::AutoInstall configuration finished.
+      include inc/Module/Install/WriteAll.pm
+      include inc/Module/Install/Win32.pm
+      include inc/Module/Install/Can.pm
+      include inc/Module/Install/Fetch.pm
+      Writing Makefile for EnsEMBL::REST
+      Writing MYMETA.yml and MYMETA.json
+      Writing META.yml
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Assuming your output shown no errors your installation is good.
+
+=============================
+Configuration of the REST API
+=============================
+
+1). Selecting the databases to use
+
+The API offers two methods of configuring databases; using connections specified in the ensembl_rest.conf file or an Ensembl Registry file. We will use the former technique as it reduces the number of configuration files required.
+
+Open ensembl_rest.conf in a text editor & edit the <Registry> section as so:
+
+  host = useastdb.ensembl.org
+  port = 5306
+  user = anonymous
+
+This will tell the API to use the public databases held on our USEast server. You could have used ensembldb.ensembl.org instead which would point to our European based database servers.
+
+2). Application Debuging
+
+Since this is your first time with the REST API you will want to configure debug messages to appear to screen as this will aid in problem solving if they occur.
+
+Firstly open log4perl.conf in a text editor & edit the first line accordingly (this should, most likely, already set):
+
+  log4perl.category = DEBUG, Screen
+
+Secondly open lib/EnsEMBL/REST.pm and edit the module to look like the following (search for use Catalyst to find the section we need to edit):
+
+  use Catalyst qw/
+    -Debug
+    ConfigLoader
+    Static::Simple
+    SubRequest
+  /;
+
+This will cause Catalyst to emit a lot of information about endpoints and the routing the application is performing. We recommend using the API with this mode on for your first steps.
+
+***** REMEMBER TO REMOVE THE -Debug FLAG WHEN GOING INTO PRODUCTION MODE ******
+
+3). Using an alternative ensembl_rest.conf
+
+Catalyst allows you to specify a different configuration file to the default ensembl_rest.conf file held in the root of the Rest API. This is a useful feature when in production environments. Export the location of the config file as so:
+
+  export ENSEMBL_REST_CONFIG=$APP_HOME/path/to/other/ensembl_rest.conf
+
+See the following links for more information:
+
+  https://metacpan.org/module/Catalyst::Plugin::ConfigLoader
+  https://metacpan.org/module/Catalyst::Plugin::ConfigLoader::Manual
+
+==================
+Running The Server
+==================
+
+1). Using Catalyst's inbuilt server
+
+  cd ensembl-rest
+  ./script/ensembl_rest_server.pl
+
+This will start up a server with the output looking like:
+
+  2012/09/05 11:01:54 (0) Catalyst.pm 1184> EnsEMBL::REST powered by Catalyst 5.90015 
+  HTTP::Server::PSGI: Accepting connections at http://0:3000/
+
+See module errors if you get an include issues appearing.
+
+Navigate to the specified address and if everything has worked you should see the main REST page appearing.
+
+2). Using a PSGI/Plack server
+
+PSGI, http://plackperl.org/, is a framework independent way of programming HTTP based frameworks. We will run the REST server using starman, https://metacpan.org/module/Starman, and a PSGI file with 5 worker threads and running on port 3000 (same as the default Catalyst port).
+
+  cd ensembl-rest
+  PERL5LIB=$PWD/lib:$PERL5LIB starman --listen :3000 --workers 5 ensembl_rest.psgi
+
+Navigate to either (depending on your machine):
+
+  http://localhost:3000/
+  http://127.0.0.1:3000/
+  http://0.0.0.0:3000/
+
+3). Production
+
+We have provided a number of example production scripts and configurations under 
+
+  bin/production
+  configurations/production
+
+These are intended as a guide about how to run this server in a production mode and heavily use Server::Starter, https://metacpan.org/module/Server::Starter, and the Linux command start-stop-daemon.
+
+=============
+Errors & Tips
+=============
+
+1). Speeding up ID Lookup
+
+A precomputed MySQL schema is available on USEast called ensembl_stable_ids_?? where ?? is the Ensembl release. This database is only available on USEast. Should you want a copy locally then please take a mysqldump of the schema or run the ensembl core script:
+
+  ensembl/misc-scripts/stable_id_lookup/populate_stable_id_lookup.pl
+
+Documentation on the code is available from ensembl/misc-scripts/stable_id_lookup/README.
+
+The database supports the following IDs:
+
+  - Genes, Transcripts, Translations & Exons
+  - Operons & Operon Transcripts
+  - Gene Trees & Families (comparative genomics)
+
+2). Lib cannot be found
+
+If you have this issue then please make sure you have run the Makefile.PL file and installed all additional libraries using your package manager of choice.
+
+3). More information on Catalyst
+
+You can see these websites for more Catalyst information:
+
+  http://www.catalystframework.org/
+  
+  https://metacpan.org/module/Catalyst
+  
+  https://metacpan.org/module/Catalyst::Manual::Intro
+
+4). Caching vs. No Caching
+
+We normally turn caching off in our production environments as caching normally bloats processes too much and the randomness of incoming requests makes hitting subsequent caches hard. Your milage may vary so please try it both on & off.
+

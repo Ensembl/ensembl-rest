@@ -1,0 +1,201 @@
+<div class="row">
+    <div class="span3 bs-docs-sidebar">
+        <ul class="nav nav-list bs-docs-sidenav affix">
+            <li class="active"><a href="#Introduction"><i class="icon-chevron-right"></i> Introduction</a></li>
+            <li><a href="#command_line"><i class="icon-chevron-right"></i> Command Line</a></li>
+            <li><a href="#perl"><i class="icon-chevron-right"></i> Perl</a></li>
+            <li><a href="#python"><i class="icon-chevron-right"></i> Python</a></li>
+            <li><a href="#ruby"><i class="icon-chevron-right"></i> Ruby</a></li>
+        </ul>
+    </div><!-- end span3--> 
+
+    <div class="span9">
+        <h1>User Guide</h1>	
+        <section id="Introduction">
+            <div class="page-header">
+                <h1>Introduction</h1>	
+            </div><!-- page header--> 
+<p>The Ensembl REST web-service is a convenient way to access some of our popular datatypes such as the VEP, Sequence retrieval, assembly coordinate transformations, gene homologies and cross-references without the need to use our Perl API. The data can be requested with simple HTTP requests and returned in a variety of programatic and bioinformatical relevant formats such as JSON, XML, YAML and FASTA. 
+
+<h2>Making a REST request</h2>
+Each datatype resides on a REST endpoint, these are all listed on our <a href="/">REST service homepage</a>. A request is made to an endpoint as a parameterised HTTP request adhering a predefined URI schema. Parameters can be required or optional. Required parameters are indicated by being preceded by a ':' in a documented endpoint and must be included in the path part of the URI. Optional parameters, where available, are indicated in the documentation for for an endpoint and can be included as cgi style parameters as part of the http request.  
+
+            <div class="bs-docs-example">
+<p>The vep endpoint has required parameters for <span class="label label-inverse">:species</span> <span class="label label-inverse">:region</span> <span class="label label-inverse">:allele</span></p>
+            <pre class="prettyprint">
+/vep/:species/:region/:allele/consequences
+                </pre>
+<h4> Example request</h4>
+            <pre class="prettyprint">
+/vep/human/9:22125503-22125502:1/C/consequences
+                </pre>
+            </div><!-- bs-oocs-example--> 
+
+            <div class="bs-docs-example">
+<p>The sequence endpoint has required parameters for <span class="label label-inverse">:species</span> <span class="label label-inverse">:region</span> and an optional parameter for <span class="label label-reverse">mask</span></p>
+            <pre class="prettyprint">
+/sequence/region/:species/:region
+                </pre>
+<h3> Example request</h3>
+            <pre class="prettyprint">
+/sequence/region/human/X:1000000..1000300?mask=soft
+                </pre>
+            </div><!-- bs-oocs-example--> 
+						<h3>Content Type</h3>
+						<p>Response types for JSON, XML, YAML and FASTA may be requested by either setting the <code>Content-type</code> in the HTTP request header or as a <code>content-type</code> URI parameter. Examples of using different content types can be seen in the following language specific examples.</p>
+						
+						<table class='table table-striped'>
+							<caption>Supported content types for Ensembl REST API</caption>
+							<tr><th>Format</th><th>Content-type</th><th>Notes</th></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/FASTA_format'>FASTA</a></td><td><tt>text/fasta</tt></td><td>Only supported on the <tt>/sequence</tt> endpoint.<br/><span class="label label-important">Important:</span> FASTA can also be specified as a filename extension e.g. <tt>ENSPXXXXXXX.fasta</tt></td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/JSON'>JSON</a></td><td><tt>application/json</tt></td><td>-</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/JSONP'>JSONP</a></td><td><tt>text/javascript</tt></td><td>Extension of JSON to avoid issues of web browser <a href='http://en.wikipedia.org/wiki/Same_origin_policy'>same origin policy</a>.</tr>
+							<tr><td><a href='http://phylosoft.org/NHX/'>New Hampshire Extended</a></td><td><tt>text/nhx</tt></td><td>Extended version of newick phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/Newick_format'>Newick (New Hampshire) format</a></td><td><tt>text/nh</tt></td><td>Phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>							
+							<tr><td><a href='http://en.wikipedia.org/wiki/PhyloXML'>PhyloXML</a></td><td><tt>text/phyloxml</tt></td><td>XML phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/XML'>XML</a></td><td><tt>text/xml</tt></td><td>-</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/YAML'>YAML</a></td><td><tt>text/x-yaml</tt></td><td>-</td></tr>
+						</table>
+						
+						
+						<h2>Citing</h2>
+						<p>If you would like to include a general reference to the Ensembl system in your work, we recommend citing the most recent overview article. Details of which can be found <a href='http://www.ensembl.org/info/about/publications.html'>on Ensembl's publication page</a>.</p>
+						
+						<h2>Installing a local version</h2>
+						<p>This service along with all other Ensembl products are available to download from our <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl'>CVS server</a>. A tarball of this release is available from <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl&pathrev=branch-ensembl-[% ensembl_version %]'>here</a>. After this follow the instructions in provided INSTALL guide.</p>
+						
+						<h2>Licensing</h2>
+						<p>The Ensembl REST API and Ensembl API are made available under a <a href='http://www.ensembl.org/info/about/code_licence.html'>modified Apache licence</a>.</p>
+        </section><!-- Introduction--> 
+
+        <section id="command_line">
+            <div class="page-header">
+                <h1>Command line access</h1>	
+            </div><!-- page header--> 
+
+            <h2>Fetching data from the command line</h2>
+            <h3>1. Using curl to fetch JSON data</h3>
+            <p>Using the command line tool <span class="label label-inverse">curl</span> to fetch JSON data from the service</p>
+            <p><span class="label label-info">Note</span> setting the content-type in the header <code>-H  "content-type:application/json"</code></p>
+
+            <div class="bs-docs-example">
+                <pre class="prettyprint">
+curl [% c.req.base %]map/human/chr_region/NCBI34/7:490000-500000/GRCh37 -H "content-type:application/json"
+                </pre>
+            </div><!-- bs-oocs-example--> 
+            <h3>2. Using wget to fetch XML data</h3>
+            <p>Using the command line tool <span class="label label-inverse">wget</span> to fetch XML data from the service</p>
+            <p><span class="label label-info">Note</span> In this example we are requesting the response as XML by setting the <code>content-type=text/xml</code> query param and not the header</p>
+
+            <div class="bs-docs-example">
+                <pre>
+wget '[% c.req.base %]map/human/NCBI34/7:490000-500000/GRCh37?content-type=text/xml' -O -
+                </pre>
+            </div><!-- bs-oocs-example--> 
+        </section><!-- command_line--> 
+
+
+        <section id="perl">
+            <div class="page-header">
+                <h1>Perl</h1>	
+            </div><!-- page header--> 
+
+            <h2>Fetching data with Perl</h2>
+            <p>This example shows fetching variant effect data from region <tt>1:6524705:6524705</tt> on human. A JSON response is requested by setting the <code>Content-type =>'application/json'</code> in the HTTP request header.</p>
+
+            <div class="bs-docs-example">
+                <pre class="prettyprint linenums">
+[% FILTER html %]
+use strict;
+use warnings;
+ 
+use HTTP::Tiny;
+use JSON;
+ 
+my $http = HTTP::Tiny->new();
+ 
+my $server = '[% c.req.base %]';
+my $ext = '/vep/human/1:6524705:6524705/T/consequences';
+my $response = $http->get($server.$ext, {
+  headers => { 'Content-type' => 'application/json' }
+});
+ 
+die "Failed!\n" unless $response->{success};
+
+my $hash = decode_json($response->{content});
+foreach my $variation_feature (@{$hash->{data}}) {
+	my @alleles = keys %{$variation_feature->{hgvs}};
+	foreach my $allele (@alleles) {
+		printf("%s = %s\n", $allele, $variation_feature->{hgvs}->{$allele});
+	}
+}
+[% END %]
+                </pre>
+            </div><!-- bs-oocs-example--> 
+
+        </section><!-- perl--> 
+        <section id="python">
+            <div class="page-header">
+                <h1>Python</h1>	
+            </div><!-- page header--> 
+
+            <h2>Fetching data with Python</h2>
+
+            <p>This example shows requesting homologs for human gene symbol <tt>CNTROB</tt>. An XML response is requested by setting <code>content-type=text/xml</code> as a cgi param in the uri.</p>
+            <div class="bs-docs-example">
+                <pre class="prettyprint linenums">
+[% FILTER html %]
+import httplib2, sys
+ 
+http = httplib2.Http(".cache")
+ 
+server = "[% c.req.base %]"
+ext = "/homology/symbol/human/CNTROB?content-type=text/xml"
+resp, xml_content = http.request(server+ext, method="GET")
+ 
+if not resp.status == 200:
+  print "Invalid response: ", resp.status
+  sys.exit()
+ 
+print xml_content
+[% END %]
+                </pre>
+            </div><!-- bs-oocs-example--> 
+        </section><!-- ruby--> 
+        <section id="ruby">
+            <div class="page-header">
+                <h1>Ruby</h1>	
+            </div><!-- page header--> 
+
+            <h2>Fetching data with Ruby</h2>
+<p>This example shows fetching sequence data for Ensembl ID <tt>ENSG00000157764</tt>. The DNA may be returned in FASTA format by setting the <code>Content-Type' => 'text/fasta</code> in the HTTP request header.</p>
+            <div class="bs-docs-example">
+                <pre class="prettyprint linenums">
+[% FILTER html %]
+require 'net/http'
+require 'uri'
+ 
+server='[% c.req.base %]'
+get_path = '/sequence/id/ENSG00000157764'
+ 
+url = URI.parse(server)
+http = Net::HTTP.new(url.host, url.port)
+ 
+request = Net::HTTP::Get.new(get_path, {'Content-Type' => 'text/fasta'})
+response = http.request(request)
+ 
+if response.code != "200":
+  puts "Invalid response: #{response.code}"
+  puts response.body
+  exit
+end
+ 
+puts response.body
+[% END %]
+                </pre>
+            </div><!-- bs-oocs-example--> 
+        </section><!-- ruby--> 
+        <hr class="bs-docs-separator">
+    </div><!-- span9-->
+</div> <!-- end row--> 
+

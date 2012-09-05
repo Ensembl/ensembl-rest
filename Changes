@@ -1,0 +1,8 @@
+This file documents the revision history for Perl extension EnsEMBL::REST.
+
+1.0.0 05-09-2012 09:10:00
+	- Initial revision of REST API
+	- Support for comparative genomics, cross references, ID lookup, mapping coordinates, sequences & variations
+	- Information endpoints also made available
+	- Documentation added for all end points
+
