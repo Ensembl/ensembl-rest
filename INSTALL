@@ -261,6 +261,8 @@ Navigate to the specified address and if everything has worked you should see th
 
 PSGI, http://plackperl.org/, is a framework independent way of programming HTTP based frameworks. We will run the REST server using starman, https://metacpan.org/module/Starman, and a PSGI file with 5 worker threads and running on port 3000 (same as the default Catalyst port).
 
+Starman can be installed using your system's default package management software or via cpan. Once installed you can invoke the server using the following:
+
   cd ensembl-rest
   PERL5LIB=$PWD/lib:$PERL5LIB starman --listen :3000 --workers 5 ensembl_rest.psgi
 
@@ -269,6 +271,8 @@ Navigate to either (depending on your machine):
   http://localhost:3000/
   http://127.0.0.1:3000/
   http://0.0.0.0:3000/
+
+Starman also has options for production environments including hot-deploy & daemonisation of the starman process. Please see its docs for more information.
 
 3). Production
 
