@@ -22,14 +22,14 @@ Expected Directory Structure
 
 Your directory structure should look like this after installation:
 .
-  ├── bioperl-1.2.3
-  ├── ensembl
-  ├── ensembl-compara
-  ├── ensembl-external
-  ├── ensembl-functgenomics
-  ├── ensembl-rest
-  ├── ensembl-tools
-  └── ensembl-variation
+ \------- bioperl-1.2.3
+ \------- ensembl
+ \------- ensembl-compara
+ \------- ensembl-external
+ \------- ensembl-functgenomics
+ \------- ensembl-rest
+ \------- ensembl-tools
+ \------- ensembl-variation
 
 ===================
 Installing Catalyst
