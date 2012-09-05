@@ -1,0 +1,12 @@
+blib
+*.tmp
+nytprof
+nytprof.out
+.cache
+inc
+pm_to_blib
+META.yml
+MYMETA.yml
+MYMETA.json
+Makefile
+reg.pm
