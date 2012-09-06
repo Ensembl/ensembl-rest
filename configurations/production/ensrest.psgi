@@ -34,6 +34,9 @@ builder {
         check_every_n_requests => 10,
     );
 
+    #------ Make uri_for do the right thing
+    enable "Plack::Middleware::ReverseProxy";
+
     #------ Adds a better stack trace
     enable 'StackTrace';
 
