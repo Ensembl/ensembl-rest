@@ -178,6 +178,7 @@ sub _encode_transcript_variants {
       #### START OF ALTERNATIVE ALLELES
       foreach my $tva (@{$tv->get_all_alternate_TranscriptVariationAlleles()}) {
         my $tva_r = {
+          allele_string => $tva->allele_string,
           display_codon_allele_string => $tva->display_codon_allele_string,
           codon_allele_string => $tva->codon_allele_string,
           pep_allele_string => $tva->pep_allele_string,
@@ -189,7 +190,7 @@ sub _encode_transcript_variants {
           hgvs_protein => $tva->hgvs_protein,
           consequence_terms => $self->_overlap_consequences($tva),
         };
-        $r->{alleles}->{$tva->allele_string()} = $tva_r;
+        push @{$r->{alleles}}, $tva_r;
       }
     
       push(@results, $r);
@@ -211,7 +212,7 @@ sub _encode_regulatory_variants {
       };
       foreach my $rfva (@{$rfv->get_all_alternate_RegulatoryFeatureVariationAlleles()}) {
         my $terms = $self->_overlap_consequences($rfva);
-        $r->{alleles}->{$rfva->allele_string()} = { consequence_terms => $terms, is_reference => $rfva->is_reference() };
+        push @{$r->{alleles}},  { allele_string => $rfva->allele_string, consequence_terms => $terms, is_reference => $rfva->is_reference() };
       }
       push(@results, $r);
     }
@@ -232,6 +233,7 @@ sub _encode_motif_variants {
         my $terms = $self->_overlap_consequences($mfva);
         my $allele = ($mfv->get_reference_MotifFeatureVariationAllele->feature_seq . '/' . $mfva->feature_seq);
         my $ra = { 
+          allele_string => $allele,
           consequence_terms => $terms,
           is_reference => $mfva->is_reference(),
           position => $mfva->motif_start(),
@@ -239,7 +241,7 @@ sub _encode_motif_variants {
         my $delta = $mfva->motif_score_delta if $mfva->variation_feature_seq =~ /^[ACGT]+$/;
         $ra->{motif_score_change} = sprintf( "%.3f", $delta ) if defined $delta;
         $ra->{high_information_position} = ( $mfva->in_informative_position ? 1 : 0 );
-        $r->{alleles}->{$allele} = $ra;
+        push @{$r->{alleles}} , $ra;
       }
       push(@results, $r);
     }
