@@ -36,6 +36,8 @@ requires 'XML::Writer';
 recommends 'Plack::Middleware::Assets';
 recommends 'Plack::Middleware::ReverseProxy';
 recommends 'Plack::Middleware::SizeLimit';
+recommends 'Plack::Middleware::Throttle';
+recommends 'Cache::Memcached';
 
 #Test requirements
 test_requires 'Test::More' => '0.88';
