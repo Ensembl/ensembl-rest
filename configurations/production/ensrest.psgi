@@ -18,7 +18,7 @@ builder {
   my $staticdir = File::Spec->catdir($rootdir, 'root');
 
   enable 'Throttle::Hour' => (
-    max     => 10800, #10800 requests per hr (3 per second)
+    max     => 11100, #11100 requests per hr (~3 per second)
     backend =>  Plack::Middleware::Throttle::Backend::Memcached->new(
       driver => 'Cache::Memcached',
       expire => 3601, #Expire set to 1hr and 1 second
@@ -29,7 +29,7 @@ builder {
         debug => 0,
       }
     ),
-    message => 'You have exceeded your current limit which is 10,800 requests per hour (3 per second)',
+    message => 'You have exceeded your limit which is 10,100 requests per hour (~3 per second)',
     path    => sub {
       my ($path) = @_;
       return 1 if $path eq '/';
@@ -39,18 +39,18 @@ builder {
   );
   
   enable 'Throttle::Second' => (
-    max     => 8, #8 requests per second
+    max     => 6, #6 requests per second
     backend =>  Plack::Middleware::Throttle::Backend::Memcached->new(
       driver => 'Cache::Memcached',
       expire => 2,
       args => {
         servers => ['127.0.0.1:11211'], 
         no_rehash => 1, 
-        namespace => 'ensrest:throttle_8pr_second:',
+        namespace => 'ensrest:throttle_6pr_second:',
         debug => 0,
       }
     ),
-    message => 'You have exceeded the overload limit of 8 requests per second. Please reduce your load',
+    message => 'You have exceeded the limit of 6 requests per second; please reduce your concurrent connections',
     path    => sub {
       my ($path) = @_;
       return 1 if $path eq '/';
