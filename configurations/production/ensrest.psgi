@@ -29,7 +29,7 @@ builder {
         debug => 0,
       }
     ),
-    message => 'You have exceeded your limit which is 10,100 requests per hour (~3 per second)',
+    message => 'You have exceeded your limit which is 11,100 requests per hour (~3 per second)',
     path    => sub {
       my ($path) = @_;
       return 1 if $path eq '/';
@@ -63,12 +63,12 @@ builder {
 
     #------ Reset processes if they get too big
     #if mac and SizeLimit is on then need to require this:
-#    Plack::Util::load_class('BSD::Resource') if $Config{osname} eq 'darwin';
-#    enable 'SizeLimit' => (
-#        max_unshared_size_in_kb => (300 * 1024),    # 100MB per process (memory assigned just to the process)
-#         # max_process_size_in_kb => (4096*25),  # seems to be the option which looks at overall size
-#        check_every_n_requests => 10,
-#    );
+    Plack::Util::load_class('BSD::Resource') if $Config{osname} eq 'darwin';
+    enable 'SizeLimit' => (
+        max_unshared_size_in_kb => (300 * 1024),    # 300MB per process (memory assigned just to the process)
+         # max_process_size_in_kb => (4096*25),  # seems to be the option which looks at overall size
+        check_every_n_requests => 10,
+    );
 
     #------ Make uri_for do the right thing
     enable "Plack::Middleware::ReverseProxy";
