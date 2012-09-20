@@ -1,6 +1,9 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
+
 1.1.0 
-    - [/vep] alleles now an array with allele_string explict instead of as key.
+  - [/vep] alleles now an array with allele_string explict instead of as key.
+  - Using CHI to cache documentation API responses
+  - Plack::Middleware::Throttle is an optional install; custom extensions available with this checkout
 
 1.0.0 05-09-2012 09:10:00
 	- Initial revision of REST API
