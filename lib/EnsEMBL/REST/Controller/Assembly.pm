@@ -3,7 +3,7 @@ package EnsEMBL::REST::Controller::Assembly;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
-use EnsEMBL::REST;
+require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 
 

@@ -4,7 +4,7 @@ use namespace::autoclean;
 use Data::Dumper;
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 use Config::General;
-use EnsEMBL::REST;
+require EnsEMBL::REST;
 use File::Find;
 use File::Spec;
 use Hash::Merge qw/merge/;
@@ -19,6 +19,11 @@ has '_merged_config' => ( is => 'rw', isa => 'HashRef');
 has 'log' => ( is => 'ro', isa => 'Log::Log4perl::Logger', lazy => 1, default => sub {
   return Log::Log4perl->get_logger(__PACKAGE__);
 });
+
+has 'example_expire_time' => ( is => 'ro', isa => 'Int', lazy => 1, default => sub {
+  return EnsEMBL::REST->config()->{Documentation}->{example_expire_time} || 3600;
+});
+
 
 sub merged_config {
   my ($self, $c) = @_;
@@ -38,6 +43,7 @@ sub merged_config {
       my $conf_hash = {$conf->getall()}->{endpoints};
       while(my ($k, $v) = each %{$conf_hash}) {
         $conf_hash->{$k}->{key} = $k;
+        $v->{id} = $k;
       }
       $merged_cfg = merge($conf_hash, $merged_cfg);
     }
@@ -79,37 +85,48 @@ sub enrich {
     foreach my $id ( keys %{ $endpoint->{examples} } ) {
         my $eg = $endpoint->{examples}->{$id};
         next if $eg->{enriched};
-
         $eg->{id}  = $id; 
-        my $path    = $eg->{path};
-        my $capture = $eg->{capture} || [];
-        my $params  = $eg->{params} || {};
-        $params->{'content-type'} = $eg->{content};
-        $c->request->params($params) if $params;
-        $capture = [$capture] unless ref($capture) eq 'ARRAY';
-        $eg->{uri} = $path . ( join '/', @{$capture} );
-        my $subreq_res = $c->subreq_res( $eg->{uri}, {}, $params );
-        $eg->{response} = $subreq_res->body;
-        die join "\n", @{ $c->error } if @{ $c->error };
-
-	      my $param_string = join ';' , map {"$_=$params->{$_}"} keys %$params;
-	      $eg->{true_root_uri} = $eg->{uri};
-	      $eg->{uri} = $eg->{uri} .'?'. $param_string;
-        #     if($c->stash()->{rest}) {
-        if ( $eg->{content} eq 'application/json' ) {
-            $eg->{response} = $json->encode( decode_json( $eg->{response} ) );
-        }
-
-        $self->_perl_example($eg, $c);
-        $self->_python_example($eg, $c);
-        $self->_ruby_example($eg, $c);
-        $self->_curl_example($eg, $c);
-        $self->_wget_example($eg, $c);
-        
+        $self->_request_example($endpoint, $eg, $c);
         $eg->{enriched} = 1;
     }
 
     return;
+}
+
+sub _request_example {
+  my ($self, $endpoint, $eg, $c) = @_;
+  
+  my $path    = $eg->{path};
+  my $capture = $eg->{capture} || [];
+  my $params  = $eg->{params} || {};
+  $params->{'content-type'} = $eg->{content};
+  $c->request->params($params) if $params;
+  $capture = [$capture] unless ref($capture) eq 'ARRAY';
+  $eg->{uri} = $path . ( join '/', @{$capture} );
+  my $param_string = join ';' , map {"$_=$params->{$_}"} keys %$params;
+  $eg->{true_root_uri} = $eg->{uri};
+  $eg->{uri} = $eg->{uri} .'?'. $param_string;
+  
+  my ($example_host, $example_uri) = $self->_url($eg, $c);
+  $eg->{example}->{host} = $example_host;
+  $eg->{example}->{uri} = $example_uri;
+  
+  my $cache = $c->cache;
+  my $key = $endpoint->{key}.'++'.$eg->{id};
+  
+  $eg->{response} = $cache->compute($key, { expires_in => $self->example_expire_time() }, sub {
+    my $json = JSON->new();
+    $json->pretty(1);
+    my $subreq_res = $c->subreq_res( $eg->{true_root_uri}, {}, $params );
+    my $sub_result = $subreq_res->body;
+    $c->log()->warn(join ("\n", @{ $c->error })) if @{ $c->error };
+    if ( $eg->{content} eq 'application/json' ) {
+      $sub_result = $json->encode( decode_json( $sub_result  ) );
+    }
+    return $sub_result;
+  });
+  
+  return;
 }
 
 sub get_groups {
@@ -148,148 +165,12 @@ sub _find_conf {
   return [sort @conf];
 }
 
-sub _perl_example {
-  my ($self, $eg, $c) = @_;
-  my $tmpl = <<'TMPL';
-use strict;
-use warnings;
-
-use HTTP::Tiny;
-
-my $http = HTTP::Tiny->new();
-
-my $server = '%s';
-my $ext = '%s';
-my $response = $http->get($server.$ext, {
-  headers => { 'Content-type' => '%s' }
-});
-
-die "Failed!\n" unless $response->{success};
-
-print "$response->{status} $response->{reason}\n";
-
-%s
-TMPL
-
-  my $print_tmpl = <<'TMPL';
-print $response->{content} if length $response->{content};
-TMPL
-
-  my $json_tmpl = <<'TMPL';
-use JSON;
-use Data::Dumper;
-if(length $response->{content}) {
-  my $hash = decode_json($response->{content});
-  local $Data::Dumper::Terse = 1;
-  local $Data::Dumper::Indent = 1;
-  print Dumper $hash;
-  print "\n";
-}
-TMPL
-  my $print_stmt = $eg->{content} eq 'application/json' ? $json_tmpl : $print_tmpl;
-  my $code = sprintf($tmpl, $self->_url($eg, $c), $eg->{content}, $print_stmt);
-  $eg->{perl} = $code;
-  return;
-}
-
-sub _python_example {
-    my ($self, $eg, $c) = @_;
-  my $tmpl = <<'TMPL';
-import httplib2, sys
-
-http = httplib2.Http(".cache")
-
-server = "%s"
-ext = "%s"
-resp, content = http.request(server+ext, method="%s", headers={"Content-Type":"%s"})
-
-if not resp.status == 200:
-  print "Invalid response: ", resp.status
-  sys.exit()
-
-%s
-TMPL
-
-  my $print_tmpl = <<'TMPL';
-print content
-TMPL
-
-  my $json_tmpl = <<'TMPL';
-import json
-
-decoded = json.loads(content)
-print repr(decoded)
-TMPL
-  my $print_stmt = $eg->{content} eq 'application/json' ? $json_tmpl : $print_tmpl;
-  my $code = sprintf($tmpl, $self->_url($eg, $c), ($eg->{method}||'GET'), $eg->{content}, $print_stmt);
-  $eg->{python} = $code;
-  return;
-}
-
-sub _ruby_example {
-  my ($self, $eg, $c) = @_;
-  my $tmpl = <<'TMPL';
-require 'net/http'
-require 'uri'
-
-server='%s'
-get_path = '%s'
-
-url = URI.parse(server)
-http = Net::HTTP.new(url.host, url.port)
-
-request = Net::HTTP::Get.new(get_path, {'Content-Type' => '%s'})
-response = http.request(request)
-
-if response.code != "200":
-  puts "Invalid response: #{response.code}"
-  puts response.body
-  exit
-end
-
-%s
-TMPL
-
-  my $print_tmpl = <<'TMPL';
-puts response.body
-TMPL
-
-  my $json_tmpl = <<'TMPL';
-require 'rubygems'
-require 'json'
-require 'yaml'
-
-result = JSON.parse(response.body)
-puts YAML::dump(result)
-TMPL
-  my $print_stmt = $eg->{content} eq 'application/json' ? $json_tmpl : $print_tmpl;
-  my $code = sprintf($tmpl, $self->_url($eg, $c), $eg->{content}, $print_stmt);
-  $eg->{ruby} = $code;
-  return;
-}
-
-sub _curl_example {
-  my ($self, $eg, $c) = @_;
-  my $code = sprintf(q{curl '%s%s' -H 'Content-type:%s'}."\n", $self->_url($eg, $c), $eg->{content});
-  $eg->{curl} = $code;
-  return;
-}
-
-sub _wget_example {
-  my ($self, $eg, $c) = @_;
-  my $code = sprintf(q{wget -q --header='Content-type:%s' '%s%s' -O -}."\n", $eg->{content}, $self->_url($eg, $c));
-  $eg->{wget} = $code;
-  return;
-}
-
 sub _url {
   my ($self, $eg, $c) = @_;
   my $host = $c->req->base;
   $host =~ s/\/$//;
   my $uri = $eg->{true_root_uri};
   my $req_params = $eg->{params} || {};
-  # my @keys = keys %{$req_params};
-  # my $params = join(q{;}, map {} )
   my $params = join(q{;}, map { $_.q{=}.$req_params->{$_} } keys %{$req_params});
   $uri .= ('?'.$params) if $params;
   return ($host, $uri);

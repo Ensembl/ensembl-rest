@@ -60,12 +60,14 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 # Static::Simple: will serve static files from the application's root
 #                 directory
 #     SubRequest: performs subrequests which we need for the doc pages
+#          Cache: Perform in-application caching
 
   # -Debug
 use Catalyst qw/
   ConfigLoader
   Static::Simple
   SubRequest
+  Cache
 /;
 
 
@@ -81,14 +83,26 @@ our $VERSION = '1.1.0';
 # local deployment.
 
 __PACKAGE__->config(
-    name => 'EnsEMBL::REST',
-    # Disable deprecated behavior needed by old applications
-    disable_component_resolution_regex_fallback => 1,
+  name => 'EnsEMBL::REST',
+  # Disable deprecated behavior needed by old applications
+  disable_component_resolution_regex_fallback => 1,
+  
+  #Allow key = [val] to become an array
+  'Plugin::ConfigLoader' => {
+    driver => {
+      General => {-ForceArray => 1},
+    },
+  },
 );
 
 # Start the application
 my $log4perl_conf = $ENV{ENS_REST_LOG4PERL}|| 'log4perl.conf';
-__PACKAGE__->log(Log::Log4perl::Catalyst->new($log4perl_conf));
+if(-f $log4perl_conf) {
+  __PACKAGE__->log(Log::Log4perl::Catalyst->new($log4perl_conf));
+}
+else {
+  __PACKAGE__->log(Log::Log4perl::Catalyst->new());
+}
 __PACKAGE__->setup();
 
 #HACK but it works

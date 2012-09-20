@@ -1,0 +1,33 @@
+<div class='tab-pane' id='ruby[% p.value.id %]'>
+<pre class="pre-scrollable prettyprint linenums">[% FILTER html %]
+require 'net/http'
+require 'uri'
+
+server='[% p.value.example.host %]'
+get_path = '[% p.value.example.uri %]'
+
+url = URI.parse(server)
+http = Net::HTTP.new(url.host, url.port)
+
+request = Net::HTTP::Get.new(get_path, {'Content-Type' => '[% p.value.content %]'})
+response = http.request(request)
+
+if response.code != "200":
+  puts "Invalid response: #{response.code}"
+  puts response.body
+  exit
+end
+
+[% IF p.value.content == 'application/json' -%]
+require 'rubygems'
+require 'json'
+require 'yaml'
+
+result = JSON.parse(response.body)
+puts YAML::dump(result)
+[% ELSE %]
+puts response.body
+[% END -%]
+[% END %]
+</pre>
+</div>

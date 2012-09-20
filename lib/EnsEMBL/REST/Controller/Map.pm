@@ -2,7 +2,7 @@ package EnsEMBL::REST::Controller::Map;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
-use EnsEMBL::REST;
+require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 
 BEGIN { extends 'Catalyst::Controller::REST'; }

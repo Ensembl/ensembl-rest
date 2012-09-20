@@ -1,0 +1,24 @@
+<div class='tab-pane' id='python[% p.value.id %]'>
+<pre class="pre-scrollable prettyprint linenums">[% FILTER html %]
+import httplib2, sys
+
+http = httplib2.Http(".cache")
+
+server = "[% p.value.example.host %]"
+ext = "[% p.value.example.uri %]"
+resp, content = http.request(server+ext, method="%s", headers={"Content-Type":"[% p.value.content %]"})
+
+if not resp.status == 200:
+  print "Invalid response: ", resp.status
+  sys.exit()
+[% IF p.value.content == 'application/json' -%]
+import json
+
+decoded = json.loads(content)
+print repr(decoded)
+[% ELSE %]
+print content
+[% END -%]
+[% END %]
+</pre>
+</div>

@@ -2,7 +2,7 @@ package EnsEMBL::REST::Model::Registry;
 
 use Moose;
 use namespace::autoclean;
-use EnsEMBL::REST;
+require EnsEMBL::REST;
 use feature 'switch';
 
 extends 'Catalyst::Model';
@@ -20,6 +20,7 @@ has '_registry' => ( is => 'ro', lazy => 0, default => sub {
   $class->no_version_check(1);
   my $cfg = EnsEMBL::REST->config()->{Registry};
   if($cfg->{file}) {
+    no warnings 'once';
     local $Bio::EnsEMBL::Registry::NEW_EVAL = 1;
     $log->info('Using the file location '.$cfg->{file});
     $class->load_all($cfg->{file});
