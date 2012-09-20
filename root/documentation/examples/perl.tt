@@ -1,0 +1,33 @@
+<div class='tab-pane' id='perl[% p.value.id %]'>
+<pre class="pre-scrollable prettyprint linenums">[% FILTER html %]
+use strict;
+use warnings;
+
+use HTTP::Tiny;
+
+my $http = HTTP::Tiny->new();
+
+my $server = '[% p.value.example.host %]';
+my $ext = '[% p.value.example.uri %]';
+my $response = $http->get($server.$ext, {
+  headers => { 'Content-type' => '[% p.value.content %]' }
+});
+
+die "Failed!\n" unless $response->{success};
+
+[% IF p.value.content == 'application/json' %]
+use JSON;
+use Data::Dumper;
+if(length $response->{content}) {
+  my $hash = decode_json($response->{content});
+  local $Data::Dumper::Terse = 1;
+  local $Data::Dumper::Indent = 1;
+  print Dumper $hash;
+  print "\n";
+}
+[% ELSE %]
+print "$response->{status} $response->{reason}\n";
+[% END -%]
+[% END %]
+</pre>
+</div>

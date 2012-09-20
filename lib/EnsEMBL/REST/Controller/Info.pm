@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 use Bio::EnsEMBL::ApiVersion;
 use Try::Tiny;
-use EnsEMBL::REST;
+require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 
 BEGIN {extends 'Catalyst::Controller::REST'; }

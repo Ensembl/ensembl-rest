@@ -55,11 +55,22 @@
 		<div class='tab-pane active' id='example[% p.value.id %]'>
 			<pre class="pre-scrollable prettyprint">[% FILTER html %][% p.value.response %][% END %]</pre>
 		</div>
-		[% FOREACH e IN example_types %]
-		<div class='tab-pane' id='[% e %][% p.value.id %]'>
-			<pre class="pre-scrollable prettyprint linenums">[% FILTER html %][% p.value.$e %][% END %]</pre>
-		</div>
-		[% END %]
+
+<!-- PERL EXAMPLE -->
+[% INCLUDE documentation/examples/perl.tt %]
+
+<!-- Python EXAMPLE -->
+[% INCLUDE documentation/examples/python.tt %]
+
+<!-- RUBY EXAMPLE -->
+[% INCLUDE documentation/examples/ruby.tt %]
+
+<!-- CURL EXAMPLE -->
+[% INCLUDE documentation/examples/curl.tt %]
+
+<!-- WGET EXAMPLE -->
+[% INCLUDE documentation/examples/wget.tt %]
+
 	</div>
   <br>
 [% END %]

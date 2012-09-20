@@ -2,7 +2,7 @@ package EnsEMBL::REST::Controller::Documentation;
 
 use Moose;
 use namespace::autoclean;
-use EnsEMBL::REST;
+require EnsEMBL::REST;
 use Bio::EnsEMBL::ApiVersion qw/software_version/;
 
 BEGIN { extends 'Catalyst::Controller'; }

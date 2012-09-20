@@ -5,7 +5,7 @@ use Try::Tiny;
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
-use EnsEMBL::REST;
+require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 
 sub index :Path Args(1) ActionClass('REST') {

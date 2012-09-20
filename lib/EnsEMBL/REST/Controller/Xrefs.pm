@@ -2,7 +2,7 @@ package EnsEMBL::REST::Controller::Xrefs;
 use Moose;
 use namespace::autoclean;
 use feature "switch";
-use EnsEMBL::REST;
+require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 use Try::Tiny;
 
