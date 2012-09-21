@@ -12,7 +12,7 @@ sub get_content {
   return $encode;
 }
 
-with 'EnsEMBL::REST::View::JSONRole';
+with 'EnsEMBL::REST::Role::JSON';
 
 __PACKAGE__->meta->make_immutable;
 

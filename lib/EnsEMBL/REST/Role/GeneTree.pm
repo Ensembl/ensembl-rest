@@ -1,4 +1,4 @@
-package EnsEMBL::REST::View::GeneTreeRole;
+package EnsEMBL::REST::Role::GeneTree;
 use Moose::Role;
 use namespace::autoclean;
 use Bio::EnsEMBL::Compara::Graph::PhyloXMLWriter;
@@ -41,14 +41,14 @@ sub encode_nh {
   return \$str;
 }
 
-sub set_content_dispsition {
-  my ($self, $c, $stash_key, $ext) = @_;
-  die 'Not ext given' unless $ext;
+around 'set_content_dispsition' => sub {
+  my ($orig, $self, $c, $ext, $stash_key) = @_;
   $stash_key ||= 'rest';
   my $gt = $c->stash->{$stash_key};
-  my $disposition = sprintf('attachment; filename=%s.%s', $gt->stable_id(), $ext);
-  $c->response->header('Content-Disposition' => $disposition);
-  return;
-}
+  my $name = $gt->stable_id();
+  return $self->$orig($c, $name, $ext);
+};
+
+with 'EnsEMBL::REST::Role::Content';
 
 1;

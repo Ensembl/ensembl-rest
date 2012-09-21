@@ -86,7 +86,8 @@ sub find_slice {
   my ($self, $c, $region) = @_;
   my $s = $c->stash();
   my $species = $s->{species};
-  my $adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'slice');
+  my $db_type = $s->{db_type} || 'core';
+  my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, 'slice');
   $c->go('ReturnError', 'custom', ["Do not know anything about the species $species and core database"]) unless $adaptor;
   my $slice = $adaptor->fetch_by_toplevel_location($region);
   $c->go('ReturnError', 'custom', ["No slice found for location $region"]) unless $slice;

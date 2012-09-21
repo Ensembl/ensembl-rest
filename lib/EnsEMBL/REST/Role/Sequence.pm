@@ -1,4 +1,4 @@
-package EnsEMBL::REST::View::SequenceRole;
+package EnsEMBL::REST::Role::Sequence;
 
 use Moose::Role;
 use namespace::autoclean;
@@ -12,12 +12,12 @@ sub encode_seq {
   my $s = $c->stash();
   my $ref;
   my $format = $s->{format};
-  my $content = $c->request()->params->{'content-type'} || $c->request()->headers()->content_type() || q{};
+  my $is_fasta_content = $self->is_content_type($c, 'text/fasta');
   
   if($format && $format eq 'fasta') {
     $ref = $self->_fasta($c, $key);
   }
-  elsif($content eq 'text/fasta') {
+  elsif($is_fasta_content) {
     $s->{fomat} = 'fasta';
     $ref = $self->_fasta($c, $key);
   }
@@ -50,6 +50,7 @@ sub _fasta {
   return $stringfh->string_ref();
 }
 
-with 'EnsEMBL::REST::View::JSONRole';
+with 'EnsEMBL::REST::Role::JSON';
+with 'EnsEMBL::REST::Role::Content';
 
 1;
