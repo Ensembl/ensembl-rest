@@ -11,7 +11,7 @@ sub get_content {
   return ${$ref};
 }
 
-with 'EnsEMBL::REST::View::SequenceRole';
+with 'EnsEMBL::REST::Role::Sequence';
 
 __PACKAGE__->meta->make_immutable;
 

@@ -11,6 +11,6 @@ sub process {
   return 1;
 }
 
-with 'EnsEMBL::REST::View::SequenceRole';
+with 'EnsEMBL::REST::Role::Sequence';
 
 1;

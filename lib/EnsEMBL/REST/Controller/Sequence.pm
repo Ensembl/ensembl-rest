@@ -28,14 +28,6 @@ my %allowed_values = (
   mask    => { map { $_, 1} qw(soft hard) },
 );
 
-sub max_length {
-  my $cfg = EnsEMBL::REST->config()->{Sequence};
-  my $default = 1e7;
-  return $default unless $cfg;
-  my $max = $cfg->{max_slice_length} || $default;
-  return $max * 1;
-}
-
 sub id_GET { }
 
 sub id :Path('id') Args(1) ActionClass('REST') {
@@ -134,7 +126,7 @@ sub _enrich_slice {
   my ($self, $c, $slice) = @_;
   $slice = $self->_expand_slice($c, $slice);
   $slice = $self->_mask_slice($c, $slice);
-  $self->_assert_slice($c, $slice);
+  $self->assert_slice_length($c, $slice);
   return $slice;
 }
 
@@ -157,17 +149,6 @@ sub _mask_slice {
     return $slice->get_repeatmasked_seq(undef, $soft_mask);
   }
   return $slice;
-}
-
-sub _assert_slice {
-  my ($self, $c, $slice) = @_;
-  my $max_length = $self->max_length();
-  my $slice_length = $slice->length();
-  if($slice_length > $max_length) {
-    my $msg = "$slice_length is greater than the maximum allowed length of $max_length. Request smaller regions of sequence";
-    $c->go('ReturnError', 'custom', [$msg]);
-  }
-  return''
 }
 
 sub _write {
@@ -215,6 +196,16 @@ sub _format_detection {
   $c->stash()->{format} = $format;
   return;
 }
+
+sub default_length {
+  return 1e7;
+}
+
+sub length_config_key {
+  return 'Sequence';
+}
+
+with 'EnsEMBL::REST::Role::SliceLength';
 
 __PACKAGE__->meta->make_immutable;
 

@@ -1,4 +1,4 @@
-package EnsEMBL::REST::View::JSONRole;
+package EnsEMBL::REST::Role::JSON;
 
 use Moose::Role;
 use namespace::autoclean;
