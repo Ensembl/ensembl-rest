@@ -48,6 +48,7 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 							<caption>Supported content types for Ensembl REST API</caption>
 							<tr><th>Format</th><th>Content-type</th><th>Notes</th></tr>
 							<tr><td><a href='http://en.wikipedia.org/wiki/FASTA_format'>FASTA</a></td><td><tt>text/fasta</tt></td><td>Only supported on the <tt>/sequence</tt> endpoint.<br/><span class="label label-important">Important:</span> FASTA can also be specified as a filename extension e.g. <tt>ENSPXXXXXXX.fasta</tt></td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/General_feature_format'>GFF3</a></td><td><tt>text/gff3</tt></td><td>Only supported on the <tt>/feature</tt> endpoint.</td></tr>
 							<tr><td><a href='http://en.wikipedia.org/wiki/JSON'>JSON</a></td><td><tt>application/json</tt></td><td>-</td></tr>
 							<tr><td><a href='http://en.wikipedia.org/wiki/JSONP'>JSONP</a></td><td><tt>text/javascript</tt></td><td>Extension of JSON to avoid issues of web browser <a href='http://en.wikipedia.org/wiki/Same_origin_policy'>same origin policy</a>.</tr>
 							<tr><td><a href='http://phylosoft.org/NHX/'>New Hampshire Extended</a></td><td><tt>text/nhx</tt></td><td>Extended version of newick phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>
@@ -78,7 +79,7 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 						<p>If you would like to include a general reference to the Ensembl system in your work, we recommend citing the most recent overview article. Details of which can be found <a href='http://www.ensembl.org/info/about/publications.html'>on Ensembl's publication page</a>.</p>
 						
 						<h2>Installing a local version</h2>
-						<p>This service along with all other Ensembl products are available to download from our <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl'>CVS server</a>. A tarball of this release is available from <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl&pathrev=branch-ensembl-[% ensembl_version %]'>here</a>. After this follow the instructions in provided INSTALL guide.</p>
+						<p>This service, along with all other Ensembl products, is available to download from our <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl'>CVS server</a>. A tarball of this release is available from <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl&pathrev=branch-ensembl-[% ensembl_version %]&view=tar'>here</a>. After this follow the instructions in provided INSTALL guide.</p>
 						
 						<h2>Licensing</h2>
 						<p>The Ensembl REST API and Ensembl API are made available under a <a href='http://www.ensembl.org/info/about/code_licence.html'>modified Apache licence</a>.</p>
