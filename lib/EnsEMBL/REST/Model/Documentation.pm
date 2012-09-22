@@ -103,7 +103,7 @@ sub _request_example {
   $c->request->params($params) if $params;
   $capture = [$capture] unless ref($capture) eq 'ARRAY';
   $eg->{uri} = $path . ( join '/', @{$capture} );
-  my $param_string = join ';' , map {"$_=$params->{$_}"} keys %$params;
+  my $param_string = $self->_hash_to_params($params);
   $eg->{true_root_uri} = $eg->{uri};
   $eg->{uri} = $eg->{uri} .'?'. $param_string;
   
@@ -171,9 +171,22 @@ sub _url {
   $host =~ s/\/$//;
   my $uri = $eg->{true_root_uri};
   my $req_params = $eg->{params} || {};
-  my $params = join(q{;}, map { $_.q{=}.$req_params->{$_} } keys %{$req_params});
+  my $params = $self->_hash_to_params($req_params);
   $uri .= ('?'.$params) if $params;
   return ($host, $uri);
+}
+
+sub _hash_to_params {
+  my ($self, $hash) = @_;
+  my @params;
+  foreach my $key (keys %{$hash}) {
+    my $value = $hash->{$key};
+    my @values = (ref($value) eq 'ARRAY') ? @{$value} : $value;
+    foreach my $v (@values) {
+      push(@params, "${key}=${v}");
+    }
+  }
+  return join(q{;}, @params);
 }
 
 __PACKAGE__->meta->make_immutable;
