@@ -23,8 +23,8 @@ sub get_adaptors : Chained('/') PathPart('genetree') CaptureArgs(0) {
   my ($self, $c) = @_;
   
   my $reg = $c->model('Registry');
-  my $default_compara = EnsEMBL::REST->config()->{Compara}->{default_compara};
-  my $compara_name = $c->request()->param('compara') || $default_compara;
+  my $best_compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
+  my $compara_name = $c->request()->param('compara') || $best_compara_name;
   
   try {
     my $ma = $reg->get_adaptor($compara_name, 'compara', 'member');
