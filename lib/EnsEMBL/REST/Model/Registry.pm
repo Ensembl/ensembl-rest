@@ -4,12 +4,15 @@ use Moose;
 use namespace::autoclean;
 require EnsEMBL::REST;
 use feature 'switch';
+use CHI;
 
 extends 'Catalyst::Model';
 
 has 'log' => ( is => 'ro', isa => 'Log::Log4perl::Logger', lazy => 1, default => sub {
   return Log::Log4perl->get_logger(__PACKAGE__);
 });
+
+has 'compara_cache' => ( is => 'ro', is => 'HashRef[String]', lazy => 1, default => sub { {} });
 
 has '_registry' => ( is => 'ro', lazy => 0, default => sub {
   my ($self) = @_;
@@ -151,6 +154,22 @@ sub get_comparas {
   }
   $self->disconnect_DBAdaptors($dbadaptors);
   return \@comparas;
+}
+
+sub get_compara_name_for_species {
+  my ($self, $species) = @_;
+  if(! exists $self->compara_cache()->{$species}) {
+    my $mc = $self->get_adaptor($species, 'core', 'metacontainer');
+    my $compara_group = 'multi';
+    my $division = $mc->single_value_by_key('species.division');
+    if($division) {
+      $division =~ s/^Ensembl//;
+      $compara_group = lc($division);
+    }
+    $self->compara_cache()->{$species} = $compara_group;
+  }
+  
+  return $self->compara_cache()->{$species};
 }
 
 sub get_unique_schema_versions {

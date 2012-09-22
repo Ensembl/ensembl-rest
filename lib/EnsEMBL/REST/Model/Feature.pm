@@ -17,8 +17,7 @@ sub fetch_features {
   my $is_gff3 = $self->is_content_type($c, 'text/gff3');
   
   my $allowed_types = $self->allowed_types();
-  
-  my $type = lc($c->request->parameters->{type});
+  my $type = $c->request->parameters->{type};
   $c->go('ReturnError', 'custom', ["No type given"]) if ! $type;
   my @types = (ref($type) eq 'ARRAY') ? @{$type} : ($type);
   
@@ -79,13 +78,27 @@ sub structural_variation {
   return $slice->get_all_StructuralVariationFeatures($source, $include_evidence, $somatic, $sv_class);
 }
 
+sub somatic_variation {
+  my ($self, $c, $slice) = @_;
+  return $slice->get_all_somatic_VariationFeatures($self->_get_SO_terms($c));
+}
+
+sub somatic_structural_variation {
+  my ($self, $c, $slice) = @_;
+  my @so_terms = $self->_get_SO_terms($c);
+  my ($source, $include_evidence, $somatic) = (undef)x3;
+  my $sv_class = (@so_terms) ? $so_terms[0] : ();
+  return $slice->get_all_somatic_StructuralVariationFeatures($source, $include_evidence, $somatic, $sv_class);
+}
+
 sub constrained {
   my ($self, $c, $slice) = @_;
   my $species_set = $c->request->parameters->{species_set} || 'mammals';
-  my $mlssa = $c->model('Registry')->get_adaptor('multi', 'compara', 'MethodLinkSpeciesSet');
+  my $compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
+  my $mlssa = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'MethodLinkSpeciesSet');
   $c->go('ReturnError', 'custom', ["No adaptor found for compara Multi and adaptor MethodLinkSpeciesSet"]) if ! $mlssa;
   my $method_list = $mlssa->fetch_by_method_link_type_species_set_name('GERP_CONSTRAINED_ELEMENT', $species_set);
-  my $cea = $c->model('Registry')->get_adaptor('Multi', 'compara', 'ConstrainedElement');
+  my $cea = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'ConstrainedElement');
   $c->go('ReturnError', 'custom', ["No adaptor found for compara Multi and adaptor ConstrainedElement"]) if ! $cea;
   return $cea->fetch_all_by_MethodLinkSpeciesSet_Slice($method_list, $slice);
 }
@@ -101,11 +114,11 @@ sub regulatory {
 sub _get_SO_terms {
   my ($self, $c) = @_;
   my $so_term = $c->request->parameters->{so_term};
-  my @terms = (! defined $so_term)  ? () 
+  my $terms = (! defined $so_term)  ? [] 
                                     : (ref($so_term) eq 'ARRAY') 
-                                    ? @{$so_term} 
-                                    : ($so_term);
-  return @terms;
+                                    ? $so_term 
+                                    : [$so_term];
+  return $terms;
 }
 
 sub _get_logic_dbtype {
