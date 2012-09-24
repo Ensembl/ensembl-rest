@@ -4,10 +4,11 @@ use Moose;
 extends 'Catalyst::Model';
 
 use EnsEMBL::REST::EnsemblModel::ExonTranscript;
+use EnsEMBL::REST::EnsemblModel::CDS;
 
-has 'allowed_types' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
+has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript exon variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
+    map { $_ => 1 } qw/gene transcript cds exon variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
   };
 });
 
@@ -16,22 +17,22 @@ sub fetch_features {
   
   my $is_gff3 = $self->is_content_type($c, 'text/gff3');
   
-  my $allowed_types = $self->allowed_types();
-  my $type = $c->request->parameters->{type};
-  $c->go('ReturnError', 'custom', ["No type given"]) if ! $type;
-  my @types = (ref($type) eq 'ARRAY') ? @{$type} : ($type);
+  my $allowed_features = $self->allowed_features();
+  my $feature = $c->request->parameters->{feature};
+  $c->go('ReturnError', 'custom', ["No feature given"]) if ! $feature;
+  my @features = (ref($feature) eq 'ARRAY') ? @{$feature} : ($feature);
   
   my $slice = $c->stash()->{slice};
   my @final_features;
-  foreach my $type (@types) {
-    my $allowed = $allowed_types->{$type};
-    $c->go('ReturnError', 'custom', ["The type $type is not understood"]) if ! $allowed;
-    my $features = $self->$type($c, $slice);
+  foreach my $feature_type (@features) {
+    my $allowed = $allowed_features->{$feature_type};
+    $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
+    my $objects = $self->$feature_type($c, $slice);
     if($is_gff3) {
-      push(@final_features, @{$features});
+      push(@final_features, @{$objects});
     }
     else {
-      push(@final_features, @{$self->to_hash($features, $type)});
+      push(@final_features, @{$self->to_hash($objects, $feature_type)});
     }
   }
   
@@ -39,11 +40,11 @@ sub fetch_features {
 }
 
 sub to_hash {
-  my ($self, $features, $type) = @_;
+  my ($self, $features, $feature_type) = @_;
   my @hashed;
   foreach my $feature (@{$features}) {
     my $hash = $feature->summary_as_hash();
-    $hash->{feature_type} = $type;
+    $hash->{feature_type} = $feature_type;
     push(@hashed, $hash);
   }
   return \@hashed;
@@ -57,6 +58,12 @@ sub gene {
 sub transcript {
   my ($self, $c, $slice, $load_exons) = @_;
   return $slice->get_all_Transcripts($load_exons, $self->_get_logic_dbtype($c));
+}
+
+sub cds {
+  my ($self, $c, $slice, $load_exons) = @_;
+  my $transcripts = $self->transcript($c, $slice, 0);
+  return EnsEMBL::REST::EnsemblModel::CDS->new_from_Transcripts($transcripts);
 }
 
 sub exon {
