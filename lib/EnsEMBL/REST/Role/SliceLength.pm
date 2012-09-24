@@ -6,7 +6,7 @@ require EnsEMBL::REST;
 has 'max_length' => ( isa => 'Int', is => 'ro', default => sub {
   my ($self) = @_;
   my $cfg = EnsEMBL::REST->config()->{$self->length_config_key()};
-  my $default = 1e7;
+  my $default = $self->default_length();
   return $default unless $cfg;
   my $max = $cfg->{max_slice_length} || $default;
   return $max * 1;
