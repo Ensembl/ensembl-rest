@@ -25,6 +25,7 @@ sub fetch_features {
   my $slice = $c->stash()->{slice};
   my @final_features;
   foreach my $feature_type (@features) {
+    $feature_type = lc($feature_type);
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
     my $objects = $self->$feature_type($c, $slice);
