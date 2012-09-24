@@ -5,6 +5,9 @@ This file documents the revision history for Perl extension EnsEMBL::REST.
   
   - [/feature] new endpoint for retrieval of features
   
+  - [/info/species] reports the division of a species; Ensembl Genomes 
+    extension
+  
   - Removal of <Compara> configuration option; new code introduced to 
     select the best compara available based upon species.division
      

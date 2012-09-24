@@ -126,15 +126,17 @@ sub get_species {
   foreach my $dba (@{$dbadaptors}) {
     my $species = $dba->species();
     my $mc = $self->get_adaptor($species, 'core', 'metacontainer');
+    my $division = $mc->single_value_by_key('species.division') || 'Ensembl';
     my $info = {
       name => $species,
       release => $mc->get_schema_version(),
       aliases => $self->_registry()->get_all_aliases($species),
-      groups  => [ map { $_->group() } @{$self->get_all_DBAdaptors(undef, $species)}]
+      groups  => [ map { $_->group() } @{$self->get_all_DBAdaptors(undef, $species)}],
+      division => $division,
     };
     push(@species, $info);
+    $dba->dbc()->disconnect_if_idle();
   }
-  $self->disconnect_DBAdaptors($dbadaptors);
   return \@species;
 }
 
