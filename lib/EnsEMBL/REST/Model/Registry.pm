@@ -12,7 +12,7 @@ has 'log' => ( is => 'ro', isa => 'Log::Log4perl::Logger', lazy => 1, default =>
   return Log::Log4perl->get_logger(__PACKAGE__);
 });
 
-has 'compara_cache' => ( is => 'ro', is => 'HashRef[String]', lazy => 1, default => sub { {} });
+has 'compara_cache' => ( is => 'ro', isa => 'HashRef[String]', lazy => 1, default => sub { {} });
 
 has '_registry' => ( is => 'ro', lazy => 0, default => sub {
   my ($self) = @_;
