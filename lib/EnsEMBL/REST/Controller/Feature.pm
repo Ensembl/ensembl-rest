@@ -14,9 +14,9 @@ __PACKAGE__->config(
 
 =pod
 
-/feature/human/X:1000000..2000000?type=gene
+/feature/region/human/X:1000000..2000000?feature=gene
 
-type = The type of feature to retrieve (gene/transcript/exon/variation/structural_variation/constrained/regulatory)
+feature = The type of feature to retrieve (gene/transcript/exon/variation/structural_variation/constrained/regulatory)
 db_type = The DB type to use; important if someone is doing queries over a non-default DB (core/otherfeatures)
 species_set = The compara species set name to look for constrained elements by (mammals)
 logic_name = Logic name used for genes
@@ -29,7 +29,7 @@ text/gff3
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
-sub species: Chained('/') PathPart('feature') CaptureArgs(1) {
+sub species: Chained('/') PathPart('feature/region') CaptureArgs(1) {
   my ( $self, $c, $species) = @_;
   $c->stash(species => $species);
 }
@@ -52,7 +52,7 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
 }
 
 sub default_length {
-  return 1e7;
+  return 5e6;
 }
 
 sub length_config_key {
