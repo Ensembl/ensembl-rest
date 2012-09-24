@@ -6,6 +6,7 @@
             <li><a href="#perl"><i class="icon-chevron-right"></i> Perl</a></li>
             <li><a href="#python"><i class="icon-chevron-right"></i> Python</a></li>
             <li><a href="#ruby"><i class="icon-chevron-right"></i> Ruby</a></li>
+            <li><a href="#roadmap"><i class="icon-chevron-right"></i> Road Map</a></li>
         </ul>
     </div><!-- end span3--> 
 
@@ -42,7 +43,7 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
                 </pre>
             </div><!-- bs-oocs-example--> 
 						<h3>Content Type</h3>
-						<p>Response types for JSON, XML, YAML and FASTA may be requested by either setting the <code>Content-type</code> in the HTTP request header or as a <code>content-type</code> URI parameter. Examples of using different content types can be seen in the following language specific examples.</p>
+						<p>Response types for JSON, XML, YAML, GFF3 and FASTA may be requested by either setting the <code>Content-type</code> in the HTTP request header or as a <code>content-type</code> URI parameter. Examples of using different content types can be seen in the following language specific examples.</p>
 						
 						<table class='table table-striped'>
 							<caption>Supported content types for Ensembl REST API</caption>
@@ -59,7 +60,7 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 						</table>
 						
 						<h2>Fair Usage Policy</h2>
-						<p>The Ensembl REST API public services operate a fair usage policy to ensure a suitable level of service for all users. Should you find the following policy too restrictive then please look into installing your own copy of <a href='http://www.ensembl.org/info/docs/webcode/install/ensembl-data.html'>Ensembl databases locally</a> and the REST API. Also consider using our Amazon Web Services public data sets which can help to reduce the time required for generating a service.</p>
+						<p>The Ensembl REST API public services operate a fair usage policy to ensure a suitable level of service for all users. Should you find the following policy too restrictive then please look into installing your own copy of <a href='http://www.ensembl.org/info/docs/webcode/install/ensembl-data.html'>Ensembl databases locally</a> and the REST API. You can use our publicly available Amazon Machine Images of Ensembl MySQL databases which can significantly reduce the time to produce a working MySQL server.</p>
 						<p>
 						  When using the service you should adhere to the following rules:
 						  <ul>
@@ -68,7 +69,7 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 						      <li>You can run 3 parallel processes each requesting 1 item per second</li>
 						      <li>Or 1 process limiting itself to 3 requests per second</li>
 						    </ul>
-						    <liExcessive program-driven use is not permitted</li>
+						    <li>Excessive program-driven use is not permitted</li>
 						    <li>If you plan to use the service in a manner you think may be excessive please contact <a href='mailto:helpdesk@ensembl.org'>Ensembl</a></li>
 						  </ul>
 						  
@@ -212,7 +213,35 @@ puts response.body
                 </pre>
             </div><!-- bs-oocs-example--> 
         </section><!-- ruby--> 
-        <hr class="bs-docs-separator">
+
+				<section id='roadmap'>
+					<div class='page-header'><h1>Development Road Map</h1></div>
+					<p>The Ensembl REST service is under constant development as we attempt to improve the service and data provided. Future planned developments include:
+						<ul>
+							<li>Object summaries</li>
+							<li>Comparative genomics</li>
+							<ul>
+								<li>Pairwise and multiple sequence genomic alignments</li>
+								<li>Synteny</li>
+								<li>Protein families</li>
+							</ul>
+							<li>Array Probes</li>
+							<li>VEP module integration</li>
+							<ul>
+								<li>Cache support</li>
+								<li>Plugin support</li>
+							</ul>
+							<li>Native clients</li>
+							<li>Ensembl Virtual Machines integration</li>
+							<ul>
+								<li>Amazon Machine Images</li>
+								<li>VirtualBox Virtual Machine</li>
+							</ul>
+						</ul>
+					</p>
+				</section> <!-- Road map -->
+				
+				<hr class="bs-docs-separator">
     </div><!-- span9-->
 </div> <!-- end row--> 
 
