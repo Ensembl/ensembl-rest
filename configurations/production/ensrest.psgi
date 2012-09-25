@@ -9,9 +9,12 @@ use Plack::Builder;
 use Plack::Util;
 use Plack::Middleware::Throttle::Backend::Memcached;
 
-my $app = EnsEMBL::REST->apply_default_middlewares(EnsEMBL::REST->psgi_app);
+my $app = EnsEMBL::REST->psgi_app;
 
 builder {
+
+  #------ Set appropriate headers when we detect REST is being used as a ReverseProxy
+  enable "Plack::Middleware::ReverseProxy";
   
   my $dirname = dirname(__FILE__);
   my $rootdir = File::Spec->rel2abs(File::Spec->catdir($dirname, File::Spec->updir(), File::Spec->updir()));
@@ -71,9 +74,6 @@ builder {
          # max_process_size_in_kb => (4096*25),  # seems to be the option which looks at overall size
         check_every_n_requests => 10,
     );
-
-    #------ Make uri_for do the right thing -- COMMENTED OUT SINCE apply_default_middlewares() BRINGS IT IN
-    #enable "Plack::Middleware::ReverseProxy";
 
     #------ Adds a better stack trace
     enable 'StackTrace';
