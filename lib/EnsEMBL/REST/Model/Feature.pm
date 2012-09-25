@@ -69,8 +69,8 @@ sub cds {
 
 sub exon {
   my ($self, $c, $slice) = @_;
-  my $transcripts = $self->transcript($c, $slice, 1);
-  return [map { EnsEMBL::REST::EnsemblModel::ExonTranscript->build_all_from_Transcript($_) } @{$transcripts}];
+  my $exons = $slice->get_all_Exons();
+  return EnsEMBL::REST::EnsemblModel::ExonTranscript->build_all_from_Exons($exons);
 }
 
 sub variation {
