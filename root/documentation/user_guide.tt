@@ -59,11 +59,11 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 						
 						<a id='responsecodes'> </a>
 						<h2>Response Codes</h2>
-						<p>The REST service attempts to respond to requests using standard <a href=''>HTTP response codes</a> allowing a user to programatically detect when a request has not succeeded. You should never assume requests will succeed when working with web services and ensure your client APIs can handle all possible eventualities. As a general rule you should look for response code <tt>200</tt> as the mark of a successful request.</p>
+						<p>The REST service attempts to respond to requests using standard <a href='http://en.wikipedia.org/wiki/List_of_HTTP_status_codes'>HTTP status codes</a> allowing a user to programatically detect when a request has not succeeded. You should never assume requests will succeed when working with web services and ensure your client APIs can handle all possible eventualities. As a general rule you should look for response code <tt>200</tt> as the mark of a successful request.</p>
 						
 						<table class='table table-striped'>
-							<caption>Supported HTTP Response Codes for Ensembl REST API</caption>
-							<tr><th>Response Code</th><th>Name</th><th>Notes</th></tr>
+							<caption>Supported HTTP Response Status codes for Ensembl REST API</caption>
+							<tr><th>Code</th><th>Name</th><th>Notes</th></tr>
 							<tr><td><tt>200</tt></td><td>OK</td><td>Request was a success. Only process data from the service when you receive this code</td></tr>
 							<tr><td><tt>400</tt></td><td>Bad Request</td><td>Occurs during exceptional circumstances such as the service is unable to find an ID. Check if the response <tt>Content-type</tt> was JSON. If so the JSON object is an exception hash with the message keyed under <tt>error</tt></td></tr>
 							<tr><td><tt>404</tt></td><td>Not Found</td><td>Indicates a badly formatted request. Check your URL</td></tr>
