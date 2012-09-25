@@ -9,7 +9,7 @@ use Plack::Builder;
 use Plack::Util;
 use Plack::Middleware::Throttle::Backend::Memcached;
 
-my $app = EnsEMBL::REST->psgi_app;
+my $app = EnsEMBL::REST->apply_default_middlewares(EnsEMBL::REST->psgi_app);
 
 builder {
   
@@ -70,8 +70,8 @@ builder {
         check_every_n_requests => 10,
     );
 
-    #------ Make uri_for do the right thing
-    enable "Plack::Middleware::ReverseProxy";
+    #------ Make uri_for do the right thing -- COMMENTED OUT SINCE apply_default_middlewares() BRINGS IT IN
+    #enable "Plack::Middleware::ReverseProxy";
 
     #------ Adds a better stack trace
     enable 'StackTrace';
