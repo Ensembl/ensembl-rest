@@ -57,6 +57,21 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 							<tr><td><a href='http://en.wikipedia.org/wiki/YAML'>YAML</a></td><td><tt>text/x-yaml</tt></td><td>-</td></tr>
 						</table>
 						
+						<a id='responsecodes'> </a>
+						<h2>Response Codes</h2>
+						<p>The REST service attempts to respond to requests using standard <a href=''>HTTP response codes</a> allowing a user to programatically detect when a request has not succeeded. You should never assume requests will succeed when working with web services and ensure your client APIs can handle all possible eventualities. As a general rule you should look for response code <tt>200</tt> as the mark of a successful request.</p>
+						
+						<table class='table table-striped'>
+							<caption>Supported HTTP Response Codes for Ensembl REST API</caption>
+							<tr><th>Response Code</th><th>Name</th><th>Notes</th></tr>
+							<tr><td><tt>200</tt></td><td>OK</td><td>Request was a success. Only process data from the service when you receive this code</td></tr>
+							<tr><td><tt>400</tt></td><td>Bad Request</td><td>Occurs during exceptional circumstances such as the service is unable to find an ID. Check if the response <tt>Content-type</tt> was JSON. If so the JSON object is an exception hash with the message keyed under <tt>error</tt></td></tr>
+							<tr><td><tt>404</tt></td><td>Not Found</td><td>Indicates a badly formatted request. Check your URL</td></tr>
+							<tr><td><tt>429</tt></td><td>Too Many Requests</td><td>You have been <a href='#fairusepolicy'>rate-limited</a>; wait and retry. The headers <tt>X-RateLimit-Reset</tt>, <tt>X-RateLimit-Limit</tt> and <tt>X-RateLimit-Remaining</tt> will inform you of how long you have until your limit is reset and what that limit was. If you get this response and have <em>not</em> exceeded your limit then check if you have made too many requests per second.</td></tr>
+							<tr><td><tt>503</tt></td><td>Service Unavailable</td><td>The service is temporarily down; retry after a pause</td></tr>
+						</table>
+						
+						<a id='fairusepolicy'> </a>
 						<h2>Fair Usage Policy</h2>
 						<p>The Ensembl REST API public services operate a fair usage policy to ensure a suitable level of service for all users. Should you find the following policy too restrictive then please look into installing your own copy of <a href='http://www.ensembl.org/info/docs/webcode/install/ensembl-data.html'>Ensembl databases locally</a> and the REST API. Also consider using our Amazon Web Services public data sets which can help to reduce the time required for generating a service.</p>
 						<p>
@@ -66,22 +81,24 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 						    <ul>
 						      <li>You can run 3 parallel processes each requesting 1 item per second</li>
 						      <li>Or 1 process limiting itself to 3 requests per second</li>
+									<li>A burst up-to 6 requests per second is allowed</li>
 						    </ul>
-						    <liExcessive program-driven use is not permitted</li>
+						    <li>Excessive program-driven use is not permitted</li>
 						    <li>If you plan to use the service in a manner you think may be excessive please contact <a href='mailto:helpdesk@ensembl.org'>Ensembl</a></li>
 						  </ul>
 						  
-						  Failure to comply will result in restriction of access.
+						  Failure to comply will result in restriction of access. This can be detected programatically via <a href='#responsecodes'>response codes</a>.
 						</p>
 						
-						<h2>Citing</h2>
-						<p>If you would like to include a general reference to the Ensembl system in your work, we recommend citing the most recent overview article. Details of which can be found <a href='http://www.ensembl.org/info/about/publications.html'>on Ensembl's publication page</a>.</p>
 						
 						<h2>Installing a local version</h2>
-						<p>This service along with all other Ensembl products are available to download from our <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl'>CVS server</a>. A tarball of this release is available from <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl&pathrev=branch-ensembl-[% ensembl_version %]'>here</a>. After this follow the instructions in provided INSTALL guide.</p>
+						<p>This service, along with all other Ensembl products, is available to download from our <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl'>CVS server</a>. A tarball of this release is available from <a href='http://cvs.sanger.ac.uk/cgi-bin/viewvc.cgi/ensembl-rest/?root=ensembl&pathrev=branch-ensembl-[% ensembl_version %]&view=tar'>here</a>. After this follow the instructions in provided INSTALL guide.</p>
 						
 						<h2>Licensing</h2>
 						<p>The Ensembl REST API and Ensembl API are made available under a <a href='http://www.ensembl.org/info/about/code_licence.html'>modified Apache licence</a>.</p>
+						
+						<h2>Citing</h2>
+						<p>If you would like to include a general reference to the Ensembl system in your work, we recommend citing the most recent overview article. Details of which can be found <a href='http://www.ensembl.org/info/about/publications.html'>on Ensembl's publication page</a>.</p>
         </section><!-- Introduction--> 
 
         <section id="command_line">
