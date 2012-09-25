@@ -22,14 +22,14 @@ Expected Directory Structure
 
 Your directory structure should look like this after installation:
 .
-  ├── bioperl-1.2.3
-  ├── ensembl
-  ├── ensembl-compara
-  ├── ensembl-external
-  ├── ensembl-functgenomics
-  ├── ensembl-rest
-  ├── ensembl-tools
-  └── ensembl-variation
+ \------- bioperl-1.2.3
+ \------- ensembl
+ \------- ensembl-compara
+ \------- ensembl-external
+ \------- ensembl-functgenomics
+ \------- ensembl-rest
+ \------- ensembl-tools
+ \------- ensembl-variation
 
 ===================
 Installing Catalyst
@@ -207,7 +207,7 @@ Open ensembl_rest.conf in a text editor & edit the <Registry> section as so:
 
 This will tell the API to use the public databases held on our USEast server. You could have used ensembldb.ensembl.org instead which would point to our European based database servers.
 
-2). Application Debuging
+2). Application Debugging
 
 Since this is your first time with the REST API you will want to configure debug messages to appear to screen as this will aid in problem solving if they occur.
 
@@ -261,6 +261,8 @@ Navigate to the specified address and if everything has worked you should see th
 
 PSGI, http://plackperl.org/, is a framework independent way of programming HTTP based frameworks. We will run the REST server using starman, https://metacpan.org/module/Starman, and a PSGI file with 5 worker threads and running on port 3000 (same as the default Catalyst port).
 
+Starman can be installed using your system's default package management software or via cpan. Once installed you can invoke the server using the following:
+
   cd ensembl-rest
   PERL5LIB=$PWD/lib:$PERL5LIB starman --listen :3000 --workers 5 ensembl_rest.psgi
 
@@ -269,6 +271,8 @@ Navigate to either (depending on your machine):
   http://localhost:3000/
   http://127.0.0.1:3000/
   http://0.0.0.0:3000/
+
+Starman also has options for production environments including hot-deploy & daemonisation of the starman process. Please see its docs for more information.
 
 3). Production
 
