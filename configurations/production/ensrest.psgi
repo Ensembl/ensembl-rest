@@ -18,6 +18,7 @@ builder {
   my $staticdir = File::Spec->catdir($rootdir, 'root');
 
   enable 'Throttle::Hour' => (
+    code    => 429, #Code is HTTP response code for "Too Many Requests"; alternatives include 420 (Twitter; "Enhance your calm")
     max     => 11100, #11100 requests per hr (~3 per second)
     backend =>  Plack::Middleware::Throttle::Backend::Memcached->new(
       driver => 'Cache::Memcached',
@@ -39,6 +40,7 @@ builder {
   );
   
   enable 'Throttle::Second' => (
+    code    => 429, #Code is HTTP response code for "Too Many Requests"; alternatives include 420 (Twitter; "Enhance your calm")
     max     => 6, #6 requests per second
     backend =>  Plack::Middleware::Throttle::Backend::Memcached->new(
       driver => 'Cache::Memcached',
