@@ -10,9 +10,9 @@ BEGIN { extends 'Catalyst::Controller::REST'; }
 
 __PACKAGE__->config(
   map => {
-    'text/html'           => [qw/View SequenceHTML/],
+    'text/html'           => [qw/View FASTAHTML/],
     'text/plain'          => [qw/View SequenceText/],
-    'text/fasta'          => [qw/View SequenceText/],
+    'text/fasta'          => [qw/View FASTAText/],
     'text/x-yaml'         => 'YAML',
     'application/json'    => 'JSON',
   }
