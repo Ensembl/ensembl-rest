@@ -9,9 +9,12 @@ use Plack::Builder;
 use Plack::Util;
 use Plack::Middleware::Throttle::Backend::Memcached;
 
-my $app = EnsEMBL::REST->apply_default_middlewares(EnsEMBL::REST->psgi_app);
+my $app = EnsEMBL::REST->psgi_app;
 
 builder {
+
+  #------ Set appropriate headers when we detect REST is being used as a ReverseProxy
+  enable "Plack::Middleware::ReverseProxy";
   
   my $dirname = dirname(__FILE__);
   my $rootdir = File::Spec->rel2abs(File::Spec->catdir($dirname, File::Spec->updir(), File::Spec->updir()));
@@ -33,8 +36,8 @@ builder {
     message => 'You have exceeded your limit which is 11,100 requests per hour (~3 per second)',
     path    => sub {
       my ($path) = @_;
-      return 1 if $path eq '/';
-      return 1 if $path !~ /\/(?:documentation|static)/;
+      return 1 if $path ne '/';
+      return 1 if $path !~ /\/(?:documentation|static|_asset)/;
       return 0;
     }
   );
@@ -55,8 +58,8 @@ builder {
     message => 'You have exceeded the limit of 6 requests per second; please reduce your concurrent connections',
     path    => sub {
       my ($path) = @_;
-      return 1 if $path eq '/';
-      return 1 if $path !~ /\/(?:documentation|static)/;
+      return 1 if $path ne '/';
+      return 1 if $path !~ /\/(?:documentation|static|_asset)/;
       return 0;
     }
   );
@@ -71,9 +74,6 @@ builder {
          # max_process_size_in_kb => (4096*25),  # seems to be the option which looks at overall size
         check_every_n_requests => 10,
     );
-
-    #------ Make uri_for do the right thing -- COMMENTED OUT SINCE apply_default_middlewares() BRINGS IT IN
-    #enable "Plack::Middleware::ReverseProxy";
 
     #------ Adds a better stack trace
     enable 'StackTrace';
