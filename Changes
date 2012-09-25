@@ -8,6 +8,9 @@ This file documents the revision history for Perl extension EnsEMBL::REST.
   - [/info/species] reports the division of a species; Ensembl Genomes 
     extension
   
+  - [/sequence] now responds to Content-type text/plain with an unformatted
+    raw String of sequence
+  
   - Removal of <Compara> configuration option; new code introduced to 
     select the best compara available based upon species.division
      

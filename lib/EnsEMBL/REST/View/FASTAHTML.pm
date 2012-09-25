@@ -1,4 +1,4 @@
-package EnsEMBL::REST::View::SequenceHTML;
+package EnsEMBL::REST::View::FASTAHTML;
 use Moose;
 use namespace::autoclean;
 
