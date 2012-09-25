@@ -37,7 +37,7 @@ builder {
     path    => sub {
       my ($path) = @_;
       return 1 if $path eq '/';
-      return 1 if $path !~ /\/(?:documentation|static)/;
+      return 1 if $path !~ /\/(?:documentation|static|_asset)/;
       return 0;
     }
   );
@@ -59,7 +59,7 @@ builder {
     path    => sub {
       my ($path) = @_;
       return 1 if $path eq '/';
-      return 1 if $path !~ /\/(?:documentation|static)/;
+      return 1 if $path !~ /\/(?:documentation|static|_asset)/;
       return 0;
     }
   );
