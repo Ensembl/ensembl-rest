@@ -36,7 +36,7 @@ builder {
     message => 'You have exceeded your limit which is 11,100 requests per hour (~3 per second)',
     path    => sub {
       my ($path) = @_;
-      return 1 if $path eq '/';
+      return 1 if $path ne '/';
       return 1 if $path !~ /\/(?:documentation|static|_asset)/;
       return 0;
     }
@@ -58,7 +58,7 @@ builder {
     message => 'You have exceeded the limit of 6 requests per second; please reduce your concurrent connections',
     path    => sub {
       my ($path) = @_;
-      return 1 if $path eq '/';
+      return 1 if $path ne '/';
       return 1 if $path !~ /\/(?:documentation|static|_asset)/;
       return 0;
     }
