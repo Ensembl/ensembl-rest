@@ -113,7 +113,7 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 
             <div class="bs-docs-example">
                 <pre class="prettyprint">
-curl [% c.req.base %]map/human/chr_region/NCBI34/7:490000-500000/GRCh37 -H "content-type:application/json"
+curl [% c.req.base %]map/human/NCBI34/7:490000-500000/GRCh37 -H "content-type:application/json"
                 </pre>
             </div><!-- bs-oocs-example--> 
             <h3>2. Using wget to fetch XML data</h3>
