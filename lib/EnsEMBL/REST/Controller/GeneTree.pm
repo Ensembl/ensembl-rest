@@ -9,13 +9,13 @@ BEGIN { extends 'Catalyst::Controller::REST'; }
 __PACKAGE__->config(
   default => 'text/html',
   map => {
-    'text/html'         => [qw/View PhyloXMLHTML/],
-    'text/phyloxml'     => [qw/View PhyloXML/],
-    'text/nh'           => [qw/View NHTree/],
-    'text/nhx'          => [qw/View NHXTree/],
-    'application/json'  => [],
-    'text/x-yaml'       => [],
-    'text/xml'          => [qw/View PhyloXML/],
+    'text/html'           => [qw/View PhyloXMLHTML/],
+    'text/x-phyloxml+xml' => [qw/View PhyloXML/],
+    'text/x-nh'           => [qw/View NHTree/],
+    'text/x-nhx'          => [qw/View NHXTree/],
+    'application/json'    => [],
+    'text/x-yaml'         => [],
+    'text/xml'            => [qw/View PhyloXML/],
   }
 );
 
