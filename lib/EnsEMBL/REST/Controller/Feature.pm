@@ -8,7 +8,7 @@ EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 
 __PACKAGE__->config(
   map => {
-    'text/gff3' => [qw/View GFF3/],
+    'text/x-gff3' => [qw/View GFF3/],
   }
 );
 
@@ -23,7 +23,7 @@ logic_name = Logic name used for genes
 so_term=sequence ontology term to limit variants to
 
 application/json
-text/gff3
+text/x-gff3
 
 =cut
 

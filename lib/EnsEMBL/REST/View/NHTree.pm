@@ -8,6 +8,7 @@ sub process {
   my ($self, $c, $stash_key) = @_;
   $c->res->body(${$self->encode_nh($c, $stash_key)});
   $self->set_content_dispsition($c, 'nh', $stash_key);
+  $c->res->headers->header('Content-Type' => 'text/plain');
   return 1;
 }
 
