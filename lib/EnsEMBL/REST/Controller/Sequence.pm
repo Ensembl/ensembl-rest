@@ -12,19 +12,14 @@ __PACKAGE__->config(
   map => {
     'text/html'           => [qw/View FASTAHTML/],
     'text/plain'          => [qw/View SequenceText/],
-    'text/fasta'          => [qw/View FASTAText/],
-    'text/x-yaml'         => 'YAML',
-    'application/json'    => 'JSON',
+    'text/x-fasta'        => [qw/View FASTAText/],
+    'text/x-seqxml+xml'   => [qw/View SeqXML/],
   }
 );
 EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 
-
-my %disallowed_seq_serialiser_formats = map { $_ => 1 } ('application/json', 'text/x-yaml');
-
 my %allowed_values = (
   type    => { map { $_, 1} qw(cds cdna genomic)},
-  format  => { map { $_, 1} qw(fasta) },
   mask    => { map { $_, 1} qw(soft hard) },
 );
 
@@ -32,7 +27,7 @@ sub id_GET { }
 
 sub id :Path('id') Args(1) ActionClass('REST') {
   my ($self, $c, $stable_id) = @_;
-  $self->_format_detection($c, $stable_id);
+  $c->stash->{id} = $stable_id;
   
   try {
     $c->log()->debug('Finding the object');
@@ -52,7 +47,6 @@ sub region_GET { }
 sub get_species :Chained('/') PathPart('sequence/region') CaptureArgs(1) {
   my ($self, $c, $species) = @_;
   $c->stash()->{species} = $species;
-  $self->_format_detection($c, '');
 }
 
 sub region :Chained('get_species') PathPart('') Args(1) ActionClass('REST') {
@@ -159,44 +153,6 @@ sub _write {
   );
 }
 
-sub _format_detection {
-  my ($self, $c, $stable_id) = @_;
-  
-  my ($id, $format);
-  $format = $c->request()->param('format') || undef;
-  if ( $stable_id =~ /(.+)\.(fasta+)$/ ) {
-    $c->log()->debug("ID '$stable_id' had a format extension");
-    $id = $1;
-    $format = $2;
-  }
-  else {
-    $id = $stable_id;
-  }
-  
-  if($format && ! $allowed_values{format}{$format}) {
-    $c->go( 'ReturnError', 'custom', ["Unsupported format type '$format'"] );
-  }
-  
-  #Sniff the right type out; will go in time 
-  if(!$format) {
-    $c->log()->debug("Sniffing the correct format from the headers");
-    my $content_type = $c->request()->params->{'content-type'} || $c->request()->headers()->content_type() || q{};
-    $format = { 'text/fasta' => 'fasta' }->{$content_type};
-    #And now optionally dis-regard it if the content type was not one of the above 2
-    if ( $format && $disallowed_seq_serialiser_formats{$content_type} ) {
-      $c->log->debug("Ignoring output format $format because content type '$content_type' has already been set");
-      $format = undef;
-    }
-    if($format) {
-      $c->log->debug("Format is $format");
-    }
-  }
-  
-  $c->stash()->{id} = $id;
-  $c->stash()->{format} = $format;
-  return;
-}
-
 sub default_length {
   return 1e7;
 }
@@ -206,6 +162,7 @@ sub length_config_key {
 }
 
 with 'EnsEMBL::REST::Role::SliceLength';
+with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
 
