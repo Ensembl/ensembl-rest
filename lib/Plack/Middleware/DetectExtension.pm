@@ -2,7 +2,7 @@
 #making for a more natural URL e.g. /sequence/id/MYID.fasta or /sequence/id/MYID.json 
 
 #To generate the regex used then invoke this command:
-#perl -MRegexp::Assemble -e 'my $ra = Regexp::Assemble->new; $ra->add($_) for qw/json xml yaml jsonp fasta seqxml orthoxml nh nhx phyloxml/; print $ra->re, "\n"'
+#perl -MRegexp::Assemble -e 'my $ra = Regexp::Assemble->new; $ra->add($_) for qw/json xml yaml jsonp fasta seqxml orthoxml nh nhx phyloxml gff3/; print $ra->re, "\n"'
 
 package Plack::Middleware::DetectExtension;
 use strict;
@@ -12,7 +12,7 @@ use Plack::Util qw//;
 use Plack::Util::Accessor qw/lookup/;
 use Data::Dumper;
 
-our $EXT_REGEX = qr/(?^:(?:(?:(?:(?:orth|phyl)o|seq)?x|ya)ml|jsonp?|fasta|nhx?))/;
+our $EXT_REGEX = qr/(?^:(?:(?:(?:(?:orth|phyl)o|seq)?x|ya)ml|jsonp?|fasta|gff3|nhx?))/;
 our %LOOKUP = (
   #Basic exts
   json => 'application/json',
@@ -23,6 +23,9 @@ our %LOOKUP = (
   #Seq exts
   fasta => 'text/x-fasta',
   seqxml => 'text/x-seqxml+xml',
+  
+  #Feature exts
+  gff3 => 'text/x-gff3',
   
   #Orthologs exts
   orthoxml => 'text/x-orthoxml+xml',
