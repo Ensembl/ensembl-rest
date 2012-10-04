@@ -9,6 +9,7 @@ sub process {
   $stash_key ||= 'rest';
   my $seq = $c->stash->{$stash_key}->{seq};
   $c->res->body($seq);
+  $c->res->headers->header('Content-Type' => 'text/plain');
   return 1;
 }
 

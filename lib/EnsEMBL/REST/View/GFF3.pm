@@ -27,7 +27,7 @@ sub process {
     $gff->print_feature($f);
   }
   $c->res->body(${$output_fh->string_ref()});
-  $self->set_content_dispsition($c, $c->stash()->{region}, 'gff3');
+  $c->res->headers->header('Content-Type' => 'text/plain');
   return 1;
 }
 

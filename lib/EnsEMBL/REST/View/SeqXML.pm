@@ -1,4 +1,4 @@
-package EnsEMBL::REST::View::FASTAText;
+package EnsEMBL::REST::View::SeqXML;
 use Moose;
 use namespace::autoclean;
 
@@ -8,7 +8,7 @@ sub process {
   my ($self, $c, $stash_key) = @_;
   $stash_key ||= 'rest';
   $c->res->body(${$self->encode_seq($c, $stash_key)});
-  $c->res->headers->header('Content-Type' => 'text/plain');
+  $c->res->headers->header('Content-Type' => 'text/x-seqxml+xml');
   return 1;
 }
 

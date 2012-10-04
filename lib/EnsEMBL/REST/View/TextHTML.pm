@@ -31,6 +31,7 @@ sub process {
 TMPL
   my $output = sprintf($template, $title, $text);
   $c->response->output( $output );
+  $c->res->headers->header('Content-Type' => 'text/html');
   return 1;
 }
 

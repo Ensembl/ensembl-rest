@@ -15,7 +15,7 @@ has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => 
 sub fetch_features {
   my ($self, $c) = @_;
   
-  my $is_gff3 = $self->is_content_type($c, 'text/gff3');
+  my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
   
   my $allowed_features = $self->allowed_features();
   my $feature = $c->request->parameters->{feature};
