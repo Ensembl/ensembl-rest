@@ -12,9 +12,13 @@ __PACKAGE__->config( 'map' => { 'text/javascript' => ['JSONP'] } );
 sub get_species : Chained("/") PathPart("vep") CaptureArgs(1) {
     my ( $self, $c, $species ) = @_;
     $c->stash->{species} = $species;
-    $c->stash( variation_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
-    $c->stash(
-        variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
+    try {
+        $c->stash( variation_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
+        $c->stash(
+            variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
+    } catch {
+        $c->go('ReturnError', 'from_ensembl', [$_]);
+    };
 }
 
 sub get_bp_slice : Chained("get_species") PathPart("") CaptureArgs(1) {
