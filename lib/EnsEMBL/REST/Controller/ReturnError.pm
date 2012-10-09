@@ -5,7 +5,7 @@ use Carp::Clan qw(^EnsEMBL::REST::Controller::);
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
 __PACKAGE__->config(
-    'default'   => 'text/x-yaml',
+    'default'   => 'application/json',
     'stash_key' => 'rest',
     'map'       => {
         'text/x-yaml'      => 'YAML::XS',
