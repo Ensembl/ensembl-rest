@@ -43,19 +43,20 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
                 </pre>
             </div><!-- bs-oocs-example--> 
 						<h3>Content Type</h3>
-						<p>Response types for JSON, XML, YAML, GFF3 and FASTA may be requested by either setting the <code>Content-type</code> in the HTTP request header or as a <code>content-type</code> URI parameter. Examples of using different content types can be seen in the following language specific examples.</p>
+						<p>Response types for JSON, XML, YAML, GFF3 and FASTA may be requested by either setting the <code>Content-type</code> in the HTTP request header or as a <code>content-type</code> URI parameter. Please be aware that some characters such as <tt>+</tt> can be interpreted incorrectly when given as a parameter rather than a header; instead use the URL encoded version of the character e.g. instead of <tt>+</tt> use <tt>%2B</tt>. Examples of using different content types can be seen in the following language specific examples.</p>
 						
 						<table class='table table-striped'>
 							<caption>Supported content types for Ensembl REST API</caption>
-							<tr><th>Format</th><th>Content-type</th><th>Notes</th></tr>
-							<tr><td><a href='http://en.wikipedia.org/wiki/FASTA_format'>FASTA</a></td><td><tt>text/fasta</tt></td><td>Only supported on the <tt>/sequence</tt> endpoint.<br/><span class="label label-important">Important:</span> FASTA can also be specified as a filename extension e.g. <tt>ENSPXXXXXXX.fasta</tt></td></tr>
-							<tr><td><a href='http://en.wikipedia.org/wiki/General_feature_format'>GFF3</a></td><td><tt>text/gff3</tt></td><td>Only supported on the <tt>/feature</tt> endpoint.</td></tr>
-							<tr><td><a href='http://en.wikipedia.org/wiki/JSON'>JSON</a></td><td><tt>application/json</tt></td><td>-</td></tr>
-							<tr><td><a href='http://en.wikipedia.org/wiki/JSONP'>JSONP</a></td><td><tt>text/javascript</tt></td><td>Extension of JSON to avoid issues of web browser <a href='http://en.wikipedia.org/wiki/Same_origin_policy'>same origin policy</a>.</tr>
-							<tr><td><a href='http://en.wikipedia.org/wiki/Newick_format'>Newick (New Hampshire) format</a></td><td><tt>text/nh</tt></td><td>Phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>							
-							<tr><td><a href='http://en.wikipedia.org/wiki/PhyloXML'>PhyloXML</a></td><td><tt>text/phyloxml</tt></td><td>XML phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>
-							<tr><td><a href='http://en.wikipedia.org/wiki/XML'>XML</a></td><td><tt>text/xml</tt></td><td>-</td></tr>
-							<tr><td><a href='http://en.wikipedia.org/wiki/YAML'>YAML</a></td><td><tt>text/x-yaml</tt></td><td>-</td></tr>
+							<tr><th>Format</th><th>Content-type</th><th>Extension</th><th>Notes</th></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/FASTA_format'>FASTA</a></td><td><tt>text/x-fasta</tt></td><td><tt>.fasta</tt></td><td>Only supported on the <tt>/sequence</tt> endpoint.<br/><span class="label label-important">Important:</span> FASTA can also be specified as a filename extension e.g. <tt>ENSPXXXXXXX.fasta</tt></td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/General_feature_format'>GFF3</a></td><td><tt>text/gff3</tt></td><td><tt>.gff3</tt></td><td>Only supported on the <tt>/feature</tt> endpoint.</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/JSON'>JSON</a></td><td><tt>application/json</tt></td><td><tt>.json</tt></td><td>-</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/JSONP'>JSONP</a></td><td><tt>text/javascript</tt></td><td><tt>.jsonp</tt></td><td>Extension of JSON to avoid issues of web browser <a href='http://en.wikipedia.org/wiki/Same_origin_policy'>same origin policy</a>.</tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/Newick_format'>Newick (New Hampshire) format</a></td><td><tt>text/x-nh</tt><td><tt>.nh</tt></td></td><td>Phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>							
+							<tr><td><a href='http://seqxml.org/'>SeqXML</a></td><td><tt>text/x-seqxml+xml</tt></td><td><tt>.seqxml</tt></td><td>XML schema used to hold sequence information</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/PhyloXML'>PhyloXML</a></td><td><tt>text/x-phyloxml+xml</tt></td><td><tt>.phyloxml</tt></td><td>XML phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/XML'>XML</a></td><td><tt>text/xml</tt></td><td><tt>.xml</tt></td><td>-</td></tr>
+							<tr><td><a href='http://en.wikipedia.org/wiki/YAML'>YAML</a></td><td><tt>text/x-yaml</tt></td><td><tt>.yaml</tt></td><td>-</td></tr>
 						</table>
 						
 						<a id='responsecodes'> </a>
