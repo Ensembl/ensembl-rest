@@ -12,7 +12,8 @@ sub find_genetree_by_stable_id {
   my $reg = $c->model('Registry');
   my ($species, $object_type, $db_type) = $self->find_object_location($c, $id);
   if($species) {
-    my $gta = $reg->get_adaptor($species, $db_type, $object_type);
+    my $dba = $reg->get_best_compara_DBAdaptor($c, $species);
+    my $gta = $dba->get_GeneTreeAdaptor();
     $c->go('ReturnError', 'custom', ["No adaptor found for ID $id, species $species, object $object_type and db $db_type"]) if ! $gta;
     my $gt = $gta->fetch_by_stable_id($id);
     return $gt if $gt;

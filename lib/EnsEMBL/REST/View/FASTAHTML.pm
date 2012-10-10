@@ -7,6 +7,7 @@ extends 'EnsEMBL::REST::View::TextHTML';
 sub get_content {
   my ($self, $c, $stash_key) = @_;
   $stash_key ||= 'rest';
+  $c->stash->{format} = 'fasta';
   my $ref = $self->encode_seq($c, $stash_key);
   return ${$ref};
 }

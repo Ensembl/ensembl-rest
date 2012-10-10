@@ -117,9 +117,9 @@ sub calc_consequences : Private {
     my $hgvs_hash = $vf->get_all_hgvs_notations();
     my $r = {
       location => {
-        start        => $vf->start(),
-        end          => $vf->end(),
-        strand       => $vf->strand(),
+        start        => ($vf->start()+0),
+        end          => ($vf->end()+0),
+        strand       => ($vf->strand()+0),
         name         => $vf->slice()->seq_region_name(),
         coord_system => $vf->slice()->coord_system()->name(),
       },
@@ -128,7 +128,7 @@ sub calc_consequences : Private {
     my $master_variant = $vf->variation();
     if($master_variant) {
       $r->{name} = $master_variant->name();
-      $r->{is_somatic} = $master_variant->is_somatic();
+      $r->{is_somatic} = ($master_variant->is_somatic() ? 1 : 0);
     }
     
     my $transcript_variants = $self->_encode_transcript_variants($c, $vf);
@@ -144,6 +144,8 @@ sub calc_consequences : Private {
   $s->{consequences} = \@all_results;
 }
 
+my @NUMERIC_T_KEYS = qw/cdna_start cdna_end cds_start cds_end translation_start translation_end intron_number exon_number codon_position/;
+my @NUMERIC_TVA_KEYS = qw/polyphen_score sift_score/;
 sub _encode_transcript_variants {
   my ($self, $c, $vf) = @_;
   return $self->_process_variants($c, $vf, 'TranscriptVariations', sub {
@@ -175,6 +177,10 @@ sub _encode_transcript_variants {
         exon_number => $tv->exon_number,
         codon_position => $tv->codon_position,
       };
+      foreach my $key (@NUMERIC_T_KEYS) {
+        my $v = $r->{$key};
+        $r->{$key} = $v*1 if defined $v;
+      }
       $r->{ccds} = $ccds->display_id if $ccds;
       $r->{translation_stable_id} = $translation->stable_id() if $translation;
       $r->{protein_features} = \@protein_features if @protein_features;
@@ -194,6 +200,10 @@ sub _encode_transcript_variants {
           hgvs_protein => $tva->hgvs_protein,
           consequence_terms => $self->_overlap_consequences($tva),
         };
+        foreach my $key (@NUMERIC_TVA_KEYS) {
+          my $v = $tva_r->{$key};
+          $tva_r->{$key} = $v*1 if defined $v;
+        }
         push @{$r->{alleles}}, $tva_r;
       }
     
@@ -216,7 +226,7 @@ sub _encode_regulatory_variants {
       };
       foreach my $rfva (@{$rfv->get_all_alternate_RegulatoryFeatureVariationAlleles()}) {
         my $terms = $self->_overlap_consequences($rfva);
-        push @{$r->{alleles}},  { allele_string => $rfva->allele_string, consequence_terms => $terms, is_reference => $rfva->is_reference() };
+        push @{$r->{alleles}},  { allele_string => $rfva->allele_string, consequence_terms => $terms, is_reference => ($rfva->is_reference() ? 1 : 0) };
       }
       push(@results, $r);
     }
@@ -239,8 +249,8 @@ sub _encode_motif_variants {
         my $ra = { 
           allele_string => $allele,
           consequence_terms => $terms,
-          is_reference => $mfva->is_reference(),
-          position => $mfva->motif_start(),
+          is_reference => ($mfva->is_reference() ? 1 : 0),
+          position => ($mfva->motif_start()*1),
         };
         my $delta = $mfva->motif_score_delta if $mfva->variation_feature_seq =~ /^[ACGT]+$/;
         $ra->{motif_score_change} = sprintf( "%.3f", $delta ) if defined $delta;

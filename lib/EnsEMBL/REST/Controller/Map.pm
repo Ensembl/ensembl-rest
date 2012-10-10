@@ -64,7 +64,7 @@ sub _map_transcript_coords {
   }
   $start ||= $end;
   my $mapped = [$transcript->get_TranscriptMapper()->$method($start, $end)];
-  return $self->map_mappings($c, $mapped);
+  return $self->map_mappings($c, $mapped, $transcript);
 }
 
 sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
@@ -77,6 +77,7 @@ sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
   catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
+  $c->go('ReturnError', 'custom', ["No valid region can be decoded from $region"]) unless $old_slice;
   # Get a slice for the old region (the region in the input file).
   $c->stash->{old_slice} = $old_slice;
 }
@@ -99,7 +100,7 @@ sub map_data : Private {
   my $old_sr_name = $old_slice->seq_region_name();
   my $old_start   = $old_slice->start();
   my $old_end     = $old_slice->end();
-  my $old_strand  = $old_slice->strand();
+  my $old_strand  = $old_slice->strand()*1;
   my $old_version = $old_slice->coord_system()->version();
 
   my @decoded_segments;
@@ -137,8 +138,10 @@ sub map_data : Private {
 }
 
 sub map_mappings {
-  my ($self, $c, $mapped) = @_;
+  my ($self, $c, $mapped, $transcript) = @_;
   my @r;
+  my $seq_region_name = $transcript->seq_region_name();
+  my $coord_system = $transcript->coord_system_name();
   foreach my $m (@{$mapped}) {
     my $strand = 0;
     my $gap = 0;
@@ -154,6 +157,8 @@ sub map_mappings {
       strand => $strand,
       rank => $m->rank(),
       gap => $gap,
+      seq_region_name => $seq_region_name,
+      coord_system => $coord_system,
     });
   }
   return \@r;

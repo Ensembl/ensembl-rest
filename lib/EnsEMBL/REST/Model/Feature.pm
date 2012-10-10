@@ -40,11 +40,18 @@ sub fetch_features {
   return \@final_features;
 }
 
+#Have to do this to force JSON encoding to encode numerics as numerics
+my @KNOWN_NUMERICS = qw( start end strand );
+
 sub to_hash {
   my ($self, $features, $feature_type) = @_;
   my @hashed;
   foreach my $feature (@{$features}) {
     my $hash = $feature->summary_as_hash();
+    foreach my $key (@KNOWN_NUMERICS) {
+      my $v = $hash->{$key};
+      $hash->{$key} = ($v*1) if defined $v;
+    }
     $hash->{feature_type} = $feature_type;
     push(@hashed, $hash);
   }

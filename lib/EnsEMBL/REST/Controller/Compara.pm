@@ -13,27 +13,21 @@ my $TYPE_TO_COMPARA_TYPE = { orthologues => 'ENSEMBL_ORTHOLOGUES', paralogues =>
 
 sub get_adaptors :Private {
   my ($self, $c) = @_;
-  
-  my $reg = $c->model('Registry');
-  my $best_compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
-  my $compara_name = $c->request()->param('compara') || $best_compara_name;
-  
+
   try {
-    my $ma = $reg->get_adaptor($compara_name, 'compara', 'member');
-    $c->go('ReturnError', 'custom', ["No MemberAdaptor found for $compara_name"]) unless $ma;
-    $c->stash(member_adaptor => $ma);
-  
-    my $ha = $reg->get_adaptor($compara_name, 'compara', 'homology');
-    $c->go('ReturnError', 'custom', ["No HomologyAdaptor found for $compara_name"]) unless $ha;
-    $c->stash(homology_adaptor => $ha);
+    my $species = $c->stash()->{species};
+    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($c, $species);
+    my $ma = $compara_dba->get_MemberAdaptor();
+    my $ha = $compara_dba->get_HomologyAdaptor();
+    my $mlssa = $compara_dba->get_MethodLinkSpeciesSetAdaptor();
+    my $gdba = $compara_dba->get_GenomeDBAdaptor();
     
-    my $mlssa = $reg->get_adaptor($compara_name, 'compara', 'methodlinkspeciesset');
-    $c->go('ReturnError', 'custom', ["No MethodLinkSpeciesSetAdaptor found for $compara_name"]) unless $mlssa;
-    $c->stash(method_link_species_set_adaptor => $mlssa);
-    
-    my $gdba = $reg->get_adaptor($compara_name, 'compara', 'genomedb');
-    $c->go('ReturnError', 'custom', ["No GenomeDB found for $compara_name"]) unless $gdba;
-    $c->stash(genome_db_adaptor => $gdba);
+    $c->stash(
+      member_adaptor => $ma, 
+      homology_adaptor => $ha,
+      method_link_species_set_adaptor => $mlssa,
+      genome_db_adaptor => $gdba
+    );
   }
   catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
@@ -42,7 +36,6 @@ sub get_adaptors :Private {
 
 sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   my ( $self, $c, $id ) = @_;
-  $c->forward('get_adaptors');
   my $lookup = $c->model('Lookup');
   my ($species) = $lookup->find_object_location($c, $id);
   $c->stash(stable_ids => [$id], species => $species);
@@ -51,7 +44,6 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
 
 sub fetch_by_gene_symbol : Chained("/") PathPart("homology/symbol") Args(2)  {
   my ( $self, $c, $species, $gene_symbol ) = @_;
-  $c->forward('get_adaptors');
   my $genes;
   try {
     $c->stash(species => $species);
@@ -78,6 +70,9 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   my ($self, $c) = @_;
   my $s = $c->stash();
   
+  #Get the compara DBAdaptor
+  $c->forward('get_adaptors');
+  
   # Sort out the encoder
   my $format = $c->request->param('format') || 'full';
   my $target = $FORMAT_LOOKUP->{$format};
@@ -103,11 +98,12 @@ sub get_orthologs : Args(0) ActionClass('REST') {
     };
     my $all_homologies;
     try {
+      my $ha = $s->{homology_adaptor};
+      
       if($c->request->param('target_species') || $c->request->param('target_taxon')) {
         $c->log->debug('Limiting on species/taxons');
         $all_homologies = [];
         my $mlss_array = $self->_method_link_speices_sets($c, $member);
-        my $ha = $s->{homology_adaptor};
         foreach my $mlss (@{$mlss_array}) {
           $c->log->debug('Searching for ', $method_link_type, ' with MLSS ID ', $mlss->dbID(), ' (', ($mlss->name() || q{-}), ')');
           my $r = $ha->fetch_all_by_Member_MethodLinkSpeciesSet($member, $mlss);
@@ -115,10 +111,10 @@ sub get_orthologs : Args(0) ActionClass('REST') {
         }
       }
       elsif($method_link_type) {
-        $all_homologies = $s->{homology_adaptor}->fetch_all_by_Member_method_link_type($member, $method_link_type);
+        $all_homologies = $ha->fetch_all_by_Member_method_link_type($member, $method_link_type);
       }
       else {
-        $all_homologies = $s->{homology_adaptor}->fetch_all_by_Member($member);
+        $all_homologies = $ha->fetch_all_by_Member($member);
       }
     }
     catch {
@@ -201,8 +197,8 @@ sub _full_encoding {
     return {
       id => $gene->stable_id(),
       species => $gene->genome_db()->name(),
-      perc_id => $member->perc_id(),
-      perc_pos => $member->perc_pos(),
+      perc_id => ($member->perc_id()*1),
+      perc_pos => ($member->perc_pos()*1),
       cigar_line => $member->cigar_line(),
       protein_id => $gene->get_canonical_Member()->stable_id(),
       align_seq => $member->alignment_string()
@@ -218,6 +214,7 @@ sub _full_encoding {
       source => $encode->($src),
       target => $encode->($trg),
     };
+    $e->{dn_ds} = $e->{dn_ds}*1 if defined $e->{dn_ds};
     push(@output, $e);
   }
   return \@output;

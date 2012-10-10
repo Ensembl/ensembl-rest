@@ -11,6 +11,7 @@ __PACKAGE__->config(
   map => {
     'text/html'           => [qw/View PhyloXMLHTML/],
     'text/x-phyloxml+xml' => [qw/View PhyloXML/],
+    'text/x-phyloxml'     => [qw/View PhyloXML/], #naughty but needs must
     'text/x-nh'           => [qw/View NHTree/],
     'text/x-nhx'          => [qw/View NHXTree/],
     'application/json'    => [],
@@ -19,30 +20,9 @@ __PACKAGE__->config(
   }
 );
 
-sub get_adaptors : Chained('/') PathPart('genetree') CaptureArgs(0) {
-  my ($self, $c) = @_;
-  
-  my $reg = $c->model('Registry');
-  my $best_compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
-  my $compara_name = $c->request()->param('compara') || $best_compara_name;
-  
-  try {
-    my $ma = $reg->get_adaptor($compara_name, 'compara', 'member');
-    $c->go('ReturnError', 'custom', ["No member adaptor found for $compara_name"]) unless $ma;
-    $c->stash(member_adaptor => $ma);
-  
-    my $ha = $reg->get_adaptor($compara_name, 'compara', 'homology');
-    $c->go('ReturnError', 'custom', ["No homology adaptor found for $compara_name"]) unless $ha;
-    $c->stash(homology_adaptor => $ha);
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
-  };
-}
-
 sub get_genetree_GET { }
 
-sub get_genetree : Chained('get_adaptors') PathPart('id') Args(1) ActionClass('REST') {
+sub get_genetree : Chained('/') PathPart('genetree/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $s = $c->stash();
   my $gt = $c->model('Lookup')->find_genetree_by_stable_id($c, $id);

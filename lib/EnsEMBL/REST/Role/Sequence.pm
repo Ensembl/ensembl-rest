@@ -7,6 +7,7 @@ use Bio::Seq;
 use Bio::SeqIO;
 use IO::String;
 use XML::Writer;
+use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 use constant SEQXML_VERSION => 0.4;
 use constant SCHEMA_LOCATION => 'http://www.seqxml.org/0.4/seqxml.xsd';
@@ -16,9 +17,10 @@ sub encode_seq {
   my ($self, $c, $key) = @_;
   my $s = $c->stash();
   my $ref;
-  my $format = $s->{format};
+  my $format = $s->{format} || '';
   my $is_fasta_content = $self->is_content_type($c, 'text/x-fasta');
   my $is_seqxml_content = $self->is_content_type($c, 'text/x-seqxml+xml');
+  my $is_plain_content = $self->is_content_type($c, 'text/plain');
   
   if(!$format) {
     if($is_fasta_content) {
@@ -27,49 +29,45 @@ sub encode_seq {
     elsif($is_seqxml_content) {
       $format = 'seqxml';
     }
+    elsif($is_plain_content) {
+      $format = 'plain';
+    }
   }
   
-  if($format eq 'fasta') {
-    $ref = $self->_fasta($c, $key);
-  }
-  elsif($format eq 'seqxml') {
-    $ref = $self->_seqxml($c, $key);
-  }
-  else {
-    $ref = $self->_json($c, $key);
-  }
+  my $dispatch = {
+    fasta   => '_fasta',
+    seqxml  => '_seqxml',
+    plain   => '_plain',
+  }->{$format};
   
-  return $ref;
-}
-
-sub _json {
-  my ($self, $c, $key) = @_;
-  my $s = $c->stash();
-  my $entity = $s->{$key};
-  my $v = $self->json()->encode($entity);
-  return \$v;
+  $c->go('ReturnError', 'custom', ["The format '$format' is not understood"]) unless $dispatch;
+  
+  my $sequences = $s->{$key} || [];
+  $sequences = wrap_array($sequences);
+  return $self->$dispatch($c, $sequences);
 }
 
 sub _fasta {
-  my ($self, $c, $key) = @_;
-  my $s = $c->stash();
-  my $entity = $s->{$key};
-  my $seq = Bio::Seq->new(-ID => $entity->{id}, -MOLECULE => $entity->{molecule}, -ALPHABET => $entity->{molecule}, -SEQ => $entity->{seq});
-  $seq->desc($entity->{desc}) if $entity->{desc};
+  my ($self, $c, $sequences) = @_;
+  $sequences ||= [];
   my $stringfh = IO::String->new();
   my $seq_out = Bio::SeqIO->new(
     -fh     => $stringfh,
-    -format => $s->{format},
+    -format => 'fasta',
   );
-  $seq_out->write_seq($seq);
+  foreach my $entity (@{$sequences}) {
+    my $seq = Bio::Seq->new(-ID => $entity->{id}, -MOLECULE => $entity->{molecule}, -ALPHABET => $entity->{molecule}, -SEQ => $entity->{seq});
+    $seq->desc($entity->{desc}) if $entity->{desc};
+    $seq_out->write_seq($seq);
+  }
   return $stringfh->string_ref();
 }
 
 sub _seqxml {
-  my ($self, $c, $key) = @_;
+  my ($self, $c, $sequences) = @_;
+  $sequences ||= [];
   my ($stringfh, $w) = $self->_seqxml_writer();
   my $s = $c->stash();
-  my $entity = $s->{$key};
   
   my $xsi_uri = XMLNS_XSI;
   my $seqxml_uri = SCHEMA_LOCATION;
@@ -78,12 +76,28 @@ sub _seqxml {
   $w->xmlDecl("UTF-8");
   $w->forceNSDecl($xsi_uri);
   $w->startTag("seqXML", [$xsi_uri, 'noNamespaceSchemaLocation'] => "${seqxml_uri}", 'seqXMLversion', $version);
-  $w->startTag('entry', 'id' => $entity->{id});
-  my $tag_name = { dna => 'DNAseq', protein => 'AAseq' }->{$entity->{molecule}};
-  $w->dataElement($tag_name, $entity->{seq});
-  $w->endTag('entry');
+  
+  foreach my $entity (@{$sequences}) {
+    $w->startTag('entry', 'id' => $entity->{id});
+    my $tag_name = { dna => 'DNAseq', protein => 'AAseq' }->{$entity->{molecule}};
+    $w->dataElement($tag_name, $entity->{seq});
+    $w->endTag('entry');
+  }
+  
   $w->endTag('seqXML');
   
+  return $stringfh->string_ref();
+}
+
+sub _plain {
+  my ($self, $c, $sequences) = @_;
+  $sequences ||= [];
+  my $count = scalar(@{$sequences});
+  my $stringfh = IO::String->new();
+  foreach my $entity (@{$sequences}) {
+    print $stringfh $entity->{seq};
+    print "\n" if $count > 1;
+  }
   return $stringfh->string_ref();
 }
 
