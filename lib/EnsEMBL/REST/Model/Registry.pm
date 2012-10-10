@@ -92,7 +92,7 @@ sub _intern_db_connections {
     my $dbname = $dbc->dbname();
     next unless $dbname; #skip if it had no DBNAME
     $dbc->disconnect_if_idle();
-    my $key = join(q{!=!}, map { ($dbc->$_() || q{?}) } qw/host port username password driver/ );
+    my $key = join(q{!=!}, map { ($dbc->$_() || q{?}) } qw(host port username password driver) );
     if(! exists $single_connections{$key}) {
       $log->info(sprintf('New connection being generated for %s DB at %s@%s:%d', $dbc->driver(), $dbc->username(), $dbc->host(), $dbc->port()));
       $single_connections{$key} = $dbc;
@@ -102,6 +102,16 @@ sub _intern_db_connections {
   }
   return;
 }
+
+sub get_best_compara_DBAdaptor {
+  my ($self, $c, $species) = @_;
+  my $best_compara_name = $self->get_compara_name_for_species($species);
+  my $compara_name = $c->request()->param('compara') || $best_compara_name;
+  if(!$compara_name) {
+    $c->go('ReturnError', 'custom', ["Cannot find a suitable compara database for the species $species. Try specifying a compara parameter"]);
+  }
+  return $self->get_DBAdaptor($compara_name, 'compara');
+} 
 
 sub get_DBAdaptor {
   my ($self, $species, $group) = @_;

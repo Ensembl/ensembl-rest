@@ -118,15 +118,16 @@ sub _encode :Private {
     };
     given(ref($dbe)) {
       when('Bio::EnsEMBL::IdentityXref') {
-        $enc->{xref_identity}     = $dbe->xref_identity();
-        $enc->{xref_start}        = $dbe->xref_start();
-        $enc->{xref_end}          = $dbe->xref_end();
-        $enc->{ensembl_identity}  = $dbe->ensembl_identity();
-        $enc->{ensembl_start}     = $dbe->ensembl_start();
-        $enc->{ensembl_end}       = $dbe->ensembl_end();
-        $enc->{score}             = $dbe->score();
+        $enc->{xref_identity}     = ($dbe->xref_identity()*1);
+        $enc->{xref_start}        = ($dbe->xref_start()*1);
+        $enc->{xref_end}          = ($dbe->xref_end()*1);
+        $enc->{ensembl_identity}  = ($dbe->ensembl_identity()*1);
+        $enc->{ensembl_start}     = ($dbe->ensembl_start()*1);
+        $enc->{ensembl_end}       = ($dbe->ensembl_end()*1);
+        $enc->{score}             = ($dbe->score()*1);
         $enc->{evalue}            = $dbe->evalue();
         $enc->{cigar_line}        = $dbe->cigar_line() if $dbe->cigar_line();
+        $enc->{evalue}            = ($enc->{evalue}*1) if defined $enc->{evalue}; 
       }
       when('Bio:EnsEMBL::OntologyXref') {
         $enc->{linkage_types} = $dbe->get_all_linkage_types();

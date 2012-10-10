@@ -14,14 +14,17 @@ __PACKAGE__->config(
     'text/plain'          => [qw/View SequenceText/],
     'text/x-fasta'        => [qw/View FASTAText/],
     'text/x-seqxml+xml'   => [qw/View SeqXML/],
+    'text/x-seqxml'       => [qw/View SeqXML/], #naughty but needs must
   }
 );
 EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 
 my %allowed_values = (
-  type    => { map { $_, 1} qw(cds cdna genomic)},
+  type    => { map { $_, 1} qw(cds cdna genomic protein)},
   mask    => { map { $_, 1} qw(soft hard) },
 );
+
+my $DEFAULT_TYPE = 'genomic';
 
 sub id_GET { }
 
@@ -73,20 +76,44 @@ sub _process {
   my ($self, $c) = @_;
   my $s = $c->stash();
   my $object = $s->{object};
-  my $ref = ref($object);
-  my $type = $c->request()->param('type');
+  my $type = $c->request()->param('type') || $DEFAULT_TYPE;
+  my $multiple_sequences = $c->request->param('multiple_sequences');
+  
+  $c->go('ReturnError', 'custom', ["The type '$type' is not understood by this service"]) unless $allowed_values{type}{$type};
+  
+  if(! $multiple_sequences) {
+    my $err;
+    if($object->isa('Bio::EnsEMBL::Gene') && $type ne 'genomic') {
+      $err = 'Requesting a gene and type not equal to "genomic" can result in multiple sequences.';
+    }
+    elsif($object->isa('Bio::EnsEMBL::Transcript') && ! $object->isa('Bio::EnsEMBL::PredictionTranscript') && $type eq 'protein') {
+      $err = 'Requesting a transcript and type "protein" can result in multiple sequences.'
+    }
+    $c->go('ReturnError', 'custom', ["$err Please rerun your request and specify the multiple_sequences parameter"]) if $err;
+  }
+  
+  my $sequences = $self->_process_feature($c, $object, $type);
+  $s->{sequences} = $sequences;
+  return;
+}
 
+sub _process_feature {
+  my ($self, $c, $object, $type) = @_;
+  
+  my @sequences;
+  
+  my $molecule = 'dna';
   my $seq;
   my $slice;
-  my $molecule = 'dna';
-
+  my $desc;
+  
   #Translations
   if($object->isa('Bio::EnsEMBL::Translation')) {
     $molecule = 'protein';
     $seq = $object->transcript()->translate()->seq();
   }
   #Transcripts
-  elsif($object->isa('Bio::EnsEMBL::Transcript')) {
+  elsif($object->isa('Bio::EnsEMBL::PredictionTranscript')) {
     if($type eq 'cdna') {
       $seq = $object->spliced_seq();
     }
@@ -94,14 +121,46 @@ sub _process {
       $seq = $object->translateable_seq();
     }
     elsif($type eq 'protein') {
-      $seq = $object->translate()->seq();
       $molecule = 'protein';
+      $seq = $object->translate()->seq();
+    }
+  }
+  elsif($object->isa('Bio::EnsEMBL::Transcript')) {
+    if($type eq 'cdna') {
+      $seq = $object->spliced_seq();
+    }
+    elsif($type eq 'cds') {
+      $seq = $object->translateable_seq();
+    }
+    #If protein perform recursive calls with the Translation object 
+    elsif($type eq 'protein') {
+      my @translations = ($object->translation());
+      push(@translations, @{$object->get_all_alternative_translations()});
+      foreach my $t (@translations) {
+        next unless $t;
+        push(@sequences, @{$self->_process_feature($c, $t, $type)});
+      }
+    }
+    elsif($type eq 'genomic') {
+      $slice = $object->feature_Slice();
+    }
+    else {
+      $c->go('ReturnError', 'custom', ["The type $type is not understood"]);
+    }
+  }
+  elsif($object->isa('Bio::EnsEMBL::Gene')) {
+    #If type was not genomic then recursivly call this method with all transcripts
+    if($type ne 'genomic') {
+      my $transcripts = $object->get_all_Transcripts();
+      foreach my $transcript (@{$transcripts}) {
+        push(@sequences, @{$self->_process_feature($c, $transcript, $type)});
+      }
     }
     else {
       $slice = $object->feature_Slice();
     }
   }
-  # Anything else
+  # Anything else (like exon)
   else {
     $slice = $object->feature_Slice();
   }
@@ -109,11 +168,19 @@ sub _process {
   if($slice) {
     $slice = $self->_enrich_slice($c, $slice);
     $seq = $slice->seq();
-    $s->{desc} = $slice->name();
+    $desc = $slice->name();
   }
-
-  $s->{seq_ref} = \$seq;
-  $s->{molecule} = $molecule;
+  
+  if($seq) {
+    push(@sequences, {
+      id => $object->stable_id(),
+      seq => $seq,
+      molecule => $molecule,
+      desc => $desc 
+    });
+  }
+  
+  return \@sequences;
 }
 
 sub _enrich_slice {
@@ -148,9 +215,12 @@ sub _mask_slice {
 sub _write {
   my ($self, $c) = @_;
   my $s = $c->stash();
-  $self->status_ok(
-    $c, entity => { seq => ${$s->{seq_ref}}, id => $s->{id}, molecule => $s->{molecule}, desc => $s->{desc} }
-  );
+  if($c->request->param('multiple_sequences')) {
+    $self->status_ok($c, entity => $c->stash()->{sequences});
+  }
+  else {
+    $self->status_ok($c, entity => $c->stash()->{sequences}->[0]);
+  }
 }
 
 sub default_length {

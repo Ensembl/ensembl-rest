@@ -43,7 +43,7 @@ sub get_content {
 sub get_title {
   my ($self, $c, $key) = @_;
   my $rest = $c->stash()->{$key};
-  return $rest->{title} if $rest->{title};
+  return $rest->{title} if ref($rest) eq 'HASH' && $rest->{title};
   return $c->config->{'name'} || '';
 }
 

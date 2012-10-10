@@ -11,8 +11,11 @@ sub begin : Private {
   my ($self, $c) = @_;
   my $endpoints = $c->model('Documentation')->merged_config($c);
   $c->stash()->{endpoints} = $endpoints;
+  my $cfg = EnsEMBL::REST->config();
   $c->stash(
-    service_name => EnsEMBL::REST->config()->{service_name},
+    service_name => $cfg->{service_name},
+    service_logo => $cfg->{service_logo},
+    service_parent_url => $cfg->{service_parent_url},
     service_version => $EnsEMBL::REST::VERSION,
     ensembl_version => software_version(),
   );

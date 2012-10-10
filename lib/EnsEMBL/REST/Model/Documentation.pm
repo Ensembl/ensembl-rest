@@ -85,6 +85,7 @@ sub enrich {
     foreach my $id ( keys %{ $endpoint->{examples} } ) {
         my $eg = $endpoint->{examples}->{$id};
         next if $eg->{enriched};
+        next if $eg->{disable};
         $eg->{id}  = $id; 
         $self->_request_example($endpoint, $eg, $c);
         $eg->{enriched} = 1;
@@ -134,9 +135,11 @@ sub get_groups {
     my $conf = $self->merged_config($c);
     my %groups;
     while ( my ( $k, $v ) = each %{$conf} ) {
+        next if $v->{disable};
         $groups{ $v->{group} } = [] unless $groups{ $v->{group} };
         push( @{ $groups{ $v->{group} } }, $v );
     }
+    my @kill_list;
     while ( my ( $k, $v ) = each %groups ) {
         my $endpoints = $groups{$k};
         my @sorted_endpoints = map { $_->{key} } sort { $a->{endpoint} cmp $b->{endpoint} } @{$endpoints};
