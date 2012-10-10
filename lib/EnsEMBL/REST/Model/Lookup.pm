@@ -8,24 +8,33 @@ extends 'Catalyst::Model';
 
 sub find_genetree_by_stable_id {
   my ($self, $c, $id) = @_;
+  my $gt;
   my $compara_name = $c->stash->{compara};
   my $reg = $c->model('Registry');
-  my ($species, $object_type, $db_type) = $self->find_object_location($c, $id);
-  if($species) {
-    my $dba = $reg->get_best_compara_DBAdaptor($c, $species);
-    my $gta = $dba->get_GeneTreeAdaptor();
-    $c->go('ReturnError', 'custom', ["No adaptor found for ID $id, species $species, object $object_type and db $db_type"]) if ! $gta;
-    my $gt = $gta->fetch_by_stable_id($id);
-    return $gt if $gt;
+  
+  #Force search to use compara as the DB type
+  $c->request->parameters->{db_type} = 'compara' if ! $c->request->parameters->{db_type};
+  
+  #Try to do a lookup if the ID DB is there
+  my $lookup = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
+  if($lookup) {
+    my ($species, $object_type, $db_type) = $self->find_object_location($c, $id);
+    if($species) {
+      my $gta = $reg->get_adaptor($species, $db_type, $object_type);
+      $c->go('ReturnError', 'custom', ["No adaptor found for ID $id, species $species, object $object_type and db $db_type"]) if ! $gta;
+      $gt = $gta->fetch_by_stable_id($id);
+    }
   }
-  else {
+  
+  #If we haven't got one then do a linear search
+  if(! $gt) {
     my $comparas = $c->model('Registry')->get_all_DBAdaptors('compara', $compara_name);
     foreach my $c (@{$comparas}) {
       my $gta = $c->get_GeneTreeAdaptor();
-      my $gt = $gta->fetch_by_stable_id($id);
-      return $gt if $gt;
+      $gt = $gta->fetch_by_stable_id($id);
     }
   }
+  return $gt if $gt;
   $c->go('ReturnError', 'custom', ["No GeneTree found for ID $id"]);
 }
 
@@ -44,7 +53,7 @@ sub find_object_by_stable_id {
 }
 
 sub find_object_location {
-  my ($self, $c, $id) = @_;
+  my ($self, $c, $id, $no_long_lookup) = @_;
   my $r = $c->request;
   my $object_type = $r->param('object_type');
   my $db_type = $r->param('db_type');
@@ -62,7 +71,7 @@ sub find_object_location {
   else {
     $c->log()->debug(sprintf('Looking for %s with %s and %s', $id, ($object_type || q{?}), ($db_type || q{?})));
     @captures = $reg->get_species_and_object_type($id, $object_type, $species, $db_type);
-    $force_long_lookup = 1;
+    $force_long_lookup = 1 unless $no_long_lookup;
   }
   
   if(@captures && $captures[0]) {
