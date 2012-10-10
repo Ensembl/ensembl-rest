@@ -114,8 +114,8 @@ sub get_best_compara_DBAdaptor {
 } 
 
 sub get_DBAdaptor {
-  my ($self, $species, $group) = @_;
-  return $self->_registry()->get_DBAdaptor($species, $group);
+  my ($self, $species, $group, $no_alias_check) = @_;
+  return $self->_registry()->get_DBAdaptor($species, $group, $no_alias_check);
 }
 
 sub get_adaptor {
