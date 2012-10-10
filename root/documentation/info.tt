@@ -43,6 +43,9 @@
 [% example_types = ['perl', 'python', 'ruby', 'curl', 'wget'] %]
 
 [% FOREACH p IN endpoint.examples.pairs %]
+	
+	[% NEXT IF p.value.disable %]
+
 	<h4><a href="[% p.value.uri %]">[% p.value.uri %]</a></h4>
 	<br>
 	<ul class="nav nav-pills">

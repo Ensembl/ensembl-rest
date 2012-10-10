@@ -31,9 +31,9 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-                <a class="brand" href="/"><img class="brand" src="/static/img/e-ensembl.png" /></a>
+                <a class="brand" href="[% service_parent_url %]"><img class="brand" src="[% service_logo %]" /></a>
                     <ul class="nav">
-                        <li class="active"><a href="/">Home</a></li>
+                        <li class="active"><a href="/">Endpoints</a></li>
                         <li><a href="/documentation/user_guide">User Guide</a></li>
                         <li><a href="http://www.ensembl.org/info/about/intro.html">About the Ensembl Project</a></li>
                         <li><a href="http://www.ensembl.org/info/about/contact/">Contact Ensembl</a></li>

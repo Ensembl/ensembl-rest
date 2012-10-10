@@ -3,6 +3,7 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
+use Bio::EnsEMBL::Utils::IO qw/slurp/;
 use Config::General;
 require EnsEMBL::REST;
 use File::Find;
@@ -24,6 +25,10 @@ has 'example_expire_time' => ( is => 'ro', isa => 'Int', lazy => 1, default => s
   return EnsEMBL::REST->config()->{Documentation}->{example_expire_time} || 3600;
 });
 
+has 'replacements' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub {
+  return EnsEMBL::REST->config()->{Documentation}->{replacements} || {};
+});
+
 
 sub merged_config {
   my ($self, $c) = @_;
@@ -39,7 +44,8 @@ sub merged_config {
     my $conf = $self->_find_conf($c, $path);
     foreach my $conf_file (@{$conf}) {
       $log->debug('Processing '.$conf_file) if $log->is_debug();
-      my $conf = Config::General->new(-ConfigFile => $conf_file);
+      my $conf_content = $self->_get_conf_content($conf_file);
+      my $conf = Config::General->new(-String => $conf_content);
       my $conf_hash = {$conf->getall()}->{endpoints};
       while(my ($k, $v) = each %{$conf_hash}) {
         $conf_hash->{$k}->{key} = $k;
@@ -190,6 +196,18 @@ sub _hash_to_params {
     }
   }
   return join(q{;}, @params);
+}
+
+sub _get_conf_content {
+  my ($self, $conf_file) = @_;
+  $self->log->debug('Working with '.$conf_file.' and will perform __VAR()__ replacements');
+  my $content = slurp($conf_file);
+  my $replacements = $self->replacements();
+  foreach my $key (%{$replacements}) {
+    my $value = $replacements->{$key};
+    $content =~ s/__VAR\($key\)__/$value/g;
+  }
+  return $content;
 }
 
 __PACKAGE__->meta->make_immutable;
