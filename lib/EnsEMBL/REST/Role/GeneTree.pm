@@ -20,21 +20,11 @@ sub encode_phyloxml {
   return $string_handle->string_ref();
 }
 
-sub encode_nhx {
-  my ($self, $c, $stash_key) = @_;
-  $stash_key ||= 'rest';
-  my $gt = $c->stash->{$stash_key};
-  my $root = $gt->root();
-  my $str = $root->nhx();
-  $root->release_tree();
-  return \$str;
-}
-
 sub encode_nh {
   my ($self, $c, $stash_key) = @_;
   $stash_key ||= 'rest';
   my $gt = $c->stash->{$stash_key};
-  my $nh_format = $c->request->param('newick_format') || 'simple';
+  my $nh_format = $c->request->param('nh_format') || 'simple';
   my $root = $gt->root();
   my $str = $root->newick_format($nh_format);
   $root->release_tree();
