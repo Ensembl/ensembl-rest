@@ -25,6 +25,12 @@ so_term=sequence ontology term to limit variants to
 application/json
 text/x-gff3
 
+
+/feature/id/ID
+
+  -> Gene/Transcript/Exon means just use the coords as is & return genomic features
+  -> Protein map back to the protein space for each feature that can be wholy mapped
+
 =cut
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
@@ -49,6 +55,22 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
   $self->status_ok($c, entity => $features );
+}
+
+sub id_GET {}
+
+sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
+  my ($self, $c, $id) = @_;
+  $c->stash(id => $id);
+  my $features;
+  try {
+    my $obj = $c->model('Lookup')->find_object_by_stable_id($c, $id);
+    $features = $c->model('Feature')->fetch_features($c);
+  }
+  catch {
+    $c->go('ReturnError', 'from_ensembl', [$_]);
+  };
+  return;
 }
 
 sub default_length {

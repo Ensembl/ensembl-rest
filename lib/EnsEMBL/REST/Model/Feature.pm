@@ -5,6 +5,8 @@ extends 'Catalyst::Model';
 
 use EnsEMBL::REST::EnsemblModel::ExonTranscript;
 use EnsEMBL::REST::EnsemblModel::CDS;
+use EnsEMBL::REST::EnsemblModel::ProjectedProteinFeature;
+use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
@@ -14,21 +16,34 @@ has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => 
 
 sub fetch_features {
   my ($self, $c) = @_;
+  my $slice = $c->stash()->{slice};
+  my $object = $c->stash()->{object};
   
+  my $allowed_features = $self->allowed_features();
+  my $feature_types = $c->request->parameters->{feature};
+  $c->go('ReturnError', 'custom', ["No feature given"]) if ! $feature_types;
+  $feature_types = wrap_array($feature_types);
+  
+  if($slice) {
+    return $self->fetch_features_by_Slice($c, $slice, $feature_types);
+  }
+  return $self->fetch_features_by_Object($c, $object, $feature_types);
+}
+
+sub fetch_features_by_Slice {
+  my ($self, $c, $slice, $feature_types, $callback_mapper) = @_;
+  warn $slice->name();
   my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
   
   my $allowed_features = $self->allowed_features();
-  my $feature = $c->request->parameters->{feature};
-  $c->go('ReturnError', 'custom', ["No feature given"]) if ! $feature;
-  my @features = (ref($feature) eq 'ARRAY') ? @{$feature} : ($feature);
   
-  my $slice = $c->stash()->{slice};
   my @final_features;
-  foreach my $feature_type (@features) {
+  foreach my $feature_type (@{$feature_types}) {
     $feature_type = lc($feature_type);
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
     my $objects = $self->$feature_type($c, $slice);
+    $objects = $callback_mapper->($objects) if $callback_mapper;
     if($is_gff3) {
       push(@final_features, @{$objects});
     }
@@ -38,6 +53,32 @@ sub fetch_features {
   }
   
   return \@final_features;
+}
+
+sub fetch_features_by_Object {
+  my ($self, $c, $object, $feature_types) = @_;
+  
+  if($object->isa('Bio::EnsEMBL::Translation')) {
+    my $transcript = $object->transcript();
+    my $start = 1;
+    my $end = $object->length();
+    my @coords = $transcript->pep2genomic($start, $end);
+    my @features;
+    my $slice = $transcript->slice();
+    foreach my $coord (@coords) {
+      next if $coord->isa('Bio::EnsEMBL::Mapper::Gap');
+      my $sub_slice = $slice->sub_Slice($coord->start(), $coord->end(), $coord->strand());
+      my $sub_features = $self->fetch_features_by_Slice($c, $sub_slice, $feature_types, sub {
+        my ($objects) = @_;
+        return EnsEMBL::REST::EnsemblModel::ProjectedProteinFeature->new_from_Features($objects);
+      });
+      push(@features, @{$sub_features});
+    }
+    return \@features;
+  }
+  
+  #If it was not a translation then just return everything at that feature Slice
+  return $self->fetch_features_by_Slice($c, $object->feature_Slice(), $feature_types);
 }
 
 #Have to do this to force JSON encoding to encode numerics as numerics
