@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/bash -ex
+exec > >(tee /var/log/rest-server-start.log|logger -t rest-server-start -s 2>/dev/console) 2>&1
+
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -21,7 +23,7 @@ APP_HOME=$(cd $SCRIPT_DIR/../../ && pwd)
 for ensdir in ensembl-variation ensemb-functgenomics ensembl-compara ensembl; do
   PERL5LIB=$ENS_CVS_ROOT_DIR/$ensdir/modules:$PERL5LIB
 done
-PERL5LIB=$ENS_CVS_ROOT_DIR/bioperl-live:$PERL5LIB
+PERL5LIB=$APP_HOME/../bioperl-live:$PERL5LIB
 PERL5LIB=$APP_HOME/lib:$PERL5LIB
 export PERL5LIB
 
