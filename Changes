@@ -1,23 +1,64 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
 1.1.0 
-  - [/vep] alleles now an array with allele_string explict instead of as key.
+
+New Features:
+
+  - [/feature] new endpoint for retrieval of features by a genomic location
+
+  - [/sequence] now responds to Content-type text/plain with an unformatted
+    raw String of sequence
+
+  - Plack::Middleware::Throttle is an optional install; custom extensions 
+    available with this checkout. Brings rate limiting to the REST API service
+
+  - Using CHI to cache documentation API responses
   
-  - [/feature] new endpoint for retrieval of features
+  - Content type detection carried out using file name extensions as well
+    as the existing mechanisms. Supported on all endpoints
   
+  - [/sequence] supports multiple sequences from a single identifier e.g. 
+    proteins from a gene identifier
+  
+  - Online change log
+
+Output:
+
+  - [/vep] alleles now an array with allele_string explicit instead of as key.
+
   - [/info/species] reports the division of a species; Ensembl Genomes 
     extension
   
-  - [/sequence] now responds to Content-type text/plain with an unformatted
-    raw String of sequence
+  - Mime types changed for many services to denote non-standard types. We now
+    use text/x-fasta, text-x-gff3, text/x-seqxml+xml and text/x-phyloxml+xml.
   
+  - [/genetree] has had NHX format retired in favour of PhyloXML
+  
+  - [/map] Translate coordinates for transcript/translation to genomic 
+    now reports the sequence region name
+
+Bugfixes
+
+  - 2 Y regions returned from [/assembly/info/human] fixed
+  
+  - JSON serialiser mis-encodes numerics as Strings due to MySQL DBD issues
+  
+  - Location parser method does not handle GL1923.1 properly
+  
+  - [/genetree] parameter nh_format has no effect on the newick output
+
+Configuration:
+
   - Removal of <Compara> configuration option; new code introduced to 
     select the best compara available based upon species.division
-     
-  - Using CHI to cache documentation API responses
   
-  - Plack::Middleware::Throttle is an optional install; custom extensions 
-    available with this checkout
+  - Documentation supports variable replacement for easier configuration by
+    third parties
+  
+  - CHI cache support in configuration; see CHI's POD and our production
+    configuration about how you can configure it
+  
+  - URL, name and logo now configurable
 
 1.0.0 05-09-2012 09:10:00
 	- Initial revision of REST API
