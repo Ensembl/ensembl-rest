@@ -12,6 +12,9 @@ sub encode_phyloxml {
     -SOURCE => 'Ensembl', -HANDLE => $string_handle
   );
   $w->aligned(1) if $c->request()->param('phyloxml_aligned');
+  my $sequence = $c->request->param('phyloxml_sequence') || 'protein';
+  $w->cdna(1) if $sequence eq 'cdna';
+  $w->no_sequences(1) if $sequence eq 'none';
   my $gt = $c->stash->{$stash_key};
   my $root = $gt->root();
   $w->write_trees($root);

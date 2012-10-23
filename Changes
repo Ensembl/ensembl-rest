@@ -21,6 +21,8 @@ New Features:
     proteins from a gene identifier
   
   - Online change log
+  
+  - [/genetree] now supports CDNA sequence in PhyloXML output
 
 Output:
 
@@ -32,7 +34,7 @@ Output:
   - Mime types changed for many services to denote non-standard types. We now
     use text/x-fasta, text-x-gff3, text/x-seqxml+xml and text/x-phyloxml+xml.
   
-  - [/genetree] has had NHX format retired in favour of PhyloXML
+  - [/genetree] has had NHX format retired in favor of PhyloXML
   
   - [/map] Translate coordinates for transcript/translation to genomic 
     now reports the sequence region name
