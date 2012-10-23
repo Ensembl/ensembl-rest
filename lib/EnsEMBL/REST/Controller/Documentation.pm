@@ -39,7 +39,13 @@ sub info :Path('info') :Args(1) {
 
 sub user_guide :Path('user_guide') {
   my ($self, $c, $endpoint) = @_;
-  $c->stash()->{template_title} = 'Code Samples';
+  $c->stash()->{template_title} = 'User Guide';
+  return;
+}
+
+sub change_log :Path('change_log') {
+  my ($self, $c, $endpoint) = @_;
+  $c->stash()->{template_title} = 'Change Log';
   return;
 }
 

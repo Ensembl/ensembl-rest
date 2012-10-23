@@ -1,0 +1,54 @@
+<h1>Change Log</h1>
+
+<h2>1.1.0</h2>
+
+<h3>New Features</h3>
+
+<ul>
+  <li><tt>[/feature]</tt> new endpoint for retrieval of features by a genomic location</li>
+  <li><tt>[/sequence]</tt> now responds to Content-type text/plain with an unformatted raw String of sequence</li>
+  <li><tt>Plack::Middleware::Throttle</tt> is an optional install; custom extensions available with this checkout. Brings rate limiting to the REST API service</li>
+  <li>Using CHI to cache documentation API responses</li>
+  <li>Content type detection carried out using file name extensions as well as the existing mechanisms. Supported on all endpoints</li>
+  <li><tt>[/sequence]</tt> supports multiple sequences from a single identifier e.g. proteins from a gene identifier</li>
+	<li>Online change log</li>
+</ul>
+
+<h3>Output</h3>
+
+<ul>
+  <li><tt>[/vep]</tt> alleles now an array with allele_string explicit instead of as key</li>
+  <li><tt>[/info/species]</tt> reports the division of a species; Ensembl Genomes extension</li>
+  <li>Mime types changed for many services to denote non-standard types. We now use <tt>text/x-fasta</tt>, <tt>text-x-gff3</tt>, <tt>text/x-seqxml+xml</tt> and <tt>text/x-phyloxml+xml</tt></li>
+  <li><tt>[/genetree]</tt> has had NHX format retired in favour of PhyloXML</li>
+  <li><tt>[/map]</tt> Translate coordinates for transcript/translation to genomic now reports the sequence region name</li>
+</ul>
+
+<h3>Bugfixes</h3>
+
+<ul>
+  <li>2 Y regions returned from <tt>[/assembly/info/human]</tt>  fixed</li>
+	<li>JSON serialiser mis-encodes numerics as Strings due to MySQL DBD issues</li>
+	<li>Location parser method does not handle GL1923.1 properly</li>
+	<li><tt>[/genetree]</tt> parameter nh_format has no effect on the newick output</li>
+</ul>
+
+<h3>Configuration</h3>
+
+<ul>
+  <li>Removal of &lt;Compara&gt; configuration option; new code introduced to select the best compara available based upon species.division</li>
+  <li>Documentation supports variable replacement for easier configuration by third parties</li>
+  <li>CHI cache support in configuration; see CHI's POD and our production configuration about how you can configure it</li>
+  <li>URL, name and logo now configurable</li>
+</ul>
+
+<hr/>
+
+<h2>1.0.0</h2>
+
+<ul>
+	<li>Initial revision of REST API</li>
+	<li>Support for comparative genomics, cross references, ID lookup, mapping coordinates, sequences &amp; variations</li>
+	<li>Information endpoints also made available</li>
+	<li>Documentation added for all end points</li>
+</ul>
