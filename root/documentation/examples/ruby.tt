@@ -4,12 +4,14 @@ require 'net/http'
 require 'uri'
 
 server='[% p.value.example.host %]'
-get_path = '[% p.value.example.uri %]'
+get_path = '[% p.value.uri %]'
 
 url = URI.parse(server)
 http = Net::HTTP.new(url.host, url.port)
 
+[% IF endpoint.method == 'GET' -%]
 request = Net::HTTP::Get.new(get_path, {'Content-Type' => '[% p.value.content %]'})
+[% END -%]
 response = http.request(request)
 
 if response.code != "200":
