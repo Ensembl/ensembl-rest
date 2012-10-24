@@ -61,9 +61,11 @@ sub region :Chained('get_species') PathPart('') Args(1) ActionClass('REST') {
     $slice = $self->_enrich_slice($c, $slice);
     $c->log()->debug('Producing the sequence');
     my $seq = $slice->seq();
-    $c->stash()->{seq_ref} = \$seq;
-    $c->stash()->{molecule} = 'dna';
-    $c->stash()->{id} = $slice->name();
+    $c->stash()->{sequences} = [{
+      id => $slice->name(),
+      molecule => 'dna',
+      seq => $seq,
+    }];
     $c->log()->debug('Pushing out the entity');
     $self->_write($c);
   } catch {
