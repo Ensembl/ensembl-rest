@@ -19,13 +19,14 @@ sub fetch_features {
   
   my $allowed_features = $self->allowed_features();
   my $feature = $c->request->parameters->{feature};
-  $c->go('ReturnError', 'custom', ["No feature given"]) if ! $feature;
+  $c->go('ReturnError', 'custom', ["No feature given. Please specify a feature to retrieve from this service"]) if ! $feature;
   my @features = (ref($feature) eq 'ARRAY') ? @{$feature} : ($feature);
   
   my $slice = $c->stash()->{slice};
   my @final_features;
   foreach my $feature_type (@features) {
     $feature_type = lc($feature_type);
+    next if $feature_type eq 'none';
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
     my $objects = $self->$feature_type($c, $slice);
