@@ -144,7 +144,7 @@ sub calc_consequences : Private {
   $s->{consequences} = \@all_results;
 }
 
-my @NUMERIC_T_KEYS = qw/cdna_start cdna_end cds_start cds_end translation_start translation_end intron_number exon_number codon_position/;
+my @NUMERIC_T_KEYS = qw/cdna_start cdna_end cds_start cds_end translation_start translation_end codon_position/;
 my @NUMERIC_TVA_KEYS = qw/polyphen_score sift_score/;
 sub _encode_transcript_variants {
   my ($self, $c, $vf) = @_;
