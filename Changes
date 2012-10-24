@@ -1,5 +1,18 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.1.1
+
+Bugfixes:
+
+  - [/sequence/region] had not been recoded for our multiple sequence 
+    changes resulting in a broken service
+    
+  - Documentation needs to internally escape characters like + for 
+    examples as Catalyst does not like this
+    
+  - [/vep] was attempting to multiple intron_number and exon_number 
+    to avoid stringification of numerics; these two fields are not numeric
+
 1.1.0 
 
 New Features:
@@ -39,7 +52,7 @@ Output:
   - [/map] Translate coordinates for transcript/translation to genomic 
     now reports the sequence region name
 
-Bugfixes
+Bugfixes:
 
   - 2 Y regions returned from [/assembly/info/human] fixed
   
