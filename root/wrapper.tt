@@ -36,7 +36,7 @@
                         <li class="active"><a href="/">Endpoints</a></li>
                         <li><a href="/documentation/user_guide">User Guide</a></li>
                         <li><a href="/documentation/change_log">Change Log</a></li>
-                        <li><a href="http://www.ensembl.org/info/about/intro.html">About the Ensembl Project</a></li>
+                        <li><a href="http://www.ensembl.org/info/about">About the Ensembl Project</a></li>
                         <li><a href="http://www.ensembl.org/info/about/contact/">Contact Ensembl</a></li>
                     </ul>
             </div><!-- container--> 
