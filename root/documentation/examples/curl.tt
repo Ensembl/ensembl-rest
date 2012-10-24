@@ -1,6 +1,6 @@
 <div class='tab-pane' id='curl[% p.value.id %]'>
 <pre class="pre-scrollable prettyprint linenums">[% FILTER html %]
-curl '[% p.value.example.host %][% p.value.example.uri %]' -H 'Content-type:[% p.value.content %]'
+curl '[% p.value.example.host %][% p.value.uri %]' -H 'Content-type:[% p.value.content %]'
 [% END -%]
 </pre>
 </div>

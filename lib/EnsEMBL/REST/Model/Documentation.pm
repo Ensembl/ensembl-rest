@@ -106,7 +106,6 @@ sub _request_example {
   my $path    = $eg->{path};
   my $capture = $eg->{capture} || [];
   my $params  = $eg->{params} || {};
-  $params->{'content-type'} = $eg->{content};
   $c->request->params($params) if $params;
   $capture = [$capture] unless ref($capture) eq 'ARRAY';
   $eg->{uri} = $path . ( join '/', @{$capture} );
@@ -180,8 +179,9 @@ sub _url {
   $host =~ s/\/$//;
   my $uri = $eg->{true_root_uri};
   my $req_params = $eg->{params} || {};
+  $req_params->{'content-type'} = $eg->{content};
   my $params = $self->_hash_to_params($req_params);
-  $uri .= ('?'.$params) if $params;
+  $uri .= '?'.$params;
   return ($host, $uri);
 }
 

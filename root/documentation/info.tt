@@ -49,7 +49,7 @@
 	
 	[% NEXT IF p.value.disable %]
 	
-	[% filtered_uri = p.value.uri.replace('\+', '%2B') %]
+	[% filtered_uri = p.value.example.uri.replace('\+', '%2B') %]
 	
 	<h4><a href="[% filtered_uri %]">[% filtered_uri %]</a></h4>
 	<br>
