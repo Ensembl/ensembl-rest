@@ -1,5 +1,20 @@
 <h1>Change Log</h1>
 
+<h2>1.1.2 - 25th October 2012</h2>
+
+<h3>Output</h3>
+<ul>
+	<li><tt>[/homology]</tt> now supports the retrieval of CDNA sequences</li>
+</ul>
+
+<h3>Bugfixes</h3>
+
+<ul>
+  <li><tt>[/feature]</tt>  had incorrect documentation WRT features available</li>
+</ul>
+
+<hr/>
+
 <h2>1.1.1 - 25th October 2012</h2>
 
 <h3>Bugfixes</h3>
