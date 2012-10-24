@@ -17,7 +17,7 @@ requires 'Catalyst::Action::RenderView';
 requires 'Moose';
 requires 'namespace::autoclean';
 requires 'Config::General'; # This should reflect the config file format you've chosen
-                 # See Catalyst::Plugin::ConfigLoader for supported formats
+                            # See Catalyst::Plugin::ConfigLoader for supported formats
 
 #Ensembl Rest Specific
 requires 'Catalyst::Controller::REST';
@@ -27,10 +27,18 @@ requires 'Catalyst::View::TT';
 requires 'JSON::XS';
 requires 'Log::Log4perl::Catalyst';
 requires 'Hash::Merge';
+requires 'Catalyst::Plugin::Cache';
+requires 'CHI';
 
 # Transient dependencies from Ensembl
 requires 'Parse::RecDescent';
 requires 'XML::Writer';
+
+# ENSEMBL IS NOT EXPLICITLY REQUIRED; PLEASE INSTALL ALL ENSEMBL MODULES AS NORMAL
+# recommends 'Bio::EnsEMBL::DBSQL::DBAdaptor';
+# recommends 'Bio::EnsEMBL::Compara::DBSQL::DBAdaptor';
+# recommends 'Bio::EnsEMBL::Variation::DBSQL::DBAdaptor';
+# recommends 'Bio::EnsEMBL::Funcgen::DBSQL::DBAdaptor';
 
 # Plack Middleware
 recommends 'Plack::Middleware::Assets';
