@@ -18,7 +18,10 @@
     <tbody>
   	[% FOREACH p IN endpoint.params.pairs %]
       <tr>
-      <td>[% p.key %]</td>
+      <td>
+				[% p.key %]
+				[% IF p.value.deprecated %]<br/><span class="label label-important">Deprecated: use <tt>[% p.value.deprecated %]</tt></span>[% END %]
+			</td>
       <td>[% IF p.value.required %]<strong>Yes</strong>[% ELSE %]No[% END %]
       <td><tt>[% p.value.type %]</tt></td>
       <td>[% p.value.description %]</td>

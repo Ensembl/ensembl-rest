@@ -1,5 +1,15 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.1.2 24-10-2012
+
+Output:
+
+  - [/homology] now supports the retrieval of CDNA sequences
+
+Bugfixes:
+
+  - [/feature] had incorrect documentation WRT features available
+
 1.1.1 24-10-2012
 
 Bugfixes:
