@@ -121,12 +121,14 @@ sub _request_example {
   my $key = $endpoint->{key}.'++'.$eg->{id};
   
   $eg->{response} = $cache->compute($key, { expires_in => $self->example_expire_time() }, sub {
+    my $content_type = $eg->{content};
     my $json = JSON->new();
     $json->pretty(1);
-    my $subreq_res = $c->subreq_res( $eg->{true_root_uri}, {}, $params );
+    $self->log()->debug('About to run the URL '.$eg->{true_root_uri}.'?'.$param_string);
+    my $subreq_res = $c->subreq_res( $eg->{true_root_uri}, {}, { %{$params}, 'content-type', $content_type} );
     my $sub_result = $subreq_res->body;
     $c->log()->warn(join ("\n", @{ $c->error })) if @{ $c->error };
-    if ( $eg->{content} eq 'application/json' ) {
+    if ($content_type eq 'application/json' ) {
       $sub_result = $json->encode( decode_json( $sub_result  ) );
     }
     return $sub_result;
