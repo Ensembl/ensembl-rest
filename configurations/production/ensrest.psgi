@@ -15,7 +15,7 @@ builder {
 
   #------ Set appropriate headers when we detect REST is being used as a ReverseProxy
   enable "Plack::Middleware::ReverseProxy";
-  
+  enable "DetectExtension";
   my $dirname = dirname(__FILE__);
   my $rootdir = File::Spec->rel2abs(File::Spec->catdir($dirname, File::Spec->updir(), File::Spec->updir()));
   my $staticdir = File::Spec->catdir($rootdir, 'root');
