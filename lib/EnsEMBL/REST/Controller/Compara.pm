@@ -191,18 +191,39 @@ sub _full_encoding {
   my ($self, $c, $homologies, $stable_id) = @_;
   my @output;
   
+  my $seq_type = $c->request->param('sequence') || 'protein';
+  my $aligned = $c->request->param('aligned');
+  $aligned = 1 unless defined $aligned;
+  
   my $encode = sub {
     my ($member) = @_;
     my $gene = $member->gene_member();
-    return {
+    my $result = {
       id => $gene->stable_id(),
       species => $gene->genome_db()->name(),
       perc_id => ($member->perc_id()*1),
       perc_pos => ($member->perc_pos()*1),
       cigar_line => $member->cigar_line(),
       protein_id => $gene->get_canonical_Member()->stable_id(),
-      align_seq => $member->alignment_string()
     };
+    if($aligned) {
+      if($seq_type eq 'protein') {
+        $result->{align_seq} = $member->alignment_string();
+      }
+      elsif($seq_type eq 'cdna') {
+       $result->{align_seq} = $member->cdna_alignment_string();
+       $result->{align_seq} =~ s/\s//g;
+      }
+    }
+    else {
+      if($seq_type eq 'protein') {
+        $result->{seq} = $member->sequence();
+      }
+      elsif($seq_type eq 'cdna') {
+        $result->{seq} = $member->sequence_cds();
+      }
+    }
+    return $result;
   };
   
   while(my $h = shift @{$homologies}) {
