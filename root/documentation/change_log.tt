@@ -1,6 +1,17 @@
 <h1>Change Log</h1>
 
-<h2>1.1.0</h2>
+<h2>1.1.1 - 25th October 2012</h2>
+
+<h3>Bugfixes</h3>
+
+<ul>
+  <li><tt>[/sequence/region]</tt> had not been recoded for our multiple sequence changes resulting in a broken service</li>
+	<li>Documentation needs to internally escape characters like <tt>+</tt> for example as Catalyst does not like this</li>
+	<li><tt>[/vep]</tt> was attempting to multiple intron_number and exon_number to avoid stringification of numerics; these two fields are not numeric</li>
+</ul>
+
+
+<h2>1.1.0 - 24th October 2012</h2>
 
 <h3>New Features</h3>
 
@@ -44,7 +55,7 @@
 
 <hr/>
 
-<h2>1.0.0</h2>
+<h2>1.0.0 - 5th September 2012</h2>
 
 <ul>
 	<li>Initial revision of REST API</li>
