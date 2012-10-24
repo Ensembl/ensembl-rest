@@ -8,10 +8,12 @@ use HTTP::Tiny;
 my $http = HTTP::Tiny->new();
 
 my $server = '[% p.value.example.host %]';
-my $ext = '[% p.value.example.uri %]';
+my $ext = '[% p.value.uri %]';
+[% IF endpoint.method == 'GET' -%]
 my $response = $http->get($server.$ext, {
   headers => { 'Content-type' => '[% p.value.content %]' }
 });
+[% END -%]
 
 die "Failed!\n" unless $response->{success};
 

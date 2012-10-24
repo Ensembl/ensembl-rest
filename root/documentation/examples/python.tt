@@ -5,8 +5,8 @@ import httplib2, sys
 http = httplib2.Http(".cache")
 
 server = "[% p.value.example.host %]"
-ext = "[% p.value.example.uri %]"
-resp, content = http.request(server+ext, method="%s", headers={"Content-Type":"[% p.value.content %]"})
+ext = "[% p.value.uri %]"
+resp, content = http.request(server+ext, method="[% endpoint.method %]", headers={"Content-Type":"[% p.value.content %]"})
 
 if not resp.status == 200:
   print "Invalid response: ", resp.status

@@ -1,6 +1,6 @@
 <div class='tab-pane' id='wget[% p.value.id %]'>
 <pre class="pre-scrollable prettyprint linenums">[% FILTER html -%]
-wget -q --header='Content-type:[% p.value.content %]' '[% p.value.example.host %][% p.value.example.uri %]'  -O -
+wget -q --header='Content-type:[% p.value.content %]' '[% p.value.example.host %][% p.value.uri %]'  -O -
 [% END -%]
 </pre>
 </div>
