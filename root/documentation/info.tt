@@ -45,8 +45,10 @@
 [% FOREACH p IN endpoint.examples.pairs %]
 	
 	[% NEXT IF p.value.disable %]
-
-	<h4><a href="[% p.value.uri %]">[% p.value.uri %]</a></h4>
+	
+	[% filtered_uri = p.value.uri.replace('\+', '%2B') %]
+	
+	<h4><a href="[% filtered_uri %]">[% filtered_uri %]</a></h4>
 	<br>
 	<ul class="nav nav-pills">
 	  <li class="active"><a href="#example[% p.value.id %]" data-toggle="tab">Example output</a></li>
