@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
-1.1.1
+1.1.1 24-10-2012
 
 Bugfixes:
 
@@ -8,12 +8,12 @@ Bugfixes:
     changes resulting in a broken service
     
   - Documentation needs to internally escape characters like + for 
-    examples as Catalyst does not like this
+    example as Catalyst does not like this
     
   - [/vep] was attempting to multiple intron_number and exon_number 
     to avoid stringification of numerics; these two fields are not numeric
 
-1.1.0 
+1.1.0 23-10-2012 
 
 New Features:
 
@@ -75,7 +75,7 @@ Configuration:
   
   - URL, name and logo now configurable
 
-1.0.0 05-09-2012 09:10:00
+1.0.0 05-09-2012
 	- Initial revision of REST API
 	
 	- Support for comparative genomics, cross references, ID lookup, 
