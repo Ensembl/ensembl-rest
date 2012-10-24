@@ -10,6 +10,7 @@
 	<li><tt>[/vep]</tt> was attempting to multiple intron_number and exon_number to avoid stringification of numerics; these two fields are not numeric</li>
 </ul>
 
+<hr/>
 
 <h2>1.1.0 - 24th October 2012</h2>
 
