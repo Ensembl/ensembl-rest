@@ -99,7 +99,9 @@ sub find_slice {
   my $db_type = $s->{db_type} || 'core';
   my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, 'slice');
   $c->go('ReturnError', 'custom', ["Do not know anything about the species $species and core database"]) unless $adaptor;
-  my $slice = $adaptor->fetch_by_toplevel_location($region);
+  my $coord_system_name = $c->request->param('coord_system') || 'toplevel';
+  my $coord_system_version = $c->request->param('coord_system_version');
+  my $slice = $adaptor->fetch_by_location($region, $coord_system_name, $coord_system_version);
   $c->go('ReturnError', 'custom', ["No slice found for location $region"]) unless $slice;
   $s->{slice} = $slice;
   return $slice;
