@@ -10,7 +10,7 @@ use warnings;
 use parent qw(Plack::Middleware);
 use Plack::Util qw//;
 use Plack::Util::Accessor qw/lookup/;
-our $EXT_REGEX = qr/(?^:(?:(?:(?:(?:orth|phyl)o|seq)?x|ya)ml|jsonp?|fasta|gff3|nhx?|txt))/;
+our $EXT_REGEX = qr/(?-xism:(?:(?:(?:(?:orth|phyl)o|seq)?x|ya)ml|jsonp?|fasta|gff3|nhx?|txt))/;
 our %LOOKUP = (
   #Basic exts
   json => 'application/json',
