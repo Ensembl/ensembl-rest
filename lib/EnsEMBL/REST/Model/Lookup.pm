@@ -32,6 +32,7 @@ sub find_genetree_by_stable_id {
     foreach my $c (@{$comparas}) {
       my $gta = $c->get_GeneTreeAdaptor();
       $gt = $gta->fetch_by_stable_id($id);
+      last if $gt;
     }
   }
   return $gt if $gt;
