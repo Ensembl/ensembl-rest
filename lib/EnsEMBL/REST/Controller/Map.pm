@@ -24,6 +24,7 @@ sub translation_GET {  }
 sub translation: Chained('/') Args(2) PathPart('map/translation') ActionClass('REST') {
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
+  $c->request->param('object_type', 'translation') unless $c->request->param('object_type');
   my $translation = $c->model('Lookup')->find_object_by_stable_id($c, $id);
   my $ref = ref($translation);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Translation object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Translation';
@@ -37,6 +38,7 @@ sub cdna_GET {  }
 sub cdna: Chained('/') Args(2) PathPart('map/cdna') ActionClass('REST') {
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
+  $c->request->param('object_type', 'transcript') unless $c->request->param('object_type');
   my $transcript = $c->model('Lookup')->find_object_by_stable_id($c, $id);
   my $ref = ref($transcript);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Transcript object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Transcript';
@@ -49,6 +51,7 @@ sub cds_GET {  }
 sub cds: Chained('/') Args(2) PathPart('map/cds') ActionClass('REST') {
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
+  $c->request->param('object_type', 'transcript') unless $c->request->param('object_type');
   my $transcript = $c->model('Lookup')->find_object_by_stable_id($c, $id);
   my $ref = ref($transcript);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Transcript object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Transcript';
@@ -72,6 +75,7 @@ sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
   my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($c, $region);
   $c->log->info($region);
   my $old_slice = try {
+    #my $coord_system = $c->request()->param('coord_system') || 'chromosome';
     $c->stash->{slice_adaptor}->fetch_by_region('chromosome', $old_sr_name, $old_start, $old_end, $old_strand, $old_assembly);
   }
   catch {
@@ -83,8 +87,8 @@ sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
 }
 
 sub mapped_region_data : Chained('get_region_slice') PathPart('') Args(1) ActionClass('REST') {
-    my ( $self, $c, $target_assembly ) = @_;
-    $c->stash->{target_assembly} = $target_assembly;
+  my ( $self, $c, $target_assembly ) = @_;
+  $c->stash->{target_assembly} = $target_assembly;
 }
 
 sub mapped_region_data_GET {
