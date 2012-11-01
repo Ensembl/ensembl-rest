@@ -75,8 +75,8 @@ sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
   my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($c, $region);
   $c->log->info($region);
   my $old_slice = try {
-    #my $coord_system = $c->request()->param('coord_system') || 'chromosome';
-    $c->stash->{slice_adaptor}->fetch_by_region('chromosome', $old_sr_name, $old_start, $old_end, $old_strand, $old_assembly);
+    my $coord_system = $c->request()->param('coord_system') || 'chromosome';
+    $c->stash->{slice_adaptor}->fetch_by_region($coord_system, $old_sr_name, $old_start, $old_end, $old_strand, $old_assembly);
   }
   catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
