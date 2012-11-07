@@ -52,7 +52,7 @@
 <footer class="footer">
 	<div class="container">
 		<p class="pull-right"><a href="#">Back to top</a></p>
-		<p>[% service_name %] (Version [% service_version %]) &copy; [% date.format(date.now, ' %b %Y', 'en_GB') %] <a href='http://www.ebi.ac.uk'>EBI</a></p>
+		<p>[% service_name %] (Version [% service_version %]) &copy; [% date.format(date.now, ' %b %Y', 'en_GB') %] [% copyright_footer %]</p>
 	</div>
 </footer>
 

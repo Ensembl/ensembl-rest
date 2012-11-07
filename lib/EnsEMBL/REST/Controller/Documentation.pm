@@ -18,6 +18,7 @@ sub begin : Private {
     service_parent_url => $cfg->{service_parent_url},
     service_version => $EnsEMBL::REST::VERSION,
     ensembl_version => software_version(),
+    copyright_footer => $cfg->{copyright_footer},
   );
   return;
 }
