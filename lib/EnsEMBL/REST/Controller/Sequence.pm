@@ -83,18 +83,19 @@ sub _process {
   
   $c->go('ReturnError', 'custom', ["The type '$type' is not understood by this service"]) unless $allowed_values{type}{$type};
   
-  if(! $multiple_sequences) {
+  
+  my $sequences = $self->_process_feature($c, $object, $type);
+  my $sequence_count = scalar(@{$sequences});
+  if($sequence_count > 1 && ! $multiple_sequences) {
     my $err;
     if($object->isa('Bio::EnsEMBL::Gene') && $type ne 'genomic') {
-      $err = 'Requesting a gene and type not equal to "genomic" can result in multiple sequences.';
+      $err = qq{Requesting a gene and type not equal to "genomic" can result in multiple sequences. $sequence_count sequencs detected.};
     }
     elsif($object->isa('Bio::EnsEMBL::Transcript') && ! $object->isa('Bio::EnsEMBL::PredictionTranscript') && $type eq 'protein') {
-      $err = 'Requesting a transcript and type "protein" can result in multiple sequences.'
+      $err = qq{Requesting a transcript and type "protein" can result in multiple sequences. $sequence_count sequencs detected.};
     }
     $c->go('ReturnError', 'custom', ["$err Please rerun your request and specify the multiple_sequences parameter"]) if $err;
   }
-  
-  my $sequences = $self->_process_feature($c, $object, $type);
   $s->{sequences} = $sequences;
   return;
 }
