@@ -85,9 +85,9 @@ CREATE TABLE `coord_system` (
 ) ENGINE=MyISAM AUTO_INCREMENT=1004 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `data_file` (
-  `data_file_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `coord_system_id` int(11) NOT NULL,
-  `analysis_id` int(11) NOT NULL,
+  `data_file_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `coord_system_id` int(10) unsigned NOT NULL,
+  `analysis_id` smallint(5) unsigned NOT NULL,
   `name` varchar(100) NOT NULL,
   `version_lock` tinyint(1) NOT NULL DEFAULT '0',
   `absolute` tinyint(1) NOT NULL DEFAULT '0',
@@ -122,9 +122,9 @@ CREATE TABLE `density_type` (
 ) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `dependent_xref` (
-  `object_xref_id` int(11) NOT NULL,
-  `master_xref_id` int(11) NOT NULL,
-  `dependent_xref_id` int(11) NOT NULL,
+  `object_xref_id` int(10) unsigned NOT NULL,
+  `master_xref_id` int(10) unsigned NOT NULL,
+  `dependent_xref_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`object_xref_id`),
   KEY `dependent` (`dependent_xref_id`),
   KEY `master_idx` (`master_xref_id`)
@@ -369,8 +369,9 @@ CREATE TABLE `mapping_session` (
 
 CREATE TABLE `mapping_set` (
   `mapping_set_id` int(10) unsigned NOT NULL,
-  `schema_build` varchar(20) NOT NULL,
-  PRIMARY KEY (`schema_build`)
+  `internal_schema_build` varchar(20) NOT NULL,
+  `external_schema_build` varchar(20) NOT NULL,
+  UNIQUE KEY `mapping_idx` (`internal_schema_build`,`external_schema_build`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `marker` (
@@ -429,7 +430,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=1776 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1781 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -613,6 +614,7 @@ CREATE TABLE `protein_feature` (
   `evalue` double DEFAULT NULL,
   `perc_ident` float DEFAULT NULL,
   `external_data` text,
+  `hit_description` text,
   PRIMARY KEY (`protein_feature_id`),
   KEY `hitname_idx` (`hit_name`),
   KEY `analysis_idx` (`analysis_id`),
