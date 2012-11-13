@@ -1,0 +1,15 @@
+{
+  "human" : {
+    "core" : {
+      "regions" : [
+        ["6", 1000000, 2000000],
+        ["X", 1, 400000],
+        ["HG681_PATCH", 152828210, 152898059],
+      ],
+      "adaptors" : [
+        { "name" : "gene", "method" : "fetch_all_by_Slice", "args" : [], "filter_exceptions" : true },
+        { "name" : "repeatfeature", "filter_exceptions" : true }
+      ]
+    }
+  }
+}
