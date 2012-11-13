@@ -26,8 +26,14 @@ sub json_GET {
   note "JSON GET $url";
   my $req = HTTP::Request->new(GET => $url);
   $req->header('Content-Type', 'application/json');
-  my ($parent) = caller(1);
+  
+  #Go a level higher until you get out of this package
+  my ($parent) = caller(0);
+  if($parent eq __PACKAGE__) {
+    $parent = caller(1);
+  }
   my $parent_request_name = "${parent}::request";
+  
   my $resp;
   {
     no strict 'refs';
@@ -46,6 +52,7 @@ sub json_GET {
     fail $msg;
     return;
   }
+  pass("JSON retrieved | $msg");
   return $json;
 }
 
