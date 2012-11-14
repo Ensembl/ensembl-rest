@@ -32,22 +32,24 @@ while(my $seq = $io->next_seq()) {
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
 Catalyst::Test->import('EnsEMBL::REST');
 
-#TODO SeqXML, FASTA, Plain Text and XML tests. Basics
-#TODO 5' and 3' ext on ID
-
 # CDNA ID based lookup
 {
   my $id = 'ENST00000314040';
+  my $url = '/sequence/id/'.$id.'?type=cdna';
+  my $seq = $seqs{$id.'_cdna'};
   is_json_GET(
-    '/sequence/id/'.$id.'?type=cdna',
+    $url,
     {
-      seq => $seqs{$id.'_cdna'}->seq(),
+      seq => $seq->seq(),
       id => $id,
       desc => undef,
       molecule => 'dna',
     },
     'CDNA retrieval'
   );
+  
+  my $plain_text = text_GET($url, 'Plain text');
+  is($plain_text, $seq->seq(), 'Plain text version brings back raw sequence unformatted');
 }
 
 # CDS ID based lookup
@@ -185,6 +187,30 @@ Catalyst::Test->import('EnsEMBL::REST');
     qr/greater than the maximum allowed length/,
     'Exceed max allowed length'
   );
+}
+
+# DNA region FASTA
+{
+  my $region = '6:61..122';
+  my $url = "/sequence/region/homo_sapiens/$region";
+  my $fasta = fasta_GET($url, 'Getting 62 bp of sequence');
+  my $expected = <<'FASTA';
+>chromosome:GRCh37:6:61:122:1
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NN
+FASTA
+  is($fasta, $expected, 'FASTA formatting');
+  
+  my $expanded_fasta = fasta_GET($url.'?expand_5prime=60;expand_3prime=60', 'Getting 182 bp of sequence');
+  my $expanded_expected = <<'FASTA';
+>chromosome:GRCh37:6:1:182:1
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+NN
+FASTA
+
+  is($expanded_fasta, $expanded_expected, 'FASTA formatting with 5 and 3 prime extensions');
 }
 
 
