@@ -49,7 +49,10 @@ recommends 'Cache::Memcached';
 
 #Test requirements
 test_requires 'Test::More' => '0.88';
+test_requires 'Test::Differences';
+test_requires 'Test::JSON';
 test_requires 'Test::XML::Simple';
+test_requires 'Test::XPath';
 catalyst;
 
 install_script glob('script/*.pl');
