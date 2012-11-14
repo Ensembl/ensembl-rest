@@ -7,6 +7,8 @@ use base qw/Exporter/;
 our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET text_GET xml_GET action_bad action_bad_regex/;
 
 use Test::More;
+use Test::Differences;
+use Test::JSON;
 use Test::XML::Simple;
 use JSON;
 use HTTP::Request;
@@ -14,12 +16,8 @@ use HTTP::Request;
 sub is_json_GET {
   my ($url, $expected, $msg) = @_;
   my $json = json_GET($url, $msg);
-  if($json) {
-    my $rc = is_deeply($json, $expected, "$url | $msg");
-    return 1 if $rc;
-    diag explain $json;
-  }
-  return 0;
+  return eq_or_diff_data($json, $expected, "$url | $msg") if $json;
+  return;
 }
 
 sub json_GET {
@@ -31,15 +29,10 @@ sub json_GET {
     return fail($msg);
   }
   my $raw = $resp->decoded_content();
+  is_valid_json($raw, "$url | $msg (testing JSON validity)");
   my $json = eval { decode_json($resp->decoded_content())};
-  if(! $json) {
-    diag "Could not decode JSON";
-    diag explain $json;
-    fail $msg;
-    return;
-  }
-  pass("JSON retrieved | $msg");
-  return $json;
+  return $json if $json;
+  return;
 }
 
 sub seqxml_GET {
@@ -51,7 +44,7 @@ sub xml_GET {
   my ($url, $msg, $content_type) = @_;
   $content_type ||= 'text/xml';
   my $xml = text_GET($url, $msg, $content_type);
-  xml_valid($xml, "XML valid | $msg") or diag explain $xml;
+  xml_valid($xml, "$url | $msg (testing XML validity)") or diag explain $xml;
   return $xml;
 }
 
