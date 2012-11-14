@@ -14,6 +14,8 @@ use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::SeqIO;
 use IO::String;
+use Test::XML::Simple;
+use XML::LibXML;
 
 my $fh;
 {
@@ -66,16 +68,30 @@ Catalyst::Test->import('EnsEMBL::REST');
 # Protein ID based lookup
 {
   my $id = 'ENSP00000320396';
+  my $seq = $seqs{$id.'_protein'};
+  my $url = '/sequence/id/'.$id; 
   is_json_GET(
-    '/sequence/id/'.$id,
+    $url,
     {
-      seq => $seqs{$id.'_protein'}->seq(),
+      seq => $seq->seq(),
       id => $id,
       desc => undef,
       molecule => 'protein',
     },
     'Protein retrieval'
   );
+  
+  my $seq_xml = seqxml_GET($url, 'Protein sequence SeqXML retrieval');
+  xml_is_long($seq_xml, '/seqXML/entry/AAseq', $seq->seq(), 'Protein sequence as expected');
+  
+  my $xml = xml_GET($url, 'Protein sequence basic XML retrieval');
+  my $doc = XML::LibXML->new->parse_string($xml);
+  my $nodes = $doc->findnodes('/opt/data');
+  is($nodes->size(), 1, 'Found a single data entry') or diag explain $xml;
+  my $node = $nodes->pop();
+  is($node->getAttribute('seq'), $seq->seq(), 'XML Protein sequence as expected');
+  is($node->getAttribute('molecule'), 'protein', 'XML Protein molecule as expected');
+  is($node->getAttribute('id'), $id, 'XML Protein ID as expected');
 }
 
 # Gene genomic DNA
