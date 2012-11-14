@@ -126,8 +126,8 @@ sub map_data : Private {
           coordinate_system => $mapped_slice->coord_system->name,
           assembly => $mapped_slice->coord_system->version,
           seq_region_name => $mapped_slice->seq_region_name(),
-          start => $mapped_slice->start(),
-          end => $mapped_slice->end(),
+          start => $mapped_slice->start() * 1,
+          end => $mapped_slice->end() * 1,
           strand => $mapped_slice->strand(),
         },
       };
