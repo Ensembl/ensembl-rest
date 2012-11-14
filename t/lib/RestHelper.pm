@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET json_GET seqxml_GET xml_GET action_bad action_bad_regex/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET text_GET xml_GET action_bad action_bad_regex/;
 
 use Test::More;
 use Test::XML::Simple;
@@ -50,15 +50,26 @@ sub seqxml_GET {
 sub xml_GET {
   my ($url, $msg, $content_type) = @_;
   $content_type ||= 'text/xml';
+  my $xml = text_GET($url, $msg, $content_type);
+  xml_valid($xml, "XML valid | $msg") or diag explain $xml;
+  return $xml;
+}
+
+sub fasta_GET {
+  my ($url, $msg) = @_;
+  return text_GET($url, $msg, 'text/x-fasta');
+}
+
+sub text_GET {
+  my ($url, $msg, $content_type) = @_;
+  $content_type ||= 'text/plain';
   my $resp = do_GET($url, $content_type);
   if(! $resp->is_success()) {
     my $code = $resp->code();
     note "Response code $code";
     return fail($msg);
   }
-  my $xml = $resp->decoded_content();
-  xml_valid($xml, "XML valid | $msg") or diag explain $xml;
-  return $xml;
+  return $resp->decoded_content();
 }
 
 sub do_GET {
