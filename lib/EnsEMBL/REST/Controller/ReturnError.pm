@@ -35,7 +35,6 @@ sub index_POST { }
 
 sub from_ensembl : Path : Args(0) : ActionClass('REST') {
     my ( $self, $c, $raw_error ) = @_;
-    carp;
     $c->log->error($raw_error);
     my ($error_cleaned) = $raw_error =~ m/MSG:\s(.*?)STACK/s;
     $error_cleaned ||= 'something bad has happened';
