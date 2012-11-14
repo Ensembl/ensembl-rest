@@ -663,7 +663,7 @@ CREATE TABLE `repeat_consensus` (
   KEY `class` (`repeat_class`),
   KEY `consensus` (`repeat_consensus`(10)),
   KEY `type` (`repeat_type`)
-) ENGINE=MyISAM AUTO_INCREMENT=595166 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=595449 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `repeat_feature` (
   `repeat_feature_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
