@@ -12,57 +12,79 @@ has 'log' => ( is => 'ro', isa => 'Log::Log4perl::Logger', lazy => 1, default =>
   return Log::Log4perl->get_logger(__PACKAGE__);
 });
 
-has 'compara_cache' => ( is => 'ro', isa => 'HashRef[String]', lazy => 1, default => sub { {} });
+# Manual host configuration
+has 'host' => ( is => 'ro', isa => 'Str' );
+has 'port' => ( is => 'ro', isa => 'Int' );
+has 'user' => ( is => 'ro', isa => 'Str' );
+has 'pass' => ( is => 'ro', isa => 'Str' );
+has 'version' => ( is => 'ro', isa => 'Int' );
+has 'verbose' => ( is => 'ro', isa => 'Bool' );
 
-has '_registry' => ( is => 'ro', lazy => 0, default => sub {
+# File based config
+has 'file' => ( is => 'ro', isa => 'Str' );
+
+# Avoid initiation of the registry
+has 'skip_initation' => ( is => 'ro', isa => 'Bool' );
+
+# Connection settings
+has 'reconnect_interval' => ( is => 'ro', isa => 'Num' );
+has 'disconnect_if_idle' => ( is => 'ro', isa => 'Bool' );
+has 'reconnect_when_lost' => ( is => 'ro', isa => 'Bool' );
+has 'no_caching' => ( is => 'ro', isa => 'Bool' );
+has 'connection_sharing' => ( is => 'ro', isa => 'Bool' );
+has 'no_version_check' => ( is => 'ro', isa => 'Bool' );
+
+has 'compara_cache' => ( is => 'ro', isa => 'HashRef[Str]', lazy => 1, default => sub { {} });
+
+has '_registry' => ( is => 'ro', lazy => 1, default => sub {
   my ($self) = @_;
   my $log = $self->log();
   $log->info('Loading the registry model object');
   my $class = 'Bio::EnsEMBL::Registry';
   Catalyst::Utils::ensure_class_loaded($class);
   $class->no_version_check(1);
-  my $cfg = EnsEMBL::REST->config()->{Registry};
-  if($cfg->{file}) {
+  return $class if $self->skip_initation();
+  if($self->file()) {
     no warnings 'once';
     local $Bio::EnsEMBL::Registry::NEW_EVAL = 1;
-    $log->info('Using the file location '.$cfg->{file});
-    $class->load_all($cfg->{file});
+    $log->info('Using the file location '.$self->file());
+    $class->load_all($self->file());
   }
-  elsif($cfg->{host}) {
+  elsif($self->host()) {
     $log->info('Using host settings from the configuration file');
     $class->load_registry_from_db(
-      -HOST => $cfg->{host},
-      -PORT => $cfg->{port},
-      -USER => $cfg->{user},
-      -PASS => $cfg->{pass},  
-      -DB_VERSION => $cfg->{version},
-      -VERBOSE => $cfg->{verbose}
+      -HOST => $self->host(),
+      -PORT => $self->port(),
+      -USER => $self->user(),
+      -PASS => $self->pass(),  
+      -DB_VERSION => $self->version(),
+      -VERBOSE => $self->verbose()
     );
   }
   else {
     confess "Cannot instantiate a registry. Please consult your configuration file and try again"
   }
-  $self->_set_connection_policies($class, $cfg);
+  $self->_set_connection_policies($class);
   return $class;
 });
 
 sub _set_connection_policies {
-  my ($self, $registry, $cfg) = @_;
+  my ($self, $registry) = @_;
   
   my $log = $self->log();
   $log->info('Setting up connection policies');
   
-  if($cfg->{disconnect_if_idle}) {
+  if($self->disconnect_if_idle()) {
     $log->info('Setting all DBAdaptors to disconnect when inactive');
     $registry->set_disconnect_when_inactive();
   }
   
-  if($cfg->{reconnect_when_lost}) {
+  if($self->reconnect_when_lost()) {
     $log->info('Setting all DBAdaptors to reconnect when connections are lost');
     $registry->set_reconnect_when_lost();
   }
   
-  if($cfg->{no_caching}) {
+  if($self->no_caching()) {
     $log->info('Stopping caching in all adaptors and clearing out existing caches');
     $registry->no_cache_warnings(1);
     foreach my $dba (@{$registry->get_all_DBAdaptors()}) {
@@ -70,18 +92,18 @@ sub _set_connection_policies {
     }
   }
   
-  if($cfg->{connection_sharing}) {
+  if($self->connection_sharing()) {
     $log->info('Connection sharing turned on');
-    $self->_intern_db_connections($registry, $cfg);
+    $self->_intern_db_connections($registry);
   }
   
   return;
 }
 
 sub _intern_db_connections {
-  my ($self, $registry, $cfg) = @_;
+  my ($self, $registry) = @_;
   my %single_connections;
-  my $reconnect_interval = $cfg->{reconnect_interval} || 0;
+  my $reconnect_interval = $self->reconnect_interval() || 0;
   Catalyst::Utils::ensure_class_loaded('Bio::EnsEMBL::DBSQL::ProxyDBConnection');
   my $log = $self->log();
   if($reconnect_interval) {

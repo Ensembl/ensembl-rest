@@ -21,22 +21,18 @@ has 'log' => ( is => 'ro', isa => 'Log::Log4perl::Logger', lazy => 1, default =>
   return Log::Log4perl->get_logger(__PACKAGE__);
 });
 
-has 'example_expire_time' => ( is => 'ro', isa => 'Int', lazy => 1, default => sub {
-  return EnsEMBL::REST->config()->{Documentation}->{example_expire_time} || 3600;
-});
+has 'example_expire_time' => ( is => 'ro', isa => 'Int', lazy => 1, default => 3600);
 
-has 'replacements' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub {
-  return EnsEMBL::REST->config()->{Documentation}->{replacements} || {};
-});
+has 'replacements' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub {{}});
 
+has 'paths' => ( is => 'ro', isa => 'ArrayRef' );
 
 sub merged_config {
   my ($self, $c) = @_;
   my $merged_cfg = $self->_merged_config();
   return $merged_cfg if $merged_cfg;
   
-  my $cfg = EnsEMBL::REST->config()->{Documentation};
-  my $paths = wrap_array($cfg->{paths});
+  my $paths = wrap_array($self->paths());
   my $log = $self->log();
 
   $merged_cfg = {};

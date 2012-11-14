@@ -1,5 +1,20 @@
 <h1>Change Log</h1>
 
+<h2>1.2.0 - </h2>
+
+<h3>Configuration</h3>
+<ul>
+  <li>Configuration has switched to a more Catalyst friendly method. Config
+    is namespaced to the object which uses it and is accessible via local
+    accessors in that object. 
+    <ul>
+      <li>Registry and Documentation are prefixed with <tt>Model::</tt></li>
+      <li>Feature and Sequence are prefixed with <tt>Controller::</tt><li>
+      <li>All other configuration sections are unaffected</li>
+    </ul>
+  </li>
+</ul>
+
 <h2>1.1.2 - 25th October 2012</h2>
 
 <h3>Output</h3>

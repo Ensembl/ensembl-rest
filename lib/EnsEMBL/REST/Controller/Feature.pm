@@ -29,6 +29,8 @@ text/x-gff3
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
+has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e7);
+
 sub species: Chained('/') PathPart('feature/region') CaptureArgs(1) {
   my ( $self, $c, $species) = @_;
   $c->stash(species => $species);
@@ -49,14 +51,6 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
   $self->status_ok($c, entity => $features );
-}
-
-sub default_length {
-  return 5e6;
-}
-
-sub length_config_key {
-  return 'Feature';
 }
 
 with 'EnsEMBL::REST::Role::SliceLength';
