@@ -20,7 +20,6 @@ sub process {
   my $output_fh = IO::String->new();
   my $gff = $self->build_gff_serializer($c, $output_fh);
   my $features = $c->stash()->{$stash_key};
-  print $features;
   my $slice = $c->stash()->{slice};
   $gff->print_main_header([$slice]);
   while(my $f = shift @{$features}) {

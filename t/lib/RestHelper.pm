@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET text_GET xml_GET action_bad action_bad_regex/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET text_GET gff_GET xml_GET action_bad action_bad_regex/;
 
 use Test::More;
 use Test::Differences;
@@ -53,14 +53,20 @@ sub fasta_GET {
   return text_GET($url, $msg, 'text/x-fasta');
 }
 
+sub gff_GET {
+  my ($url, $msg) = @_;
+  return text_GET($url, $msg, 'text/x-gff3');
+}
+
 sub text_GET {
   my ($url, $msg, $content_type) = @_;
   $content_type ||= 'text/plain';
   my $resp = do_GET($url, $content_type);
   if(! $resp->is_success()) {
     my $code = $resp->code();
-    note "Response code $code";
-    return fail($msg);
+    note "Response code for $url was $code";
+    fail($msg);
+    return;
   }
   return $resp->decoded_content();
 }
