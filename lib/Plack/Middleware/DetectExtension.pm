@@ -47,22 +47,26 @@ sub regex {
 
 sub call {
   my ($self, $env) = @_;
-  
   #Only process if content-type header was not set and if not in the query params then sniff away
   if(!$env->{CONTENT_TYPE} && $env->{QUERY_STRING} !~ /content-type=/i) {
-    my $lookup = $self->get_lookup();
-    my $regex = $self->regex();
-    #Search for an ext in the PATH_INFO
-    $env->{PATH_INFO} =~ s/\.($regex)$//;
-    my $ext = $1;
-    if($ext) {
-      my $content_type = $lookup->{$ext};
-      $env->{CONTENT_TYPE} = $content_type;
-      #We do *not* process REQUEST_URI: Plack spec says we shouldn't 
-    }
+    my $content_type = $self->process_path_info($env->{PATH_INFO});
+    $env->{CONTENT_TYPE} = $content_type if $content_type;
   }
-  
   $self->app->($env);
-};
+}
+
+sub process_path_info {
+  my ($self, $path_info) = @_;
+  my $lookup = $self->get_lookup();
+  my $regex = $self->regex();
+  #Search for an ext in the PATH_INFO
+  $path_info =~ s/\.($regex)$//;
+  my $ext = $1;
+  if($ext) {
+    my $content_type = $lookup->{$ext};
+    return $content_type;
+  }
+  return;
+}
 
 1;
