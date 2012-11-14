@@ -8,7 +8,7 @@ use EnsEMBL::REST::EnsemblModel::CDS;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
+    map { $_ => 1 } qw/gene transcript cds exon repeat variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
   };
 });
 
@@ -79,6 +79,11 @@ sub exon {
   my ($self, $c, $slice) = @_;
   my $exons = $slice->get_all_Exons();
   return EnsEMBL::REST::EnsemblModel::ExonTranscript->build_all_from_Exons($exons);
+}
+
+sub repeat {
+  my ($self, $c, $slice) = @_;
+  return $slice->get_all_RepeatFeatures();
 }
 
 sub variation {

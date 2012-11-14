@@ -19,6 +19,8 @@ __PACKAGE__->config(
 );
 EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
 
+has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e7);
+
 my %allowed_values = (
   type    => { map { $_, 1} qw(cds cdna genomic protein)},
   mask    => { map { $_, 1} qw(soft hard) },
@@ -224,14 +226,6 @@ sub _write {
   else {
     $self->status_ok($c, entity => $c->stash()->{sequences}->[0]);
   }
-}
-
-sub default_length {
-  return 1e7;
-}
-
-sub length_config_key {
-  return 'Sequence';
 }
 
 with 'EnsEMBL::REST::Role::SliceLength';

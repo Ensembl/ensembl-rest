@@ -1,5 +1,17 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.2.0 - 
+
+Configuration:
+
+  - Configuration has switched to a more Catalyst friendly method. Config
+    is namespaced to the object which uses it and is accessible via local
+    accessors in that object. 
+    
+    Registry and Documentation are prefixed with Model:: 
+    Feature and Sequence are prefixed with Controller::
+    All other configuration sections are unaffected
+
 1.1.2 24-10-2012
 
 Output:
