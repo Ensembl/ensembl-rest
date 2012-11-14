@@ -110,6 +110,34 @@ Catalyst::Test->import('EnsEMBL::REST');
   );
 }
 
+# Gene to protein
+{
+  my $id = 'ENSG00000176515';
+  my $protein_id = 'ENSP00000320396';
+  my $seq = $seqs{$protein_id.'_protein'};
+  
+  my $base_url = "/sequence/id/${id}?type=protein";
+  my $single_json = json_GET($base_url, 'Accept Gene -> Protein without multiple_sequences on if 1 sequence is available');
+  is($single_json->{seq}, $seq->seq(), 'Checking sequence is fine and no array is present');
+  
+  is_json_GET(
+    $base_url.';multiple_sequences=1',
+    [{
+      seq => $seq->seq,
+      id => $protein_id,
+      desc => ($seq->desc ? $seq->desc : undef),
+      molecule => 'protein',
+    }],
+    'Gene to protein sequence retrieval with multiple sequences on'
+  );
+  
+  my $multiple_transcript_gene_id = 'ENSG00000112699';
+  my $base_multi_url = "/sequence/id/${multiple_transcript_gene_id}?type=cdna";
+  action_bad_regex($base_multi_url, qr/multiple_sequences/, 'Genes with more than one sequence are rejected without multiple_sequences on');
+  my $json = json_GET($base_multi_url.';multiple_sequences=1', 'Getting multiple_sequences JSON');
+  is(@{$json}, 10, 'Expect 10 CDNAs linked');
+}
+
 # DNA Region; good
 {
   my $region = '6:1080164-1105181';
