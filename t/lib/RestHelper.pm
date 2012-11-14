@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET json_GET action_bad action_bad_regex/;
+our @EXPORT = qw/is_json_GET json_GET seqxml_GET xml_GET action_bad action_bad_regex/;
 
 use Test::More;
+use Test::XML::Simple;
 use JSON;
 use HTTP::Request;
 
@@ -39,6 +40,25 @@ sub json_GET {
   }
   pass("JSON retrieved | $msg");
   return $json;
+}
+
+sub seqxml_GET {
+  my ($url, $msg) = @_;
+  return xml_GET($url, $msg, 'text/x-seqxml+xml');
+}
+
+sub xml_GET {
+  my ($url, $msg, $content_type) = @_;
+  $content_type ||= 'text/xml';
+  my $resp = do_GET($url, $content_type);
+  if(! $resp->is_success()) {
+    my $code = $resp->code();
+    note "Response code $code";
+    return fail($msg);
+  }
+  my $xml = $resp->decoded_content();
+  xml_valid($xml, "XML valid | $msg") or diag explain $xml;
+  return $xml;
 }
 
 sub do_GET {
