@@ -161,7 +161,7 @@ sub get_species {
     my $division = $mc->single_value_by_key('species.division') || 'Ensembl';
     my $info = {
       name => $species,
-      release => $mc->get_schema_version(),
+      release => $mc->get_schema_version() * 1,
       aliases => $self->_registry()->get_all_aliases($species),
       groups  => [ map { $_->group() } @{$self->get_all_DBAdaptors(undef, $species)}],
       division => $division,
@@ -214,7 +214,7 @@ sub get_unique_schema_versions {
     $hash{$dba->get_MetaContainer()->get_schema_version()} = 1;
   }
   $self->disconnect_DBAdaptors(@dbadaptors);
-  return [keys %hash];
+  return [map { $_ *1 } keys %hash];
 }
 
 sub get_all_DBAdaptors {
