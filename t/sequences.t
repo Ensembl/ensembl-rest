@@ -15,7 +15,7 @@ use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::SeqIO;
 use IO::String;
 use Test::XML::Simple;
-use XML::LibXML;
+use Test::XPath;
 
 my $fh;
 {
@@ -87,13 +87,16 @@ Catalyst::Test->import('EnsEMBL::REST');
   xml_is_long($seq_xml, '/seqXML/entry/AAseq', $seq->seq(), 'Protein sequence as expected');
   
   my $xml = xml_GET($url, 'Protein sequence basic XML retrieval');
-  my $doc = XML::LibXML->new->parse_string($xml);
-  my $nodes = $doc->findnodes('/opt/data');
-  is($nodes->size(), 1, 'Found a single data entry') or diag explain $xml;
-  my $node = $nodes->pop();
-  is($node->getAttribute('seq'), $seq->seq(), 'XML Protein sequence as expected');
-  is($node->getAttribute('molecule'), 'protein', 'XML Protein molecule as expected');
-  is($node->getAttribute('id'), $id, 'XML Protein ID as expected');
+  my $tx = Test::XPath->new(xml => $xml);
+  my $count = 0;
+  $tx->ok('/opt/data', sub {
+    $count++;
+    my $node = $tx->node();
+    is($node->getAttribute('seq'), $seq->seq(), 'XML Protein sequence as expected');
+    is($node->getAttribute('molecule'), 'protein', 'XML Protein molecule as expected');
+    is($node->getAttribute('id'), $id, 'XML Protein ID as expected');
+  }, 'Asserting <data> XML entity');
+  is($count, 1, 'XML Should only have 1 <data> entity');
 }
 
 # Gene genomic DNA
