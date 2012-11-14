@@ -94,7 +94,7 @@ sub _process {
       $err = qq{Requesting a gene and type not equal to "genomic" can result in multiple sequences. $sequence_count sequencs detected.};
     }
     elsif($object->isa('Bio::EnsEMBL::Transcript') && ! $object->isa('Bio::EnsEMBL::PredictionTranscript') && $type eq 'protein') {
-      $err = qq{Requesting a transcript and type "protein" can result in multiple sequences. $sequence_count sequencs detected.};
+      $err = qq{Requesting a transcript and type "protein" can result in multiple sequences. $sequence_count sequences detected.};
     }
     $c->go('ReturnError', 'custom', ["$err Please rerun your request and specify the multiple_sequences parameter"]) if $err;
   }
