@@ -1,0 +1,2 @@
+variation_feature	2	11
+flanking_sequence	2	\N

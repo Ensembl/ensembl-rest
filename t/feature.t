@@ -13,6 +13,7 @@ use Test::More;
 use Test::Differences;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
+use Bio::EnsEMBL::Test::TestUtils;
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
@@ -20,11 +21,35 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 my $base = '/feature/region/homo_sapiens';
 
-#Get features overlapping
+#Null based queries
 {
   my $region = '6:1000000..2000000';
+  is_json_GET("$base/$region?feature=none", [], 'Using feature type none returns nothing');
+  action_bad_regex("$base/$region?feature=wibble", qr/wibble/, 'Using a bad feature type causes an exception');
+}
+
+#Get basic features overlapping
+{
+  my $region = '6:1000000..2000000';
+  my $expected = 9;
   my $json = json_GET("$base/$region?feature=gene", '10 genes from chr 6');
-  is(scalar(@{$json}), 9, 'Genes in the basic region');
+  is(scalar(@{$json}), $expected, 'Genes in the basic region');
+  
+  is(
+    @{json_GET("$base/$region?feature=gene;logic_name=ensembl", 'Ensembl logic name genes')}, 
+    1, '1 genes from chr 6 of logic name ensembl');
+  
+  is(
+    @{json_GET("$base/$region?feature=gene;logic_name=wibble", 'Wibble logic name genes')}, 
+    0, '0 genes from chr 6 of logic name wibble');
+  
+  is(
+    @{json_GET("$base/$region?feature=gene;logic_name=ensembl;db_type=core", 'Ensembl logic name genes from enforced core DB')}, 
+    1, '1 genes from chr 6 of logic name ensembl from enforced core db');
+  
+  warns_like(sub {
+    is_json_GET("$base/$region?feature=gene;db_type=wibble",[], 'Bad db type given');
+  }, qr/wibble genes not available/, 'Checking for internal warnings when bad DB type given');
 }
 
 #Inspect the first feature
@@ -55,6 +80,33 @@ my $base = '/feature/region/homo_sapiens';
   is($cds->{Parent}, $transcript->{ID}, 'CDS parent is the previous transcript');
   is($cds->{start}, 1101508, 'First CDS starts at first coding point in the second exon');
   is($cds->{end}, 1101531, 'First CDS ends at the second exon');
+}
+
+#Query variation DB
+{
+  my $region = '6:1000000-1003000';
+  my $expected_count = 2;
+  my $json = json_GET("$base/$region?feature=variation", 'Fetching variations at '.$region);
+  is(scalar(@{$json}), $expected_count, 'Expected variations at '.$region);
+  eq_or_diff_data($json->[0],{
+    start => 1001893,
+    end => 1001893,
+    strand => 1,
+    ID => 'tmp__',
+    consequence_type => 'intergenic_variant',
+    feature_type => 'variation',
+    seq_region_name => '6',
+    alt_alleles => [ qw/T -/]
+  }, 'Checking one variation format');
+  
+  my $somatic_json = json_GET("$base/$region?feature=somatic_variation", 'Fetching somatic variations at '.$region);
+  is(scalar(@{$somatic_json}), 1, 'Expected somatic variations at '.$region);
+  
+  #SO:0001650 inframe_variant (but the original term does not work)
+  is_json_GET("$base/$region?feature=variation;so_term=inframe_variant", [], 'SO term querying');
+  my $intergenic = 'intergenic_variant';
+  my $json_so = json_GET("$base/$region?feature=variation;so_term=$intergenic", 'SO term querying with known type');
+  is(scalar(@{$json}), $expected_count, 'Expected '.$intergenic.' variations at '.$region);
 }
 
 #Query for other objects

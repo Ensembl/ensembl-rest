@@ -9,6 +9,10 @@
   'databases' => {
     'homo_sapiens' => { 
       'core' => 'Bio::EnsEMBL::DBSQL::DBAdaptor',
+      'variation' => 'Bio::EnsEMBL::Variation::DBSQL::DBAdaptor',
+    },
+    'multi' => {
+      'ontology' => 'Bio::EnsEMBL::DBSQL::OntologyDBAdaptor',
     },
   },
 

@@ -1,1 +1,2 @@
-5	SO	sequence
+1	SO	sequence
+2	UNKNOWN	unknown ontology

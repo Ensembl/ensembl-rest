@@ -108,7 +108,7 @@ sub somatic_structural_variation {
   my ($self, $c, $slice) = @_;
   my @so_terms = $self->_get_SO_terms($c);
   my ($source, $include_evidence, $somatic) = (undef)x3;
-  my $sv_class = (@so_terms) ? $so_terms[0] : ();
+  my ($sv_class) = @so_terms;
   return $slice->get_all_somatic_StructuralVariationFeatures($source, $include_evidence, $somatic, $sv_class);
 }
 
