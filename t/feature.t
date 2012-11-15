@@ -102,8 +102,11 @@ my $base = '/feature/region/homo_sapiens';
   my $somatic_json = json_GET("$base/$region?feature=somatic_variation", 'Fetching somatic variations at '.$region);
   is(scalar(@{$somatic_json}), 1, 'Expected somatic variations at '.$region);
   
-  #SO:0001650 inframe_variant (but the original term does not work)
+  #SO:0001650 inframe_variant which has no entries
   is_json_GET("$base/$region?feature=variation;so_term=inframe_variant", [], 'SO term querying');
+  is_json_GET("$base/$region?feature=variation;so_term=SO:0001650", [], 'SO accession querying');
+  
+  #Normal SO querying
   my $intergenic = 'intergenic_variant';
   my $json_so = json_GET("$base/$region?feature=variation;so_term=$intergenic", 'SO term querying with known type');
   is(scalar(@{$json}), $expected_count, 'Expected '.$intergenic.' variations at '.$region);

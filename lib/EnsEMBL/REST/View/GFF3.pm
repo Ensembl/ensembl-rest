@@ -9,7 +9,7 @@ extends 'Catalyst::View';
 
 sub build_gff_serializer {
   my ($self, $c, $output_fh) = @_;
-  my $ontology_adaptor = $c->model('Registry')->get_adaptor( 'Multi', 'Ontology', 'OntologyTerm' );  
+  my $ontology_adaptor = $c->model('Registry')->get_ontology_term_adaptor();  
   my $serializer = Bio::EnsEMBL::Utils::IO::GFFSerializer->new($ontology_adaptor, $output_fh);
   return $serializer;
 } 
