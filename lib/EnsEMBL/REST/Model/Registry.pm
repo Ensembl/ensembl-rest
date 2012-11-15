@@ -233,6 +233,11 @@ sub map_all_DBAdaptors {
   return @results;
 }
 
+sub get_ontology_term_adaptor {
+  my ($self) = @_;
+  return $self->get_adaptor('multi','ontology', 'ontologyterm');
+}
+
 sub disconnect_DBAdaptors {
   my ($self, @db_adaptors) = @_;
   foreach my $dba (@db_adaptors) {

@@ -124,6 +124,12 @@ sub decode_region {
   return ($sr_name, $start, $end, $strand);
 }
 
+sub ontology_accession_to_OntologyTerm {
+  my ($self, $c, $accession) = @_;
+  my $term_adaptor = $c->model('Registry')->get_ontology_term_adaptor();
+  return $term_adaptor->fetch_by_accession($accession);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

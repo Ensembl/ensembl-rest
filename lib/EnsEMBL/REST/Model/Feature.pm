@@ -139,7 +139,20 @@ sub _get_SO_terms {
                                     : (ref($so_term) eq 'ARRAY') 
                                     ? $so_term 
                                     : [$so_term];
-  return $terms;
+  my @final_terms;
+  foreach my $term (@{$terms}) {
+    if($term =~ /^SO\:/) {
+      my $ontology_term = $c->model('Lookup')->ontology_accession_to_OntologyTerm($c, $term);
+      if(!$ontology_term) {
+        $c->go('ReturnError', 'custom', ["The SO accession '${term}' could not be found in our ontology database"]);
+      }
+      push(@final_terms, $ontology_term->name());
+    }
+    else {
+      push(@final_terms, $term);
+    }
+  }
+  return \@final_terms;
 }
 
 sub _get_logic_dbtype {
