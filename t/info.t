@@ -16,6 +16,7 @@ use Bio::EnsEMBL::ApiVersion qw/software_version/;
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
 Catalyst::Test->import('EnsEMBL::REST');
+require EnsEMBL::REST;
 
 my $VERSION = software_version();
 
@@ -37,8 +38,18 @@ is_json_GET(
 # info/species
 is_json_GET(
   '/info/species', 
-  {species => [ { division => 'Ensembl', name => 'homo_sapiens', groups => ['core'], aliases => [], release => $VERSION} ]},
+  {species => [ { division => 'Ensembl', name => 'homo_sapiens', groups => ['core', 'variation'], aliases => [], release => $VERSION} ]},
   "checking only DBA available is the test DBA"
+);
+
+# /info/software
+is_json_GET(
+  '/info/software', { release => $VERSION }, "software reports current version $VERSION"
+);
+
+# /info/rest
+is_json_GET(
+  '/info/rest', { release => $EnsEMBL::REST::VERSION }, "rest current version is $EnsEMBL::REST::VERSION"
 );
 
 done_testing();

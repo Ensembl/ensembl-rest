@@ -1,0 +1,12 @@
+1	SO_accession		Sequence Ontology accession
+2	SO_term		Sequence Ontology term
+3	display_term		Ensembl display term
+4	NCBI_term		NCBI term
+5	feature_SO_term		Sequence Ontology term for the associated feature
+6	rank		Relative severity of this variation consequence
+7	polyphen_prediction		PolyPhen-2 prediction
+8	sift_prediction		SIFT prediction
+9	short_name	Short name	A shorter name for an instance, e.g. a VariationSet
+10	dbsnp_clin_sig	dbSNP clinical significance	The clinical significance of a variant as reported by dbSNP
+11	dgva_clin_sig	DGVa clinical significance	The clinical significance of a structural variant as reported by DGVa
+12	prot_func_analysis	Protein function analysis 	The program used to make protein function predictions
