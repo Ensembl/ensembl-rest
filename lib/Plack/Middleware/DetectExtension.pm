@@ -19,6 +19,9 @@ our %LOOKUP = (
   jsonp => 'text/javascript',
   txt => 'text/plain',
   
+  #Binary exts
+  sereal => 'application/x-sereal',
+  
   #Seq exts
   fasta => 'text/x-fasta',
   seqxml => 'text/x-seqxml+xml',
