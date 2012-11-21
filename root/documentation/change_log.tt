@@ -2,6 +2,13 @@
 
 <h2>1.2.0 - </h2>
 
+<h3>New Feature</h3>
+<ul>
+  <li>Support for Sereal encoding format from <tt>Sereal::Encoder</tt>. MIME type
+    <tt>application/x-sereal</tt> is required and extension support is
+    <tt>.sereal</tt></li>
+</ul>
+
 <h3>Configuration</h3>
 <ul>
   <li>Configuration has switched to a more Catalyst friendly method. Config

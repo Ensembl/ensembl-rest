@@ -2,6 +2,12 @@ This file documents the revision history for Perl extension EnsEMBL::REST.
 
 1.2.0 - 
 
+New Features:
+
+  - Support for Sereal encoding format from Sereal::Encoder. MIME type
+    application/x-sereal is required and extension support is
+    .sereal
+
 Configuration:
 
   - Configuration has switched to a more Catalyst friendly method. Config
