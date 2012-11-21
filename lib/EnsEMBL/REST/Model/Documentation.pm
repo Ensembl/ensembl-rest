@@ -82,6 +82,15 @@ sub enrich {
         };
       }
     }
+    
+    if(EnsEMBL::REST->config()->{sereal}) {
+      my $outputs = $endpoint->{output};
+      $outputs = [$outputs] unless ref($outputs);
+      if(! grep { lc($_) eq 'sereal'} @{$outputs}) {
+        push(@{$outputs}, 'sereal');
+      }
+      $endpoint->{output} = $outputs;
+    }
 
     #Build each output example
     foreach my $id ( keys %{ $endpoint->{examples} } ) {

@@ -119,7 +119,7 @@ sub turn_on_config_serialisers {
   if($class->config->{sereal}) {
     $package->config(
       map => {
-        'binary/x-sereal'     => 'Sereal',
+        'application/x-sereal'     => 'Sereal',
       }
     );
   }
