@@ -106,12 +106,20 @@ else {
 __PACKAGE__->setup();
 
 #HACK but it works
-sub turn_on_jsonp {
+sub turn_on_config_serialisers {
   my ($class, $package) = @_;
   if($class->config->{jsonp}) {
     $package->config(
       map => {
         'text/javascript'     => 'JSONP',
+      }
+    );
+  }
+  
+  if($class->config->{sereal}) {
+    $package->config(
+      map => {
+        'binary/x-sereal'     => 'Sereal',
       }
     );
   }

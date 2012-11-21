@@ -17,7 +17,7 @@ __PACKAGE__->config(
     'text/x-seqxml'       => [qw/View SeqXML/], #naughty but needs must
   }
 );
-EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
+EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e7);
 

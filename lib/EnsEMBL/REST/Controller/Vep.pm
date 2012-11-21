@@ -3,7 +3,7 @@ use Moose;
 use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
 require EnsEMBL::REST;
-EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
+EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
 use Try::Tiny;

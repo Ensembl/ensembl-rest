@@ -6,7 +6,7 @@ use Try::Tiny;
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
 require EnsEMBL::REST;
-EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
+EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 sub index :Path Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
