@@ -3,7 +3,7 @@ use Moose;
 use namespace::autoclean;
 use feature "switch";
 require EnsEMBL::REST;
-EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
+EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 use Try::Tiny;
 
 BEGIN {extends 'Catalyst::Controller::REST'; }

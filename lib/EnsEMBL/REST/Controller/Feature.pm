@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 require EnsEMBL::REST;
-EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
+EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 __PACKAGE__->config(
   map => {

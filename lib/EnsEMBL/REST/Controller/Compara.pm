@@ -4,7 +4,7 @@ use namespace::autoclean;
 use Try::Tiny;
 require EnsEMBL::REST;
 
-EnsEMBL::REST->turn_on_jsonp(__PACKAGE__);
+EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
