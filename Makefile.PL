@@ -46,6 +46,9 @@ recommends 'Plack::Middleware::ReverseProxy';
 recommends 'Plack::Middleware::SizeLimit';
 recommends 'Plack::Middleware::Throttle';
 recommends 'Cache::Memcached';
+recommends 'Sereal::Encoder';
+recommends 'Data::MessagePack';
+
 
 #Test requirements
 test_requires 'Test::More' => '0.88';

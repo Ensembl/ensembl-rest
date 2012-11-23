@@ -12,3 +12,4 @@ Makefile
 reg.pm
 .project
 .includepath
+cover_db

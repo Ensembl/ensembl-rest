@@ -123,6 +123,14 @@ sub turn_on_config_serialisers {
       }
     );
   }
+  
+  if($class->config->{msgpack}) {
+    $package->config(
+      map => {
+        'application/x-msgpack' => 'MessagePack'
+      }
+    );
+  }
   return;
 }
 
