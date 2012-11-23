@@ -91,6 +91,15 @@ sub enrich {
       }
       $endpoint->{output} = $outputs;
     }
+    
+    if(EnsEMBL::REST->config()->{msgpack}) {
+      my $outputs = $endpoint->{output};
+      $outputs = [$outputs] unless ref($outputs);
+      if(! grep { lc($_) eq 'msgpack'} @{$outputs}) {
+        push(@{$outputs}, 'msgpack');
+      }
+      $endpoint->{output} = $outputs;
+    }
 
     #Build each output example
     foreach my $id ( keys %{ $endpoint->{examples} } ) {
