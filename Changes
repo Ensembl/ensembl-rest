@@ -7,6 +7,10 @@ New Features:
   - Support for Sereal encoding format from Sereal::Encoder. MIME type
     application/x-sereal is required and extension support is
     .sereal
+  
+  - Support for MessagePack encoding format from Data::MessagePack. MIME type
+    application/x-msgpack is required and extension support is
+    .msgpack
 
 Configuration:
 

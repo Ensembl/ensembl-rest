@@ -4,9 +4,17 @@
 
 <h3>New Feature</h3>
 <ul>
-  <li>Support for Sereal encoding format from <tt>Sereal::Encoder</tt>. MIME type
+  <li>
+    Support for Sereal encoding format from <tt>Sereal::Encoder</tt>. MIME type
     <tt>application/x-sereal</tt> is required and extension support is
-    <tt>.sereal</tt></li>
+    <tt>.sereal</tt>
+  </li>
+  <li>
+    Support for MessagePack encoding format from <tt>Data::MessagePack</tt>. MIME type
+    <tt>application/x-msgpack</tt> is required and extension support is
+    <tt>.msgpack</tt>
+  </li>
+    
 </ul>
 
 <h3>Configuration</h3>
