@@ -21,6 +21,7 @@ our %LOOKUP = (
   
   #Binary exts
   sereal => 'application/x-sereal',
+  msgpack => 'application/x-msgpack',
   
   #Seq exts
   fasta => 'text/x-fasta',
