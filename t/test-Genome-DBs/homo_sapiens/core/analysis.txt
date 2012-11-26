@@ -27,3 +27,6 @@
 8301	2009-03-27 11:33:33	human_est	human_ests	\N	/lustre/work1/ensembl/jb16/NCBI37/ests/est_chunks	\N	\N	exonerate-0.9.0	\N	Exonerate2Genes	\N	\N	\N
 8302	2006-07-13 15:53:10	ncoils	coiled_coil	\N	/usr/local/ensembl/data/coils	ncoils	\N	ncoils		ProteinAnnotation/Coil	\N	ncoils	annotation
 8303	2012-03-01 14:15:44	assembly_patch_ensembl	\N	\N	\N	\N	\N	\N	\N	GeneBuilder	\N	\N	\N
+8304	2011-02-15 17:06:42	firstef	firstef	\N	\N	firstef	\N	\N	-repeatmasked	FirstEF	\N	firstef	exon
+8305	2011-02-15 17:06:42	cpg	cpg	\N	\N	cpg	\N	cpg	\N	CPG	\N	cpg	cpg_island
+8306	2011-02-15 17:06:42	eponine	Eponine	\N	\N	eponine-scan	1	/vol/software/linux-x86_64/jdk1.6.0_01/bin/java	-epojar => /usr/local/ensembl/lib/eponine-scan.jar, -threshold => 0.999	EponineTSS	\N	Eponine	TSS
