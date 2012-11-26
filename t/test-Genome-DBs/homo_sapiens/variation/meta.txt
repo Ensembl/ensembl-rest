@@ -1,2 +1,6 @@
 1	1	schema_type	variation
 2	\N	schema_version	70
+3	\N	patch	patch_69_70_a.sql|schema version
+4	\N	patch	patch_69_70_b.sql|drop table flanking_sequence
+5	\N	patch	patch_69_70_c.sql|add freqs_from_gts column to sample table
+6	\N	patch	patch_69_70_d.sql|add regulatory region variation tables

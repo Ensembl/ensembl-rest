@@ -8,7 +8,7 @@ use EnsEMBL::REST::EnsemblModel::CDS;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
   };
 });
 
@@ -130,6 +130,19 @@ sub regulatory {
   my $rfa = $c->model('Registry')->get_adaptor( $species, 'funcgen', 'regulatoryfeature');
   $c->go('ReturnError', 'custom', ["No adaptor found for species $species, object regulatoryfeature and db funcgen"]) if ! $rfa;
   return $rfa->fetch_all_by_Slice($slice);
+}
+
+sub simple {
+  my ($self, $c, $slice) = @_;
+  my ($logic_name, $db_type) = $self->_get_logic_dbtype($c);
+  return $slice->get_all_SimpleFeatures($logic_name, undef, $db_type);
+}
+
+sub misc {
+  my ($self, $c, $slice) = @_;
+  my $db_type = $c->request->parameters->{db_type};
+  my $misc_set = $c->request->parameters->{misc_set} || undef;
+  return $slice->get_all_MiscFeatures($misc_set, $db_type);
 }
 
 sub _get_SO_terms {

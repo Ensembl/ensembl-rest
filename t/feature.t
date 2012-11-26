@@ -127,6 +127,66 @@ my $base = '/feature/region/homo_sapiens';
   }, 'Checking one repeat');
 }
 
+#Simple feature testing
+{
+  my $region = '6:1020000..1030000';
+  is_json_GET("$base/$region?feature=simple", [{
+    start => 1026863,
+    end => 1027454,
+    strand => -1,
+    ID => 'rank = 1',
+    feature_type => 'simple',
+    score => 0.925,
+    external_name => 'rank = 1',
+    seq_region_name => '6',
+    logic_name => 'firstef'
+  }], 'Getting simple_feature as JSON');
+  
+  is_json_GET("$base/$region?feature=simple;logic_name=bogus", 
+    [], 'Getting simple_feature no entries with bogus logic_name as JSON');
+}
+
+#Misc feature
+{
+  my $region = '6:1070000..1080000';
+  my $thirty_k_feature = {
+    start => 1040974,
+    end => 1216597,
+    strand => 1,
+    ID => '',
+    feature_type => 'misc',
+    seq_region_name => '6',
+    
+    clone_name => 'RP11-550K21',
+    misc_set_code => [qw/cloneset_30k/],
+    misc_set_name => ['30k clone set'],
+    type => 'arrayclone',
+    alt_well_name => 'ChrtpXtra-384-4L20',
+    bacend_well_nam => 'Chr6tp-M-1G12', #Not a typo; well not here as the attrib code is bacend_well_nam
+    sanger_project => 'bA550K21',
+    well_name => 'Chr6tp-3D12',
+  };
+  is_json_GET("$base/$region?feature=misc", [
+  {
+    start => 1072318,
+    end => 1248050,
+    strand => 1,
+    ID => '',
+    feature_type => 'misc',
+    seq_region_name => '6',
+    
+    clone_name => 'RP11-488J04',
+    misc_set_code => [qw/cloneset_32k/],
+    misc_set_name => ['32k clone set'],
+    type => 'arrayclone',
+  },
+  $thirty_k_feature  
+  ], 'Getting misc_feature as JSON with no limits');
+  
+  is_json_GET("$base/$region?feature=misc;misc_set=cloneset_30k",
+     [$thirty_k_feature], 'Getting misc_feature as JSON with misc_set limit of cloneset_30k');
+}
+
 #Ask for a region too big
 action_bad_regex(
   "$base/6:1..2000000?feature=gene",

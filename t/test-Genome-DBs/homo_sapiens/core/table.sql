@@ -23,7 +23,7 @@ CREATE TABLE `analysis` (
   `gff_feature` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`analysis_id`),
   UNIQUE KEY `logic_name_idx` (`logic_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=8304 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=8307 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `analysis_description` (
   `analysis_id` smallint(5) unsigned NOT NULL,
@@ -456,7 +456,7 @@ CREATE TABLE `misc_feature` (
   `seq_region_strand` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`misc_feature_id`),
   KEY `seq_region_idx` (`seq_region_id`,`seq_region_start`)
-) ENGINE=MyISAM AUTO_INCREMENT=92975 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=93024 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `misc_feature_misc_set` (
   `misc_feature_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -473,7 +473,7 @@ CREATE TABLE `misc_set` (
   `max_length` int(10) unsigned NOT NULL,
   PRIMARY KEY (`misc_set_id`),
   UNIQUE KEY `code_idx` (`code`)
-) ENGINE=MyISAM AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `object_xref` (
   `object_xref_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -731,7 +731,7 @@ CREATE TABLE `simple_feature` (
   KEY `seq_region_idx` (`seq_region_id`,`seq_region_start`),
   KEY `analysis_idx` (`analysis_id`),
   KEY `hit_idx` (`display_label`)
-) ENGINE=MyISAM AUTO_INCREMENT=950928 DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=80;
+) ENGINE=MyISAM AUTO_INCREMENT=951211 DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=80;
 
 CREATE TABLE `splicing_event` (
   `splicing_event_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

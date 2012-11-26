@@ -13,14 +13,14 @@ use Test::XML::Simple;
 use JSON;
 use HTTP::Request;
 
-sub is_json_GET {
+sub is_json_GET($$$) {
   my ($url, $expected, $msg) = @_;
   my $json = json_GET($url, $msg);
   return eq_or_diff_data($json, $expected, "$url | $msg") if $json;
   return;
 }
 
-sub json_GET {
+sub json_GET($$) {
   my ($url, $msg) = @_;
   my $resp = do_GET($url, 'application/json');
   if(! $resp->is_success()) {
@@ -35,12 +35,12 @@ sub json_GET {
   return;
 }
 
-sub seqxml_GET {
+sub seqxml_GET($$) {
   my ($url, $msg) = @_;
   return xml_GET($url, $msg, 'text/x-seqxml+xml');
 }
 
-sub xml_GET {
+sub xml_GET($$$) {
   my ($url, $msg, $content_type) = @_;
   $content_type ||= 'text/xml';
   my $xml = text_GET($url, $msg, $content_type);
@@ -48,17 +48,17 @@ sub xml_GET {
   return $xml;
 }
 
-sub fasta_GET {
+sub fasta_GET($$) {
   my ($url, $msg) = @_;
   return text_GET($url, $msg, 'text/x-fasta');
 }
 
-sub gff_GET {
+sub gff_GET($$) {
   my ($url, $msg) = @_;
   return text_GET($url, $msg, 'text/x-gff3');
 }
 
-sub text_GET {
+sub text_GET($$$) {
   my ($url, $msg, $content_type) = @_;
   $content_type ||= 'text/plain';
   my $resp = do_GET($url, $content_type);
@@ -71,7 +71,7 @@ sub text_GET {
   return $resp->decoded_content();
 }
 
-sub do_GET {
+sub do_GET($;$) {
   my ($url, $content_type) = @_;
   $content_type = 'application/json' unless defined $content_type;
   note "GET $url";

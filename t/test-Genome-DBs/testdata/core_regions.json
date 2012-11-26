@@ -8,7 +8,9 @@
       ],
       "adaptors" : [
         { "name" : "gene", "method" : "fetch_all_by_Slice", "args" : [], "filter_exceptions" : true },
-        { "name" : "repeatfeature", "filter_exceptions" : true, "suppress_warnings" : true }
+        { "name" : "repeatfeature", "filter_exceptions" : true, "suppress_warnings" : true },
+        { "name" : "simplefeature", "filter_exceptions" : true },
+        { "name" : "miscfeature", "filter_exceptions" : true },
       ]
     }
   }
