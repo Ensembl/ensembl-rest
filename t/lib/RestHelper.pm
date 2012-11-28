@@ -40,7 +40,7 @@ sub seqxml_GET($$) {
   return xml_GET($url, $msg, 'text/x-seqxml+xml');
 }
 
-sub xml_GET($$$) {
+sub xml_GET($$;$) {
   my ($url, $msg, $content_type) = @_;
   $content_type ||= 'text/xml';
   my $xml = text_GET($url, $msg, $content_type);
@@ -58,7 +58,7 @@ sub gff_GET($$) {
   return text_GET($url, $msg, 'text/x-gff3');
 }
 
-sub text_GET($$$) {
+sub text_GET($$;$) {
   my ($url, $msg, $content_type) = @_;
   $content_type ||= 'text/plain';
   my $resp = do_GET($url, $content_type);

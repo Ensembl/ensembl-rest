@@ -29,6 +29,7 @@ requires 'Log::Log4perl::Catalyst';
 requires 'Hash::Merge';
 requires 'Catalyst::Plugin::Cache';
 requires 'CHI';
+requires 'XML::Simple';
 
 # Transient dependencies from Ensembl
 requires 'Parse::RecDescent';
@@ -48,6 +49,7 @@ recommends 'Plack::Middleware::Throttle';
 recommends 'Cache::Memcached';
 recommends 'Sereal::Encoder';
 recommends 'Data::MessagePack';
+recommends 'Template::Stash::XS';
 
 
 #Test requirements
