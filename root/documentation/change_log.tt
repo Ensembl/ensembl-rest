@@ -1,6 +1,6 @@
 <h1>Change Log</h1>
 
-<h2>1.2.0 - </h2>
+<h2>1.2.0 - 15th Feburary 2013</h2>
 
 <h3>New Feature</h3>
 <ul>
@@ -28,6 +28,14 @@
       <li>All other configuration sections are unaffected</li>
     </ul>
   </li>
+</ul>
+
+<h3>Bugfixes</h3>
+
+<ul>
+  <li><tt>[/feature]</tt> CDS no longer report a protein as an exon's ID since 
+    ID should be unique in a file. Instead this is available via the 
+    protein_id attribute</li>
 </ul>
 
 <h2>1.1.2 - 25th October 2012</h2>

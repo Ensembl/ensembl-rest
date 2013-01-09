@@ -1,6 +1,6 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
-1.2.0 - 
+1.2.0 15-02-2013
 
 New Features:
 
@@ -21,6 +21,12 @@ Configuration:
     Registry and Documentation are prefixed with Model:: 
     Feature and Sequence are prefixed with Controller::
     All other configuration sections are unaffected
+
+Bugfixes:
+
+  - [/feature] CDS no longer report a protein as an exon's ID since 
+    ID should be unique in a file. Instead this is available via the 
+    protein_id attribute
 
 1.1.2 24-10-2012
 
