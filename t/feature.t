@@ -76,7 +76,7 @@ my $base = '/feature/region/homo_sapiens';
   is($transcript->{Parent}, $gene->{ID}, 'Transcript parent is previous gene');
   
   my ($cds) = sort { $a->{start} <=> $b->{start} } grep { $_->{feature_type} eq 'cds'} @{$json};
-  is($cds->{ID}, 'ENSP00000320396', 'CDS ID is the protein identifier');
+  is($cds->{ID}, '', 'CDS ID is a blank String');
   is($cds->{Parent}, $transcript->{ID}, 'CDS parent is the previous transcript');
   is($cds->{start}, 1101508, 'First CDS starts at first coding point in the second exon');
   is($cds->{end}, 1101531, 'First CDS ends at the second exon');
@@ -202,7 +202,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 gene in this region');
   
-  my $gff_line = q{6	EnsEMBL	protein_coding_gene	1080164	1105181	.	+	.	ID=ENSG00000176515;logic_name=ensembl;external_name=AL033381.1;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];biotype=protein_coding;};
+  my $gff_line = q{6	EnsEMBL	protein_coding_gene	1080164	1105181	.	+	.	ID=ENSG00000176515;logic_name=ensembl;external_name=AL033381.1;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];biotype=protein_coding};
   is($lines[0], $gff_line, 'Expected output line from GFF');
 }
 
