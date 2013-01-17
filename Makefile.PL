@@ -47,6 +47,7 @@ recommends 'Plack::Middleware::ReverseProxy';
 recommends 'Plack::Middleware::SizeLimit';
 recommends 'Plack::Middleware::Throttle';
 recommends 'Cache::Memcached';
+recommends 'CHI::Driver::Memcached';
 recommends 'Sereal::Encoder';
 recommends 'Data::MessagePack';
 recommends 'Template::Stash::XS';
