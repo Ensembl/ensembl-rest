@@ -53,8 +53,11 @@ sub call {
   my ($self, $env) = @_;
   #Only process if content-type header was not set and if not in the query params then sniff away
   if(!$env->{CONTENT_TYPE} && $env->{QUERY_STRING} !~ /content-type=/i) {
-    my $content_type = $self->process_path_info($env->{PATH_INFO});
-    $env->{CONTENT_TYPE} = $content_type if $content_type;
+    my ($content_type, $new_path) = $self->process_path_info($env->{PATH_INFO});
+    if($content_type) {
+      $env->{CONTENT_TYPE} = $content_type;
+      $env->{PATH_INFO} = $new_path;
+    }
   }
   $self->app->($env);
 }
@@ -68,7 +71,7 @@ sub process_path_info {
   my $ext = $1;
   if($ext) {
     my $content_type = $lookup->{$ext};
-    return $content_type;
+    return ($content_type, $path_info);
   }
   return;
 }
