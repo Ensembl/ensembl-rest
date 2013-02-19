@@ -25,7 +25,7 @@ sub translation: Chained('/') Args(2) PathPart('map/translation') ActionClass('R
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
   $c->request->param('object_type', 'translation') unless $c->request->param('object_type');
-  my $translation = $c->model('Lookup')->find_object_by_stable_id($c, $id);
+  my $translation = $c->model('Lookup')->find_object_by_stable_id($id);
   my $ref = ref($translation);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Translation object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Translation';
   my $transcript = $translation->transcript();
@@ -39,7 +39,7 @@ sub cdna: Chained('/') Args(2) PathPart('map/cdna') ActionClass('REST') {
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
   $c->request->param('object_type', 'transcript') unless $c->request->param('object_type');
-  my $transcript = $c->model('Lookup')->find_object_by_stable_id($c, $id);
+  my $transcript = $c->model('Lookup')->find_object_by_stable_id($id);
   my $ref = ref($transcript);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Transcript object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Transcript';
   my $mappings = $self->_map_transcript_coords($c, $transcript, $region, 'cdna2genomic');
@@ -52,7 +52,7 @@ sub cds: Chained('/') Args(2) PathPart('map/cds') ActionClass('REST') {
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
   $c->request->param('object_type', 'transcript') unless $c->request->param('object_type');
-  my $transcript = $c->model('Lookup')->find_object_by_stable_id($c, $id);
+  my $transcript = $c->model('Lookup')->find_object_by_stable_id($id);
   my $ref = ref($transcript);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Transcript object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Transcript';
   my $mappings = $self->_map_transcript_coords($c, $transcript, $region, 'cds2genomic');
@@ -72,7 +72,7 @@ sub _map_transcript_coords {
 
 sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
   my ( $self, $c, $old_assembly, $region ) = @_;
-  my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($c, $region);
+  my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($region);
   $c->log->info($region);
   my $old_slice = try {
     my $coord_system = $c->request()->param('coord_system') || 'chromosome';

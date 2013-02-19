@@ -12,9 +12,19 @@ has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => 
   };
 });
 
+with 'Catalyst::Component::InstancePerContext';
+
+has 'context' => (is => 'ro');
+
+sub build_per_context_instance {
+  my ($self, $c, @args) = @_;
+  return $self->new({ context => $c, %$self, @args });
+}
+
 sub fetch_features {
-  my ($self, $c) = @_;
+  my ($self) = @_;
   
+  my $c = $self->context();
   my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
   
   my $allowed_features = $self->allowed_features();
@@ -39,6 +49,19 @@ sub fetch_features {
   }
   
   return \@final_features;
+}
+
+sub fetch_feature {
+  my ($self, $id) = @_;
+  my $c = $self->context();
+  $c->log()->debug('Finding the object');
+  my $object = $c->model('Lookup')->find_object_by_stable_id($id);
+  my $hash = {};
+  if($object) {
+    my $hashes = $self->to_hash([$object]);
+    $hash = $hashes->[0];
+  }
+  return $hash;
 }
 
 #Have to do this to force JSON encoding to encode numerics as numerics
@@ -155,7 +178,7 @@ sub _get_SO_terms {
   my @final_terms;
   foreach my $term (@{$terms}) {
     if($term =~ /^SO\:/) {
-      my $ontology_term = $c->model('Lookup')->ontology_accession_to_OntologyTerm($c, $term);
+      my $ontology_term = $c->model('Lookup')->ontology_accession_to_OntologyTerm($term);
       if(!$ontology_term) {
         $c->go('ReturnError', 'custom', ["The SO accession '${term}' could not be found in our ontology database"]);
       }

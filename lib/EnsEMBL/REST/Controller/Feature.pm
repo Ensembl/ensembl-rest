@@ -43,14 +43,28 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   $c->stash()->{region} = $region;
   my $features;
   try {
-    my $slice = $c->model('Lookup')->find_slice($c, $region);
+    my $slice = $c->model('Lookup')->find_slice($region);
     $self->assert_slice_length($c, $slice);
-    $features = $c->model('Feature')->fetch_features($c);
+    $features = $c->model('Feature')->fetch_features();
   }
   catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
   $self->status_ok($c, entity => $features );
+}
+
+sub id_GET {}
+
+sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
+  my ($self, $c, $id) = @_;
+  my $feature;
+  try {
+    $c->log()->debug('Finding the object');
+    $feature = $c->model('Feature')->fetch_feature($id);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [$_]);
+  };
+  $self->status_ok($c, entity => $feature );
 }
 
 with 'EnsEMBL::REST::Role::SliceLength';

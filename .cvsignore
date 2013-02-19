@@ -13,3 +13,5 @@ reg.pm
 .project
 .includepath
 cover_db
+tmp
+temp

@@ -5,10 +5,23 @@ use namespace::autoclean;
 use Try::Tiny;
 
 extends 'Catalyst::Model';
+with 'Catalyst::Component::InstancePerContext';
+
+# Config
+has 'lookup_model' => ( is => 'ro', isa => 'Str', required => 1, default => ' DatabaseIDLookup' );
+
+# Per instance variables
+has 'context' => (is => 'ro');
+
+sub build_per_context_instance {
+  my ($self, $c, @args) = @_;
+  return $self->new({ context => $c, %$self, @args });
+}
 
 sub find_genetree_by_stable_id {
-  my ($self, $c, $id) = @_;
+  my ($self, $id) = @_;
   my $gt;
+  my $c = $self->context();
   my $compara_name = $c->stash->{compara};
   my $reg = $c->model('Registry');
   
@@ -41,9 +54,10 @@ sub find_genetree_by_stable_id {
 
 # uses the request for more optional arguments
 sub find_object_by_stable_id {
-  my ($self, $c, $id) = @_;
+  my ($self, $id) = @_;
+  my $c = $self->context();
   my $reg = $c->model('Registry');
-  my ($species, $type, $db) = $self->find_object_location($c, $id);
+  my ($species, $type, $db) = $self->find_object_location($id);
   $c->go('ReturnError', 'custom', [qq{Not possible to find an object with the ID '$id' in this release}]) unless $species;
   my $adaptor = $reg->get_adaptor($species, $db, $type);
   $c->log()->debug('Found an adaptor '.$adaptor);
@@ -54,47 +68,42 @@ sub find_object_by_stable_id {
 }
 
 sub find_object_location {
-  my ($self, $c, $id, $no_long_lookup) = @_;
+  my ($self, $id, $no_long_lookup) = @_;
+  my $c = $self->context();
   my $r = $c->request;
-  my $object_type = $r->param('object_type');
-  my $db_type = $r->param('db_type');
-  my $species = $r->param('species');
-  my $reg = $c->model('Registry');
-  
+  my $log = $c->log();
+  my ($object_type, $db_type, $species) = map { $r->param($_) } qw/object_type db_type species/;
   my @captures;
-  my $force_long_lookup = 0;
-  
   if($object_type && $object_type eq 'predictiontranscript') {
-    my $pred_trans_adaptor = $reg->get_adaptor($species, $db_type, $object_type);
-    my $obj = $pred_trans_adaptor->fetch_by_stable_id($id);
-    @captures = ($species, $object_type, $db_type);
+    @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
   }
   else {
     $c->log()->debug(sprintf('Looking for %s with %s and %s', $id, ($object_type || q{?}), ($db_type || q{?})));
-    @captures = $reg->get_species_and_object_type($id, $object_type, $species, $db_type);
-    $force_long_lookup = 1 unless $no_long_lookup;
+    my $model_name = $self->lookup_model();
+    my $lookup = $c->model($model_name);
+    $c->log()->debug('Using '.$model_name);
+    @captures = $lookup->find_object_location($id, $object_type, $db_type, $species);
+    if(! @captures) {
+      $c->log()->debug('Using long database lookup');
+      @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
+    }
   }
   
-  if(@captures && $captures[0]) {
-    $c->log()->debug(sprintf('Found %s, %s and %s', @captures));
-  }
-  else {
-    $c->log()->debug('Retrying with a long lookup forced on');
-    @captures = $reg->get_species_and_object_type($id, $object_type, $species, $db_type, $force_long_lookup);
-  }
-  
-  if(@captures && $captures[0]) {
-    $c->log()->debug(sprintf('Found %s, %s and %s', @captures));
-  }
-  else {
-    $c->log()->debug('Found no ID');
+  if($log->is_debug()) {
+    if(@captures && $captures[0]) {
+      $log->debug(sprintf('Found %s, %s and %s', @captures));
+    }
+    else {
+      $log->debug('Found no ID');
+    }
   }
   
   return @captures;
 }
 
 sub find_slice {
-  my ($self, $c, $region) = @_;
+  my ($self, $region) = @_;
+  my $c = $self->context();
   my $s = $c->stash();
   my $species = $s->{species};
   my $db_type = $s->{db_type} || 'core';
@@ -109,7 +118,8 @@ sub find_slice {
 }
 
 sub decode_region {
-  my ($self, $c, $region, $no_warnings, $no_errors) = @_;
+  my ($self, $region, $no_warnings, $no_errors) = @_;
+  my $c = $self->context();
   my $s = $c->stash();
   my $species = $s->{species};
   my $adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'slice');
@@ -125,7 +135,8 @@ sub decode_region {
 }
 
 sub ontology_accession_to_OntologyTerm {
-  my ($self, $c, $accession) = @_;
+  my ($self, $accession) = @_;
+  my $c = $self->context();
   my $term_adaptor = $c->model('Registry')->get_ontology_term_adaptor();
   return $term_adaptor->fetch_by_accession($accession);
 }
