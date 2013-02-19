@@ -5,6 +5,7 @@ use namespace::autoclean;
 require EnsEMBL::REST;
 use feature 'switch';
 use CHI;
+use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
 extends 'Catalyst::Model';
 
@@ -126,11 +127,10 @@ sub _intern_db_connections {
 }
 
 sub get_best_compara_DBAdaptor {
-  my ($self, $c, $species) = @_;
-  my $best_compara_name = $self->get_compara_name_for_species($species);
-  my $compara_name = $c->request()->param('compara') || $best_compara_name;
+  my ($self, $species, $request_compara_name) = @_;
+  my $compara_name = $request_compara_name || $self->get_compara_name_for_species($species);
   if(!$compara_name) {
-    $c->go('ReturnError', 'custom', ["Cannot find a suitable compara database for the species $species. Try specifying a compara parameter"]);
+    throw "Cannot find a suitable compara database for the species $species. Try specifying a compara parameter";
   }
   return $self->get_DBAdaptor($compara_name, 'compara');
 } 

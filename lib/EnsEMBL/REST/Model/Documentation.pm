@@ -14,6 +14,14 @@ use JSON;
 use YAML qw//;
 
 extends 'Catalyst::Model';
+with 'Catalyst::Component::InstancePerContext';
+
+has 'context' => (is => 'ro');
+
+sub build_per_context_instance {
+  my ($self, $c, @args) = @_;
+  return $self->new({ context => $c, %$self, @args });
+}
 
 has '_merged_config' => ( is => 'rw', isa => 'HashRef');
 
@@ -28,7 +36,7 @@ has 'replacements' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub 
 has 'paths' => ( is => 'ro', isa => 'ArrayRef' );
 
 sub merged_config {
-  my ($self, $c) = @_;
+  my ($self) = @_;
   my $merged_cfg = $self->_merged_config();
   return $merged_cfg if $merged_cfg;
   
@@ -37,7 +45,7 @@ sub merged_config {
 
   $merged_cfg = {};
   foreach my $path (@{$paths}) {
-    my $conf = $self->_find_conf($c, $path);
+    my $conf = $self->_find_conf($path);
     foreach my $conf_file (@{$conf}) {
       $log->debug('Processing '.$conf_file) if $log->is_debug();
       my $conf_content = $self->_get_conf_content($conf_file);
@@ -55,7 +63,7 @@ sub merged_config {
 }
 
 sub enrich {
-    my ( $self, $endpoint, $c ) = @_;
+    my ( $self, $endpoint ) = @_;
 
     my $json = JSON->new();
     $json->pretty(1);
@@ -107,7 +115,7 @@ sub enrich {
         next if $eg->{enriched};
         next if $eg->{disable};
         $eg->{id}  = $id; 
-        $self->_request_example($endpoint, $eg, $c);
+        $self->_request_example($endpoint, $eg);
         $eg->{enriched} = 1;
     }
 
@@ -115,8 +123,8 @@ sub enrich {
 }
 
 sub _request_example {
-  my ($self, $endpoint, $eg, $c) = @_;
-  
+  my ($self, $endpoint, $eg) = @_;
+  my $c = $self->context();
   my $path    = $eg->{path};
   my $capture = $eg->{capture} || [];
   my $params  = $eg->{params} || {};
@@ -170,7 +178,8 @@ sub get_groups {
 }
 
 sub _find_conf {
-  my ($self, $c, $path) = @_;
+  my ($self, $path) = @_;
+  my $c = $self->context();
   my $log = $self->log();
   $log->debug('Looking for CFGs in the directory '.$path) if $log->is_debug();
 
@@ -190,7 +199,8 @@ sub _find_conf {
 }
 
 sub _url {
-  my ($self, $eg, $c) = @_;
+  my ($self, $eg) = @_;
+  my $c = $self->context();
   my $host = $c->req->base;
   $host =~ s/\/$//;
   my $uri = $eg->{true_root_uri};

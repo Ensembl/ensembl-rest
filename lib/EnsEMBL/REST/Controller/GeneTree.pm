@@ -24,7 +24,7 @@ sub get_genetree_GET { }
 sub get_genetree : Chained('/') PathPart('genetree/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $s = $c->stash();
-  my $gt = $c->model('Lookup')->find_genetree_by_stable_id($c, $id);
+  my $gt = $c->model('Lookup')->find_genetree_by_stable_id($id);
   $self->status_ok( $c, entity => $gt );
 }
 

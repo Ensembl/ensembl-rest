@@ -16,7 +16,7 @@ sub get_adaptors :Private {
 
   try {
     my $species = $c->stash()->{species};
-    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($c, $species);
+    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'));
     my $ma = $compara_dba->get_MemberAdaptor();
     my $ha = $compara_dba->get_HomologyAdaptor();
     my $mlssa = $compara_dba->get_MethodLinkSpeciesSetAdaptor();
@@ -37,7 +37,7 @@ sub get_adaptors :Private {
 sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   my ( $self, $c, $id ) = @_;
   my $lookup = $c->model('Lookup');
-  my ($species) = $lookup->find_object_location($c, $id);
+  my ($species) = $lookup->find_object_location($id);
   $c->stash(stable_ids => [$id], species => $species);
   $c->detach('get_orthologs');
 }

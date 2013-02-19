@@ -13,12 +13,16 @@ use Test::More;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::ApiVersion qw/software_version/;
+use Test::Differences;
 
-my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
+my $test = Bio::EnsEMBL::Test::MultiTestDB->new();
+my $dba = $test->get_DBAdaptor('core');
 Catalyst::Test->import('EnsEMBL::REST');
 require EnsEMBL::REST;
 
 my $VERSION = software_version();
+my $schema_version = $dba->get_MetaContainer()->single_value_by_key('schema_version');
+$schema_version *= 1;
 
 # info/comparas
 is_json_GET(
@@ -27,7 +31,7 @@ is_json_GET(
 
 # info/data
 is_json_GET(
-  '/info/data', {releases => [ $VERSION ]}, "only release available is $VERSION"
+  '/info/data', {releases => [ $schema_version ]}, "only release available is $schema_version"
 );
 
 # /info/ping
@@ -36,11 +40,21 @@ is_json_GET(
 );
 
 # info/species
-is_json_GET(
-  '/info/species', 
-  {species => [ { division => 'Ensembl', name => 'homo_sapiens', groups => ['core', 'variation'], aliases => [], release => $VERSION} ]},
-  "checking only DBA available is the test DBA"
-);
+{
+  my $url = '/info/species';
+  my $msg = 'Checking only DBA available is the test DBA';
+  my $info_species = json_GET($url, $msg);
+  if($info_species) {
+    my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', groups => ['core', 'variation'], aliases => [], release => $schema_version} ]};
+    $info_species->{species}->[0]->{groups} = [sort @{$info_species->{species}->[0]->{groups}}];
+    eq_or_diff_data($info_species, $expected, "$url | $msg");
+  }
+}
+# is_json_GET(
+#   '/info/species', 
+#   {species => [ { division => 'Ensembl', name => 'homo_sapiens', groups => ['core', 'variation'], aliases => [], release => $schema_version} ]},
+#   "checking only DBA available is the test DBA"
+# );
 
 # /info/software
 is_json_GET(
