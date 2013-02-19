@@ -34,7 +34,7 @@ sub encode_nh {
   return \$str;
 }
 
-around 'set_content_dispsition' => sub {
+around 'set_content_disposition' => sub {
   my ($orig, $self, $c, $ext, $stash_key) = @_;
   $stash_key ||= 'rest';
   my $gt = $c->stash->{$stash_key};
