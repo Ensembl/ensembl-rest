@@ -13,7 +13,7 @@ sub is_content_type {
   return 0;
 }
 
-sub set_content_dispsition {
+sub set_content_disposition {
   my ($self, $c, $name, $ext) = @_;
   die 'Not ext given' unless $ext;
   my $disposition = sprintf('attachment; filename=%s.%s', $name, $ext);
