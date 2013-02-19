@@ -9,7 +9,7 @@ extends 'Catalyst::Model';
 sub find_genetree_by_stable_id {
   my ($self, $c, $id) = @_;
   my $gt;
-  my $compara_name = $c->stash->{compara};
+  my $compara_name = $c->request->parameters->{compara};
   my $reg = $c->model('Registry');
   
   #Force search to use compara as the DB type
