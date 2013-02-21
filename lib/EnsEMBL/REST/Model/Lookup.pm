@@ -39,6 +39,24 @@ sub find_genetree_by_stable_id {
   $c->go('ReturnError', 'custom', ["No GeneTree found for ID $id"]);
 }
 
+sub find_genetree_by_member_id {
+  my ($self,$c,$id) = @_;
+  my $compara_name = $c->request->parameters->{compara}; 
+  my $reg = $c->model('Registry');
+ 
+  my ($species, $type, $db) = $c->model('Lookup')->find_object_location($c, $id);
+  $c->go('ReturnError', 'custom', ["Unable to find given object: $id"]) unless $species;
+  
+  my $dba = $reg->get_best_compara_DBAdaptor($c,$species,$compara_name);
+  my $ma = $dba->get_MemberAdaptor;
+  my $member = $ma->fetch_by_source_stable_id('ENSEMBLGENE',$id);
+  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree Member"]) unless $member;
+  
+  my $gta = $dba->get_GeneTreeAdaptor;
+  my $gt = $gta->fetch_default_for_Member($member);
+  return $gt;
+}
+
 # uses the request for more optional arguments
 sub find_object_by_stable_id {
   my ($self, $c, $id) = @_;
