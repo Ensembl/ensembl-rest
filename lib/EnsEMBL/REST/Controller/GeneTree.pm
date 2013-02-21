@@ -33,24 +33,26 @@ sub get_genetree_by_member_id_GET { }
 sub get_genetree_by_member_id : Chained('/') PathPart('genetree/member/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
    
-  my $compara_name = $c->request->parameters->{compara}; 
-  my $reg = $c->model('Registry');
-  
-  my ($species, $type, $db) = $c->model('Lookup')->find_object_location($c, $id);
-  
-  $c->go('ReturnError', 'custom', ["Unable to find given object: $id"]) unless $species;
-  
-  my $r = $c->request;
-    
-  my $dba = $reg->get_best_compara_DBAdaptor($c,$species,$compara_name);
-  my $ma = $dba->get_MemberAdaptor;
-  my $member = $ma->fetch_by_source_stable_id('ENSEMBLGENE',$id);
-  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree Member"]) unless $member;
-  
-  my $gta = $dba->get_GeneTreeAdaptor;
-  my $gt = $gta->fetch_default_for_Member($member);
+  my $gt = $c->model('Lookup')->find_genetree_by_member_id($c,$id);
   $c->go('ReturnError', 'custom', ["Could not fetch GeneTree"]) unless $gt;
   
+  $self->status_ok( $c, entity => $gt);
+}
+
+
+sub get_genetree_by_symbol_GET { }
+
+sub get_genetree_by_symbol : Chained('/') PathPart('genetree/member/symbol') Args(2) ActionClass('REST') {
+  my ($self, $c, $species, $symbol) = @_;
+
+  my $reg = $c->model('Registry');
+  
+  my $gene_adaptor = $reg->get_adaptor($species, 'core', 'Gene');
+  my $gene = $gene_adaptor->fetch_by_display_label($symbol);
+  $c->go('ReturnError','custom', ["Given symbol $symbol not found in Gene table"]) unless $gene;
+  
+  my $gt = $c->model('Lookup')->find_genetree_by_member_id($c,$gene->stable_id);
+  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree for $symbol"]) unless $gt;
   $self->status_ok( $c, entity => $gt);
 }
 
