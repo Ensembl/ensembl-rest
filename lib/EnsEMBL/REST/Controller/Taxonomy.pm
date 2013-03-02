@@ -22,7 +22,8 @@ sub id_GET {}
 sub id : Chained('taxonomy_root') PathPart('id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $taxon = $self->taxon($c, $id);
-  $self->status_ok( $c, entity => $self->_encode($taxon));
+  my $simple = $c->request->param('simple');
+  $self->status_ok( $c, entity => $self->_encode($taxon, $simple));
 }
 
 sub classification_GET {}
@@ -31,23 +32,6 @@ sub classification : Chained('taxonomy_root') PathPart('classification') Args(1)
   my $taxon = $self->taxon($c, $id);
   my $classification = $taxon->classification(-AS_ARRAY => 1);
   my $entity = $self->_encode_array($classification);
-  $self->status_ok($c, entity => $entity);
-}
-
-sub childern_GET {}
-sub childern : Chained('taxonomy_root') PathPart('children') Args(1) ActionClass('REST') {
-  my ($self, $c, $id) = @_;
-  my $taxon = $self->taxon($c, $id);
-  my $children = $taxon->sorted_children();
-  my $entity = $self->_encode_array($children);
-  $self->status_ok($c, entity => $entity);
-}
-
-sub parent_GET {}
-sub parent : Chained('taxonomy_root') PathPart('parent') Args(1) ActionClass('REST') {
-  my ($self, $c, $id) = @_;
-  my $taxon = $self->taxon($c, $id);
-  my $entity = $self->_encode($taxon->parent);
   $self->status_ok($c, entity => $entity);
 }
 
@@ -65,13 +49,13 @@ sub taxon {
 }
 
 sub _encode_array {
-  my ($self, $taxons) = @_;
-  return [ map {$self->_encode($_)} @{$taxons}];
+  my ($self, $taxons, $ignore_relations) = @_;
+  return [ map {$self->_encode($_, $ignore_relations)} @{$taxons}];
 }
 
 sub _encode {
-  my ($self, $taxon) = @_;
-  return {} unless $taxon;
+  my ($self, $taxon, $ignore_relations) = @_;
+  return {} unless check_ref($taxon, 'Bio::EnsEMBL::Compara::NCBITaxon');
   my $entity = {
     id => $taxon->taxon_id(),
     scientific_name => $taxon->scientific_name(),
@@ -81,6 +65,16 @@ sub _encode {
   foreach my $tag ($taxon->get_all_tags()) {
     my $values = $taxon->get_all_values_for_tag($tag);
     $entity->{tags}->{$tag} = $values;
+  }
+  if(! $ignore_relations) {
+    my $parent = $taxon->parent();
+    my $children = $taxon->children();
+    if(defined $parent) {
+      $entity->{parent} = $self->_encode($parent, 1);
+    }
+    if(defined $children && scalar(@{$children}) > 0) {
+      $entity->{children} = $self->_encode_array($children, 1);
+    }
   }
   return $entity;
 }
