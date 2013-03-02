@@ -8,7 +8,7 @@ extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
 
 # Config
-has 'lookup_model' => ( is => 'ro', isa => 'Str', required => 1, default => ' DatabaseIDLookup' );
+has 'lookup_model' => ( is => 'ro', isa => 'Str', required => 1, default => 'DatabaseIDLookup' );
 
 # Per instance variables
 has 'context' => (is => 'ro');
@@ -72,13 +72,13 @@ sub find_object_location {
   my $c = $self->context();
   my $r = $c->request;
   my $log = $c->log();
-  my ($object_type, $db_type, $species) = map { $r->param($_) } qw/object_type db_type species/;
+  my ($object_type, $db_type, $species) = map { my $p = $r->param($_); $p; } qw/object_type db_type species/;
   my @captures;
   if($object_type && $object_type eq 'predictiontranscript') {
     @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
   }
   else {
-    $c->log()->debug(sprintf('Looking for %s with %s and %s', $id, ($object_type || q{?}), ($db_type || q{?})));
+    $c->log()->debug(sprintf('Looking for %s with %s and %s in %s', $id, ($object_type || q{?}), ($db_type || q{?}), ($species || q{?})));
     my $model_name = $self->lookup_model();
     my $lookup = $c->model($model_name);
     $c->log()->debug('Using '.$model_name);
