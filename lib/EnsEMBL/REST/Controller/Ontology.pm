@@ -3,7 +3,7 @@ package EnsEMBL::REST::Controller::Ontology;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
-use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
+use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
@@ -20,6 +20,7 @@ sub id_GET {}
 sub id : Chained('ontology_root') PathPart('id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $term = $self->term($c, $id);
+  $self->enhance_terms($c, [$term]);
   $self->status_ok( $c, entity => $self->_encode($term));
 }
 
@@ -28,7 +29,22 @@ sub name : Chained('ontology_root') PathPart('name') Args(1) ActionClass('REST')
   my ($self, $c, $name) = @_;
   my $ontology = $c->request()->param('ontology');
   my $terms = $c->stash->{ontology_adaptor}->fetch_all_by_name($name, $ontology);
+  $self->enhance_terms($c, $terms);
   $self->status_ok( $c, entity => $self->_encode_array($terms));
+}
+
+#Serialise the right 
+sub enhance_terms {
+  my ($self, $c, $terms) = @_;
+  return if $c->request->param('simple');
+  my $relation = $c->request->param('relation') || [];
+  $relation = wrap_array($relation);
+  foreach my $t (@{$terms}) {
+    my $parents = $t->parents(@{$relation});
+    my $children = $t->children(@{$relation});
+    $t->{tmp} = {parents => $parents, children => $children};
+  }
+  return;
 }
 
 sub ancestors_GET {}
@@ -40,33 +56,13 @@ sub ancestors : Chained('ontology_root') PathPart('ancestors') Args(1) ActionCla
   $self->status_ok($c, entity => $self->_encode_array($terms));
 }
 
-sub childern_GET {}
-sub childern : Chained('ontology_root') PathPart('children') Args(1) ActionClass('REST') {
-  my ($self, $c, $id) = @_;
-  my $term = $self->term($c, $id);
-  my $relation = $c->request->param('relation') || [];
-  $relation = ( check_ref($relation, 'ARRAY') ) ? $relation : [$relation];
-  my $terms = $term->children(@{$relation});
-  $self->status_ok($c, entity => $self->_encode_array($terms));
-}
-
-sub parents_GET {}
-sub parents : Chained('ontology_root') PathPart('parents') Args(1) ActionClass('REST') {
-  my ($self, $c, $id) = @_;
-  my $term = $self->term($c, $id);
-  my $relation = $c->request->param('relation') || [];
-  $relation = ( check_ref($relation, 'ARRAY') ) ? $relation : [$relation];
-  my $terms = $term->parents(@{$relation});
-  $self->status_ok($c, entity => $self->_encode_array($terms));
-}
-
 sub descendents_GET {}
 sub descendents : Chained('ontology_root') PathPart('descendents') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $term = $self->term($c, $id);
   my $r = $c->request();
-  my ($subset, $closest_terms, $zero_distance, $cross_ontology) = map { $r->param($_) } qw/subset closest_terms zero_distance cross_ontology/;
-  my $terms = $c->stash()->{ontology_adaptor}->fetch_all_by_descendant_term($term, $subset, $closest_terms, $zero_distance, $cross_ontology);
+  my ($subset, $closest_terms, $zero_distance, $ontology) = map { $r->param($_) } qw/subset closest_terms zero_distance ontology/;
+  my $terms = $c->stash()->{ontology_adaptor}->fetch_all_by_descendant_term($term, $subset, $closest_terms, $zero_distance, $ontology);
   $self->status_ok($c, entity => $self->_encode_array($terms));
 }
 
@@ -117,6 +113,11 @@ sub _encode {
       synonyms => $term->synonyms(),
       subsets => $term->subsets(),
     };
+    if(exists $term->{tmp}) {
+      $entity->{parents} = $self->_encode_array($term->{tmp}->{parents});
+      $entity->{children} = $self->_encode_array($term->{tmp}->{children});
+      delete $term->{tmp};
+    }
   }
   return $entity;
 }
