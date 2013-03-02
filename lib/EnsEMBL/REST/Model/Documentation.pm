@@ -12,6 +12,7 @@ use Hash::Merge qw/merge/;
 use Log::Log4perl;
 use JSON;
 use YAML qw//;
+use EnsEMBL::REST::EnsemblModel::Endpoint;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -84,7 +85,7 @@ sub enrich {
       if(! exists $endpoint->{params}->{callback}) {
         $endpoint->{params}->{callback} = {
           type => 'String', 
-          description => 'Name of the callback to be returned by the requested JSONP. Required ONLY when using JSONP', 
+          description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="/documentation/user_guide">the user guide</a>.', 
           required => 0,
           example => [qw/randomlygeneratedname/]
         };
@@ -119,7 +120,7 @@ sub enrich {
         $eg->{enriched} = 1;
     }
 
-    return;
+    return EnsEMBL::REST::EnsemblModel::Endpoint->new(%{$endpoint});
 }
 
 sub _request_example {
