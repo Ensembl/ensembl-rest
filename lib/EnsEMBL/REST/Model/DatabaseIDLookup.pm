@@ -29,7 +29,7 @@ sub find_object_location {
     @captures = $self->find_prediction_transcript($id, $object_type, $db_type, $species);
   }
   else {
-    $self->context->log->debug(sprintf('Looking for %s with %s and %s', $id, ($object_type || q{?}), ($db_type || q{?})));
+    $self->context->log->debug(sprintf('Looking for %s with %s and %s in %s', $id, ($object_type || q{?}), ($db_type || q{?}), ($species || q{?})));
     @captures = $reg->get_species_and_object_type($id, $object_type, $species, $db_type, $force_long_lookup);
   }
   
