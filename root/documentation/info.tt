@@ -87,7 +87,7 @@
 
 <h2>Example Requests</h2>
 
-[% example_types = ['perl', 'python', 'ruby', 'curl', 'wget'] %]
+[% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget'] %]
 
 [% FOREACH p IN endpoint.examples.pairs %]
 	
@@ -116,6 +116,9 @@
 
 <!-- RUBY EXAMPLE -->
 [% INCLUDE documentation/examples/ruby.tt %]
+
+<!-- JAVA EXAMPLE -->
+[% INCLUDE documentation/examples/java.tt %]
 
 <!-- CURL EXAMPLE -->
 [% INCLUDE documentation/examples/curl.tt %]

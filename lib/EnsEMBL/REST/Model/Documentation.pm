@@ -70,43 +70,35 @@ sub enrich {
     $json->pretty(1);
     my $log = $self->log;
     
+    my $outputs = $endpoint->{output};
+    $outputs = [$outputs] unless ref($outputs);
+    my %outputs_hash = map { lc($_) => 1 } @{$outputs};
+    
     #Add JSONP if available
     if(EnsEMBL::REST->config->{jsonp}) {
-      
-      #Add it as an output
-      my $outputs = $endpoint->{output};
-      $outputs = [$outputs] unless ref($outputs);
-      if(! grep { lc($_) eq 'jsonp'} @{$outputs}) {
+      if($outputs_hash{'json'}) {
         push(@{$outputs}, 'jsonp');
-      }
-      $endpoint->{output} = $outputs;
+        $endpoint->{output} = $outputs;
       
-      #Now add it as a parameter if missing
-      if(! exists $endpoint->{params}->{callback}) {
-        $endpoint->{params}->{callback} = {
-          type => 'String', 
-          description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="/documentation/user_guide">the user guide</a>.', 
-          required => 0,
-          example => [qw/randomlygeneratedname/]
-        };
+        #Now add it as a parameter if missing
+        if(! exists $endpoint->{params}->{callback}) {
+          $endpoint->{params}->{callback} = {
+            type => 'String', 
+            description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="/documentation/user_guide">the user guide</a>.', 
+            required => 0,
+            example => [qw/randomlygeneratedname/]
+          };
+        }
       }
     }
     
-    if(EnsEMBL::REST->config()->{sereal}) {
-      my $outputs = $endpoint->{output};
-      $outputs = [$outputs] unless ref($outputs);
-      if(! grep { lc($_) eq 'sereal'} @{$outputs}) {
-        push(@{$outputs}, 'sereal');
-      }
+    if(EnsEMBL::REST->config()->{sereal} && $outputs_hash{'json'}) {
+      push(@{$outputs}, 'sereal');
       $endpoint->{output} = $outputs;
     }
-    
-    if(EnsEMBL::REST->config()->{msgpack}) {
-      my $outputs = $endpoint->{output};
-      $outputs = [$outputs] unless ref($outputs);
-      if(! grep { lc($_) eq 'msgpack'} @{$outputs}) {
-        push(@{$outputs}, 'msgpack');
-      }
+
+    if(EnsEMBL::REST->config()->{msgpack} && $outputs_hash{'json'}) {
+      push(@{$outputs}, 'msgpack');
       $endpoint->{output} = $outputs;
     }
 
