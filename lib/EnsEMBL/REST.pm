@@ -42,6 +42,7 @@ package EnsEMBL::REST;
 use Moose;
 use namespace::autoclean;
 use Log::Log4perl::Catalyst;
+use EnsEMBL::REST::Types;
 
 use 5.010_001;
 

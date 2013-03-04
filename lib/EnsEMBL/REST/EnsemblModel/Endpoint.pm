@@ -6,7 +6,7 @@ has 'description' => ( isa => 'Str', is => 'ro', required => 1 );
 has 'endpoint'    => ( isa => 'Str', is => 'ro', required => 1 );
 has 'method'      => ( isa => 'Str', is => 'ro', required => 1 );
 has 'group'       => ( isa => 'Str', is => 'ro', required => 1 );
-has 'output'      => ( isa => 'ArrayRef', is => 'ro', required => 1, coerce => 1 );
+has 'output'      => ( isa => 'EnsRESTValueList', is => 'ro', required => 1, coerce => 1);
 has 'params'      => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'examples'    => ( isa => 'HashRef', is => 'ro', required => 0 );
 
@@ -16,7 +16,6 @@ sub has_required_params {
   return 0 unless $p;
   foreach my $key (keys %{$p}) {
     my $value = $p->{$key};
-    # warn $key .' '.$value->{required};
     return 1 if $value->{required};
   }
   return 0;

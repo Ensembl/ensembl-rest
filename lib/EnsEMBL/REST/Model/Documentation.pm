@@ -18,17 +18,14 @@ extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro');
+has '_parent' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ context => $c, _parent => $self, %$self, @args });
 }
 
 has '_merged_config' => ( is => 'rw', isa => 'HashRef');
-
-has 'log' => ( is => 'ro', isa => 'Log::Log4perl::Logger', lazy => 1, default => sub {
-  return Log::Log4perl->get_logger(__PACKAGE__);
-});
 
 has 'example_expire_time' => ( is => 'ro', isa => 'Int', lazy => 1, default => 3600);
 
@@ -42,7 +39,7 @@ sub merged_config {
   return $merged_cfg if $merged_cfg;
   
   my $paths = wrap_array($self->paths());
-  my $log = $self->log();
+  my $log = $self->context->log();
 
   $merged_cfg = {};
   foreach my $path (@{$paths}) {
@@ -60,6 +57,7 @@ sub merged_config {
     }
   }
   $self->_merged_config($merged_cfg);
+  $self->_parent->_merged_config($merged_cfg);
   return $merged_cfg;
 }
 
@@ -68,36 +66,34 @@ sub enrich {
 
     my $json = JSON->new();
     $json->pretty(1);
-    my $log = $self->log;
+    my $log = $self->context->log;
     
     my $outputs = $endpoint->{output};
     $outputs = [$outputs] unless ref($outputs);
     my %outputs_hash = map { lc($_) => 1 } @{$outputs};
     
     #Add JSONP if available
-    if(EnsEMBL::REST->config->{jsonp}) {
-      if($outputs_hash{'json'}) {
-        push(@{$outputs}, 'jsonp');
-        $endpoint->{output} = $outputs;
-      
-        #Now add it as a parameter if missing
-        if(! exists $endpoint->{params}->{callback}) {
-          $endpoint->{params}->{callback} = {
-            type => 'String', 
-            description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="/documentation/user_guide">the user guide</a>.', 
-            required => 0,
-            example => [qw/randomlygeneratedname/]
-          };
-        }
+    if(EnsEMBL::REST->config->{jsonp} && exists $outputs_hash{'json'} && ! exists $outputs_hash{'jsonp'}) {
+      push(@{$outputs}, 'jsonp');
+      $endpoint->{output} = $outputs;
+    
+      #Now add it as a parameter if missing
+      if(! exists $endpoint->{params}->{callback}) {
+        $endpoint->{params}->{callback} = {
+          type => 'String', 
+          description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="/documentation/user_guide">the user guide</a>.', 
+          required => 0,
+          example => [qw/randomlygeneratedname/]
+        };
       }
     }
     
-    if(EnsEMBL::REST->config()->{sereal} && $outputs_hash{'json'}) {
+    if(EnsEMBL::REST->config()->{sereal} && $outputs_hash{'json'} && ! exists $outputs_hash{'sereal'}) {
       push(@{$outputs}, 'sereal');
       $endpoint->{output} = $outputs;
     }
 
-    if(EnsEMBL::REST->config()->{msgpack} && $outputs_hash{'json'}) {
+    if(EnsEMBL::REST->config()->{msgpack} && $outputs_hash{'json'} && ! exists $outputs_hash{'msgpack'}) {
       push(@{$outputs}, 'msgpack');
       $endpoint->{output} = $outputs;
     }
@@ -118,6 +114,7 @@ sub enrich {
 sub _request_example {
   my ($self, $endpoint, $eg) = @_;
   my $c = $self->context();
+  my $log = $c->log();
   my $path    = $eg->{path};
   my $capture = $eg->{capture} || [];
   my $params  = $eg->{params} || {};
@@ -139,10 +136,10 @@ sub _request_example {
     my $content_type = $eg->{content};
     my $json = JSON->new();
     $json->pretty(1);
-    $self->log()->debug('About to run the URL '.$eg->{true_root_uri}.'?'.$param_string);
+    $log->debug('About to run the URL '.$eg->{true_root_uri}.'?'.$param_string);
     my $subreq_res = $c->subreq_res( $eg->{true_root_uri}, {}, { %{$params}, 'content-type', $content_type} );
     my $sub_result = $subreq_res->body;
-    $c->log()->warn(join ("\n", @{ $c->error })) if @{ $c->error };
+    $log->warn(join ("\n", @{ $c->error })) if @{ $c->error };
     if ($content_type eq 'application/json' ) {
       $sub_result = $json->encode( decode_json( $sub_result  ) );
     }
@@ -173,7 +170,7 @@ sub get_groups {
 sub _find_conf {
   my ($self, $path) = @_;
   my $c = $self->context();
-  my $log = $self->log();
+  my $log = $c->log();
   $log->debug('Looking for CFGs in the directory '.$path) if $log->is_debug();
 
   #If path is not absolute then
@@ -183,7 +180,7 @@ sub _find_conf {
   }
   my @conf;
   find(sub {
-    $self->log->debug($_);
+    $log->debug($_);
     if($_ =~ /\.conf$/) {
       push(@conf, $File::Find::name);
     }
@@ -219,7 +216,7 @@ sub _hash_to_params {
 
 sub _get_conf_content {
   my ($self, $conf_file) = @_;
-  $self->log->debug('Working with '.$conf_file.' and will perform __VAR()__ replacements');
+  $self->context->log->debug('Working with '.$conf_file.' and will perform __VAR()__ replacements');
   my $content = slurp($conf_file);
   my $replacements = $self->replacements();
   foreach my $key (%{$replacements}) {
