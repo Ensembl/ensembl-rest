@@ -59,22 +59,22 @@ sub symbol_GET {}
 sub symbol :Chained('/') PathPart('xrefs/symbol') Args(2) ActionClass('REST') {
   my ($self, $c, $species, $symbol) = @_;
   $c->stash(species => $species, symbol => $symbol);
-  my $external_db = $c->request->param('external_db');
-  my $db_type = $c->request->param('db_type') || 'core';
+  my $db_type = $c->request->param('db_type');
+  unless ($db_type) {
+      $db_type = 'core';
+      $c->request->param('db_type',$db_type);
+  }
   my @entries;
   try {
-    my @objects_with_xrefs = $c->request->param('object') ? ($c->request->param('object')) : qw(gene transcript translation);
-    foreach my $object_type (@objects_with_xrefs) {
-      my $object_adaptor = $c->model('Registry')->get_adaptor($c->stash()->{species}, $db_type, $object_type);
-      my $objects_linked_to_name = $object_adaptor->fetch_all_by_external_name($symbol, $external_db);
-      while(my $obj = shift @{$objects_linked_to_name}) {
-        my $encoded = {
-          id => $obj->stable_id(),
-          type => $object_type
-        };
-        push(@entries, $encoded);
-      }
+    my $objects_linked_to_name = $c->model('Lookup')->find_objects_by_symbol($c,$symbol);
+    while(my $obj = shift @{$objects_linked_to_name}) {
+      my $encoded = {
+        id => $obj->stable_id(),
+        type => lc( [split(/::/,ref($obj))]->[-1] )
+      }; # type is classname trimmed down, e.g. Bio::EnsEMBL::Gene -> gene
+      push(@entries, $encoded);
     }
+    
   }
   catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);

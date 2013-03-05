@@ -48,7 +48,7 @@ sub find_genetree_by_member_id {
   $c->go('ReturnError', 'custom', ["Unable to find given object: $id"]) unless $species;
   
   my $dba = $reg->get_best_compara_DBAdaptor($c,$species,$compara_name);
-  my $ma = $dba->get_MemberAdaptor;
+  my $ma = $dba->get_GeneMemberAdaptor;
   my $member = $ma->fetch_by_source_stable_id('ENSEMBLGENE',$id);
   $c->go('ReturnError', 'custom', ["Could not fetch GeneTree Member"]) unless $member;
   
@@ -70,6 +70,26 @@ sub find_object_by_stable_id {
   $c->stash()->{object} = $final_obj;
   return $final_obj;
 }
+
+sub find_objects_by_symbol {
+  my ($self, $c, $symbol) = @_;
+  
+  my $db_type = $c->request->param('db_type');
+  my $external_db = $c->request->param('external_db');
+  my @entries;  
+  my @objects_to_try = $c->request->param('object') ? ($c->request->param('object')) : qw(gene transcript translation);
+  foreach my $object_type (@objects_to_try) {
+    my $object_adaptor = $c->model('Registry')->get_adaptor($c->stash->{'species'}, $db_type, $object_type);
+    my $objects_linked_to_symbol = $object_adaptor->fetch_all_by_external_name($symbol, $external_db);
+    while(my $obj = shift @{$objects_linked_to_symbol}) {
+      $c->log()->debug("Found by symbol ".$symbol." ".$obj);
+      push(@entries, $obj);
+    }
+  }
+  
+  return \@entries;
+}
+  
 
 sub find_object_location {
   my ($self, $c, $id, $no_long_lookup) = @_;
@@ -114,7 +134,9 @@ sub find_object_location {
 sub find_slice {
   my ($self, $c, $region) = @_;
   my $s = $c->stash();
+  # don't do this.
   my $species = $s->{species};
+  # or this
   my $db_type = $s->{db_type} || 'core';
   my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, 'slice');
   $c->go('ReturnError', 'custom', ["Do not know anything about the species $species and core database"]) unless $adaptor;

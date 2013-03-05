@@ -44,15 +44,18 @@ sub get_genetree_by_symbol_GET { }
 
 sub get_genetree_by_symbol : Chained('/') PathPart('genetree/member/symbol') Args(2) ActionClass('REST') {
   my ($self, $c, $species, $symbol) = @_;
-
-  my $reg = $c->model('Registry');
+  $c->stash(species => $species);
+  my $object_type = $c->request->param('object');
+  unless ($object_type) {$c->request->param('object','gene')};
+  unless ($c->request->param('db_type') ) {$c->request->param('db_type','core')}; 
   
-  my $gene_adaptor = $reg->get_adaptor($species, 'core', 'Gene');
-  my $gene = $gene_adaptor->fetch_by_display_label($symbol);
-  $c->go('ReturnError','custom', ["Given symbol $symbol not found in Gene table"]) unless $gene;
+  my @objects = @{$c->model('Lookup')->find_objects_by_symbol($c,$symbol) };
+  $c->log()->debug(scalar(@objects). " objects found with symbol: ".$symbol);
+  $c->go('ReturnError', 'custom', ["Lookup found nothing."]) unless (@objects && scalar(@objects) > 0);
+  my $stable_id = $objects[0]->stable_id;
   
-  my $gt = $c->model('Lookup')->find_genetree_by_member_id($c,$gene->stable_id);
-  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree for $symbol"]) unless $gt;
+  my $gt = $c->model('Lookup')->find_genetree_by_member_id($c,$stable_id);
+  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree for $symbol,$stable_id"]) unless $gt;
   $self->status_ok( $c, entity => $gt);
 }
 
