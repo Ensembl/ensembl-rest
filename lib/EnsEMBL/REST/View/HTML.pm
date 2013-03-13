@@ -10,7 +10,7 @@ __PACKAGE__->config(
     TEMPLATE_EXTENSION => '.tt',
     RENDER_DIE => 1,
     WRAPPER => 'wrapper.tt',
-    COMPILE_DIR => File::Spec->catdir(File::Spec->tmpdir(),'ensrest', 'template_cache'),
+    COMPILE_DIR => File::Spec->catdir(File::Spec->tmpdir(),'ensrest', $ENV{USER}, 'template_cache'),
     STASH => Template::Stash::XS->new(),
 );
 
