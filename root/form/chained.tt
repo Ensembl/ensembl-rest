@@ -1,1 +1,26 @@
-<h1> the form goes here </h1>
+<h1> Generate REST endpoints</h1>
+
+<form name="" class="_chainform" method="post" action="#">
+
+	<label style="display:inline">Choose your start endpoint:</label>
+	<select name="first_endpoint" disabled=disabled>
+		<option value="">Loading...</option>
+	</select>
+
+	<select name="second_endpoint" disabled=disabled>
+		<option value="">Loading...</option>
+	</select>	
+
+	<input type="text" class="input-large" placeholder="ID">
+	<p style="margin-top:20px;">
+		<button class="btn btn-large btn-primary" style="width:70px;" type="button">Run</button>
+	</p>
+
+	<p style="margin-top:40px">
+
+		<h3> Result </h3>
+		<textarea name="result" rows="20">
+		</textarea>
+	</p>
+</form>
+
