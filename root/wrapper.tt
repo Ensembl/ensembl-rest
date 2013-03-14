@@ -60,8 +60,10 @@
 [% IF c.request.env.$psg %]
 <script src='[% c.request.env.$psg.1 %]'></script>
 [% ELSE %]
+<script src="/static/js/00-onload.js"></script>
 <script src="/static/js/10-bootstrap.js"></script>
 <script src="/static/js/20-prettify.js"></script>
+<script src="/static/js/30-chainedform.js"></script>
 [% END %]
 
 
