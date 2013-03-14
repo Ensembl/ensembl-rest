@@ -1,5 +1,5 @@
 {
-  "succes": true,
+  "success": true,
   "services": [
     {
         "service" : "xrefs/symbol",
