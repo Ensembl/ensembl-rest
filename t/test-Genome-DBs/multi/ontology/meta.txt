@@ -1,3 +1,3 @@
-2	OBO_file_date	SO.obo/13:04:2012 11:41
-3	OBO_load_date	SO.obo/Wed Nov 14 23:58:20 2012
+2	OBO_file_date	so.obo/14:11:2012 16:46
+3	OBO_load_date	so.obo/Wed Mar 20 11:32:01 2013
 1	schema_type	ontology
