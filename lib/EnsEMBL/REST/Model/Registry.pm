@@ -3,6 +3,11 @@ package EnsEMBL::REST::Model::Registry;
 use Moose;
 use namespace::autoclean;
 require EnsEMBL::REST;
+our $LOOKUP_AVAILABLE = 0;
+eval {
+  require Bio::EnsEMBL::LookUp;
+  $LOOKUP_AVAILABLE = 1;
+};
 use feature 'switch';
 use CHI;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
@@ -23,6 +28,12 @@ has 'verbose' => ( is => 'ro', isa => 'Bool' );
 
 # File based config
 has 'file' => ( is => 'ro', isa => 'Str' );
+
+# Ensembl Genomes LookUp Support
+has 'lookup_file' => ( is => 'ro', isa => 'Str' );
+has 'lookup_url'  => ( is => 'ro', isa => 'Str' );
+has 'lookup_cache_file'  => ( is => 'ro', isa => 'Str' );
+has 'lookup_no_cache'  => ( is => 'ro', isa => 'Bool' );
 
 # Avoid initiation of the registry
 has 'skip_initation' => ( is => 'ro', isa => 'Bool' );
@@ -45,6 +56,7 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
   Catalyst::Utils::ensure_class_loaded($class);
   $class->no_version_check(1);
   return $class if $self->skip_initation();
+  
   if($self->file()) {
     no warnings 'once';
     local $Bio::EnsEMBL::Registry::NEW_EVAL = 1;
@@ -62,12 +74,18 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
       -VERBOSE => $self->verbose()
     );
   }
+  elsif(($self->lookup_url() || $self->lookup_file()) && $LOOKUP_AVAILABLE) {
+    $log->info('User submitted EnsemblGenomes lookup information. Building from this');
+    $self->_lookup();
+  }
   else {
-    confess "Cannot instantiate a registry. Please consult your configuration file and try again"
+    confess "Cannot instantiate a registry; we have looked for configuration regarding a registry file, host information and ensembl genomes lookup. None were given. Please consult your configuration file and try again"
   }
   $self->_set_connection_policies($class);
   return $class;
 });
+
+has '_lookup' => ( is => 'ro', lazy => 1, builder => '_build_lookup');
 
 sub _set_connection_policies {
   my ($self, $registry) = @_;
@@ -124,6 +142,29 @@ sub _intern_db_connections {
     $dba->dbc($new_dbc);
   }
   return;
+}
+
+sub _build_lookup {
+  my ($self)= @_;
+  my $log = $self->log();
+  my %args;
+  if($self->lookup_no_cache()) {
+    $log->info('Turning off local Ensembl Genomes LookUp caching');
+    $args{-NO_CACHE} = 1;
+  }
+  if($self->lookup_cache_file()) {
+    $log->info('Using local json cache file '.$self->lookup_cache_file());
+    $args{-CACHE_FILE} = $self->lookup_cache_file();
+  }
+  if($self->lookup_url()) {
+    $log->info('Using LookUp URL '.$self->lookup_url());
+    $args{-URL} = $self->lookup_url();
+  }
+  if($self->lookup_file()) {
+    $log->info('Using LookUp file '.$self->lookup_file());
+    $args{-FILE} = $self->lookup_file();
+  }
+  return Bio::EnsEMBL::LookUp->new(%args);
 }
 
 sub get_best_compara_DBAdaptor {
