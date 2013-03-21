@@ -1,5 +1,5 @@
 1775	1	xref.timestamp	2012-09-03 21:14:58
-1	\N	schema_version	70
+1	\N	schema_version	71
 2	\N	patch	patch_52_53_a.sql|schema_version
 3	\N	patch	patch_52_53_b.sql|external_db_type_enum
 4	\N	patch	patch_52_53_c.sql|identity_xref_rename
@@ -166,3 +166,5 @@
 1778	\N	patch	patch_69_70_c.sql|column_datatype_consistency
 1779	\N	patch	patch_69_70_d.sql|data_file_id_auto_increment
 1780	\N	patch	patch_69_70_e.sql|protein_feature_hit_description
+1781	\N	patch	patch_70_71_a.sql|schema_version
+1782	\N	patch	patch_70_71_b.sql|mapping_set_index
