@@ -15,3 +15,4 @@ reg.pm
 cover_db
 tmp
 temp
+lookup_cache.json
