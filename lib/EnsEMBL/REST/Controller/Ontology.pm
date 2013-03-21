@@ -33,7 +33,6 @@ sub name : Chained('ontology_root') PathPart('name') Args(1) ActionClass('REST')
   $self->status_ok( $c, entity => $self->_encode_array($terms));
 }
 
-#Serialise the right 
 sub enhance_terms {
   my ($self, $c, $terms) = @_;
   return if $c->request->param('simple');
