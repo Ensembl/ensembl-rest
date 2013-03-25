@@ -8,42 +8,86 @@
 
 <h2>Parameters</h2>
 
-[% IF endpoint.params %]
+<h3>Required</h3>
+[% IF endpoint.has_required_params() %]
+<table class="table table-striped">
+<thead>
+  <tr>
+    <th>Name</th><th>Type</th><th>Description</th><th>Default</th><th>Example Values</th>
+  </tr>
+</thead>
+<tbody>
+	[% FOREACH p IN endpoint.params.pairs %]
+		[% NEXT IF ! p.value.required %]
+    <tr>
+    <td>
+			[% p.key %]
+			[% IF p.value.deprecated %]<br/><span class="label label-important">Deprecated: use <var>[% p.value.deprecated %]</tvart></span>[% END %]
+		</td>
+    <td><var>[% p.value.type %]</var></td>
+    <td>[% p.value.description %]</td>
+    <td><var>
+      [% IF p.value.default.defined %] [% p.value.default %] [% ELSE %] - [% END %]
+    </var></td>
+    <td>
+			[% IF p.value.example %] 
+      [% FOREACH eg IN p.value.example %]
+        <var>[% eg %]</var><br>
+      [% END %]
+			[% ELSE %]
+				<var>-</var>
+			[% END %]
+    </td>
+    </tr>
+	[% END %]
+</tbody>
+</table>
+[% ELSE %]
+<p>No required parameters</p>
+[% END %]
+
+<h3>Optional</h3>
+
+[% IF endpoint.has_optional_params() %]
   <table class="table table-striped">
   <thead>
     <tr>
-      <th>Name</th><th>Required</th><th>Type</th><th>Description</th><th>Default</th><th>Example Values</th>
+      <th>Name</th><th>Type</th><th>Description</th><th>Default</th><th>Example Values</th>
     </tr>
   </thead>
     <tbody>
   	[% FOREACH p IN endpoint.params.pairs %]
+			[% NEXT IF p.value.required %]
       <tr>
       <td>
 				[% p.key %]
-				[% IF p.value.deprecated %]<br/><span class="label label-important">Deprecated: use <tt>[% p.value.deprecated %]</tt></span>[% END %]
+				[% IF p.value.deprecated %]<br/><span class="label label-important">Deprecated: use <var>[% p.value.deprecated %]</var></span>[% END %]
 			</td>
-      <td>[% IF p.value.required %]<strong>Yes</strong>[% ELSE %]No[% END %]
-      <td><tt>[% p.value.type %]</tt></td>
+      <td><var>[% p.value.type %]</var></td>
       <td>[% p.value.description %]</td>
-      <td><tt>
+      <td><var>
         [% IF p.value.default.defined %] [% p.value.default %] [% ELSE %] - [% END %]
-      </tt></td>
+      </var></td>
       <td>
-        [% FOREACH eg IN p.value.example %]
-          <tt>[% eg %]<tt><br>
-        [% END %]
+				[% IF p.value.example %] 
+	      [% FOREACH eg IN p.value.example %]
+	        <var>[% eg %]</var><br>
+	      [% END %]
+				[% ELSE %]
+					<var>-</var>
+				[% END %]
       </td>
       </tr>
   	[% END %]
   	</tbody>
 	</table>
 [% ELSE %]
-	<p>No parameters required</p>
+	<p>No optional parameters</p>
 [% END %]
 
-<h3>Example Requests</h3>
+<h2>Example Requests</h2>
 
-[% example_types = ['perl', 'python', 'ruby', 'curl', 'wget'] %]
+[% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget'] %]
 
 [% FOREACH p IN endpoint.examples.pairs %]
 	
@@ -51,7 +95,7 @@
 	
 	[% filtered_uri = p.value.example.uri.replace('\+', '%2B') %]
 	
-	<h4><a href="[% filtered_uri %]">[% filtered_uri %]</a></h4>
+	<h3><a href="[% filtered_uri %]">[% filtered_uri %]</a></h3>
 	<br>
 	<ul class="nav nav-pills">
 	  <li class="active"><a href="#example[% p.value.id %]" data-toggle="tab">Example output</a></li>
@@ -72,6 +116,9 @@
 
 <!-- RUBY EXAMPLE -->
 [% INCLUDE documentation/examples/ruby.tt %]
+
+<!-- JAVA EXAMPLE -->
+[% INCLUDE documentation/examples/java.tt %]
 
 <!-- CURL EXAMPLE -->
 [% INCLUDE documentation/examples/curl.tt %]

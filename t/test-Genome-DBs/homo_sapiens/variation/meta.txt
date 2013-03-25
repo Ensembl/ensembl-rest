@@ -1,6 +1,18 @@
 1	1	schema_type	variation
-2	\N	schema_version	70
+2	\N	schema_version	71
 3	\N	patch	patch_69_70_a.sql|schema version
 4	\N	patch	patch_69_70_b.sql|drop table flanking_sequence
 5	\N	patch	patch_69_70_c.sql|add freqs_from_gts column to sample table
 6	\N	patch	patch_69_70_d.sql|add regulatory region variation tables
+7	\N	patch	patch_69_70_e.sql|add consequence terms to consequence_types set in variation_feature
+8	\N	patch	patch_70_71_a.sql|schema version
+9	\N	patch	patch_70_71_b.sql|add evidence column
+10	\N	patch	patch_70_71_c.sql|increase size of minor_allele
+11	\N	patch	patch_70_71_d.sql|drop feature_idx from consequence tables
+12	\N	patch	patch_70_71_e.sql|create study_variation table
+13	\N	patch	patch_70_71_f.sql|add phenotype_feature and phenotype_feature_attrib
+14	\N	patch	patch_70_71_g.sql|add stable_id column to phenotype
+15	\N	patch	patch_70_71_h.sql|copy data to phenotype_feature and phenotype_feature_attrib
+16	\N	patch	patch_70_71_i.sql|drop old annotation tables
+17	\N	patch	patch_70_71_j.sql|add pos_idx key to phenotype_feature
+18	\N	patch	patch_70_71_k.sql|add type_value_idx key to phenotype_feature_attrib

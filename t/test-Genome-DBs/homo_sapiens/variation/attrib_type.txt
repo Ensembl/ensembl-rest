@@ -10,3 +10,9 @@
 10	dbsnp_clin_sig	dbSNP clinical significance	The clinical significance of a variant as reported by dbSNP
 11	dgva_clin_sig	DGVa clinical significance	The clinical significance of a structural variant as reported by DGVa
 12	prot_func_analysis	Protein function analysis 	The program used to make protein function predictions
+13	associated_gene	Associated gene	ID of gene(s) linked by a phenotype association
+14	risk_allele	Risk allele	Risk allele in phenotype association
+15	p_value	P-value	P-value denoting significance of an observed phenotype annotation
+16	variation_names	Variation names	ID of variant(s) linked with a phenotype association
+17	sample_id	Sample ID	Sample ID for source of phenotype association
+18	strain_id	Strain ID	Strain ID for source of phenotype association

@@ -42,6 +42,7 @@ package EnsEMBL::REST;
 use Moose;
 use namespace::autoclean;
 use Log::Log4perl::Catalyst;
+use EnsEMBL::REST::Types;
 
 use 5.010_001;
 
@@ -71,7 +72,7 @@ use Catalyst qw/
 /;
 
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.3.0';
 
 # Configure the application.
 #

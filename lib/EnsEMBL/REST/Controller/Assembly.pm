@@ -32,7 +32,7 @@ sub seq_region_GET {}
 
 sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   my ( $self, $c, $name) = @_;
-  my $slice = $c->model('Lookup')->find_slice($c, $name);
+  my $slice = $c->model('Lookup')->find_slice($name);
   $self->status_ok( $c, entity => { 
     length => $slice->length(),
     coordinate_system => $slice->coord_system()->name(),

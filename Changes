@@ -1,5 +1,47 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.3.0 09-04-2013
+
+New Features:
+
+  - [/feature/id] allows for the querying of features overlapping a 
+    stable ID
+  
+  - [/genetree/member/id] allows for the querying of a GeneTree by one 
+    of its member's stable ID
+  
+  - [/genetree/member/symbol] allows for the querying of a GeneTree by
+    one of its member's symbols (its name e.g. BRAF)
+  
+  - [/taxonomy/] provides methods for querying the Ensembl taxonomy 
+    database. This is a mirror of NCBI's taxonomy.
+  
+  - [/ontology/] provides methods for querying the Ensembl ontology 
+    database
+  
+  - Model::Registry supports use of Ensembl Genomes' Bio::EnsEMBL::LookUp 
+    object to help loading bacteria datasets
+  
+  - Support for CrossOrigin resource sharing via Plack::Middleware::CrossOrigin
+
+Configuration:
+
+  - [/species/info] now supports the vast numbers Ensembl Bacteria brings 
+    into the registry
+  
+  - All models if they need access to the Catalyst context object implement 
+    methods to access this without explicit pass throughs. Affects all 
+    Models apart from Registry
+
+Bugfixes:
+
+  - Model::Registry has Bio::EnsEMBL::LookUp configuration attributes
+
+  - Controller::Taxonomy allows for database name configuration
+
+  - Controller::Ontology allows for database name configuration
+
+
 1.2.0 15-02-2013
 
 New Features:
