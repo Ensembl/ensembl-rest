@@ -274,7 +274,7 @@ sub _build_species_info {
     my $info = {
       name => $species,
       release => $release_lookup{$species},
-      aliases => $alias_lookup{$species},
+      aliases => $alias_lookup{$species} || [],
       groups  => $groups_lookup{$species},
       division => $division_lookup{$species},
     };
