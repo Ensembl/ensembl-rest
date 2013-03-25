@@ -1,5 +1,45 @@
 <h1>Change Log</h1>
 
+<h2>1.3.0 - 9th April 2013</h2>
+
+<h3>New Feature</h3>
+<ul>
+  <li>
+    <tt>[/feature/id]</tt> allows for the querying of features overlapping a stable ID
+  </li>
+  <li>
+    <tt>[/genetree/member/id]</tt> allows for the querying of a GeneTree by one of its member's stable ID
+  </li>
+  <li>
+    <tt>[/genetree/member/symbol]</tt> allows for the querying of a GeneTree by one of its member's symbols (its name e.g. BRAF)
+  </li>
+  <li>
+    <tt>[/taxonomy/]</tt> provides methods for querying the Ensembl taxonomy database. This is a mirror of NCBI's taxonomy.
+  </li>
+  <li>
+    <tt>[/ontology/]</tt> provides methods for querying the Ensembl ontology database
+  </li>
+  <li>
+    <tt>Model::Registry</tt> supports use of Ensembl Genomes' <tt>Bio::EnsEMBL::LookUp</tt> object to help loading bacteria datasets
+  </li>
+  <li>
+    Support for CrossOrigin resource sharing via <tt>Plack::Middleware::CrossOrigin</tt>
+  </li>
+</ul>
+
+<h3>Bugfixes</h3>
+<ul>
+  <li><tt>[/species/info]</tt> now supports the vast numbers Ensembl Bacteria brings into the registry</li>
+  <li>All models if they need access to the Catalyst context object implement methods to access this without explicit pass throughs. Affects all Models apart from Registry</li>
+</ul>
+
+<h3>Configuration</h3>
+<ul>
+  <li><tt>Model::Registry</tt> has <tt>Bio::EnsEMBL::LookUp</tt> configuration attributes</li>
+  <li><tt>Controller::Taxonomy</tt> allows for database name configuration</li>
+  <li><tt>Controller::Ontology</tt> allows for database name configuration</li>
+</ul>
+
 <h2>1.2.0 - 15th Feburary 2013</h2>
 
 <h3>New Feature</h3>

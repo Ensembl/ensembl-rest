@@ -36,7 +36,7 @@ sub id :Path('id') Args(1) ActionClass('REST') {
   
   try {
     $c->log()->debug('Finding the object');
-    $c->model('Lookup')->find_object_by_stable_id($c, $c->stash()->{id});
+    $c->model('Lookup')->find_object_by_stable_id($c->stash()->{id});
     $c->log()->debug('Processing the sequences');
     $self->_process($c);
     $c->log()->debug('Pushing out the entity');
@@ -59,7 +59,7 @@ sub region :Chained('get_species') PathPart('') Args(1) ActionClass('REST') {
   
   try {
     $c->log()->debug('Finding the Slice');
-    my $slice = $c->model('Lookup')->find_slice($c, $region);
+    my $slice = $c->model('Lookup')->find_slice($region);
     $slice = $self->_enrich_slice($c, $slice);
     $c->log()->debug('Producing the sequence');
     my $seq = $slice->seq();

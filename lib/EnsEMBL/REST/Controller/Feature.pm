@@ -3,6 +3,7 @@ package EnsEMBL::REST::Controller::Feature;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
+use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
@@ -43,11 +44,29 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   $c->stash()->{region} = $region;
   my $features;
   try {
-    my $slice = $c->model('Lookup')->find_slice($c, $region);
+    my $slice = $c->model('Lookup')->find_slice($region);
     $self->assert_slice_length($c, $slice);
-    $features = $c->model('Feature')->fetch_features($c);
+    $features = $c->model('Feature')->fetch_features();
   }
   catch {
+    $c->go('ReturnError', 'from_ensembl', [$_]);
+  };
+  $self->status_ok($c, entity => $features );
+}
+
+sub id_GET {}
+
+sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
+  my ($self, $c, $id) = @_;
+  my $features;
+  try {
+    $c->log()->debug('Finding the object');
+    my $feature = $c->model('Lookup')->find_object_by_stable_id($id);
+    $c->go('ReturnError', 'custom', "The given stable ID does not point to a Feature. Cannot perform overlap") unless check_ref($feature, 'Bio::EnsEMBL::Feature');
+    my $slice = $feature->feature_Slice();
+    $c->stash->{slice} = $slice;
+    $features = $c->model('Feature')->fetch_features();
+  } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
   $self->status_ok($c, entity => $features );

@@ -3,8 +3,14 @@ package EnsEMBL::REST::Model::Registry;
 use Moose;
 use namespace::autoclean;
 require EnsEMBL::REST;
+our $LOOKUP_AVAILABLE = 0;
+eval {
+  require Bio::EnsEMBL::LookUp;
+  $LOOKUP_AVAILABLE = 1;
+};
 use feature 'switch';
 use CHI;
+use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
 extends 'Catalyst::Model';
 
@@ -22,6 +28,12 @@ has 'verbose' => ( is => 'ro', isa => 'Bool' );
 
 # File based config
 has 'file' => ( is => 'ro', isa => 'Str' );
+
+# Ensembl Genomes LookUp Support
+has 'lookup_file' => ( is => 'ro', isa => 'Str' );
+has 'lookup_url'  => ( is => 'ro', isa => 'Str' );
+has 'lookup_cache_file'  => ( is => 'ro', isa => 'Str' );
+has 'lookup_no_cache'  => ( is => 'ro', isa => 'Bool' );
 
 # Avoid initiation of the registry
 has 'skip_initation' => ( is => 'ro', isa => 'Bool' );
@@ -44,11 +56,15 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
   Catalyst::Utils::ensure_class_loaded($class);
   $class->no_version_check(1);
   return $class if $self->skip_initation();
+  
+  my $load = 0;
+    
   if($self->file()) {
     no warnings 'once';
     local $Bio::EnsEMBL::Registry::NEW_EVAL = 1;
     $log->info('Using the file location '.$self->file());
     $class->load_all($self->file());
+    $load = 1;
   }
   elsif($self->host()) {
     $log->info('Using host settings from the configuration file');
@@ -60,13 +76,29 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
       -DB_VERSION => $self->version(),
       -VERBOSE => $self->verbose()
     );
+    $load = 1;
   }
-  else {
-    confess "Cannot instantiate a registry. Please consult your configuration file and try again"
+  if(defined $self->lookup_url() || defined $self->lookup_file()) {
+    if($LOOKUP_AVAILABLE) {
+      $log->info('User submitted EnsemblGenomes lookup information. Building from this');
+      $self->_lookup();
+      $load = 1;
+    }
+    else {
+      $log->error('You tried to use Bio::EnsEMBL::LookUp but this was not on your PERL5LIB');
+    }
+  }
+  
+  if(!$load) {
+    confess "Cannot instantiate a registry; we have looked for configuration regarding a registry file, host information and ensembl genomes lookup. None were given. Please consult your configuration file and try again"
   }
   $self->_set_connection_policies($class);
   return $class;
 });
+
+has '_lookup' => ( is => 'ro', lazy => 1, builder => '_build_lookup');
+
+has '_species_info' => ( isa => 'ArrayRef', is => 'ro', lazy => 1, builder => '_build_species_info' );
 
 sub _set_connection_policies {
   my ($self, $registry) = @_;
@@ -125,12 +157,34 @@ sub _intern_db_connections {
   return;
 }
 
+sub _build_lookup {
+  my ($self)= @_;
+  my $log = $self->log();
+  my %args;
+  if($self->lookup_no_cache()) {
+    $log->info('Turning off local Ensembl Genomes LookUp caching');
+    $args{-NO_CACHE} = 1;
+  }
+  if($self->lookup_cache_file()) {
+    $log->info('Using local json cache file '.$self->lookup_cache_file());
+    $args{-CACHE_FILE} = $self->lookup_cache_file();
+  }
+  if($self->lookup_url()) {
+    $log->info('Using LookUp URL '.$self->lookup_url());
+    $args{-URL} = $self->lookup_url();
+  }
+  if($self->lookup_file()) {
+    $log->info('Using LookUp file '.$self->lookup_file());
+    $args{-FILE} = $self->lookup_file();
+  }
+  return Bio::EnsEMBL::LookUp->new(%args);
+}
+
 sub get_best_compara_DBAdaptor {
-  my ($self, $c, $species) = @_;
-  my $best_compara_name = $self->get_compara_name_for_species($species);
-  my $compara_name = $c->request()->param('compara') || $best_compara_name;
+  my ($self, $species, $request_compara_name) = @_;
+  my $compara_name = $request_compara_name || $self->get_compara_name_for_species($species);
   if(!$compara_name) {
-    $c->go('ReturnError', 'custom', ["Cannot find a suitable compara database for the species $species. Try specifying a compara parameter"]);
+    throw "Cannot find a suitable compara database for the species $species. Try specifying a compara parameter";
   }
   return $self->get_DBAdaptor($compara_name, 'compara');
 } 
@@ -152,23 +206,81 @@ sub get_species_and_object_type {
 
 sub get_species {
   my ($self) = @_;
+  return $self->_species_info();
+}
+
+sub _build_species_info {
+  my ($self) = @_;
   my @species;
   my $reg = $self->_registry();
-  my $dbadaptors = $self->get_all_DBAdaptors('core');
-  foreach my $dba (@{$dbadaptors}) {
+  
+  #Aliases is backwards i.e. alias -> species
+  my %alias_lookup;
+  while (my ($alias, $species) = each %{ $Bio::EnsEMBL::Registry::registry_register{_ALIAS} }) {
+    if($alias ne $species) {
+      push(@{$alias_lookup{$species}}, $alias); # iterate through the alias,species pairs & reverse
+    }
+  }
+  
+  my @all_dbadaptors = @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
+  my @core_dbadaptors;
+  my %groups_lookup;
+  my %division_lookup;
+  my %release_lookup;
+  my %processed_db;
+  while(my $dba = shift @all_dbadaptors) {
     my $species = $dba->species();
-    my $mc = $self->get_adaptor($species, 'core', 'metacontainer');
-    my $division = $mc->single_value_by_key('species.division') || 'Ensembl';
+    my $group = $dba->group();
+    my $species_lc = ($species);
+    push(@{$groups_lookup{$species_lc}}, $group);
+    
+    if($group eq 'core') {
+      push(@core_dbadaptors, $dba);
+      my $dbc = $dba->dbc();
+      my $db_key = sprintf(
+          "host=%s;port=%s;dbname=%s;user=%s;pass=%s",
+          $dbc->host(),    $dbc->port(),
+          $dbc->dbname(),  $dbc->username(), $dbc->password());
+
+      if(! exists $processed_db{$db_key}) {
+        my $mc = $dba->get_MetaContainer();
+        my $schema_version = $mc->get_schema_version();
+        $schema_version = $schema_version * 1;
+        $release_lookup{$species} = $schema_version;
+        
+        if(!$dba->is_multispecies()) {
+          $division_lookup{$species} = $mc->get_division() || 'Ensembl';
+        }
+        else {
+          $dbc->sql_helper->execute_no_return(
+            -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
+            -PARAMS => ['species.production_name', 'species.division'],
+            -CALLBACK => sub {
+              my ($row) = @_;
+              $division_lookup{$row->[0]} = $row->[1];
+              return;
+            }
+          );
+        }
+        
+        $processed_db{$db_key} = 1;
+      }
+    }
+  }
+  
+  foreach my $dba (@core_dbadaptors) {
+    my $species = $dba->species();
+    my $species_lc = ($species);
     my $info = {
       name => $species,
-      release => $mc->get_schema_version() * 1,
-      aliases => $self->_registry()->get_all_aliases($species),
-      groups  => [ map { $_->group() } @{$self->get_all_DBAdaptors(undef, $species)}],
-      division => $division,
+      release => $release_lookup{$species},
+      aliases => $alias_lookup{$species} || [],
+      groups  => $groups_lookup{$species},
+      division => $division_lookup{$species},
     };
     push(@species, $info);
-    $dba->dbc()->disconnect_if_idle();
   }
+  
   return \@species;
 }
 

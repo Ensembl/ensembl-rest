@@ -22,6 +22,7 @@ requires 'Config::General'; # This should reflect the config file format you've 
 #Ensembl Rest Specific
 requires 'Catalyst::Controller::REST';
 requires 'Catalyst::Plugin::SubRequest';
+requires 'Catalyst::Component::InstancePerContext';
 requires 'Catalyst::View::JSON';
 requires 'Catalyst::View::TT';
 requires 'JSON::XS';
@@ -46,6 +47,7 @@ recommends 'Plack::Middleware::Assets';
 recommends 'Plack::Middleware::ReverseProxy';
 recommends 'Plack::Middleware::SizeLimit';
 recommends 'Plack::Middleware::Throttle';
+recommends 'Plack::Middleware::CrossOrigin';
 recommends 'Cache::Memcached';
 recommends 'CHI::Driver::Memcached';
 recommends 'Sereal::Encoder';

@@ -33,7 +33,7 @@ sub id :Chained('/') PathPart('xrefs/id') Args(1)  ActionClass('REST') {
   $c->stash()->{id} = $id;
   try {
     $c->log()->debug('Finding the object');
-    my $obj = $c->model('Lookup')->find_object_by_stable_id($c, $id);
+    my $obj = $c->model('Lookup')->find_object_by_stable_id($id);
     $c->log()->debug('Processing the Xrefs');
     my $method = $c->request()->param('all_levels') ? 'get_all_DBLinks' : 'get_all_DBEntries';
     my $can = $obj->can($method);
@@ -66,7 +66,7 @@ sub symbol :Chained('/') PathPart('xrefs/symbol') Args(2) ActionClass('REST') {
   }
   my @entries;
   try {
-    my $objects_linked_to_name = $c->model('Lookup')->find_objects_by_symbol($c,$symbol);
+    my $objects_linked_to_name = $c->model('Lookup')->find_objects_by_symbol($symbol);
     while(my $obj = shift @{$objects_linked_to_name}) {
       my $encoded = {
         id => $obj->stable_id(),
