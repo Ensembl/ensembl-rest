@@ -17,13 +17,14 @@ sub get_adaptors :Private {
   try {
     my $species = $c->stash()->{species};
     my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'));
-    my $ma = $compara_dba->get_MemberAdaptor();
+    my $gma = $compara_dba->get_GeneMemberAdaptor();
+    my $sma = $compara_dba->get_SeqMemberAdaptor();
     my $ha = $compara_dba->get_HomologyAdaptor();
     my $mlssa = $compara_dba->get_MethodLinkSpeciesSetAdaptor();
     my $gdba = $compara_dba->get_GenomeDBAdaptor();
     
     $c->stash(
-      member_adaptor => $ma, 
+      gene_member_adaptor => $gma,
       homology_adaptor => $ha,
       method_link_species_set_adaptor => $mlssa,
       genome_db_adaptor => $gdba
@@ -90,7 +91,7 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   foreach my $stable_id ( @{ $s->{stable_ids} } ) {
     my $member = try { 
       $c->log->debug('Searching for gene member linked to ', $stable_id);
-      $s->{member_adaptor}->fetch_by_source_stable_id( "ENSEMBLGENE", $stable_id );
+      $s->{gene_member_adaptor}->fetch_by_source_stable_id( "ENSEMBLGENE", $stable_id );
     }
     catch {
       $c->log->error(qq{Stable Id not found id db: $stable_id});
@@ -103,15 +104,15 @@ sub get_orthologs : Args(0) ActionClass('REST') {
       if($c->request->param('target_species') || $c->request->param('target_taxon')) {
         $c->log->debug('Limiting on species/taxons');
         $all_homologies = [];
-        my $mlss_array = $self->_method_link_speices_sets($c, $member);
+        my $mlss_array = $self->_method_link_species_sets($c, $member);
         foreach my $mlss (@{$mlss_array}) {
           $c->log->debug('Searching for ', $method_link_type, ' with MLSS ID ', $mlss->dbID(), ' (', ($mlss->name() || q{-}), ')');
-          my $r = $ha->fetch_all_by_Member_MethodLinkSpeciesSet($member, $mlss);
+	  my $r = $ha->fetch_all_by_Member($member, -METHOD_LINK_SPECIES_SET => $mlss);
           push(@{$all_homologies}, @{$r});
         }
       }
       elsif($method_link_type) {
-        $all_homologies = $ha->fetch_all_by_Member_method_link_type($member, $method_link_type);
+	$all_homologies = $ha->fetch_all_by_Member($member, -METHOD_LINK_TYPE => $method_link_type);
       }
       else {
         $all_homologies = $ha->fetch_all_by_Member($member);
@@ -130,7 +131,7 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   $c->stash(homology_data => \@final_homologies);
 }
 
-sub _method_link_speices_sets {
+sub _method_link_species_sets {
   my ($self, $c, $member) = @_;
   
   my $mlssa = $c->stash->{method_link_species_set_adaptor};
@@ -204,7 +205,7 @@ sub _full_encoding {
       perc_id => ($member->perc_id()*1),
       perc_pos => ($member->perc_pos()*1),
       cigar_line => $member->cigar_line(),
-      protein_id => $gene->get_canonical_Member()->stable_id(),
+      protein_id => $gene->get_canonical_SeqMember()->stable_id(),
     };
     if($aligned) {
       if($seq_type eq 'protein') {
@@ -252,7 +253,7 @@ sub _condensed_encoding {
       type => $h->description(),
       subtype => $h->subtype(),
       id => $gene_member->stable_id(),
-      protein_id => $gene_member->get_canonical_Member()->stable_id(),
+      protein_id => $gene_member->get_canonical_SeqMember()->stable_id(),
     };
     push(@output, $e);
   }
