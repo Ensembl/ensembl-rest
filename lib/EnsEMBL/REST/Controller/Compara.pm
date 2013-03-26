@@ -254,6 +254,7 @@ sub _condensed_encoding {
       subtype => $h->subtype(),
       id => $gene_member->stable_id(),
       protein_id => $gene_member->get_canonical_SeqMember()->stable_id(),
+      species => $gene_member->genome_db->name(),
     };
     push(@output, $e);
   }
