@@ -13,7 +13,7 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/</td>
+	<td>http://${CurrentEnvironment}/</td>
 	<td></td>
 </tr>
 <tr>
@@ -36,7 +36,6 @@
 	<td>link=About the Ensembl Project</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

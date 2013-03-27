@@ -1,1 +1,29 @@
-The following files are all Selinium tests designed in SeliniumIDE & tested in Firefox 17. To run you must install SeleniumIDE & to run the entire suite you should use TestSuite. 
+Outline
+≠≠≠≠≠≠≠
+
+The following files are all Selinium tests designed in SeliniumIDE & tested in Firefox 19. 
+To run you must install SeleniumIDE & to run the entire suite you should use TestSuite.
+
+
+Installing
+≠≠≠≠≠≠≠≠≠≠
+
+Selinium IDE is available from http://docs.seleniumhq.org/download/ and installs itself into Firefox
+
+
+How to run
+≠≠≠≠≠≠≠≠≠≠
+
+1). Load the test suite file *TestSuite*
+
+2). Edit the environment test case to set the CurrentEnvironment to your server installation
+
+3). Run the test suite
+
+
+When to run
+≠≠≠≠≠≠≠≠≠≠≠
+
+1). Loading a new instance on Amazon EC2
+
+2). Prodding the cache to populate all examples
