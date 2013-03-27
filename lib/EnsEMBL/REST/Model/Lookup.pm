@@ -89,7 +89,7 @@ sub find_object_by_stable_id {
 sub find_objects_by_symbol {
   my ($self, $symbol) = @_;
   my $c = $self->context();
-  my $db_type = $c->request->param('db_type');
+  my $db_type = $c->request->param('db_type') || 'core';
   my $external_db = $c->request->param('external_db');
   my @entries;  
   my @objects_to_try = $c->request->param('object') ? ($c->request->param('object')) : qw(gene transcript translation);

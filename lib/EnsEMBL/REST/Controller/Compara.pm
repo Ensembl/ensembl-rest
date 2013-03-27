@@ -48,19 +48,22 @@ sub fetch_by_gene_symbol : Chained("/") PathPart("homology/symbol") Args(2)  {
   my $genes;
   try {
     $c->stash(species => $species);
-    my $adaptor = $c->model('Registry')->get_adaptor( $species, 'Core', 'Gene' );
-    $c->go('ReturnError', 'custom', ["No core gene adaptor found for $species"]) unless $adaptor;
-    $c->stash->{gene_adaptor} = $adaptor;
-    my $external_db = $c->request->param('external_db');
-    $genes = $adaptor->fetch_all_by_external_name($gene_symbol, $external_db);
+    $c->request->param('object', 'gene');
+    my $local_genes = $c->model('Lookup')->find_objects_by_symbol($gene_symbol);
+    $genes = [grep { $_->slice->is_reference() } @{$local_genes}];
+    # my $adaptor = $c->model('Registry')->get_adaptor( $species, 'Core', 'Gene' );
+    # $c->go('ReturnError', 'custom', ["No core gene adaptor found for $species"]) unless $adaptor;
+    # $c->stash->{gene_adaptor} = $adaptor;
+    # my $external_db = $c->request->param('external_db');
+    # $genes = $adaptor->fetch_all_by_external_name($gene_symbol, $external_db);
   }
   catch {
     $c->log->fatal(qq{No genes found for external id: $gene_symbol});
-    $c->go( 'ReturnError', 'no content', [$_] );
+    $c->go('ReturnError', 'from_ensembl', [$_]);
   };
   unless ( defined $genes ) {
       $c->log->fatal(qq{Nothing found in DB for : [$gene_symbol]});
-      $c->go( 'ReturnError', 'no_content', [qq{No content for [$gene_symbol]}] );
+      $c->go( 'ReturnError', 'custom', [qq{No content for [$gene_symbol]}] );
   }
   my @gene_stable_ids = map { $_->stable_id } @$genes;
   $c->stash->{stable_ids} = \@gene_stable_ids;
