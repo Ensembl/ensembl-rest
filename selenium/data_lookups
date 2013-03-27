@@ -13,7 +13,7 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/sequence/id/ENSP00000288602?content-type=application/json</td>
+	<td>http://${CurrentEnvironment}/sequence/id/ENSP00000288602?content-type=application/json</td>
 	<td></td>
 </tr>
 <tr>
@@ -23,7 +23,7 @@
 </tr>
 <tr>
 	<td>open</td>
-	<td>/sequence/id/ENSP00000288602.json</td>
+	<td>http://${CurrentEnvironment}/sequence/id/ENSP00000288602.json</td>
 	<td></td>
 </tr>
 <tr>

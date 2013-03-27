@@ -4,33 +4,19 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://beta.rest.ensembl.org/" />
-<title>VEP</title>
+<title>Environment</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">VEP</td></tr>
+<tr><td rowspan="1" colspan="3">Environment</td></tr>
 </thead><tbody>
 <tr>
-	<td>open</td>
-	<td>http://${CurrentEnvironment}/</td>
-	<td></td>
+	<td>store</td>
+	<td>localhost:3000</td>
+	<td>CurrentEnvironment</td>
 </tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=GET vep/:species/:region/:allele/consequences</td>
-	<td></td>
-</tr>
-<tr>
-	<td>open</td>
-	<td>http://${CurrentEnvironment}/</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=GET vep/:species/id/:id/consequences</td>
-	<td></td>
-</tr>
+
 </tbody></table>
 </body>
 </html>

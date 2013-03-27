@@ -13,7 +13,7 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/</td>
+	<td>http://${CurrentEnvironment}/</td>
 	<td></td>
 </tr>
 <tr>
@@ -23,7 +23,7 @@
 </tr>
 <tr>
 	<td>open</td>
-	<td>/</td>
+	<td>http://${CurrentEnvironment}/</td>
 	<td></td>
 </tr>
 <tr>
@@ -33,7 +33,7 @@
 </tr>
 <tr>
 	<td>open</td>
-	<td>/</td>
+	<td>http://${CurrentEnvironment}/</td>
 	<td></td>
 </tr>
 <tr>
@@ -41,7 +41,6 @@
 	<td>link=GET xrefs/symbol/:species/:symbol</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

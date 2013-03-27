@@ -13,7 +13,7 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/</td>
+	<td>http://${CurrentEnvironment}/</td>
 	<td></td>
 </tr>
 <tr>
@@ -23,7 +23,27 @@
 </tr>
 <tr>
 	<td>open</td>
-	<td>/</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET genetree/member/id/:id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET genetree/member/symbol/:species/:symbol</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
 	<td></td>
 </tr>
 <tr>
@@ -33,7 +53,7 @@
 </tr>
 <tr>
 	<td>open</td>
-	<td>/</td>
+	<td>http://${CurrentEnvironment}/</td>
 	<td></td>
 </tr>
 <tr>
@@ -41,7 +61,6 @@
 	<td>link=GET homology/symbol/:species/:symbol</td>
 	<td></td>
 </tr>
-
 </tbody></table>
 </body>
 </html>

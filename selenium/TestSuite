@@ -8,12 +8,14 @@
 <body>
 <table id="suiteTable" cellpadding="1" cellspacing="1" border="1" class="selenium"><tbody>
 <tr><td><b>Test Suite</b></td></tr>
+<tr><td><a href="environment">Environment</a></td></tr>
 <tr><td><a href="comparative_genomics">Comparative Genomics</a></td></tr>
 <tr><td><a href="xrefs">Xrefs</a></td></tr>
 <tr><td><a href="features">Features</a></td></tr>
 <tr><td><a href="info">Info</a></td></tr>
 <tr><td><a href="lookup">Lookup</a></td></tr>
 <tr><td><a href="mapping">Mapping Entities</a></td></tr>
+<tr><td><a href="ontology_and_taxonomy">Taxonomy and Ontology</a></td></tr>
 <tr><td><a href="sequence">Sequence</a></td></tr>
 <tr><td><a href="vep">VEP</a></td></tr>
 <tr><td><a href="toplinks">Top page links</a></td></tr>
