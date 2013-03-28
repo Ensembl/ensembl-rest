@@ -66,8 +66,7 @@ sub symbol :Chained('/') PathPart('xrefs/symbol') Args(2) ActionClass('REST') {
   }
   my @entries;
   try {
-    my $objects_linked_to_name_full = $c->model('Lookup')->find_objects_by_symbol($symbol);
-    my $objects_linked_to_name = [grep { $_->slice->is_reference() } @{$objects_linked_to_name_full}];
+    my $objects_linked_to_name = $c->model('Lookup')->find_objects_by_symbol($symbol);
     while(my $obj = shift @{$objects_linked_to_name}) {
       my $encoded = {
         id => $obj->stable_id(),
