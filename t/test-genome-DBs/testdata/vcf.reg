@@ -1,0 +1,17 @@
+use Bio::EnsEMBL::DBSQL::DBAdaptor;
+use Bio::EnsEMBL::Variation::DBSQL::DBAdaptor;
+
+Bio::EnsEMBL::DBSQL::DBAdaptor->new(-host => localhost, -port => 3306, -user => root, -dbname => 'my_var_db', -species => 'human');
+Bio::EnsEMBL::Variation::DBSQL::DBAdaptor->new(-host => localhost, -port => 3306, -user => root, -dbname => 'variation_human_vcf', -species => 'human');
+
+1;
+
+__END__
+export MYSQL_HOST='host'
+export MYSQL_USR='usr'
+export MYSQL_PASS='pass'
+export DB="my_var_db"
+
+MySQL command line: mysql --host=$MYSQL_HOST --user=$MYSQL_USR --password=$MYSQL_PASS $DB
+Schema Patcher command line: schema_patcher.pl --host $MYSQL_HOST --user $MYSQL_USR --pass $MYSQL_PASS --database $DB --verbose --fixlast --dryrun
+Database dumper command line: dump_mysql.pl --host $MYSQL_HOST --user $MYSQL_USR --pass $MYSQL_PASS --database $DB --verbose --testcompatible --directory /tmp

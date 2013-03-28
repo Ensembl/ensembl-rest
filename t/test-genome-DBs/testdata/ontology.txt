@@ -1,0 +1,30 @@
+The ontology data set contains only Sequence Ontology version 2.5.1 downloaded from:
+
+http://downloads.sourceforge.net/project/song/Sequence%20Ontology/so_2_5_1/so_2_5_1.obo
+
+The DB was created using:
+
+# Download ontology
+curl -s 'http://www.sequenceontology.org/resources/obo_files/release_2.5.1.obo' > so.obo
+
+# Create the DB. 
+export MYSQL_HOST='127.0.0.1'
+export MYSQL_USR='root'
+export MYSQL_PASS=''
+export DB="${USER}_so_ontology"
+mysqladmin --host=$MYSQL_HOST --user=$MYSQL_USR --password=$MYSQL_PASS create $DB
+
+# Pipe schema in
+mysql --host=$MYSQL_HOST --user=$MYSQL_USR --password=$MYSQL_PASS $DB < ensembl/misc-scripts/ontology/sql/tables.sql
+
+# Load
+perl ensembl/misc-scripts/ontology/scripts/load_OBO_file.pl -host $MYSQL_HOST -user $MYSQL_USR -pass $MYSQL_PASS -name $DB -f so.obo -o SO
+
+# Compute closures
+perl ensembl/misc-scripts/ontology/scripts/compute_closure.pl -host $MYSQL_HOST -user $MYSQL_USR -pass $MYSQL_PASS -name $DB
+
+# Dump
+ensembl/misc-scripts/db/dump_mysql.pl --host $MYSQL_HOST --user $MYSQL_USR --pass $MYSQL_PASS --database $DB --verbose --testcompatible --directory /tmp
+
+# Drop DB
+mysqladmin --host=$MYSQL_HOST --user=$MYSQL_USR --password=$MYSQL_PASS drop $DB
