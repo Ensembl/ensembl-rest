@@ -111,6 +111,7 @@ sub find_object_location {
   my $c = $self->context();
   my $r = $c->request;
   my $log = $c->log();
+
   my ($object_type, $db_type, $species) = map { my $p = $r->param($_); $p; } qw/object_type db_type species/;
   my @captures;
   if($object_type && $object_type eq 'predictiontranscript') {
@@ -119,15 +120,15 @@ sub find_object_location {
   else {
     $c->log()->debug(sprintf('Looking for %s with %s and %s in %s', $id, ($object_type || q{?}), ($db_type || q{?}), ($species || q{?})));
     my $model_name = $self->lookup_model();
-    my $lookup = $c->model($model_name);
     $c->log()->debug('Using '.$model_name);
+    my $lookup = $c->model($model_name);
     @captures = $lookup->find_object_location($id, $object_type, $db_type, $species);
     if(! @captures) {
       $c->log()->debug('Using long database lookup');
       @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
     }
   }
-  
+
   if($log->is_debug()) {
     if(@captures && $captures[0]) {
       $log->debug(sprintf('Found %s, %s and %s', @captures));
@@ -136,7 +137,10 @@ sub find_object_location {
       $log->debug('Found no ID');
     }
   }
-  
+
+  # It is not warranted at this point that we have @captures
+  @captures = (@captures, $self->feature_coordinates($id, [@captures]));
+
   return @captures;
 }
 
@@ -180,6 +184,25 @@ sub ontology_accession_to_OntologyTerm {
   my $c = $self->context();
   my $term_adaptor = $c->model('Registry')->get_ontology_term_adaptor();
   return $term_adaptor->fetch_by_accession($accession);
+}
+
+sub feature_coordinates {
+  my ($self, $id, $feature_type) = @_;
+  my $c = $self->context();
+  my ($species, $object_type, $db_type) = @$feature_type;
+  if ($db_type eq "core") {
+    my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, $object_type);
+    my $feature = $adaptor->fetch_by_stable_id($id);
+    if ($feature->isa('Bio::EnsEMBL::Feature')) {
+      my $chr     = $feature->seq_region_name();
+      my $start   = $feature->seq_region_start();
+      my $end     = $feature->seq_region_end();
+      my $strand  = $feature->seq_region_strand();
+      $c->log()->debug("CHR:$chr $start - $end :$strand");
+      return ($chr,$start,$end,$strand);
+    }
+  }
+  return
 }
 
 __PACKAGE__->meta->make_immutable;
