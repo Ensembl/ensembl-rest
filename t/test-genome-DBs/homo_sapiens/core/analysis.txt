@@ -1,0 +1,32 @@
+8275	2009-05-12 18:26:58	ensembl	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8276	2009-06-01 09:01:22	xrefexoneratedna	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8277	2010-09-30 09:17:16	human_cdna2genome	\N	\N	\N	\N	\N	/nfs/users/nfs_j/jhv/bin/exonerate.hacked.cdna2genome	\N	Exonerate2Genes	\N	\N	\N
+8278	2009-06-01 09:01:22	xrefexonerateprotein	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8279	2012-09-03 17:48:15	xrefchecksum	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8280	2009-05-12 18:26:57	ncrna	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8281	2009-05-20 12:21:05	rfamblast	Rfam	\N	/lustre/scratch1/ensembl/sw4/ncRNA/BLAST/high_copy.fasta	wublastn	\N	wublastn	lowcopy => /lustre/scratch1/ensembl/sw4/ncRNA/BLAST/low_copy.fasta	Bio::EnsEMBL::Analysis::RunnableDB::BlastRfam	\N	ensembl	gene
+8282	2009-05-14 15:43:42	ensembl_havana_gene	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8283	2009-05-14 15:43:42	ensembl_havana_transcript	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8284	2007-09-07 12:01:22	vertrna_havana	\N	10-Nov-10 (105)	\N	\N	\N	\N	ori_analysis => vertrna_raw, mode => single, no_filter => 9606	ClusterDepthFilter	\N	vertebrate_mRNA	similarity
+8285	2007-09-07 12:01:22	uniprot_sw_havana	\N	2010_11	\N	\N	\N	\N	percentid_cutoff => 40, ori_analysis => Uniprot_raw, hit_db => Swissprot, mode => single	DepthFilter	\N	SwissProt	\N
+8286	2007-09-07 12:01:22	uniprot_tr_havana	\N	2010_11	\N	\N	\N	\N	percentid_cutoff => 40, ori_analysis => Uniprot_raw, hit_db => TrEMBL, mode => single	DepthFilter	\N	TrEMBL	\N
+8287	2006-07-13 15:53:10	pfam	Pfam	\N	/data/blastdb/Ensembl/interpro_scan/Pfam-A.hmm	/software/ensembl/bin/hmmer3/hmmscan	\N	/software/ensembl/bin/hmmer3/hmmscan	--acc --noali --cut_ga --cpu 1	ProteinAnnotation/Hmmpfam	\N	Pfam	domain
+8288	2007-08-28 17:47:37	superfamily	Superfamily	\N	/data/blastdb/Ensembl/interpro_scan/superfamily.tab	/software/ensembl/bin/superfamily.pl	\N	/software/ensembl/bin/superfamily.pl	-t /tmp -m /data/blastdb/Ensembl/interpro_scan/superfamily.hmm -d /data/blastdb/Ensembl/interpro_scan/superfamily.tab -a /data/blastdb/Ensembl/interpro_scan/superfamily.acc -p /software/ensembl/bin/hmmpfam -s /software/ensembl/bin/ 1e-05 -r y	ProteinAnnotation/Superfamily	\N	Superfamily	domain
+8289	2007-08-28 17:47:37	smart	Smart	\N	/data/blastdb/Ensembl/interpro_scan/smart.HMMs	hmmpfam	\N	hmmpfam	-E 0.01 -A 100 -Z 350000 --acc --cpu 1	ProteinAnnotation/Hmmpfam	\N	Smart	domain
+8290	2006-07-13 15:53:10	seg	low_complexity	\N	\N	seg	\N	seg	\N	ProteinAnnotation/Seg	\N	Seg	annotation
+8291	2006-07-13 15:53:10	pfscan	Prosite_profiles	\N	/data/blastdb/Ensembl/interpro_scan/prosite.profiles	pfscan	\N	pfscan	\N	ProteinAnnotation/PrositeProfile	\N	Profile	domain
+8292	2006-07-13 15:53:10	prints	Prints	\N	/data/blastdb/Ensembl/interpro_scan/prints.pval	/software//ensembl/bin/FingerPRINTScan	\N	/software//ensembl/bin/FingerPRINTScan	-e 0.0001 -d 10 -E 257043 84355444 -fjR -a -o 15	ProteinAnnotation/Prints	\N	Prints	domain
+8293	2010-09-23 14:40:18	ccds	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8294	2009-05-14 15:43:42	havana	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+8295	2007-09-07 12:01:22	est2genome_human_havana	\N	10-Nov-10 (105)	\N	\N	\N	\N	ori_analysis => Est2genome_human_raw, mode => single	ClusterDepthFilter	\N	EST_Human	similarity
+8296	2007-09-07 12:01:22	est2genome_other_havana	\N	10-Nov-10 (105)	\N	\N	\N	\N	ori_analysis => Est2genome_other_raw, mode => single	ClusterDepthFilter	\N	EST_Other	similarity
+8297	0000-00-00 00:00:00	human_cdna	\N	\N	\N	exonerate	0.9.0	/usr/local/ensembl/bin/exonerate-0.9.0	\N	Exonerate2Genes	\N	Exonerate	similarity
+8298	2007-09-07 12:01:22	est2genome_mouse_havana	\N	10-Nov-10 (105)	\N	\N	\N	\N	ori_analysis => Est2genome_mouse_raw, mode => single	ClusterDepthFilter	\N	EST_Mouse	similarity
+8299	2009-03-11 17:25:55	human_protein	\N	refseq_40,uniprot_2010_07	\N	\N	\N	\N	\N	BestTargetted	\N	\N	\N
+8300	2009-05-13 13:23:17	tigrfam	TIGRfam	\N	/data/blastdb/Ensembl/interpro_scan/TIGRFAMs_HMM.LIB	/software/ensembl/bin/hmmer3/hmmscan	\N	/software/ensembl/bin/hmmer3/hmmscan	--acc --noali --cut_tc --cpu 1	ProteinAnnotation/Hmmpfam	\N	TIGRFAM	domain
+8301	2009-03-27 11:33:33	human_est	human_ests	\N	/lustre/work1/ensembl/jb16/NCBI37/ests/est_chunks	\N	\N	exonerate-0.9.0	\N	Exonerate2Genes	\N	\N	\N
+8302	2006-07-13 15:53:10	ncoils	coiled_coil	\N	/usr/local/ensembl/data/coils	ncoils	\N	ncoils		ProteinAnnotation/Coil	\N	ncoils	annotation
+8303	2012-03-01 14:15:44	assembly_patch_ensembl	\N	\N	\N	\N	\N	\N	\N	GeneBuilder	\N	\N	\N
+8304	2011-02-15 17:06:42	firstef	firstef	\N	\N	firstef	\N	\N	-repeatmasked	FirstEF	\N	firstef	exon
+8305	2011-02-15 17:06:42	cpg	cpg	\N	\N	cpg	\N	cpg	\N	CPG	\N	cpg	cpg_island
+8306	2011-02-15 17:06:42	eponine	Eponine	\N	\N	eponine-scan	1	/vol/software/linux-x86_64/jdk1.6.0_01/bin/java	-epojar => /usr/local/ensembl/lib/eponine-scan.jar, -threshold => 0.999	EponineTSS	\N	Eponine	TSS
