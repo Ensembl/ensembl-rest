@@ -218,10 +218,10 @@ get_path = '/sequence/id/ENSG00000157764'
 url = URI.parse(server)
 http = Net::HTTP.new(url.host, url.port)
  
-request = Net::HTTP::Get.new(get_path, {'Content-Type' => 'text/fasta'})
+request = Net::HTTP::Get.new(get_path, {'Content-Type' => 'text/x-fasta'})
 response = http.request(request)
  
-if response.code != "200":
+if response.code != "200"
   puts "Invalid response: #{response.code}"
   puts response.body
   exit
