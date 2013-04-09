@@ -20,6 +20,9 @@
     <tt>[/ontology/]</tt> provides methods for querying the Ensembl ontology database
   </li>
   <li>
+    <tt>[/lookup/id]</tt> replaces <tt>[/lookup]</tt> but the old endpoint remains active. This endpoint now supports genomic location reporting of features. Please use the new endpoint.
+  </li>
+  <li>
     <tt>Model::Registry</tt> supports use of Ensembl Genomes' <tt>Bio::EnsEMBL::LookUp</tt> object to help loading bacteria datasets
   </li>
   <li>
