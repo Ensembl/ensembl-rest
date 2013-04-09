@@ -19,6 +19,10 @@ New Features:
   - [/ontology/] provides methods for querying the Ensembl ontology 
     database
   
+  - [/lookup/id] replaces [/lookup] but the old endpoint remains active. 
+    This endpoint now supports genomic location reporting of features when 
+    output format is set to full. Please use the new endpoint.
+  
   - Model::Registry supports use of Ensembl Genomes' Bio::EnsEMBL::LookUp 
     object to help loading bacteria datasets
   
