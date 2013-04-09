@@ -26,6 +26,9 @@ New Features:
   - Model::Registry supports use of Ensembl Genomes' Bio::EnsEMBL::LookUp 
     object to help loading bacteria datasets
   
+  - All location based services no longer support underscores as a numeric 
+    separator. All now support UCSC names for sequence regions
+  
   - Support for CrossOrigin resource sharing via Plack::Middleware::CrossOrigin
 
 Configuration:
