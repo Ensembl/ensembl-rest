@@ -163,7 +163,8 @@ sub find_slice {
   $c->go('ReturnError', 'custom', ["Do not know anything about the species $species and core database"]) unless $adaptor;
   my $coord_system_name = $c->request->param('coord_system') || 'toplevel';
   my $coord_system_version = $c->request->param('coord_system_version');
-  my $slice = $adaptor->fetch_by_location($region, $coord_system_name, $coord_system_version);
+  my ($no_warnings, $no_fuzz, $ucsc_matching) = (undef, undef, 1);
+  my $slice = $adaptor->fetch_by_location($region, $coord_system_name, $coord_system_version, $no_warnings, $no_fuzz, $ucsc_matching);
   $c->go('ReturnError', 'custom', ["No slice found for location $region"]) unless $slice;
   $s->{slice} = $slice;
   return $slice;
