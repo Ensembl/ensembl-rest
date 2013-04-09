@@ -40,9 +40,9 @@ sub id : Chained('') Args(1) PathPart('lookup/id') {
       if($obj->can('summary_as_hash')) {
         my $summary_hash = $obj->summary_as_hash();
         $entity->{seq_region_name} = $summary_hash->{seq_region_name};
-        $entity->{start} = $summary_hash->{start};
-        $entity->{end} = $summary_hash->{end};
-        $entity->{strand} = $summary_hash->{strand};
+        $entity->{start} = $summary_hash->{start} * 1;
+        $entity->{end} = $summary_hash->{end} * 1;
+        $entity->{strand} = $summary_hash->{strand} * 1;
       }
       else {
         $c->go('ReturnError','custom',[qq{ID '$id' does not support 'full' format type. Please use 'condensed'}]);
