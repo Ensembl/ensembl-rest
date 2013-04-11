@@ -31,7 +31,7 @@ sub find_genetree_by_stable_id {
   #Try to do a lookup if the ID DB is there
   my $lookup = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
   if($lookup) {
-    my ($species, $object_type, $db_type) = $self->find_object_location($c, $id);
+    my ($species, $object_type, $db_type) = $self->find_object_location($id);
     if($species) {
       my $gta = $reg->get_adaptor($species, $db_type, $object_type);
       $c->go('ReturnError', 'custom', ["No adaptor found for ID $id, species $species, object $object_type and db $db_type"]) if ! $gta;
@@ -58,10 +58,10 @@ sub find_genetree_by_member_id {
   my $compara_name = $c->request->parameters->{compara}; 
   my $reg = $c->model('Registry');
  
-  my ($species, $type, $db) = $c->model('Lookup')->find_object_location($c, $id);
+  my ($species, $type, $db) = $c->model('Lookup')->find_object_location($id);
   $c->go('ReturnError', 'custom', ["Unable to find given object: $id"]) unless $species;
   
-  my $dba = $reg->get_best_compara_DBAdaptor($c,$species,$compara_name);
+  my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
   my $ma = $dba->get_GeneMemberAdaptor;
   my $member = $ma->fetch_by_source_stable_id('ENSEMBLGENE',$id);
   $c->go('ReturnError', 'custom', ["Could not fetch GeneTree Member"]) unless $member;
