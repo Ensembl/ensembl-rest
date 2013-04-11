@@ -50,9 +50,10 @@ sub get_genetree_by_symbol : Chained('/') PathPart('genetree/member/symbol') Arg
   unless ($c->request->param('db_type') ) {$c->request->param('db_type','core')}; 
   
   my @objects = @{$c->model('Lookup')->find_objects_by_symbol($symbol) };
-  $c->log()->debug(scalar(@objects). " objects found with symbol: ".$symbol);
-  $c->go('ReturnError', 'custom', ["Lookup found nothing."]) unless (@objects && scalar(@objects) > 0);
-  my $stable_id = $objects[0]->stable_id;
+  my @genes = grep { $_->slice->is_reference() } @{$objects};
+  $c->log()->debug(scalar(@genes). " objects found with symbol: ".$symbol);
+  $c->go('ReturnError', 'custom', ["Lookup found nothing."]) unless (@genes && scalar(@genes) > 0);
+  my $stable_id = $genes[0]->stable_id;
   
   my $gt = $c->model('Lookup')->find_genetree_by_member_id($stable_id);
   $c->go('ReturnError', 'custom', ["Could not fetch GeneTree for $symbol,$stable_id"]) unless $gt;
