@@ -2,7 +2,6 @@ package EnsEMBL::REST::View::GFF3;
 use Moose;
 use namespace::autoclean;
 use Bio::EnsEMBL::Utils::IO::GFFSerializer;
-use Bio::EnsEMBL::Utils::BiotypeMapper;
 use IO::String;
 
 extends 'Catalyst::View';
