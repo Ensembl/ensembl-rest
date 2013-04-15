@@ -24,7 +24,7 @@ sub get_species : Chained("/") PathPart("vep") CaptureArgs(1) {
 sub get_bp_slice : Chained("get_species") PathPart("") CaptureArgs(1) {
     my ( $self, $c, $region ) = @_;
     my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
-    $c->model('Lookup')->find_slice( $c, $sr_name );
+    $c->model('Lookup')->find_slice( $sr_name );
 }
 
 sub get_rs_variations : Chained('get_species') PathPart('id') CaptureArgs(1) {
