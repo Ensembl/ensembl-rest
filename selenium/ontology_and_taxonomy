@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://change-this-to-the-site-you-are-testing/" />
+<title>Taxonomy and Ontology</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Taxonomy and Ontology</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET ontology/ancestors/:id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET ontology/ancestors/chart/:id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET ontology/descendents/:id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET ontology/id/:id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET ontology/name/:name</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET taxonomy/classification/:id</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET taxonomy/id/:id</td>
+	<td></td>
+</tr>
+</tbody></table>
+</body>
+</html>
