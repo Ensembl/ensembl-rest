@@ -69,7 +69,8 @@ sub species : Local : ActionClass('REST') :Args(0) { }
 
 sub species_GET :Local :Args(0) {
   my ($self, $c) = @_;
-  $self->status_ok($c, entity => { species => $c->model('Registry')->get_species()});
+  my $division = $c->request->param('division');
+  $self->status_ok($c, entity => { species => $c->model('Registry')->get_species($division)});
   return;
 }
 

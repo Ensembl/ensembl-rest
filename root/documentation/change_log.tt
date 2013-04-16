@@ -1,5 +1,11 @@
 <h1>Change Log</h1>
 
+<h2>1.3.2 - 156h April 2013</h2>
+<h3>New Feature</h3>
+<ul>
+  <li><tt>[/info/species]</tt> allows you to specify a division to limit the data by</li>
+</ul>
+
 <h2>1.3.1 - 15th April 2013</h2>
 <h3>Bugfixes</h3>
 <ul>

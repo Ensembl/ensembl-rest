@@ -205,8 +205,10 @@ sub get_species_and_object_type {
 }
 
 sub get_species {
-  my ($self) = @_;
-  return $self->_species_info();
+  my ($self, $division) = @_;
+  my $info = $self->_species_info();
+  return $info unless $division;
+  return [ grep { lc($_->{division}) eq lc($division) } @{$info}];
 }
 
 sub _build_species_info {
