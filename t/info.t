@@ -41,20 +41,32 @@ is_json_GET(
 
 # info/species
 {
-  my $url = '/info/species';
-  my $msg = 'Checking only DBA available is the test DBA';
-  my $info_species = json_GET($url, $msg);
-  if($info_species) {
-    my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', groups => ['core', 'variation'], aliases => [], release => $schema_version} ]};
-    $info_species->{species}->[0]->{groups} = [sort @{$info_species->{species}->[0]->{groups}}];
-    eq_or_diff_data($info_species, $expected, "$url | $msg");
-  }
+  my $get_species = sub {
+    my ($url, $msg) = @_;
+    my $info_species = json_GET($url, $msg);
+    foreach my $species (@{$info_species->{species}}) {
+      $species->{groups} = [sort @{$species->{groups}}];
+    }
+    return $info_species;
+  };
+
+  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', groups => ['core', 'variation'], aliases => [], release => $schema_version} ]};
+
+  eq_or_diff_data(
+    $get_species->('/info/species', 'Checking only DBA available is the test DBA'), $expected, 
+    "/info/species | Checking only DBA available is the test DBA");
+  eq_or_diff_data(
+    $get_species->('/info/species?division=Ensembl', q{Output is same as /info/species if specified 'Ensembl' division}), $expected, 
+    "/info/species?division=Ensembl | Output is same as /info/species if specified 'Ensembl' division");
+  eq_or_diff_data(
+    $get_species->('/info/species?division=ensembl', q{Output is same as /info/species if specified 'ensembl' division}), $expected, 
+    "/info/species?division=ensembl | Output is same as /info/species if specified 'ensembl' division");
+  eq_or_diff_data(
+    $get_species->('/info/species?division=EnsEMBL', q{Output is same as /info/species if specified 'EnsEMBL' division}), $expected, 
+    "/info/species?division=EnsEMBL | Output is same as /info/species if specified 'EnsEMBL' division");
+
+  is_json_GET('/info/species?division=wibble', { species => [] }, 'Bogus division results in no results');
 }
-# is_json_GET(
-#   '/info/species', 
-#   {species => [ { division => 'Ensembl', name => 'homo_sapiens', groups => ['core', 'variation'], aliases => [], release => $schema_version} ]},
-#   "checking only DBA available is the test DBA"
-# );
 
 # /info/software
 is_json_GET(

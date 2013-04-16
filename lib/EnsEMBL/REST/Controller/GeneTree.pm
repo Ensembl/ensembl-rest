@@ -53,6 +53,7 @@ sub get_genetree_by_symbol : Chained('/') PathPart('genetree/member/symbol') Arg
   my @genes = grep { $_->slice->is_reference() } @objects;
   $c->log()->debug(scalar(@genes). " objects found with symbol: ".$symbol);
   $c->go('ReturnError', 'custom', ["Lookup found nothing."]) unless (@genes && scalar(@genes) > 0);
+  
   my $stable_id = $genes[0]->stable_id;
   
   my $gt = $c->model('Lookup')->find_genetree_by_member_id($stable_id);
