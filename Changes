@@ -1,5 +1,10 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+Bugfixes:
+
+  - [/homology/id] and [/homology/symbol] have improved error 
+    reporting when IDs and symbols cannot be found
+
 1.3.2 16-04-2013
 
 New Features:
