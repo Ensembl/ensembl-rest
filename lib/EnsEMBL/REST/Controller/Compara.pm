@@ -39,6 +39,7 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   my ( $self, $c, $id ) = @_;
   my $lookup = $c->model('Lookup');
   my ($species) = $lookup->find_object_location($id);
+  $c->go('ReturnError', 'custom', ["Could not find the ID '${id}' in any database. Please try again"]) if ! $species;
   $c->stash(stable_ids => [$id], species => $species);
   $c->detach('get_orthologs');
 }
@@ -66,6 +67,9 @@ sub fetch_by_gene_symbol : Chained("/") PathPart("homology/symbol") Args(2)  {
       $c->go( 'ReturnError', 'custom', [qq{No content for [$gene_symbol]}] );
   }
   my @gene_stable_ids = map { $_->stable_id } @$genes;
+  if(! @gene_stable_ids) {
+    $c->go('ReturnError','custom', "Cannot find a suitable gene for the symbol '${gene_symbol}' and species '${species}");
+  }
   $c->stash->{stable_ids} = \@gene_stable_ids;
   $c->detach('get_orthologs');
 }
