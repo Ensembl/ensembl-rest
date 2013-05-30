@@ -62,6 +62,28 @@ CREATE TABLE `assembly_exception` (
   KEY `ex_idx` (`exc_seq_region_id`,`exc_seq_region_start`)
 ) ENGINE=MyISAM AUTO_INCREMENT=160 DEFAULT CHARSET=latin1;
 
+CREATE TABLE `associated_group` (
+  `associated_group_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `description` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`associated_group_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `associated_xref` (
+  `associated_xref_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `object_xref_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `xref_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `source_xref_id` int(10) unsigned DEFAULT NULL,
+  `condition_type` varchar(128) DEFAULT NULL,
+  `associated_group_id` int(10) unsigned DEFAULT NULL,
+  `rank` int(10) unsigned DEFAULT '0',
+  PRIMARY KEY (`associated_xref_id`),
+  UNIQUE KEY `object_associated_source_type_idx` (`object_xref_id`,`xref_id`,`source_xref_id`,`condition_type`,`associated_group_id`),
+  KEY `associated_source_idx` (`source_xref_id`),
+  KEY `associated_object_idx` (`object_xref_id`),
+  KEY `associated_idx` (`xref_id`),
+  KEY `associated_group_idx` (`associated_group_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 CREATE TABLE `attrib_type` (
   `attrib_type_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(15) NOT NULL DEFAULT '',
@@ -431,7 +453,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=1783 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1785 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
