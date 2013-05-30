@@ -6,10 +6,12 @@ use IO::String;
 
 extends 'Catalyst::View';
 
+has 'default_source' => ( isa => 'Str', is => 'ro', default => '.' );
+
 sub build_gff_serializer {
   my ($self, $c, $output_fh) = @_;
   my $ontology_adaptor = $c->model('Registry')->get_ontology_term_adaptor();  
-  my $serializer = Bio::EnsEMBL::Utils::IO::GFFSerializer->new($ontology_adaptor, $output_fh);
+  my $serializer = Bio::EnsEMBL::Utils::IO::GFFSerializer->new($ontology_adaptor, $output_fh, $self->default_source());
   return $serializer;
 } 
 

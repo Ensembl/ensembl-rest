@@ -68,8 +68,9 @@ my $base = '/feature/region/homo_sapiens';
     feature_type => 'gene',
     logic_name => 'ensembl',
     seq_region_name => '6',
+    source => 'ensembl',
     start => 1080164,
-    strand => 1
+    strand => 1,
   }, 'Checking structure of gene model as expected');
   
   my ($transcript) = grep { $_->{feature_type} eq 'transcript' } @{$json};
@@ -80,6 +81,35 @@ my $base = '/feature/region/homo_sapiens';
   is($cds->{Parent}, $transcript->{ID}, 'CDS parent is the previous transcript');
   is($cds->{start}, 1101508, 'First CDS starts at first coding point in the second exon');
   is($cds->{end}, 1101531, 'First CDS ends at the second exon');
+}
+
+# Biotype queries
+{
+  my $region = '6:1078245-1108340';
+  my $json = json_GET("$base/$region?feature=gene;biotype=protein_coding", 'Fetching protein coding genes');
+  is(scalar(@{$json}), 1, '1 protein coding gene models expected');
+
+  $json = json_GET("$base/$region?feature=gene;biotype=wibble", 'Fetching wibble biotype genes');
+  is(scalar(@{$json}), 0, '0 wibble biotype gene models expected');
+
+  $json = json_GET("$base/$region?feature=gene;biotype=protein_coding;logic_name=wibble", 'Fetching protein coding genes logic name wibble');
+  is(scalar(@{$json}), 0, '0 protein coding logic name wibble gene models');
+
+  $json = json_GET("$base/$region?feature=gene;biotype=protein_coding;source=wibble", 'Fetching protein coding genes source wibble');
+  is(scalar(@{$json}), 0, '0 protein coding source wibble gene models');
+
+  $json = json_GET("$base/$region?feature=gene;biotype=wibble;biotype=protein_coding", 'Fetching protein coding and wibble biotype genes');
+  is(scalar(@{$json}), 1, '1 protein coding and wibble biotype gene models expected');
+
+  #DO transcript checks
+  $json = json_GET("$base/$region?feature=transcript;biotype=protein_coding", 'Fetching protein coding biotype transcripts');
+  is(scalar(@{$json}), 1, '1 protein coding transcript models');
+
+  $json = json_GET("$base/$region?feature=transcript;biotype=wibble", 'Fetching wibble biotype transcripts');
+  is(scalar(@{$json}), 0, '0 biotype wibble transcript models');
+
+  $json = json_GET("$base/$region?feature=transcript;biotype=wibble;biotype=protein_coding", 'Fetching wibble & protein_coding biotype transcripts');
+  is(scalar(@{$json}), 1, '1 biotype wibble and protein_coding transcript models');
 }
 
 #Query variation DB
@@ -202,8 +232,18 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 gene in this region');
   
-  my $gff_line = q{6	EnsEMBL	protein_coding_gene	1080164	1105181	.	+	.	ID=ENSG00000176515;logic_name=ensembl;external_name=AL033381.1;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];biotype=protein_coding};
-  is($lines[0], $gff_line, 'Expected output line from GFF');
+  my $gff_line = qq{6\tensembl\tprotein_coding_gene\t1080164\t1105181\t.\t+\t.\tID=ENSG00000176515;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];external_name=AL033381.1;logic_name=ensembl};
+  eq_or_diff($lines[0], $gff_line, 'Expected output gene line from GFF');
+}
+
+{
+  my $region = '6:1079386-1079387';
+  my $gff = gff_GET("$base/$region?feature=repeat", 'Getting a single repeat');
+  my @lines = filter_gff($gff);
+  is(scalar(@lines), 1, '1 GFF line with 1 repeat in this region');
+  
+  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079680\t.\t+\t.\tID=AluSq};
+  eq_or_diff($lines[0], $gff_line, 'Expected output repeat feature line from GFF');
 }
 
 sub filter_gff {

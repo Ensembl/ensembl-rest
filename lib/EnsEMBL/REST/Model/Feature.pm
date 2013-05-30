@@ -5,6 +5,7 @@ extends 'Catalyst::Model';
 
 use EnsEMBL::REST::EnsemblModel::ExonTranscript;
 use EnsEMBL::REST::EnsemblModel::CDS;
+use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
@@ -84,12 +85,20 @@ sub to_hash {
 
 sub gene {
   my ($self, $c, $slice) = @_;
-  return $slice->get_all_Genes($self->_get_logic_dbtype($c));
+  my ($dbtype, $load_transcripts, $source, $biotype) = 
+    (undef, undef, $c->request->parameters->{source}, $c->request->parameters->{biotype});
+  return $slice->get_all_Genes($self->_get_logic_dbtype($c), $load_transcripts, $source, $biotype);
 }
 
 sub transcript {
   my ($self, $c, $slice, $load_exons) = @_;
-  return $slice->get_all_Transcripts($load_exons, $self->_get_logic_dbtype($c));
+  my $biotype = $c->request->parameters->{biotype};
+  my $transcripts = $slice->get_all_Transcripts($load_exons, $self->_get_logic_dbtype($c));
+  if($biotype) {
+    my %lookup = map { $_, 1 } @{wrap_array($biotype)};
+    $transcripts = [ grep { $lookup{$_->biotype()} } @{$transcripts}];
+  }
+  return $transcripts;
 }
 
 sub cds {
