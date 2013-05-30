@@ -1,5 +1,5 @@
 1	1	schema_type	variation
-2	\N	schema_version	71
+2	\N	schema_version	72
 3	\N	patch	patch_69_70_a.sql|schema version
 4	\N	patch	patch_69_70_b.sql|drop table flanking_sequence
 5	\N	patch	patch_69_70_c.sql|add freqs_from_gts column to sample table
@@ -16,3 +16,12 @@
 16	\N	patch	patch_70_71_i.sql|drop old annotation tables
 17	\N	patch	patch_70_71_j.sql|add pos_idx key to phenotype_feature
 18	\N	patch	patch_70_71_k.sql|add type_value_idx key to phenotype_feature_attrib
+19	\N	patch	patch_71_72_a.sql|schema version
+20	\N	patch	patch_71_72_b.sql|Changes for sample table redesign: Rename columns and indexes
+21	\N	patch	patch_71_72_c.sql|Move data from sample table to new individual and population tables.
+22	\N	patch	patch_71_72_d.sql|Replace sample_synonym by individual_synonym and population_synonym
+23	\N	patch	patch_71_72_e.sql|change variation clinical_significance column
+24	\N	patch	patch_71_72_f.sql|new tables for citations
+25	\N	patch	patch_71_72_g.sql|Add new columns to the tables structural_variation and structural_variation_feature.
+26	\N	patch	patch_71_72_h.sql|Create a table structural_variation_sample. Move the structural variation data from phenotype_feature_attrib to structural_variation_sample and structural_variation.
+27	\N	patch	patch_71_72_i.sql|Change the type of the column description in the table study.

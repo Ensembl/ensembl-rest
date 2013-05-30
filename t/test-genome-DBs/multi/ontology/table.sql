@@ -1,3 +1,12 @@
+CREATE TABLE `alt_id` (
+  `alt_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `term_id` int(10) unsigned NOT NULL,
+  `accession` varchar(64) NOT NULL,
+  PRIMARY KEY (`alt_id`),
+  UNIQUE KEY `term_alt_idx` (`term_id`,`alt_id`),
+  KEY `accession_idx` (`accession`(50))
+) ENGINE=InnoDB ;
+
 CREATE TABLE `closure` (
   `closure_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `child_term_id` int(10) unsigned NOT NULL,
@@ -69,7 +78,8 @@ CREATE TABLE `term` (
   `accession` varchar(64) NOT NULL,
   `name` varchar(255) NOT NULL,
   `definition` text,
-  `is_root` int(11) DEFAULT NULL,
+  `is_root` int(11) NOT NULL DEFAULT '0',
+  `is_obsolete` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`term_id`),
   UNIQUE KEY `accession_idx` (`accession`),
   UNIQUE KEY `ontology_acc_idx` (`ontology_id`,`accession`),
