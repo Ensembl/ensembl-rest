@@ -4,6 +4,7 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
+use Data::Dumper;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
@@ -60,7 +61,12 @@ sub descendents : Chained('ontology_root') PathPart('descendents') Args(1) Actio
   my ($self, $c, $id) = @_;
   my $term = $self->term($c, $id);
   my $r = $c->request();
-  my ($subset, $closest_terms, $zero_distance, $ontology) = map { $r->param($_) } qw/subset closest_terms zero_distance ontology/;
+  
+  my $subset = $r->param('subset');
+  my $closest_terms = $r->param('closest_terms');
+  my $zero_distance = $r->param('zero_distance');
+  my $ontology = $r->param('ontology');
+  
   my $terms = $c->stash()->{ontology_adaptor}->fetch_all_by_descendant_term($term, $subset, $closest_terms, $zero_distance, $ontology);
   $self->status_ok($c, entity => $self->_encode_array($terms));
 }
