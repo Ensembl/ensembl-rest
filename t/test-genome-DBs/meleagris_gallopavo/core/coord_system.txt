@@ -1,0 +1,3 @@
+1	1	contig	\N	3	default_version,sequence_level
+2	1	scaffold	UMD2	2	default_version
+3	1	chromosome	UMD2	1	default_version

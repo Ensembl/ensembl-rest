@@ -1,0 +1,17 @@
+9	CR1-F2	LINE/CR1	Type I Transposons/LINE	N
+12	Char12Mar1_GG	DNA/hAT-Charlie	Type II Transposons	N
+13	CR1-D2	LINE/CR1	Type I Transposons/LINE	N
+22	CR1-Y4	LINE/CR1	Type I Transposons/LINE	N
+347	trf	trf	Tandem repeats	TTG
+378	trf	trf	Tandem repeats	GT
+416	CR1-C4	LINE/CR1	Type I Transposons/LINE	N
+470	trf	trf	Tandem repeats	TTTGT
+1885	trf	trf	Tandem repeats	TTTTTTTGT
+2640	trf	trf	Tandem repeats	TATATC
+3715	AmnSINE1	SINE/Deu	Type I Transposons/SINE	N
+8141	trf	trf	Tandem repeats	TTTTTTGTTGTT
+9656	Mariner1_GG	DNA/TcMar-Mariner	Type II Transposons	N
+51634	trf	trf	Tandem repeats	AATTTAATTTTGGAGCATTCAGCTGTAGCAATGGCC
+51635	trf	trf	Tandem repeats	TAATTTAAC
+51636	trf	trf	Tandem repeats	GCAGCAAAGAAC
+118317	dust	dust	Dust	N
