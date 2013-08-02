@@ -1,0 +1,4 @@
+1	\N	schema_version	72
+2	\N	schema_type	compara
+3	\N	patch	patch_71_72_a.sql|schema_version
+4	\N	patch	patch_71_72_b.sql|new member_production_counts table
