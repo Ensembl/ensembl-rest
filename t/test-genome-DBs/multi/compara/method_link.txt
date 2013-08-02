@@ -1,0 +1,16 @@
+1	BLASTZ_NET	GenomicAlignBlock.pairwise_alignment
+7	TRANSLATED_BLAT_NET	GenomicAlignBlock.pairwise_alignment
+10	PECAN	GenomicAlignBlock.multiple_alignment
+11	GERP_CONSTRAINED_ELEMENT	ConstrainedElement.constrained_element
+13	EPO	GenomicAlignTree.ancestral_alignment
+14	EPO_LOW_COVERAGE	GenomicAlignTree.tree_alignment
+16	LASTZ_NET	GenomicAlignBlock.pairwise_alignment
+19	LASTZ_PATCH	GenomicAlignBlock.pairwise_alignment
+101	SYNTENY	SyntenyRegion.synteny
+201	ENSEMBL_ORTHOLOGUES	Homology.homology
+202	ENSEMBL_PARALOGUES	Homology.homology
+205	ENSEMBL_PROJECTIONS	Homology.homology
+301	FAMILY	Family.family
+401	PROTEIN_TREES	ProteinTree.protein_tree_node
+402	NC_TREES	NCTree.nc_tree_node
+501	GERP_CONSERVATION_SCORE	ConservationScore.conservation_score
