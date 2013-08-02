@@ -1,0 +1,19 @@
+318468	CR1AVI	LINE/CR1	Type I Transposons/LINE	N
+318489	trf	trf	Tandem repeats	T
+319112	trf	trf	Tandem repeats	TTG
+346047	trf	trf	Tandem repeats	TTTTTGTTGGGTTTGGT
+346048	trf	trf	Tandem repeats	TTTTTGTTGGGTTTGGTTTTTGG
+346049	trf	trf	Tandem repeats	TTCACTTTG
+346050	trf	trf	Tandem repeats	TATATTCAATATTAAAATA
+346051	trf	trf	Tandem repeats	TATAGCATACACATTT
+574100	dust	dust	Dust	N
+593461	CR1-E	LINE/CR1	Type I Transposons/LINE	N
+593466	CR1-X2	LINE/CR1	Type I Transposons/LINE	N
+593467	CR1-Y4	LINE/CR1	Type I Transposons/LINE	N
+593468	CR1-C4	LINE/CR1	Type I Transposons/LINE	N
+593536	taeniopygia_guttata_4_2	LINE/CR1	Type I Transposons/LINE	N
+593540	taeniopygia_guttata_64	LINE/CR1	Type I Transposons/LINE	N
+593545	taeniopygia_guttata_9_2	Unknown	Unknown	N
+593546	taeniopygia_guttata_249	LINE/CR1	Type I Transposons/LINE	N
+593549	taeniopygia_guttata_58	LINE/CR1	Type I Transposons/LINE	N
+593556	taeniopygia_guttata_33	LINE/CR1	Type I Transposons/LINE	N
