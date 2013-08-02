@@ -71,6 +71,112 @@ sub find_genetree_by_member_id {
   return $gt;
 }
 
+
+#Find all the Method objects in the compara database
+sub find_compara_methods {
+  my ($self, $class) = @_;
+
+  my $c = $self->context();
+
+  #default is "multi"
+  my $compara = $c->request->parameters->{compara} || 'multi'; 
+  my $reg = $c->model('Registry');
+
+  my $compara_dba = $reg->get_DBAdaptor($compara, "compara");
+  my $methods = $compara_dba->get_MethodAdaptor->fetch_all_by_class_pattern($class);
+
+  return $methods;
+}
+
+#Find all the species_set_groups for this method in the compara database 
+sub find_compara_species_set_groups {
+  my ($self, $method) = @_;
+
+  my $c = $self->context();
+  #default is "multi"
+  my $compara = $c->request->parameters->{compara} || 'multi';
+
+  my $reg = $c->model('Registry');
+
+  my $compara_dba = $reg->get_DBAdaptor($compara, "compara");
+
+  my $species_set_groups;
+
+  #Get MethodLinkSpeciesSet object
+  my $mlsss = $compara_dba->get_MethodLinkSpeciesSetAdaptor->fetch_all_by_method_link_type($method);
+  foreach my $mlss (@$mlsss) {
+    my $species_set = $mlss->species_set_obj();
+    #find tag with value 'name'
+    my $tag = $species_set->get_value_for_tag('name');
+    push @$species_set_groups, $tag if ($tag);
+  }
+  return $species_set_groups if $species_set_groups;
+
+  $c->go('ReturnError', 'custom', ["No species_set_groups found for method $method"]);
+
+}
+
+#Find all the species_sets for this method in the compara database 
+sub find_compara_species_sets {
+  my ($self, $method) = @_;
+
+  my $c = $self->context();
+  #default is "multi"
+  my $compara = $c->request->parameters->{compara} || 'multi';
+
+  my $reg = $c->model('Registry');
+
+  my $compara_dba = $reg->get_DBAdaptor($compara, "compara");
+
+  my $species_sets;
+
+  #Get MethodLinkSpeciesSet object
+  my $mlsss = $compara_dba->get_MethodLinkSpeciesSetAdaptor->fetch_all_by_method_link_type($method);
+  foreach my $mlss (@$mlsss) {
+    my $species_set;
+    foreach my $genome_db (@{$mlss->species_set_obj->genome_dbs}) {
+      push @$species_set,  $genome_db->name;
+    }
+    push @$species_sets, $species_set;
+  }
+  return $species_sets;
+}
+
+#Find all MethodLinkSpeciesSet objects for this method in the compara database
+sub find_compara_method_link_species_sets {
+  my ($self, $method) = @_;
+
+  my $c = $self->context();
+  #default is "multi"
+  my $compara = $c->request->parameters->{compara} || 'multi'; 
+  my $reg = $c->model('Registry');
+
+  my $compara_dba = $reg->get_DBAdaptor($compara, "compara");
+
+  my $method_link_species_set_array;
+  my $mlsss = $compara_dba->get_MethodLinkSpeciesSetAdaptor->fetch_all_by_method_link_type($method);
+  foreach my $mlss (@$mlsss) {
+    #get species_set_group
+    my $species_set_obj = $mlss->species_set_obj();
+    my $tag = $species_set_obj->get_value_for_tag('name');
+    
+    #get species_set
+    my $species_set;
+    foreach my $genome_db (@{$mlss->species_set_obj->genome_dbs}) {
+      push @$species_set,  $genome_db->name;
+    }
+    
+    my $method_link_species_set;
+    %$method_link_species_set = ("id" => ($mlss->dbID*1),
+				 "name" => $mlss->name,
+				 "method" => $method,
+			         "species_set" => $species_set);
+    $method_link_species_set->{"species_set_group"} = $tag if ($tag);
+    push @$method_link_species_set_array, $method_link_species_set;
+  }
+  return $method_link_species_set_array;
+}
+
 # uses the request for more optional arguments
 sub find_object_by_stable_id {
   my ($self, $id) = @_;

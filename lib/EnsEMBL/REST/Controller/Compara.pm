@@ -21,13 +21,21 @@ sub get_adaptors :Private {
     my $sma = $compara_dba->get_SeqMemberAdaptor();
     my $ha = $compara_dba->get_HomologyAdaptor();
     my $mlssa = $compara_dba->get_MethodLinkSpeciesSetAdaptor();
+    my $ma = $compara_dba->get_MethodAdaptor();
     my $gdba = $compara_dba->get_GenomeDBAdaptor();
+    my $asa = $compara_dba->get_AlignSliceAdaptor();
+    my $gata = $compara_dba->get_GenomicAlignTreeAdaptor();
+    my $gaba = $compara_dba->get_GenomicAlignBlockAdaptor();
     
     $c->stash(
       gene_member_adaptor => $gma,
       homology_adaptor => $ha,
       method_link_species_set_adaptor => $mlssa,
-      genome_db_adaptor => $gdba
+      genome_db_adaptor => $gdba,
+      align_slice_adaptor => $asa,
+      genomic_align_tree_adaptor => $gata,
+      genomic_align_block_adaptor => $gaba,
+      method_adaptor => $ma,
     );
   }
   catch {
@@ -282,6 +290,79 @@ sub _decode_members {
   }
   return ($src, $trg);
 }
+
+sub genomic_methods_GET { }
+
+sub genomic_methods : Chained('/') PathPart('compara/info/methods') Args(0) ActionClass('REST') {
+  my ($self, $c) = @_;
+
+  my $class = "GenomicAlign%";
+  my $types;
+
+  try {
+    my $methods = $c->model('Lookup')->find_compara_methods($class);
+    
+    #return the method types
+    foreach my $method (@$methods) {
+      push @$types, $method->type;
+    }
+  } catch {
+    $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  };
+
+  $self->status_ok($c, entity => $types);
+
+}
+
+sub method_and_species_sets_GET { }
+
+sub method_and_species_sets : Chained('/') PathPart("compara/info/method_and_species_sets") Args(1) ActionClass('REST') {
+  my ($self, $c, $method) = @_;
+
+  my $method_link_species_sets;
+  try {
+    $method_link_species_sets = $c->model('Lookup')->find_compara_method_link_species_sets($method);
+  } catch {
+    $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  };
+
+  $self->status_ok($c, entity => $method_link_species_sets);
+
+}
+
+
+sub species_set_groups_GET { }
+
+sub species_set_groups : Chained('/') PathPart("compara/info/species_set_groups") Args(1) ActionClass('REST') {
+  my ($self, $c, $method) = @_;
+
+  my $species_set_groups;
+  try {
+    $species_set_groups = $c->model('Lookup')->find_compara_species_set_groups($method);
+  } catch {
+    $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  };
+
+  $self->status_ok($c, entity => $species_set_groups);
+
+}
+
+sub species_sets_GET { }
+
+sub species_sets : Chained('/') PathPart("compara/info/species_sets") Args(1) ActionClass('REST') {
+  my ($self, $c, $method) = @_;
+
+  my $species_sets;
+  try {
+    $species_sets = $c->model('Lookup')->find_compara_species_sets($method);
+  } catch {
+    $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  };
+
+  $self->status_ok($c, entity => $species_sets);
+
+}
+
 
 __PACKAGE__->meta->make_immutable;
 
