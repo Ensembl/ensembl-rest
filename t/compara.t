@@ -14,7 +14,9 @@ use Test::Differences;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 
-my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
+#get databases
+my $multi = Bio::EnsEMBL::Test::MultiTestDB->new( "multi");
+
 Catalyst::Test->import('EnsEMBL::REST');
 require EnsEMBL::REST;
 
