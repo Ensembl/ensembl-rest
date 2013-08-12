@@ -219,7 +219,7 @@ sub _get_conf_content {
   $self->context->log->debug('Working with '.$conf_file.' and will perform __VAR()__ replacements');
   my $content = slurp($conf_file);
   my $replacements = $self->replacements();
-  foreach my $key (%{$replacements}) {
+  foreach my $key (keys %{$replacements}) {
     my $value = $replacements->{$key};
     $content =~ s/__VAR\($key\)__/$value/g;
   }
