@@ -56,7 +56,10 @@ my $data = get_data();
 #Invalid species_set_group
 #curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040000-106041500?method=EPO;species_set_group=wibble' -H 'Content-type:application/json'
 {
- action_bad_regex("/alignment/slice/region/$species/$region?method=EPO;species_set_group=wibble", qr/wibble/, "Using unsupported species_set_group causes an exception");
+  warns_like {
+    action_bad_regex("/alignment/slice/region/$species/$region?method=EPO;species_set_group=wibble", qr/wibble/, "Using unsupported species_set_group causes an exception");
+  } qr/Unable to find method_link_species_set with .+ EPO .+ wibble/, 'Checking that correct warning in emitted in background from MLSS Adaptor';
+ 
 }
 
 #Invalid species_set
