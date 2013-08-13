@@ -52,6 +52,26 @@ sub fetch_features {
   return \@final_features;
 }
 
+sub fetch_protein_features {
+  my ($self) = @_;
+
+  my $c = $self->context();
+
+  my $translation = $c->stash->{translation};
+  my $feature = $c->request->parameters->{feature};
+
+  my @final_features;
+  $feature = 'protein_feature' if !( defined $feature);
+  my @features = (ref($feature) eq 'ARRAY') ? @{$feature} : ($feature);
+
+  foreach my $feature_type (@features) {
+    $feature_type = lc($feature_type);
+    my $objects = $self->$feature_type($c, $translation);
+    push (@final_features, @{$self->to_hash($objects, $feature_type)});
+  }
+  return \@final_features;
+}
+
 sub fetch_feature {
   my ($self, $id) = @_;
   my $c = $self->context();
@@ -116,6 +136,22 @@ sub exon {
 sub repeat {
   my ($self, $c, $slice) = @_;
   return $slice->get_all_RepeatFeatures();
+}
+
+sub protein_feature {
+  my ($self, $c, $translation) = @_;
+  my $type = $c->request->parameters->{type};
+  return $translation->get_all_ProteinFeatures($type);
+}
+
+sub transcript_variation {
+  my ($self, $c, $translation) = @_;
+  my @vfs;
+  my $transcript = $translation->transcript();
+  foreach my $tv ($transcript->get_transcript_variations) {
+    push(@vfs, $tv->variation_feature);
+  }
+  return @vfs;
 }
 
 sub variation {
