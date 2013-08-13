@@ -53,11 +53,10 @@ sub fetch_features {
 }
 
 sub fetch_protein_features {
-  my ($self) = @_;
+  my ($self, $translation) = @_;
 
   my $c = $self->context();
 
-  my $translation = $c->stash->{translation};
   my $feature = $c->request->parameters->{feature};
 
   my @final_features;
@@ -147,14 +146,17 @@ sub protein_feature {
 sub transcript_variation {
   my ($self, $c, $translation) = @_;
   my $species = $c->stash->{species};
+  my $type = $c->request->parameters->{type};
 
   my @vfs;
   my $transcript = $translation->transcript();
-  my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariationAdaptor');
-  foreach my $tv ($tva->fetch_all_by_Transcripts_with_constraint($transcript)) {
+  my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+  foreach my $tv (@{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c))}) {
+    if ($type && $tv->display_consequence !~ /$type/) { next ; }
+    my $vf = $tv->variation_feature;
     push(@vfs, $tv->variation_feature);
   }
-  return @vfs;
+  return \@vfs;
 }
 
 sub variation {
