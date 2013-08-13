@@ -150,8 +150,14 @@ sub transcript_variation {
 
   my @vfs;
   my $transcript = $translation->transcript();
+  my @transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
-  foreach my $tv (@{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c))}) {
+  if (scalar(@{$self->_get_SO_terms($c)})) {
+    @transcript_variants = @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c))} ;
+  } else {
+    @transcript_variants = @{$tva->fetch_all_by_Transcripts([$transcript])};
+  }
+  foreach my $tv (@transcript_variants) {
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
     my $vf = $tv->variation_feature;
     push(@vfs, $tv->variation_feature);
