@@ -72,6 +72,22 @@ sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
   $self->status_ok($c, entity => $features );
 }
 
+sub translation_GET {}
+
+sub translation: Chained('/') PathPart('feature/translation') Args(1) ActionClass('REST') {
+  my ($self, $c, $id) = @_;
+  my $features;
+  try {
+    $c->log()->debug('Finding the object');
+    my $translation = $c->model('Lookup')->find_object_by_stable_id($id);
+    $c->stash->{translation} = $translation;
+    $features = $c->model('Feature')->fetch_protein_features();
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [$_]);
+  };
+  $self->status_ok($c, entity => $features );
+}
+
 with 'EnsEMBL::REST::Role::SliceLength';
 
 __PACKAGE__->meta->make_immutable;
