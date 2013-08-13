@@ -148,6 +148,9 @@ sub find_object_location {
     }
   }
 
+  #Quickly add in the species into the stash
+  $c->stash(species => $captures[0], object_type => $captures[1], group => $captures[2]);
+
   return @captures;
 }
 
