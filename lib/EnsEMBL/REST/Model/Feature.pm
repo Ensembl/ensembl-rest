@@ -146,9 +146,12 @@ sub protein_feature {
 
 sub transcript_variation {
   my ($self, $c, $translation) = @_;
+  my $species = $c->stash->{species};
+
   my @vfs;
   my $transcript = $translation->transcript();
-  foreach my $tv ($transcript->get_transcript_variations) {
+  my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariationAdaptor');
+  foreach my $tv ($tva->fetch_all_by_Transcripts_with_constraint($transcript)) {
     push(@vfs, $tv->variation_feature);
   }
   return @vfs;
