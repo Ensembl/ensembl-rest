@@ -5,6 +5,7 @@ extends 'Catalyst::Model';
 
 use EnsEMBL::REST::EnsemblModel::ExonTranscript;
 use EnsEMBL::REST::EnsemblModel::CDS;
+use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
@@ -160,7 +161,8 @@ sub transcript_variation {
   foreach my $tv (@transcript_variants) {
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
     my $vf = $tv->variation_feature;
-    push(@vfs, $tv->variation_feature);
+    my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
+    push(@vfs, $blessed_vf);
   }
   return \@vfs;
 }
