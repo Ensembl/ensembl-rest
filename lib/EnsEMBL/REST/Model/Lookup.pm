@@ -111,6 +111,19 @@ sub find_objects_by_symbol {
       push(@entries, $obj);
     }
   }
+
+  # If we ran out of possible symbols then switch onto using the gene's display label
+  if(! @entries) {
+    my $object_param = $c->request->param('object');
+    if(! defined $object_param || (defined $object_param && $object_param eq 'gene') ) {
+      my $object_adaptor = $c->model('Registry')->get_adaptor($c->stash->{'species'}, $db_type, 'gene');
+      my $objects_linked_to_symbol = $object_adaptor->fetch_all_by_display_label($symbol);
+      while(my $obj = shift @{$objects_linked_to_symbol}) {
+        $c->log()->debug("Found by symbol ".$symbol." ".$obj);
+        push(@entries, $obj);
+      }
+    }
+  }
   
   return \@entries;
 }
