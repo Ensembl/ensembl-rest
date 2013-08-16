@@ -59,6 +59,7 @@ sub fetch_protein_features {
   my $c = $self->context();
 
   my $feature = $c->request->parameters->{feature};
+  my $allowed_features = {'transcript_variation'=> 1, 'protein_feature' => 1};
 
   my @final_features;
   $feature = 'protein_feature' if !( defined $feature);
@@ -66,6 +67,8 @@ sub fetch_protein_features {
 
   foreach my $feature_type (@features) {
     $feature_type = lc($feature_type);
+    my $allowed = $allowed_features->{$feature_type};
+    $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
     my $objects = $self->$feature_type($c, $translation);
     push (@final_features, @{$self->to_hash($objects, $feature_type)});
   }
