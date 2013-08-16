@@ -10,11 +10,16 @@ use Bio::EnsEMBL::Utils::Scalar qw/assert_ref split_array/;
 sub new {
   my ($class, $proxy_vf, $transcript_variant, $rank) = @_;
   my $self = $class->SUPER::new($proxy_vf);
+  my $tva = $transcript_variant->get_all_alternate_TranscriptVariationAlleles->[0];
   $self->{translation_start} = $transcript_variant->translation_start;
   $self->{translation_id} = $transcript_variant->transcript->translation->stable_id;
   $self->{ID} = $proxy_vf->variation_name;
   $self->{type} = $transcript_variant->display_consequence;
   $self->{allele} = $proxy_vf->allele_string(undef);
+  $self->{codon} = $transcript_variant->codons;
+  $self->{residues} = $transcript_variant->pep_allele_string;
+  $self->{sift} = $tva->sift_score;
+  $self->{polyphen} = $tva->polyphen_score;
   return $self;
 }
 
@@ -32,10 +37,34 @@ sub type {
   return $self->{'type'};
 }
 
+sub sift {
+  my ($self, $sift) = @_;
+  $self->{'sift'} = $sift if defined $sift;
+  return $self->{'sift'};
+}
+
+sub polyphen {
+  my ($self, $polyphen) = @_;
+  $self->{'polyphen'} = $polyphen if defined $polyphen;
+  return $self->{'polyphen'};
+}
+
 sub allele {
   my ($self, $allele) = @_;
   $self->{'allele'} = $allele if defined $allele;
   return $self->{'allele'};
+}
+
+sub codon {
+  my ($self, $codon) = @_;
+  $self->{'codon'} = $codon if defined $codon;
+  return $self->{'codon'};
+}
+
+sub residues {
+  my ($self, $residues) = @_;
+  $self->{'residues'} = $residues if defined $residues;
+  return $self->{'residues'};
 }
 
 sub translation_id {
@@ -65,6 +94,10 @@ sub summary_as_hash {
   $summary->{translation} = $self->translation_id;
   $summary->{allele} = $self->allele;
   $summary->{type} = $self->type;
+  $summary->{codons} = $self->codon;
+  $summary->{residues} = $self->residues;
+  $summary->{sift} = $self->sift;
+  $summary->{polyphen} = $self->polyphen;
   return $summary;
 }
 
