@@ -1,2 +1,3 @@
 CLEAN.t
 MultiTestDB.conf
+*.MultiTestDB.frozen.*
