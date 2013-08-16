@@ -52,7 +52,29 @@ my $UPI = 'UPI0000073BC4';
     '/xrefs/symbol/homo_sapiens/ENSG00000176515?external_db=ArrayExpress', 
     [{ id => 'ENSG00000176515', type => 'gene' }],
     'ArrayExpress by ensembl Gene ID is only on 1 Gene'
-  );  
+  );
+}
+
+#Replicating the Ensembl Genomes way of holding names. UniProt gene names
+#are only held via display xref id
+{
+  $dba->save('core', 'object_xref');
+  my $symbol = 'AL033381.1';
+  my $sql = 'delete object_xref from object_xref join xref using (xref_id) where xref.dbprimary_acc =?';
+  $dba->get_DBAdaptor('core')->dbc()->sql_helper->execute_update(
+    -SQL => $sql, -PARAMS => [$symbol]
+  );
+  is_json_GET(
+    '/xrefs/symbol/homo_sapiens/'.$symbol,
+    [{"type" => "gene", "id" => "ENSG00000176515"}],
+    'Checking we can still find display names if they are not linked to the object as an xref'
+  );
+  is_json_GET(
+    '/xrefs/symbol/homo_sapiens/'.$symbol.'?object=transcript',
+    [],
+    'Asking for a symbol without an object_xref and incorrect object type returns an array'
+  );
+  $dba->restore('core', 'object_xref');
 }
 
 done_testing();
