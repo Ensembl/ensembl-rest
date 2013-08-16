@@ -9,14 +9,6 @@ BEGIN {
   # $ENV{ENS_REST_LOG4PERL} = "$Bin/../log4perl_testing.conf";
 }
 
-$SIG{INT} = sub {
-  #Capture normal SIG INTs to force the cleaning up of the databases. For
-  #some reason Catalyst/PSGI/Something is very good at ignoring
-  #DEMOLISH blocks
-  my $code = Catalyst::Script::EnsemblTest->new(application_name => 'EnsEMBL::REST');
-  exit();
-};
-
 use Catalyst::ScriptRunner;
 Catalyst::ScriptRunner->run('EnsEMBL::REST', 'EnsemblTest');
 
@@ -25,6 +17,11 @@ Catalyst::ScriptRunner->run('EnsEMBL::REST', 'EnsemblTest');
 =head1 NAME
 
 ensembl_rest_test_server.pl - Ensembl REST Test Server
+
+=head1 WARNING
+
+THIS SCRIPT DOES *NOT* CLEANUP TEST DATABASES. YOU MUST RUN
+t/CLEAN.t MANUALLY.
 
 =head1 SYNOPSIS
 
