@@ -129,19 +129,39 @@ Using bash we bring each modules directory onto the library path:
   PERL5LIB=${PWD}/ensembl-functgenomics/modules:${PERL5LIB}
   export PERL5LIB
 
-3). Setting up Catalyst and Ensembl REST
+3 a). Setting up Catalyst and Ensembl REST using cpanm
 
 First cd into the directory:
 
   cd ensembl-rest
 
-Then run the Makefile.PL:
+Then run cpanm asking it to install local dependencies
+
+	cpanm --installdeps .
+
+This will run for quite some time but will install all recommended & essential libraries. After which run Makefile.PL to confirm the setup:
 
   perl Makefile.PL
 
-This program will prompt to install CPAN dependencies required for the REST API. If you are on your machine as root and wish to do this into a central machine location then say Y to any prompt. Otherwise use this script as a way of discovering the dependencies for the API. You can use the output in the document as a guide to the required dependencies or look at Makefile.PL's contents.
+3 b). Installing with CPAN
 
-Makefile.PL will emit output looking like:
+Run the makefile:
+
+	perl Makefile.PL
+
+This program will prompt to install CPAN dependencies required for the REST API. If you are on your machine as root and wish to do this into a central machine location then say Y to any prompt.
+
+3 c). Installing using another dependency manager
+
+Should you want to use another manager (such as apt or yum) you should use Makefile.PL's output as a way of checking for dependencies. Should anything report as being missing then quit the program (Ctrl+c), install the missing dependency and retry.
+
+4). Confirming the setup
+
+First run Makefile.PL
+
+	perl Makefile.PL
+
+This will emit output looking like:
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -190,6 +210,12 @@ Makefile.PL will emit output looking like:
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Assuming your output shown no errors your installation is good.
+
+Secondly you should run ping_ensembl.pl
+
+	perl ensembl/misc-scripts/ping_ensembl.pl
+
+This script checks that all Ensembl dependencies are installed and we can contact the public Ensembl MySQL instances. If ping_ensembl.pl returns a successful message then your installation is ready to go.
 
 =============================
 Configuration of the REST API
@@ -282,6 +308,23 @@ We have provided a number of example production scripts and configurations under
   configurations/production
 
 These are intended as a guide about how to run this server in a production mode and heavily use Server::Starter, https://metacpan.org/module/Server::Starter, and the Linux command start-stop-daemon.
+
+4). Running the Test Server
+
+Ensembl REST ships with a number of test databases. It is possible to run a local server which communicates only with these databases. Firstly you must setup the test case configuration like so
+
+	cd ensembl-rest
+	cp t/MultiTestDB.conf.example t/MultiTestDB.conf
+	$EDITOR t/MultiTestDB.conf
+	# In the editor replace connection settings with more appropriate ones
+	# and save
+
+To run execute the following
+
+	cd ensembl-rest
+	./scripts/ensembl_rest_test_server.pl
+
+The script supports the same debug, restart and file watching capacities as the ensembl_rest_server.pl script. Automatic cleanup of databases will occur.
 
 =============
 Errors & Tips

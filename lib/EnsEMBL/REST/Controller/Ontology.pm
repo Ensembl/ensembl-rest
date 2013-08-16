@@ -30,6 +30,7 @@ sub name : Chained('ontology_root') PathPart('name') Args(1) ActionClass('REST')
   my ($self, $c, $name) = @_;
   my $ontology = $c->request()->param('ontology');
   my $terms = $c->stash->{ontology_adaptor}->fetch_all_by_name($name, $ontology);
+  $c->go('ReturnError', 'custom',  [qq{No valid terms found for ontology name $name}]) unless @{$terms};
   $self->enhance_terms($c, $terms);
   $self->status_ok( $c, entity => $self->_encode_array($terms));
 }
@@ -96,6 +97,7 @@ sub ancestors_chart : Chained('ontology_root') PathPart('ancestors/chart') Args(
 sub term {
   my ($self, $c, $id) = @_;
   my $term = $c->stash->{ontology_adaptor}->fetch_by_accession($id);
+  $c->go('ReturnError', 'custom', ["No ontology term found for '$id'"]) if ! $term;
   $c->go('ReturnError', 'custom', ["No ontology term found for '$id'"]) if ! $term->dbID();
   return $term;
 }
