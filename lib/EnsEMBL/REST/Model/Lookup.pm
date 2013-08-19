@@ -207,7 +207,7 @@ sub ontology_accession_to_OntologyTerm {
   my ($self, $accession) = @_;
   my $c = $self->context();
   my $term_adaptor = $c->model('Registry')->get_ontology_term_adaptor();
-  return $term_adaptor->fetch_by_accession($accession);
+  return $term_adaptor->fetch_by_accession($accession, 1);
 }
 
 __PACKAGE__->meta->make_immutable;
