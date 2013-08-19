@@ -18,8 +18,9 @@ sub new {
   $self->{allele} = $proxy_vf->allele_string(undef);
   $self->{codon} = $transcript_variant->codons;
   $self->{residues} = $transcript_variant->pep_allele_string;
-  $self->{sift} = $tva->sift_score;
+  $self->sift($tva->sift_score);
   $self->{polyphen} = $tva->polyphen_score;
+  $self->minor_allele_frequency($proxy_vf->minor_allele_frequency);
   return $self;
 }
 
@@ -37,9 +38,15 @@ sub type {
   return $self->{'type'};
 }
 
+sub minor_allele_frequency {
+  my ($self, $minor_allele_frequency) = @_;
+  $self->{'minor_allele_frequency'} = $minor_allele_frequency - 0 if defined $minor_allele_frequency;
+  return $self->{'minor_allele_frequency'};
+}
+
 sub sift {
   my ($self, $sift) = @_;
-  $self->{'sift'} = $sift if defined $sift;
+  $self->{'sift'} = $sift - 0 if defined $sift;
   return $self->{'sift'};
 }
 
@@ -98,6 +105,7 @@ sub summary_as_hash {
   $summary->{residues} = $self->residues;
   $summary->{sift} = $self->sift;
   $summary->{polyphen} = $self->polyphen;
+  $summary->{minor_allele_frequency} = $self->minor_allele_frequency;
   return $summary;
 }
 
