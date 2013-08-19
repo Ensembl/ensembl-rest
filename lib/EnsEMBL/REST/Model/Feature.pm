@@ -5,6 +5,7 @@ extends 'Catalyst::Model';
 
 use EnsEMBL::REST::EnsemblModel::ExonTranscript;
 use EnsEMBL::REST::EnsemblModel::CDS;
+use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
@@ -49,6 +50,28 @@ sub fetch_features {
     }
   }
   
+  return \@final_features;
+}
+
+sub fetch_protein_features {
+  my ($self, $translation) = @_;
+
+  my $c = $self->context();
+
+  my $feature = $c->request->parameters->{feature};
+  my $allowed_features = {'transcript_variation'=> 1, 'protein_feature' => 1};
+
+  my @final_features;
+  $feature = 'protein_feature' if !( defined $feature);
+  my @features = (ref($feature) eq 'ARRAY') ? @{$feature} : ($feature);
+
+  foreach my $feature_type (@features) {
+    $feature_type = lc($feature_type);
+    my $allowed = $allowed_features->{$feature_type};
+    $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
+    my $objects = $self->$feature_type($c, $translation);
+    push (@final_features, @{$self->to_hash($objects, $feature_type)});
+  }
   return \@final_features;
 }
 
@@ -116,6 +139,35 @@ sub exon {
 sub repeat {
   my ($self, $c, $slice) = @_;
   return $slice->get_all_RepeatFeatures();
+}
+
+sub protein_feature {
+  my ($self, $c, $translation) = @_;
+  my $type = $c->request->parameters->{type};
+  return $translation->get_all_ProteinFeatures($type);
+}
+
+sub transcript_variation {
+  my ($self, $c, $translation) = @_;
+  my $species = $c->stash->{species};
+  my $type = $c->request->parameters->{type};
+
+  my @vfs;
+  my $transcript = $translation->transcript();
+  my @transcript_variants;
+  my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+  if (scalar(@{$self->_get_SO_terms($c)}) > 0) {
+    @transcript_variants = @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c))} ;
+  } else {
+    @transcript_variants = @{$tva->fetch_all_by_Transcripts([$transcript])};
+  }
+  foreach my $tv (@transcript_variants) {
+    if ($type && $tv->display_consequence !~ /$type/) { next ; }
+    my $vf = $tv->variation_feature;
+    my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
+    push(@vfs, $blessed_vf);
+  }
+  return \@vfs;
 }
 
 sub variation {
@@ -190,6 +242,9 @@ sub _get_SO_terms {
       my $ontology_term = $c->model('Lookup')->ontology_accession_to_OntologyTerm($term);
       if(!$ontology_term) {
         $c->go('ReturnError', 'custom', ["The SO accession '${term}' could not be found in our ontology database"]);
+      }
+      if ($ontology_term->is_obsolete) {
+        $c->go('ReturnError', 'custom', ["The SO accession '${term}' is obsolete"]);
       }
       push(@final_terms, $ontology_term->name());
     }
