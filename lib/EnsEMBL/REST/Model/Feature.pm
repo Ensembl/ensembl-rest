@@ -156,7 +156,7 @@ sub transcript_variation {
   my $transcript = $translation->transcript();
   my @transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
-  if (scalar(@{$self->_get_SO_terms($c)})) {
+  if (scalar(@{$self->_get_SO_terms($c)}) > 0) {
     @transcript_variants = @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c))} ;
   } else {
     @transcript_variants = @{$tva->fetch_all_by_Transcripts([$transcript])};
@@ -242,6 +242,9 @@ sub _get_SO_terms {
       my $ontology_term = $c->model('Lookup')->ontology_accession_to_OntologyTerm($term);
       if(!$ontology_term) {
         $c->go('ReturnError', 'custom', ["The SO accession '${term}' could not be found in our ontology database"]);
+      }
+      if ($ontology_term->is_obsolete) {
+        $c->go('ReturnError', 'custom', ["The SO accession '${term}' is obsolete"]);
       }
       push(@final_terms, $ontology_term->name());
     }
