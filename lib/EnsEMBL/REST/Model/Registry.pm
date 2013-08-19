@@ -207,8 +207,9 @@ sub get_species_and_object_type {
 sub get_species {
   my ($self, $division) = @_;
   my $info = $self->_species_info();
-  return $info unless $division;
-  return [ grep { lc($_->{division}) eq lc($division) } @{$info}];
+  #have to force numerification again. It got lost ... somewhere
+  return [ map {$_->{release} += 0; $_} @{$info} ] unless $division;
+  return [ map {$_->{release} += 0; $_} grep { lc($_->{division}) eq lc($division) } @{$info}];
 }
 
 sub _build_species_info {
@@ -246,8 +247,7 @@ sub _build_species_info {
 
       if(! exists $processed_db{$db_key}) {
         my $mc = $dba->get_MetaContainer();
-        my $schema_version = $mc->get_schema_version();
-        $schema_version = $schema_version * 1;
+        my $schema_version = $mc->get_schema_version() * 1;
         $release_lookup{$species} = $schema_version;
         
         if(!$dba->is_multispecies()) {
@@ -323,11 +323,15 @@ sub get_compara_name_for_species {
 sub get_unique_schema_versions {
   my ($self) = @_;
   my %hash;
-  my @dbadaptors = grep { $_->group() eq 'core' } @{$self->_registry()->get_all_DBAdaptors()};
-  foreach my $dba (@dbadaptors) {
-    $hash{$dba->get_MetaContainer()->get_schema_version()} = 1;
+  my $species_info = $self->_species_info();
+  foreach my $species (@{$species_info}) {
+    $hash{$species->{release}} = 1;
   }
-  $self->disconnect_DBAdaptors(@dbadaptors);
+  # my @dbadaptors = grep { $_->group() eq 'core' } @{$self->_registry()->get_all_DBAdaptors()};
+  # foreach my $dba (@dbadaptors) {
+  #   $hash{$dba->get_MetaContainer()->get_schema_version()} = 1;
+  # }
+  # $self->disconnect_DBAdaptors(@dbadaptors);
   return [map { $_ *1 } keys %hash];
 }
 
