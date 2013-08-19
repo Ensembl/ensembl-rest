@@ -252,4 +252,78 @@ sub filter_gff {
   return grep { $_ !~ /^#/ && $_ ne q{} } split(/\n/, $gff);
 }
 
+
+########### ID endpoint testing
+
+$base = '/feature/id';
+
+#Null based queries
+{
+  my $id = 'ENSG00000176515';
+  is_json_GET("$base/$id?feature=none", [], 'Using feature type none returns nothing');
+  action_bad_regex("$base/$id?feature=wibble", qr/wibble/, 'Using a bad feature type causes an exception');
+}
+
+#Get basic features overlapping
+{
+  my $id = 'ENSG00000176515';
+  is(
+    @{json_GET("$base/$id?feature=exon", 'Ensembl exons')},
+    3, '3 exons for gene ENSG00000176515');
+  
+  is(
+    @{json_GET("$base/$id?feature=repeat;logic_name=repeatmask", 'Ensembl logic name repeats')}, 
+    67, '67 repeats overlapping ENSG00000176515 of logic name repeatmask');
+  
+  is(
+    @{json_GET("$base/$id?feature=misc;misc_set=cloneset_30k", 'Ensembl cloneset misc features')}, 
+    1, '1 misc feature for cloneset_30k overlapping ENSG00000176515');
+  
+  is(
+    @{json_GET("$base/$id?feature=transcript;biotype=protein_coding", 'Ensembl biotype transcripts')}, 
+    1, '1 transcript for gene ENSG00000176515');
+
+  is(
+    @{json_GET("$base/$id?feature=variation;so_term=intergenic_variant", 'Ensembl variation with so term')},
+    5, '5 intergenic variants overlapping ENSG00000176515');
+  
+}
+
+########### Translation endpoint testing
+
+$base = '/feature/translation';
+
+#Null based queries
+{
+  my $id = 'ENSP00000371073';
+  action_bad_regex("$base/$id?feature=wibble", qr/wibble/, 'Using a bad feature type causes an exception');
+}
+
+#Get basic features overlapping
+{
+  my $id = 'ENSP00000371073';
+  is(
+    @{json_GET("$base/$id", 'Protein domains for ENSP00000371073')},
+    4, "4 protein domains for $id");
+
+  is(
+    @{json_GET("$base/$id?feature=protein_feature;type=Superfamily", 'Ensembl superfamily domains')}, 
+    1, '1 superfamily domains fetched via logic _name and feature type');
+  
+  is(
+    @{json_GET("$base/$id?feature=transcript_variation", 'Ensembl transcript variation')}, 
+    5, "5 variation feature for $id");
+  
+  is(
+    @{json_GET("$base/$id?feature=transcript_variation;feature=protein_feature", 'Ensembl biotype transcripts')}, 
+    9, "9 features for protein $id");
+
+  is(
+    @{json_GET("$base/$id?feature=transcript_variation;so_term=intron_variant", 'Ensembl variation with so term')},
+    5, "5 intron variants overlapping $id");
+}
+
+
+
+
 done_testing();
