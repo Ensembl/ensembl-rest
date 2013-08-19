@@ -208,8 +208,8 @@ sub get_species {
   my ($self, $division) = @_;
   my $info = $self->_species_info();
   #have to force numerification again. It got lost ... somewhere
-  return [ map {$_->{release} += 0; $_} @{$info} ] unless $division;
-  return [ map {$_->{release} += 0; $_} grep { lc($_->{division}) eq lc($division) } @{$info}];
+  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} @{$info} ] unless $division;
+  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{division}) eq lc($division) } @{$info}];
 }
 
 sub _build_species_info {
