@@ -299,7 +299,7 @@ $base = '/feature/translation';
   action_bad_regex("$base/$id?feature=wibble", qr/wibble/, 'Using a bad feature type causes an exception');
 }
 
-#Get basic features overlapping
+#Get protein and variation features
 {
   my $id = 'ENSP00000371073';
   is(
@@ -312,15 +312,18 @@ $base = '/feature/translation';
   
   is(
     @{json_GET("$base/$id?feature=transcript_variation", 'Ensembl transcript variation')}, 
-    5, "5 variation feature for $id");
+    3, "3 variation feature for $id");
   
   is(
     @{json_GET("$base/$id?feature=transcript_variation;feature=protein_feature", 'Ensembl biotype transcripts')}, 
-    9, "9 features for protein $id");
+    7, "7 features for protein $id");
 
   is(
     @{json_GET("$base/$id?feature=transcript_variation;so_term=intron_variant", 'Ensembl variation with so term')},
-    5, "5 intron variants overlapping $id");
+    3, "3 intron variants for $id");
+  is(
+    @{json_GET("$base/$id?feature=transcript_variation;somatic=1", 'Ensembl variation with somatic data')},
+    2, "2 somatic variations overlapping $id");
 }
 
 
