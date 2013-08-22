@@ -66,7 +66,7 @@ sub _encode :Private{
 
   if (!$archive->is_current) {
     foreach my $successor (@{ $archive->get_all_successors }) {
-      my $event = $aia->fetch_stable_id_event($archive, $successor->stable_id);
+      my $event = $archive->get_event($successor->stable_id);
       my $score = $event->score;
       push(@replacements, { stable_id => $successor->stable_id, score => $score });
     }
@@ -79,7 +79,7 @@ sub _encode :Private{
       is_current => $archive->is_current,
       assembly => $archive->assembly,
       type => $archive->type,
-      replacement => \@replacements,
+      possible_replacement => \@replacements,
       latest => $archive->get_latest_incarnation->stable_id .".". $archive->get_latest_incarnation->version,
       peptide => $peptide,
   };
