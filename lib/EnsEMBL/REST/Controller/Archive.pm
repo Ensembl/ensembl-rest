@@ -59,9 +59,19 @@ sub id: Chained('species') PathPart('') Args(1) ActionClass('REST') {
 
 sub _encode :Private{
   my ($self, $c) = @_;
-  my ($enc, $peptide);
+  my ($enc, $peptide, @replacements);
   my $archive = $c->stash()->{entries};
+  my $aia = $c->model('Registry')->get_adaptor($c->stash()->{species},'Core','ArchiveStableID');
   $peptide = $archive->get_peptide if (!$archive->is_current);
+
+  if (!$archive->is_current) {
+    foreach my $successor (@{ $archive->get_all_successors }) {
+      my $event = $aia->fetch_stable_id_event($archive, $successor->stable_id);
+      my $score = $event->score;
+      push(@replacements, { stable_id => $successor->stable_id, score => $score });
+    }
+  }
+
   $enc = {
       ID => $archive->stable_id,
       version => $archive->version,
@@ -69,7 +79,8 @@ sub _encode :Private{
       is_current => $archive->is_current,
       assembly => $archive->assembly,
       type => $archive->type,
-      replacement => $archive->get_latest_incarnation->stable_id .".". $archive->get_latest_incarnation->version,
+      replacement => \@replacements,
+      latest => $archive->get_latest_incarnation->stable_id .".". $archive->get_latest_incarnation->version,
       peptide => $peptide,
   };
   $c->stash(entity => $enc);
