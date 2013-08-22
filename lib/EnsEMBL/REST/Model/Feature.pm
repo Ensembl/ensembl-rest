@@ -151,24 +151,15 @@ sub transcript_variation {
   my ($self, $c, $translation) = @_;
   my $species = $c->stash->{species};
   my $type = $c->request->parameters->{type};
-  my $somatic = $c->request->parameters->{somatic};
 
   my @vfs;
   my $transcript = $translation->transcript();
   my @transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
   if (scalar(@{$self->_get_SO_terms($c)}) > 0) {
-    if ($somatic) {
-      @transcript_variants = @{ $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c)) };
-    } else {
-      @transcript_variants = @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c))} ;
-    }
+    @transcript_variants = @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c))} ;
   } else {
-    if ($somatic) {
-      @transcript_variants = @{$tva->fetch_all_somatic_by_Transcripts([$transcript])};
-    } else {
-      @transcript_variants = @{$tva->fetch_all_by_Transcripts([$transcript])};
-    }
+    @transcript_variants = @{$tva->fetch_all_by_Transcripts([$transcript])};
   }
   foreach my $tv (@transcript_variants) {
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
