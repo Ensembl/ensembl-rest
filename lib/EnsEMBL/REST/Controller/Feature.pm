@@ -54,6 +54,21 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   $self->status_ok($c, entity => $features );
 }
 
+=pod
+
+/feature/id/ENSG00000157764
+
+feature = The type of feature to retrieve (gene/transcript/exon/variation/structural_variation/constrained/regulatory)
+db_type = The DB type to use; important if someone is doing queries over a non-default DB (core/otherfeatures)
+species_set = The compara species set name to look for constrained elements by (mammals)
+logic_name = Logic name used for genes
+so_term=sequence ontology term to limit variants to
+
+application/json
+text/x-gff3
+
+=cut
+
 sub id_GET {}
 
 sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
@@ -71,6 +86,21 @@ sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
   };
   $self->status_ok($c, entity => $features );
 }
+
+=pod
+
+/feature/translation/ENSP00000288602?type=Superfamily
+
+feature = The type of feature to retrieve (default is protein_feature, but can also retrieve transcript_variation)
+db_type = The DB type to use; important if someone is doing queries over a non-default DB (core/otherfeatures)
+species_set = The compara species set name to look for constrained elements by (mammals)
+so_term = sequence ontology term to limit variants to
+somatic = Where to include somatic data or not
+
+application/json
+text/x-gff3
+
+=cut
 
 sub translation_GET {}
 
