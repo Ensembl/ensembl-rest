@@ -24,12 +24,14 @@ is_json_GET(
     'assembly.name' => 'GRCh37.p8', 
     'assembly.date' => '2009-02', 
     top_level_seq_region_names => [qw/6 X/],
+    karyotype => [qw/6 X/],
     'genebuild.start_date' => "2010-07-Ensembl",
     'genebuild.initial_release_date' => "2011-04",
     schema_build => $schema_build,
     'genebuild.last_geneset_update' => "2012-10",
     'genebuild.method' => "full_genebuild",
-    coord_system_versions => [ '', qw/GRCh37 NCBI36 NCBI34 NCBI35/ ]
+    coord_system_versions => [ '', qw/GRCh37 NCBI36 NCBI34 NCBI35/ ],
+    default_coord_system_version => 'GRCh37',
   },
   'Checking output of info'
 );
