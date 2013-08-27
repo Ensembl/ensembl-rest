@@ -151,7 +151,7 @@ my $base = '/feature/region/homo_sapiens';
     start => 1000732,
     end => 1000776,
     strand => 0, # YES DON'T CHANGE THIS; THEY DO NOT HAVE A STRAND
-    ID => 'dust',
+    description => 'dust',
     seq_region_name => '6',
     feature_type => 'repeat',
   }, 'Checking one repeat');
@@ -242,7 +242,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 repeat in this region');
   
-  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079680\t.\t+\t.\tID=AluSq};
+  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079680\t.\t+\t.\tdescription=AluSq};
   eq_or_diff($lines[0], $gff_line, 'Expected output repeat feature line from GFF');
 }
 
