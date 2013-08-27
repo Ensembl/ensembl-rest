@@ -122,7 +122,7 @@ sub summary_as_hash {
   my ($self) = @_;
   my $summary = $self->SUPER::summary_as_hash();
   $summary->{Parent} = $self->parent_id;
-  $summary->{protein_id} = $self->stable_id();
+  $summary->{ID} = $self->stable_id();
   $summary->{phase} = 0;
   $summary->{rank} = $self->rank();
   return $summary;
