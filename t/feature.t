@@ -77,7 +77,7 @@ my $base = '/feature/region/homo_sapiens';
   is($transcript->{Parent}, $gene->{ID}, 'Transcript parent is previous gene');
   
   my ($cds) = sort { $a->{start} <=> $b->{start} } grep { $_->{feature_type} eq 'cds'} @{$json};
-  is($cds->{ID}, '', 'CDS ID is a blank String');
+  is($cds->{ID}, 'ENSP00000320396', 'CDS ID is a protein ID');
   is($cds->{Parent}, $transcript->{ID}, 'CDS parent is the previous transcript');
   is($cds->{start}, 1101508, 'First CDS starts at first coding point in the second exon');
   is($cds->{end}, 1101531, 'First CDS ends at the second exon');
