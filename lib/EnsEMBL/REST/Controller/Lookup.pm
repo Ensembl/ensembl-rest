@@ -22,6 +22,7 @@ sub id : Chained('') Args(1) PathPart('lookup/id') {
 
   # output format check
   my $format = $c->request->param('format') || 'condensed';
+  my $include = $c->request->param('include');
   $c->go('ReturnError', 'custom', [qq{The format '$format' is not an understood encoding}]) unless $FORMAT_TYPES->{$format};
 
   my $entity;
@@ -43,6 +44,28 @@ sub id : Chained('') Args(1) PathPart('lookup/id') {
         $entity->{start} = $summary_hash->{start} * 1;
         $entity->{end} = $summary_hash->{end} * 1;
         $entity->{strand} = $summary_hash->{strand} * 1;
+        if($include) {
+          my $type;
+          if ($object_type eq 'Gene') {
+            $type = 'Transcript';
+          } elsif ($object_type eq 'Transcript') {
+            $type = 'Exon';
+          } else {
+            $c->go('ReturnError', 'custom',  ["Include option only available for Genes and Transcripts"]);
+          }
+          my $sub_objects = $c->model('Lookup')->find_include($obj, $type);
+          my $count = 0;
+          foreach my $sub_object ( @$sub_objects) {
+            $count++;
+            my $summary_hash = $sub_object->summary_as_hash();
+            my $id = $sub_object->stable_id();
+            $entity->{$type.$count}->{id} = $id;
+            $entity->{$type.$count}->{seq_region_name} = $summary_hash->{seq_region_name};
+            $entity->{$type.$count}->{start} = $summary_hash->{start} * 1;
+            $entity->{$type.$count}->{end} = $summary_hash->{end} * 1;
+            $entity->{$type.$count}->{strand} = $summary_hash->{strand} * 1;
+          }
+        }
       }
       else {
         $c->go('ReturnError','custom',[qq{ID '$id' does not support 'full' format type. Please use 'condensed'}]);
