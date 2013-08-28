@@ -75,7 +75,6 @@ sub find_genetree_by_member_id {
 sub find_object_by_stable_id {
   my ($self, $id) = @_;
   my $c = $self->context();
-  my $reg = $c->model('Registry');
   my ($species, $type, $db) = $self->find_object_location($id);
   return $self->find_object($id, $species, $type, $db);
 }
@@ -94,6 +93,25 @@ sub find_object {
   $c->go('ReturnError', 'custom', ["No object found for ID $id"]) unless $final_obj;
   $c->stash()->{object} = $final_obj;
   return $final_obj;
+}
+
+sub find_include {
+  my ($self, $object, $type) = @_;
+  my $c = $self->context();
+  my $reg = $c->model('Registry');
+  my @final_objects;
+  if ($type eq 'Transcript') {
+    my @transcripts = @{ $object->get_all_Transcripts };
+    foreach my $transcript (@transcripts) {
+      my @exons = @{ $transcript->get_all_Exons };
+      push @final_objects, $transcript;
+      push @final_objects, @exons;
+    }
+  } elsif ($type eq 'Exon') {
+    my @exons = @{ $object->get_all_Exons };
+    push @final_objects, @exons;
+  }
+  return \@final_objects;
 }
 
 sub find_objects_by_symbol {
