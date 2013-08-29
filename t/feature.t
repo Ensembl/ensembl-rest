@@ -322,7 +322,7 @@ $base = '/feature/translation';
     @{json_GET("$base/$id?feature=transcript_variation;so_term=intron_variant", 'Ensembl variation with so term')},
     3, "3 intron variants for $id");
   is(
-    @{json_GET("$base/$id?feature=transcript_variation;somatic=1", 'Ensembl variation with somatic data')},
+    @{json_GET("$base/$id?feature=somatic_transcript_variation", 'Ensembl variation with somatic data')},
     2, "2 somatic variations overlapping $id");
 }
 
