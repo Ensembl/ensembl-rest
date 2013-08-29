@@ -3,13 +3,11 @@ package EnsEMBL::REST::EnsemblModel::TranscriptVariation;
 use strict;
 use warnings;
 
-use base qw/Bio::EnsEMBL::Utils::Proxy/;
 use Bio::EnsEMBL::Utils::Scalar qw/assert_ref split_array/;
-
 
 sub new {
   my ($class, $proxy_vf, $transcript_variant, $rank) = @_;
-  my $self = $class->SUPER::new($proxy_vf);
+  my $self = bless({}, $class);
   my $tva = $transcript_variant->get_all_alternate_TranscriptVariationAlleles->[0];
   $self->{translation_start} = $transcript_variant->translation_start;
   $self->{translation_id} = $transcript_variant->transcript->translation->stable_id;
@@ -23,7 +21,6 @@ sub new {
   $self->minor_allele_frequency($proxy_vf->minor_allele_frequency);
   return $self;
 }
-
 
 sub new_from_variation_feature {
   my ($class, $vf, $tv) = @_;
@@ -94,10 +91,10 @@ sub ID {
 
 sub summary_as_hash {
   my ($self) = @_;
-  my $summary;
-#  my $summary = $self->SUPER::summary_as_hash();
+  my $summary = {};
   $summary->{ID} = $self->ID;
-  $summary->{start} = $self->translation_start;
+  $summary->{start} = $self->translation_start || 0;
+  $summary->{end} = $self->translation_start || 0;
   $summary->{translation} = $self->translation_id;
   $summary->{allele} = $self->allele;
   $summary->{type} = $self->type;
@@ -106,7 +103,14 @@ sub summary_as_hash {
   $summary->{sift} = $self->sift;
   $summary->{polyphen} = $self->polyphen;
   $summary->{minor_allele_frequency} = $self->minor_allele_frequency;
+
+  $summary->{seq_region_name} = $summary->{translation};
   return $summary;
+}
+
+sub SO_term {
+  my ($self) = @_;
+  return 'SO:0001146'; # polypeptide_variation_site
 }
 
 1;

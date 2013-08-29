@@ -8,11 +8,20 @@ use EnsEMBL::REST::EnsemblModel::CDS;
 use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
 use EnsEMBL::REST::EnsemblModel::TranslationSpliceSiteOverlap;
 use EnsEMBL::REST::EnsemblModel::TranslationExon;
+use EnsEMBL::REST::EnsemblModel::TranslationSlice;
+use EnsEMBL::REST::EnsemblModel::TranslationProteinFeature;
+
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
     map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
+  };
+});
+
+has 'allowed_translation_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
+  return {
+    'transcript_variation'=> 1, 'protein_feature' => 1, 'residue_overlap' => 1, 'translation_exon' => 1, 'somatic_transcript_variation' => 1
   };
 });
 
@@ -59,20 +68,30 @@ sub fetch_protein_features {
   my ($self, $translation) = @_;
 
   my $c = $self->context();
+  my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
 
   my $feature = $c->request->parameters->{feature};
-  my $allowed_features = {'transcript_variation'=> 1, 'protein_feature' => 1};
+  my $allowed_features = $self->allowed_translation_features();
 
   my @final_features;
   $feature = 'protein_feature' if !( defined $feature);
   my @features = (ref($feature) eq 'ARRAY') ? @{$feature} : ($feature);
+
+  if($is_gff3) {
+    $c->stash()->{slice} = EnsEMBL::REST::EnsemblModel::TranslationSlice->new(translation => $translation);
+  }
 
   foreach my $feature_type (@features) {
     $feature_type = lc($feature_type);
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
     my $objects = $self->$feature_type($c, $translation);
-    push (@final_features, @{$self->to_hash($objects, $feature_type)});
+    if($is_gff3) {
+      push(@final_features, @{$objects});
+    }
+    else {
+      push(@final_features, @{$self->to_hash($objects, $feature_type)});
+    }
   }
   return \@final_features;
 }
@@ -146,33 +165,51 @@ sub repeat {
 sub protein_feature {
   my ($self, $c, $translation) = @_;
   my $type = $c->request->parameters->{type};
-  return $translation->get_all_ProteinFeatures($type);
+  my $protein_features = $translation->get_all_ProteinFeatures($type);
+  return EnsEMBL::REST::EnsemblModel::TranslationProteinFeature->get_from_ProteinFeatures($protein_features, $translation);
 }
 
 sub transcript_variation {
   my ($self, $c, $translation) = @_;
   my $species = $c->stash->{species};
   my $type = $c->request->parameters->{type};
-  my $somatic = $c->request->parameters->{somatic};
-
   my @vfs;
   my $transcript = $translation->transcript();
-  my @transcript_variants;
+  my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
-  if (scalar(@{$self->_get_SO_terms($c)}) > 0) {
-    if ($somatic) {
-      @transcript_variants = @{ $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c)) };
-    } else {
-      @transcript_variants = @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $self->_get_SO_terms($c))} ;
-    }
-  } else {
-    if ($somatic) {
-      @transcript_variants = @{$tva->fetch_all_somatic_by_Transcripts([$transcript])};
-    } else {
-      @transcript_variants = @{$tva->fetch_all_by_Transcripts([$transcript])};
-    }
+  my $so_terms = $self->_get_SO_terms($c);
+  if (scalar(@{$so_terms}) > 0) {
+    $transcript_variants = $tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms);
   }
-  foreach my $tv (@transcript_variants) {
+  else {
+    $transcript_variants = $tva->fetch_all_by_Transcripts([$transcript]);
+  }
+  return $self->_filter_transcript_variation($transcript_variants);
+}
+
+sub somatic_transcript_variation {
+  my ($self, $c, $translation) = @_;
+  my $species = $c->stash->{species};
+  my $type = $c->request->parameters->{type};
+  my @vfs;
+  my $transcript = $translation->transcript();
+  my $transcript_variants;
+  my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+  my $so_terms = $self->_get_SO_terms($c);
+  if (scalar(@{$so_terms}) > 0) {
+    $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms);
+  } 
+  else {
+    $transcript_variants = $tva->fetch_all_somatic_by_Transcripts([$transcript]);
+  }
+  return $self->_filter_transcript_variation($transcript_variants);
+}
+
+sub _filter_transcript_variation {
+  my ($self, $transcript_variants) = @_;
+  my $type = $self->context->request->parameters->{type};
+  my @vfs;
+  foreach my $tv (@{$transcript_variants}) {
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
     my $vf = $tv->variation_feature;
     my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
