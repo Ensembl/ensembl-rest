@@ -28,6 +28,21 @@ my $full_response = {
 };
 is_json_GET("/lookup/$basic_id?format=full", $full_response, 'Get of a known ID to the old URL will return a value');
 
+my $expanded_response = {
+  %{$condensed_response},
+  Transcript => [
+                 {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040',
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
+        Exon =>
+                [
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861'},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874'},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
+                ]
+                }]
+                };
+is_json_GET("/lookup/id/$basic_id?expand=1", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
+
 action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');
 
 done_testing();
