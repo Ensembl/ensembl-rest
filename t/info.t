@@ -98,4 +98,15 @@ is_json_GET(
   action_bad_regex('/info/external_dbs/wibble', qr/Could not fetch adaptor for species .+/, 'Bogus species means error message');
 }
 
+# /info/biotypes/:species
+{
+  my $biotypes_json = json_GET('/info/biotypes/homo_sapiens', 'Get the external dbs hash');
+  is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
+  cmp_ok(scalar(@{$biotypes_json}), '==', 20, 'Ensuring we have the right number of biotypes');
+  my ($protein_coding) = grep { $_->{biotype} eq 'protein_coding' } @{$biotypes_json};
+  my $expected = { biotype => 'protein_coding', groups => ['core'], objects => ['gene', 'transcript']}
+  eq_or_diff_data();
+  action_bad_regex('/info/biotypes/wibble', qr/Could not fetch adaptor for species .+/, 'Bogus species means error message');
+}
+
 done_testing();
