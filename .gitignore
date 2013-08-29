@@ -1,3 +1,10 @@
 CLEAN.t
 MultiTestDB.conf
 *.MultiTestDB.frozen.*
+*.frozen.conf
+/blib
+/inc
+/META.yml
+/MYMETA.*
+/Makefile
+
