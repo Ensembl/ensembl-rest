@@ -326,7 +326,26 @@ $base = '/feature/translation';
     2, "2 somatic variations overlapping $id");
 }
 
+#Check can we get the splice sites and exon boundaries of a translation
+{
+  my $id = 'ENSP00000371073';
+  my $json = json_GET("$base/$id?feature=translation_exon", 'Getting exon information from a translation');
+  cmp_ok(scalar(@{$json}), '==', 6, 'Expect 6 translatable exons');
+  my $expected_exon_one = { start => 1, end => 43, rank => 1, ID => 'ENSE00002753423', feature_type => 'translation_exon', seq_region_name => $id };
+  eq_or_diff($json->[0], $expected_exon_one, 'Checking that the 1st exon has the expected location');
 
+  my $expected_exon_two = { start => 43, end => 88, rank => 2, ID => 'ENSE00002909822', feature_type => 'translation_exon', seq_region_name => $id };
+  eq_or_diff($json->[1], $expected_exon_two, 'Checking that the 2nd exon has the expected location');
+}
+
+#Retriving splice site overlaps like the one mentioned between exons 1 & 2
+{
+  my $id = 'ENSP00000371073';
+  my $json = json_GET("$base/$id?feature=residue_overlap", 'Getting residue_overlap information from a translation');
+  cmp_ok(scalar(@{$json}), '==', 2, 'Expect 2 overlaps');
+  my $expected = { start => 43, end => 43, feature_type => 'residue_overlap', seq_region_name => $id };
+  eq_or_diff($json->[0], $expected, 'Checking that the overlap is at the expected location');
+}
 
 
 done_testing();
