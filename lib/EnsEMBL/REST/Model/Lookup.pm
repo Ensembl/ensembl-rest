@@ -58,7 +58,7 @@ sub find_genetree_by_member_id {
   my $compara_name = $c->request->parameters->{compara}; 
   my $reg = $c->model('Registry');
  
-  my ($species, $type, $db) = $c->model('Lookup')->find_object_location($id);
+  my ($species, $type, $db_type) = $self->find_object_location($id);
   $c->go('ReturnError', 'custom', ["Unable to find given object: $id"]) unless $species;
   
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
@@ -75,16 +75,16 @@ sub find_genetree_by_member_id {
 sub find_object_by_stable_id {
   my ($self, $id) = @_;
   my $c = $self->context();
-  my ($species, $type, $db) = $self->find_object_location($id);
-  return $self->find_object($id, $species, $type, $db);
+  my ($species, $type, $db_type) = $self->find_object_location($id);
+  return $self->find_object($id, $species, $type, $db_type);
 }
 
 sub find_object {
-  my ($self, $id, $species, $type, $db) = @_;
+  my ($self, $id, $species, $type, $db_type) = @_;
   my $c = $self->context();
   my $reg = $c->model('Registry');
   $c->go('ReturnError', 'custom', [qq{Not possible to find an object with the ID '$id' in this release; no species found}]) unless $species;
-  my $adaptor = $reg->get_adaptor($species, $db, $type);
+  my $adaptor = $reg->get_adaptor($species, $db_type, $type);
   $c->log()->debug('Found an adaptor '.$adaptor);
   if(! $adaptor->can('fetch_by_stable_id')) {
     $c->go('ReturnError', 'custom', ["Object, $type, type's adaptor does not support fetching by a stable ID for ID '$id'"]);
@@ -95,24 +95,6 @@ sub find_object {
   return $final_obj;
 }
 
-sub find_include {
-  my ($self, $object, $type) = @_;
-  my $c = $self->context();
-  my $reg = $c->model('Registry');
-  my @final_objects;
-  if ($type eq 'Transcript') {
-    my @transcripts = @{ $object->get_all_Transcripts };
-    foreach my $transcript (@transcripts) {
-      my @exons = @{ $transcript->get_all_Exons };
-      push @final_objects, $transcript;
-      push @final_objects, @exons;
-    }
-  } elsif ($type eq 'Exon') {
-    my @exons = @{ $object->get_all_Exons };
-    push @final_objects, @exons;
-  }
-  return \@final_objects;
-}
 
 sub find_objects_by_symbol {
   my ($self, $symbol) = @_;
@@ -179,10 +161,85 @@ sub find_object_location {
     }
   }
 
-  #Quickly add in the species into the stash
-  $c->stash(species => $captures[0], object_type => $captures[1], group => $captures[2]);
+  $species = $captures[0];
+  $object_type = $captures[1];
+  $db_type = $captures[2];
+  my $features = $self->features_as_hash($id, $species, $object_type, $db_type);
 
-  return @captures;
+  my $expand = $c->request->param('expand');
+  if ($expand) {
+    my $type;
+    if ($features->{object_type} eq 'Gene') {
+      $type = 'Transcript';
+    } elsif ($features->{object_type} eq 'Transcript') {
+      $type = 'Exon';
+    } else {
+      $c->go('ReturnError', 'custom',  ["Include option only available for Genes and Transcripts"]);
+    }
+    $features->{$type} = $self->$type($features->{id}, $species, $db_type);
+  }
+
+  return $features;
+}
+
+
+sub Transcript {
+  my ($self, $id, $species, $db_type) = @_;
+
+  my @transcripts;
+  my $features;
+  my $object = $self->find_object($id, $species, 'Gene', $db_type);
+  my $transcripts = $object->get_all_Transcripts;
+  foreach my $transcript (@$transcripts) {
+    $features = $self->features_as_hash($transcript->stable_id, $species, 'Transcript', $db_type);
+    $features->{Exon} = $self->Exon($features->{id}, $species, $db_type);
+    if ($transcript->translate) {
+      my $translation = $transcript->translation;
+      $features->{Translation} = $self->features_as_hash($translation->stable_id, $species, 'Translation', $db_type);
+    }
+    push @transcripts, $features;
+  }
+  return \@transcripts;
+}
+
+sub Exon {
+  my ($self, $id, $species, $db_type) = @_;
+
+  my @exons;
+  my $object = $self->find_object($id, $species, 'Transcript', $db_type);
+  my $exons = $object->get_all_Exons;
+  foreach my $exon(@$exons) {
+    push @exons, $self->features_as_hash($exon->stable_id, $species, 'Exon', $db_type);
+  }
+
+  return \@exons;
+}
+
+sub features_as_hash {
+  my ($self, $id, $species, $object_type, $db_type) = @_;
+
+  my $c = $self->context();
+  my $format = $c->request->param('format') || 'condensed';
+  my $features;
+  $features->{id} = $id;
+  $features->{species} = $species;
+  $features->{object_type} = $object_type;
+  $features->{db_type} = $db_type;
+
+  if ($format eq 'full') {
+    my $obj = $self->find_object($id, $species, $object_type, $db_type);
+    if($obj->can('summary_as_hash')) {
+      my $summary_hash = $obj->summary_as_hash();
+      $features->{seq_region_name} = $summary_hash->{seq_region_name};
+      $features->{start} = $summary_hash->{start} * 1;
+      $features->{end} = $summary_hash->{end} * 1;
+      $features->{strand} = $summary_hash->{strand} * 1;
+    } else {
+      $c->go('ReturnError','custom',[qq{ID '$id' does not support 'full' format type. Please use 'condensed'}]);
+    }
+  }
+
+  return $features;
 }
 
 sub find_slice {
