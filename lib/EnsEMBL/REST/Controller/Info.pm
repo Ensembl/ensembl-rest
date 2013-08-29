@@ -82,6 +82,22 @@ sub comparas_GET :Local :Args(0) {
   return;
 }
 
+sub analysis :Local :ActionClass('REST') :Args(1) { }
+
+sub analysis_GET :Local :Args(1) { 
+  my ($self, $c, $species) = @_;
+  my %names;
+  my @adaptors = @{$c->model('Registry')->get_all_adaptors_by_type($species, 'analysis')};
+  foreach my $adaptor (@adaptors) {
+    my $group = $adaptor->db->group;
+    foreach my $analysis (@{$adaptor->fetch_all}) {
+      push(@{$names{$analysis->logic_name()}}, $group);
+    }
+  }
+  $self->status_ok($c, entity => \%names);
+  return;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
