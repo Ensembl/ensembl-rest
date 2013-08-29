@@ -88,4 +88,14 @@ is_json_GET(
   is_json_GET('/info/analysis/wibble', {}, 'Bogus species means empty hash');
 }
 
+# /info/external_dbs/:species
+{
+  my $external_dbs_json = json_GET('/info/external_dbs/homo_sapiens', 'Get the external dbs hash');
+  cmp_ok(scalar(@{$external_dbs_json}), '==', 510, 'Ensuring we have the right number of external_dbs available');
+  my $expected = [{ name => 'GO', description => undef, release => undef, display_name => 'GO' }];
+  is_json_GET('/info/external_dbs/homo_sapiens?filter=GO', $expected, 'Checking GO filtering works');
+
+  action_bad_regex('/info/external_dbs/wibble', qr/Could not fetch adaptor for species .+/, 'Bogus species means error message');
+}
+
 done_testing();

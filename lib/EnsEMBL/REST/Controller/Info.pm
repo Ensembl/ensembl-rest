@@ -4,6 +4,7 @@ use Moose;
 use namespace::autoclean;
 use Bio::EnsEMBL::ApiVersion;
 use Try::Tiny;
+use EnsEMBL::REST::EnsemblModel::ExternalDB;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
@@ -95,6 +96,18 @@ sub analysis_GET :Local :Args(1) {
     }
   }
   $self->status_ok($c, entity => \%names);
+  return;
+}
+
+sub external_dbs :Local :ActionClass('REST') :Args(1) { }
+
+sub external_dbs_GET :Local :Args(1) { 
+  my ($self, $c, $species) = @_;
+  my $dba = $c->model('Registry')->get_DBAdaptor($species, 'core', 1);
+  $c->go('ReturnError', 'custom', ["Could not fetch adaptor for species $species"]) unless $dba;
+  my $dbs = EnsEMBL::REST::EnsemblModel::ExternalDB->get_ExternalDBs($dba, $c->request->param('filter'));
+  my @decoded = map { $_->summary_as_hash() } @{$dbs};
+  $self->status_ok($c, entity => \@decoded);
   return;
 }
 
