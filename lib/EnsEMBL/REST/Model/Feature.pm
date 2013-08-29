@@ -6,6 +6,8 @@ extends 'Catalyst::Model';
 use EnsEMBL::REST::EnsemblModel::ExonTranscript;
 use EnsEMBL::REST::EnsemblModel::CDS;
 use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
+use EnsEMBL::REST::EnsemblModel::TranslationSpliceSiteOverlap;
+use EnsEMBL::REST::EnsemblModel::TranslationExon;
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
@@ -177,6 +179,16 @@ sub transcript_variation {
     push(@vfs, $blessed_vf);
   }
   return \@vfs;
+}
+
+sub residue_overlap {
+  my ($self, $c, $translation) = @_;
+  return EnsEMBL::REST::EnsemblModel::TranslationSpliceSiteOverlap->get_by_Translation($translation);
+}
+
+sub translation_exon {
+  my ($self, $c, $translation) = @_;
+  return EnsEMBL::REST::EnsemblModel::TranslationExon->get_by_Translation($translation);
 }
 
 sub variation {
