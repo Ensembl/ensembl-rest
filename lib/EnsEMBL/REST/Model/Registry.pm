@@ -335,6 +335,13 @@ sub get_unique_schema_versions {
   return [map { $_ *1 } keys %hash];
 }
 
+sub get_all_adaptors_by_type {
+  my ($self, $species, $type) = @_;
+  my $registry = $self->_registry();
+  return [] if ! $registry->alias_exists($species);
+  return $registry->get_all_adaptors(-species => $species, -type => $type);
+}
+
 sub get_all_DBAdaptors {
   my ($self, $group, $species) = @_;
   my %args;
