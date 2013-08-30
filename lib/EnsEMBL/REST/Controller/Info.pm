@@ -124,6 +124,41 @@ sub biotypes_GET :Local :Args(1) {
   return;
 }
 
+sub genomic_methods_GET { }
+
+sub genomic_methods : Chained('/') PathPart('info/compara/methods') Args(0) ActionClass('REST') {
+  my ($self, $c) = @_;
+
+  my $class = $c->request->param('class');
+  my %types;
+
+  try {
+    my $methods = $c->model('Lookup')->find_compara_methods($class);
+    push(@{$types{$_->class()}}, $_->type()) for @{$methods};
+  } catch {
+    $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  };
+
+  $self->status_ok($c, entity => \%types);
+
+}
+
+sub species_sets_GET { }
+
+sub species_sets : Chained('/') PathPart("info/compara/species_sets") Args(1) ActionClass('REST') {
+  my ($self, $c, $method) = @_;
+
+  my $species_sets;
+  try {
+    $species_sets = $c->model('Lookup')->find_compara_species_sets($method);
+  } catch {
+    $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  };
+
+  $self->status_ok($c, entity => $species_sets);
+
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
