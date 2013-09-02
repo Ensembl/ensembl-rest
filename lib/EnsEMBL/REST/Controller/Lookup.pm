@@ -27,7 +27,7 @@ sub id : Chained('') Args(1) PathPart('lookup/id') {
 
   my $features;
   try {
-    $features = $c->model('Lookup')->find_object_location($id);
+    $features = $c->model('Lookup')->find_and_locate_object($id);
     $c->go('ReturnError', 'custom',  [qq{No valid lookup found for ID $id}]) unless $features->{species};
       }
   catch {
