@@ -208,9 +208,17 @@ sub find_object_location {
     }
   }
 
-  $species = $captures[0];
-  $object_type = $captures[1];
-  $db_type = $captures[2];
+  return @captures;
+}
+
+sub find_and_locate_object {
+  my ($self, $id, $no_long_lookup) = @_;
+  my $c = $self->context();
+
+  my @captures = $self->find_object_location($id, $no_long_lookup);
+  my $species = $captures[0];
+  my $object_type = $captures[1];
+  my $db_type = $captures[2];
   my $features = $self->features_as_hash($id, $species, $object_type, $db_type);
 
   my $expand = $c->request->param('expand');
