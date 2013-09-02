@@ -9,7 +9,7 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
 my $FORMAT_LOOKUP = { full => '_full_encoding', condensed => '_condensed_encoding' };
-my $TYPE_TO_COMPARA_TYPE = { orthologues => 'ENSEMBL_ORTHOLOGUES', paralogues => 'ENSEMBL_PARALOGUES', all => ''};
+my $TYPE_TO_COMPARA_TYPE = { orthologues => 'ENSEMBL_ORTHOLOGUES', paralogues => 'ENSEMBL_PARALOGUES', projections => 'ENSEMBL_PROJECTIONS', all => ''};
 
 has default_compara => ( is => 'ro', isa => 'Str', default => 'multi' );
 
@@ -114,6 +114,12 @@ sub get_orthologs : Args(0) ActionClass('REST') {
       $c->log->error(qq{Stable Id not found id db: $stable_id});
       $c->go( 'ReturnError', 'custom', [qq{stable id '$stable_id' not found}] );
     };
+
+    if(! defined $member) {
+      $c->log->debug('The ID '.$stable_id.' produced no member in compara');
+      next;
+    }
+
     my $all_homologies;
     try {
       my $ha = $s->{homology_adaptor};
@@ -224,7 +230,7 @@ sub _full_encoding {
       cigar_line => $member->cigar_line(),
       protein_id => $gene->get_canonical_SeqMember()->stable_id(),
     };
-    if($aligned) {
+    if($aligned && $member->cigar_line()) {
       if($seq_type eq 'protein') {
         $result->{align_seq} = $member->alignment_string();
       }
@@ -246,12 +252,14 @@ sub _full_encoding {
   
   while(my $h = shift @{$homologies}) {
     my ($src, $trg) = $self->_decode_members($h, $stable_id);
+    my $type = $h->description();
     my $e = {
-      type => $h->description(),
+      type => $type,
       subtype => $h->subtype(),
       dn_ds => $h->dnds_ratio(),
       source => $encode->($src),
       target => $encode->($trg),
+      method_link_type => $h->method_link_species_set()->method()->type(),
     };
     $e->{dn_ds} = $e->{dn_ds}*1 if defined $e->{dn_ds};
     push(@output, $e);
@@ -272,6 +280,7 @@ sub _condensed_encoding {
       id => $gene_member->stable_id(),
       protein_id => $gene_member->get_canonical_SeqMember()->stable_id(),
       species => $gene_member->genome_db->name(),
+      method_link_type => $h->method_link_species_set()->method()->type(),
     };
     push(@output, $e);
   }
