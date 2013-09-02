@@ -7,6 +7,8 @@ BEGIN {
   use lib "$Bin/lib";
   $ENV{CATALYST_CONFIG} = "$Bin/../ensembl_rest_testing.conf";
   # $ENV{ENS_REST_LOG4PERL} = "$Bin/../log4perl_testing.conf";
+
+  $ENV{RUNTESTS_HARNESS} = 1;
 }
 
 use Catalyst::ScriptRunner;
