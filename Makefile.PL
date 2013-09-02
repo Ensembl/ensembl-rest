@@ -61,6 +61,8 @@ test_requires 'Test::Differences';
 test_requires 'Test::JSON';
 test_requires 'Test::XML::Simple';
 test_requires 'Test::XPath';
+test_requires 'HTTP::Request::Common';
+test_requires 'Plack::Test';
 catalyst;
 
 install_script glob('script/*.pl');
