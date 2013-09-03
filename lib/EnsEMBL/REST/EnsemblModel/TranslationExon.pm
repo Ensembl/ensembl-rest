@@ -12,7 +12,7 @@ Provides a way of accessing exon information for a translation
 
 =cut
 
-use Mouse;
+use Moose;
 
 =head2 ATTRIBUTES
 
