@@ -109,6 +109,7 @@ sub translation: Chained('/') PathPart('feature/translation') Args(1) ActionClas
   my $features;
   try {
     $c->log()->debug('Finding the object');
+    $c->request->param('object_type', 'translation');
     my $translation = $c->model('Lookup')->find_object_by_stable_id($id);
     $features = $c->model('Feature')->fetch_protein_features($translation);
   } catch {
