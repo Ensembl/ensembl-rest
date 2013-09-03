@@ -151,7 +151,7 @@ sub find_objects_by_symbol {
   my $db_type = $c->request->param('db_type') || 'core';
   my $external_db = $c->request->param('external_db');
   my @entries;  
-  my @objects_to_try = $c->request->param('object') ? ($c->request->param('object')) : qw(gene transcript translation);
+  my @objects_to_try = $c->request->param('object_type') ? ($c->request->param('object_type')) : qw(gene transcript translation);
   foreach my $object_type (@objects_to_try) {
     my $object_adaptor = $c->model('Registry')->get_adaptor($c->stash->{'species'}, $db_type, $object_type);
     my $objects_linked_to_symbol = $object_adaptor->fetch_all_by_external_name($symbol, $external_db);
@@ -163,7 +163,7 @@ sub find_objects_by_symbol {
 
   # If we ran out of possible symbols then switch onto using the gene's display label
   if(! @entries) {
-    my $object_param = $c->request->param('object');
+    my $object_param = $c->request->param('object_type');
     if(! defined $object_param || (defined $object_param && $object_param eq 'gene') ) {
       my $object_adaptor = $c->model('Registry')->get_adaptor($c->stash->{'species'}, $db_type, 'gene');
       my $objects_linked_to_symbol = $object_adaptor->fetch_all_by_display_label($symbol);
