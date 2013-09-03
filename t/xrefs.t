@@ -70,7 +70,7 @@ my $UPI = 'UPI0000073BC4';
     'Checking we can still find display names if they are not linked to the object as an xref'
   );
   is_json_GET(
-    '/xrefs/symbol/homo_sapiens/'.$symbol.'?object=transcript',
+    '/xrefs/symbol/homo_sapiens/'.$symbol.'?object_type=transcript',
     [],
     'Asking for a symbol without an object_xref and incorrect object type returns an array'
   );
