@@ -58,7 +58,7 @@ sub find_genetree_by_member_id {
   my $compara_name = $c->request->parameters->{compara}; 
   my $reg = $c->model('Registry');
  
-  my ($species, $type, $db_type) = $self->find_object_location($id);
+  my ($species, $object_type, $db_type) = $self->find_object_location($id);
   $c->go('ReturnError', 'custom', ["Unable to find given object: $id"]) unless $species;
   
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
@@ -122,19 +122,21 @@ sub find_compara_species_sets {
 sub find_object_by_stable_id {
   my ($self, $id) = @_;
   my $c = $self->context();
-  my ($species, $type, $db_type) = $self->find_object_location($id);
-  return $self->find_object($id, $species, $type, $db_type);
+  my ($species, $object_type, $db_type) = $self->find_object_location($id);
+  return $self->find_object($id, $species, $object_type, $db_type);
 }
 
 sub find_object {
-  my ($self, $id, $species, $type, $db_type) = @_;
+  my ($self, $id, $species, $object_type, $db_type) = @_;
   my $c = $self->context();
+  my $r = $c->request();
   my $reg = $c->model('Registry');
-  $c->go('ReturnError', 'custom', [qq{Not possible to find an object with the ID '$id' in this release; no species found}]) unless $species;
-  my $adaptor = $reg->get_adaptor($species, $db_type, $type);
+  $object_type = $r->param('object_type') if !$object_type;
+  $c->go('ReturnError', 'custom', [qq{Not possible to find a $object_type with the ID '$id' in this release; no species found}]) unless $species;
+  my $adaptor = $reg->get_adaptor($species, $db_type, $object_type);
   $c->log()->debug('Found an adaptor '.$adaptor);
   if(! $adaptor->can('fetch_by_stable_id')) {
-    $c->go('ReturnError', 'custom', ["Object, $type, type's adaptor does not support fetching by a stable ID for ID '$id'"]);
+    $c->go('ReturnError', 'custom', ["Object, $object_type, type's adaptor does not support fetching by a stable ID for ID '$id'"]);
   }
   my $final_obj = $adaptor->fetch_by_stable_id($id);
   $c->go('ReturnError', 'custom', ["No object found for ID $id"]) unless $final_obj;
@@ -183,6 +185,7 @@ sub find_object_location {
   my $log = $c->log();
 
   my ($object_type, $db_type, $species) = map { my $p = $r->param($_); $p; } qw/object_type db_type species/;
+
   my @captures;
   if($object_type && $object_type eq 'predictiontranscript') {
     @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
@@ -207,6 +210,8 @@ sub find_object_location {
       $log->debug('Found no ID');
     }
   }
+
+  $c->stash(species => $captures[0], object_type => $captures[1], group => $captures[2]);
 
   return @captures;
 }
