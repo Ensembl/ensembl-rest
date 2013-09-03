@@ -81,6 +81,36 @@
 	<td>link=GET info/species</td>
 	<td></td>
 </tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET info/external_dbs/:species</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET info/compara/methods</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET info/compara/species_sets/:method</td>
+	<td></td>
+</tr>
 </tbody></table>
 </body>
 </html>
