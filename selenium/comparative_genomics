@@ -61,6 +61,26 @@
 	<td>link=GET homology/symbol/:species/:symbol</td>
 	<td></td>
 </tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET alignment/block/region/:species/:region</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://${CurrentEnvironment}/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=GET alignment/slice/region/:species/:region</td>
+	<td></td>
+</tr>
 </tbody></table>
 </body>
 </html>
