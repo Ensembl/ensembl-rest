@@ -15,6 +15,7 @@ to populate the object.
 =cut
 
 use Moose;
+use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
 
 =head2 ATTRIBUTES
 

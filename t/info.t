@@ -17,6 +17,10 @@ use Test::Differences;
 
 my $test = Bio::EnsEMBL::Test::MultiTestDB->new();
 my $dba = $test->get_DBAdaptor('core');
+
+my $multi_test = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
+my $compara_dba = $multi_test->get_DBAdaptor('compara');
+
 Catalyst::Test->import('EnsEMBL::REST');
 require EnsEMBL::REST;
 
@@ -26,7 +30,7 @@ $schema_version *= 1;
 
 # info/comparas
 is_json_GET(
-  '/info/comparas', { comparas => [] }, "is empty"
+  '/info/comparas', { comparas => [ { name => 'multi', release => $schema_version} ] }, "Comparas returns 1 DB"
 );
 
 # info/data
@@ -102,11 +106,44 @@ is_json_GET(
 {
   my $biotypes_json = json_GET('/info/biotypes/homo_sapiens', 'Get the external dbs hash');
   is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
-  cmp_ok(scalar(@{$biotypes_json}), '==', 20, 'Ensuring we have the right number of biotypes');
+  cmp_ok(scalar(@{$biotypes_json}), '==', 11, 'Ensuring we have the right number of biotypes');
   my ($protein_coding) = grep { $_->{biotype} eq 'protein_coding' } @{$biotypes_json};
-  my $expected = { biotype => 'protein_coding', groups => ['core'], objects => ['gene', 'transcript']}
-  eq_or_diff_data();
+  my $expected = { biotype => 'protein_coding', groups => ['core'], objects => ['gene', 'transcript']};
+  eq_or_diff_data($protein_coding, $expected, 'Checking internal contents of biotype hash as expected');
   action_bad_regex('/info/biotypes/wibble', qr/Could not fetch adaptor for species .+/, 'Bogus species means error message');
+}
+
+#/info/compara/methods
+{
+  my $methods_json = json_GET('/info/compara/methods', 'Get the compara methods hash');
+  cmp_ok(keys(%{$methods_json}), '==', 11, 'Ensuring we have the right number of compara methods available');
+  is_json_GET(
+    '/info/compara/methods?class=Homology', 
+    {'Homology.homology' => [qw/ENSEMBL_PROJECTIONS ENSEMBL_PARALOGUES ENSEMBL_ORTHOLOGUES/]}, 
+    'Checking filtering brings back subsets of compara methods'
+  );
+}
+
+#/info/compara/species_sets/:method
+{
+  is_json_GET(
+    '/info/compara/species_sets/ENSEMBL_PROJECTIONS', 
+    [
+      { 
+        species_set_group => q{}, 
+        name => "M.mus patch projections", 
+        method => "ENSEMBL_PROJECTIONS", 
+        species_set => ["mus_musculus"]
+      },
+      {
+        species_set_group => q{},
+        name => "H.sap patch projections",
+        method => "ENSEMBL_PROJECTIONS",
+        species_set => ["homo_sapiens"]
+        },
+    ],
+    'Checking retrieval of ENSEMBL_PROJECTIONS returns 2 group descriptions'
+  );
 }
 
 done_testing();
