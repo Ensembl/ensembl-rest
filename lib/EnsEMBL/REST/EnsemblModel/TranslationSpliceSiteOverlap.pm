@@ -13,7 +13,7 @@ whose codons are held by two different exons
 
 =cut
 
-use Mouse;
+use Moose;
 
 =head2 ATTRIBUTES
 
