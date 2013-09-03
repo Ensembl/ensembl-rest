@@ -1,15 +1,45 @@
 <h1>Change Log</h1>
 
-<h2>1.3.2 - 15th April 2013</h2>
+<h2>1.4.0 - 3rd September 2013</h2>
+
+<h3>New Features</h3>
+<ul>
+  <li>Improved error page when a user goes to an unknown documentation page</li>
+  <li>Rate limiter responds with a Retry-After header once limits have been hit</li>
+  <li><tt>[/assembly/info]</tt> should return those Slices which are part of the karyotype</li>
+  <li><tt>[/feature/translation/:id]</tt> Support the retrieval of splice sites with respect from a translation</li>
+  <li><tt>[/feature/translation]</tt> Improved translation feature support for GFF3</li>
+  <li><tt>[/info/analysis]</tt> Support retrieval of analysis logic names</li>
+  <li><tt>[/info/analysis]</tt> to provide logic names available</li>
+  <li><tt>[/info/biotype]</tt> Support for listing available biotypes</li>
+  <li><tt>[/info/data]</tt> has been sped up for Ensembl Genomes servers (Ensembl Bacteria)</li>
+  <li><tt>[/info/external_db]</tt> Support retrieval of external dbs</li>
+  <li><tt>[/info/external_dbs]</tt> Support the retrieval of external dbs </li>
+  <li><tt>[/lookup/id]</tt> Provide more information for a lookup ID</li>
+  <li><tt>[info/biotypes]</tt> Support retrieval of biotypes from the rest api</li>
+</ul>
 
 <h3>Bugfixes</h3>
 <ul>
-  <li><tt>[/homology/id]</tt> and <tt>[/homology/symbol]</tt> have improved error reporting when IDs and symbols cannot be found</li>
+  <li>REST GFF CDS Line is incorrect. ID can repeat in a single GFF file</li>
+  <li><tt>[/compara/homology]</tt> throws an exception when requesting ENSEMBL_PROJECTION ortholog alignmnets</li>
+  <li><tt>[/feature/id]</tt> does not work for regulatory regions</li>
+  <li><tt>[/feature/id]</tt> is failing as it thinks species is a HASH ref</li>
+  <li><tt>[/genetree/symbol]</tt> and <tt>[/feature/translation]</tt> modified to default object type</li>
+  <li><tt>[/ontology/descendents/:id]</tt> Using the zero_distance parameter destroys any output</li>
+  <li><tt>[/ontology/id/:id]</tt> Giving a bogus ontology ID causes a stack trace</li>
 </ul>
+
+<h2>1.3.2 - 15th April 2013</h2>
 
 <h3>New Feature</h3>
 <ul>
   <li><tt>[/info/species]</tt> allows you to specify a division to limit the data by</li>
+</ul>
+
+<h3>Bugfixes</h3>
+<ul>
+  <li><tt>[/homology/id]</tt> and <tt>[/homology/symbol]</tt> have improved error reporting when IDs and symbols cannot be found</li>
 </ul>
 
 <h2>1.3.1 - 15th April 2013</h2>

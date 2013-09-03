@@ -1,15 +1,67 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.4.0 03-09-2013
+
+New Features:
+
+    - Improved error page when a user goes to an unknown documentation page
+
+    - Rate limiter responds with a Retry-After header once limits have been hit
+
+    - [/assembly/info] should return those Slices which are part of the
+      karyotype
+
+    - [/feature/translation/:id] Support the retrieval of splice sites with
+      respect from a translation
+
+    - [/feature/translation] Improved translation feature support for GFF3
+
+    - [/info/analysis] Support retrieval of analysis logic names
+
+    - [/info/analysis] to provide logic names available
+
+    - [/info/biotype] Support for listing available biotypes
+
+    - [/info/data] has been sped up for Ensembl Genomes servers (Ensembl
+      Bacteria)
+
+    - [/info/external_db] Support retrieval of external dbs
+
+    - [/info/external_dbs] Support the retrieval of external dbs
+
+    - [/lookup/id] Provide more information for a lookup ID
+
+    - [info/biotypes] Support retrieval of biotypes from the rest api
+
+Bugfixes:
+
+    - REST GFF CDS Line is incorrect. ID can repeat in a single GFF file
+
+    - [/compara/homology] throws an exception when requesting ENSEMBL_PROJECTION
+      ortholog alignmnets
+
+    - [/feature/id] does not work for regulatory regions
+
+    - [/feature/id] is failing as it thinks species is a HASH ref
+
+    - [/genetree/symbol] and [/feature/translation] modified to default object
+      type
+
+    - [/ontology/descendents/:id] Using the zero_distance parameter destroys any
+      output
+
+    - [/ontology/id/:id] Giving a bogus ontology ID causes a stack trace
+
 1.3.2 16-04-2013
+
+New Features:
+
+  - [/info/species] allows you to specify a division to limit the data by
 
 Bugfixes:
 
   - [/homology/id] and [/homology/symbol] have improved error 
     reporting when IDs and symbols cannot be found
-
-New Features:
-
-  - [/info/species] allows you to specify a division to limit the data by
 
 1.3.1 15-04-2013
 
