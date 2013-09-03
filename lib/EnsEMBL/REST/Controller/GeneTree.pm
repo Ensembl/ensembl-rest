@@ -45,8 +45,8 @@ sub get_genetree_by_symbol_GET { }
 sub get_genetree_by_symbol : Chained('/') PathPart('genetree/member/symbol') Args(2) ActionClass('REST') {
   my ($self, $c, $species, $symbol) = @_;
   $c->stash(species => $species);
-  my $object_type = $c->request->param('object_type');
-  unless ($object_type) {$c->request->param('object_type','gene')};
+  my $object_type = $c->request->param('object');
+  unless ($object_type) {$c->request->param('object','gene')};
   unless ($c->request->param('db_type') ) {$c->request->param('db_type','core')}; 
   
   my @objects = @{$c->model('Lookup')->find_objects_by_symbol($symbol) };
