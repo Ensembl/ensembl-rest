@@ -135,7 +135,7 @@ sub find_object_location {
   my $r = $c->request;
   my $log = $c->log();
 
-  my ($object_type, $db_type, $species) = map { my $p = $r->param($_); $p; } qw/object_type db_type species/;
+  my ($object_type, $db_type, $species, $use_archive) = map { my $p = $r->param($_); $p; } qw/object_type db_type species use_archive/;
   my @captures;
   if($object_type && $object_type eq 'predictiontranscript') {
     @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
@@ -143,9 +143,8 @@ sub find_object_location {
   else {
     $c->log()->debug(sprintf('Looking for %s with %s and %s in %s', $id, ($object_type || q{?}), ($db_type || q{?}), ($species || q{?})));
     my $model_name = $self->lookup_model();
-    $c->log()->debug('Using '.$model_name);
     my $lookup = $c->model($model_name);
-    @captures = $lookup->find_object_location($id, $object_type, $db_type, $species);
+    @captures = $lookup->find_object_location($id, $object_type, $db_type, $species, $use_archive);
     if(! @captures) {
       $c->log()->debug('Using long database lookup');
       @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);

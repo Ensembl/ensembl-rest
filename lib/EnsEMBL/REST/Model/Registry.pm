@@ -200,8 +200,8 @@ sub get_adaptor {
 }
 
 sub get_species_and_object_type {
-  my ( $self, $stable_id, $object_type, $species, $db_type, $force_long_lookup ) = @_;
-  return $self->_registry()->get_species_and_object_type($stable_id,$object_type, $species, $db_type, $force_long_lookup);
+  my ( $self, $stable_id, $object_type, $species, $db_type, $force_long_lookup, $use_archive ) = @_;
+  return $self->_registry()->get_species_and_object_type($stable_id,$object_type, $species, $db_type, $force_long_lookup, $use_archive);
 }
 
 sub get_species {
