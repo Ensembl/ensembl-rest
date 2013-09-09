@@ -187,7 +187,12 @@ sub find_object_location {
   my ($object_type, $db_type, $species) = map { my $p = $r->param($_); $p; } qw/object_type db_type species/;
 
   my @captures;
-  if($object_type && $object_type eq 'predictiontranscript') {
+
+  #If all 3 params were specified then let it through. User knows best
+  if($object_type && $db_type && $species) {
+    @captures = ($species, $object_type, $db_type);
+  }
+  elsif($object_type && $object_type eq 'predictiontranscript') {
     @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
   }
   else {
@@ -196,7 +201,8 @@ sub find_object_location {
     $c->log()->debug('Using '.$model_name);
     my $lookup = $c->model($model_name);
     @captures = $lookup->find_object_location($id, $object_type, $db_type, $species);
-    if(! @captures) {
+    #Check if we any conntent or if the 1st element was false (both mean force a long lookup)
+    if(! @captures || ! $captures[0]) {
       $c->log()->debug('Using long database lookup');
       @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
     }
