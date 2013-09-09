@@ -1,5 +1,12 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.4.1 09-09-2013
+
+Bugfixes:
+
+    - Lookup with a non-indexed stable identifiers in databases other than 
+      core failed
+
 1.4.0 03-09-2013
 
 New Features:

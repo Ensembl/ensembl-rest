@@ -1,5 +1,12 @@
 <h1>Change Log</h1>
 
+<h2>1.4.1 - 9th September 2013</h2>
+
+<h3>Bugfixes</h3>
+<ul>
+  <li>Lookup with a non-indexed stable identifiers in databases other than core failed</li>
+</ul>
+
 <h2>1.4.0 - 3rd September 2013</h2>
 
 <h3>New Features</h3>
