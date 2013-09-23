@@ -49,7 +49,7 @@ my $base = '/feature/region/homo_sapiens';
   
   warns_like(sub {
     is_json_GET("$base/$region?feature=gene;db_type=wibble",[], 'Bad db type given');
-  }, qr/wibble genes not available/, 'Checking for internal warnings when bad DB type given');
+  }, qr/No adaptor.+ object type Gene/s, 'Checking for internal warnings when bad DB type given');
 }
 
 #Inspect the first feature
@@ -287,6 +287,12 @@ $base = '/feature/id';
     @{json_GET("$base/$id?feature=variation;so_term=intergenic_variant", 'Ensembl variation with so term')},
     5, '5 intergenic variants overlapping ENSG00000176515');
   
+  # retriving features a -ve feature still ensures we report it on the -ve strand
+  my $negative_id = 'ENSG00000261730'; #fetch features from a -ve stranded feature
+  my $negative_json = json_GET("$base/$negative_id?feature=gene", 'Retriving negative stranded features from a negative stranded feature'); 
+  cmp_ok(scalar(@{$negative_json}), '>', 0, 'We got features back');
+  is($negative_json->[0]->{ID}, $negative_id, 'Feature ID was the submitted one to the service');
+  is($negative_json->[0]->{strand}, -1, 'The strand of the feature must be negative');
 }
 
 ########### Translation endpoint testing
