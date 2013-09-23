@@ -243,7 +243,8 @@ sub structural_variation {
 
 sub somatic_variation {
   my ($self, $c, $slice) = @_;
-  return $slice->get_all_somatic_VariationFeatures($self->_get_SO_terms($c));
+  my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
+  return $vfa->fetch_all_somatic_by_Slice_SO_terms($slice, $self->_get_SO_terms($c));
 }
 
 sub somatic_structural_variation {
