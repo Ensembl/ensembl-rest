@@ -78,9 +78,20 @@ sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
     $c->log()->debug('Finding the object');
     my $feature = $c->model('Lookup')->find_object_by_stable_id($id);
     $c->go('ReturnError', 'custom', "The given stable ID does not point to a Feature. Cannot perform overlap") unless check_ref($feature, 'Bio::EnsEMBL::Feature');
-    my $slice = $feature->feature_Slice();
+    
+    my $feature_slice = $feature->feature_Slice();
+    my $coord_system = $feature_slice->coord_system();
+    my $strand = 1;
+    #Fetch the slice again so we are back on the +ve strand
+    my $slice = $feature_slice->adaptor()->fetch_by_region(
+      $coord_system->name(), 
+      $feature_slice->seq_region_name(), $feature_slice->start(), $feature_slice->end(), $strand, 
+      $coord_system->version()
+    );
+    # my $slice = $feature_slice;
     $c->stash->{slice} = $slice;
-    $features = $c->model('Feature')->fetch_features();
+
+    $features = $c->model('Feature')->fetch_features($slice);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
