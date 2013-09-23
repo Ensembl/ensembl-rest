@@ -79,7 +79,6 @@ sub get_alignment {
   }
 
   #Get alignments
-  my $align_hash;
   if ($align_slice) {
     #Use AlignSlice method
 
@@ -103,9 +102,10 @@ sub get_alignment {
     my $align_slice = $c->stash->{align_slice_adaptor}->fetch_by_Slice_MethodLinkSpeciesSet($slice, $mlss, $expanded, $overlaps);
 
     #Convert AlignSlice object into hash
-    $align_hash = $align_slice->summary_as_hash($display_species, $mask);
+    my $align_hash;
+    my $these_alignments = $align_slice->summary_as_hash($display_species, $mask);
 
-    my $align_hash = ratify_summary($c, $align_hash);
+    $align_hash->{'alignments'} = ratify_summary($c, $these_alignments);
     push @$alignments, $align_hash;
 
   } else {
@@ -126,8 +126,18 @@ sub get_alignment {
     #Dump these alignments
     foreach my $this_genomic_align_block (@$genomic_align_blocks) {
 
+      my $align_hash;
+
       #Convert GenomicAlignBlock/GenomicAlignTree object to a hash
-      $align_hash = $this_genomic_align_block->summary_as_hash($display_species, $mask, $compact_all_alignments);
+      my $these_alignments = $this_genomic_align_block->summary_as_hash($display_species, $mask, $compact_all_alignments);
+
+      #Get newick tree if EPO (the only alignment method which has trees)
+      my $newick_trees;
+      my $nh_format = 'simple'; #Only allow simple format for now
+      if ($method eq "EPO") {
+	my $newick_tree = $this_genomic_align_block->root->newick_format($nh_format);
+	$align_hash->{'tree'} = $newick_tree;
+      }
 
       #Tidy up memory
       if ($this_genomic_align_block->isa("Bio::EnsEMBL::Compara::GenomicAlignTree")) {
@@ -138,13 +148,11 @@ sub get_alignment {
       }
 
       #ensure numeric values are actually numeric
-      $align_hash = ratify_summary($c, $align_hash);
+      $align_hash->{'alignments'} = ratify_summary($c, $these_alignments);
       push @$alignments, $align_hash;
     }
   }
-
   return $alignments;
-
 }
 
 sub deep_clean {
@@ -191,6 +199,7 @@ sub ratify_summary {
   foreach my $aln (@{$summary}) {
     foreach my $key (@KNOWN_NUMERICS) {
       my $v = $aln->{$key};
+      #$c->log()->debug("key $key, $v\n");
       $aln->{$key} = ($v*1) if defined $v;
     }
     #push @$seqs, $aln;
