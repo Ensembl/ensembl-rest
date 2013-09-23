@@ -1,5 +1,12 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.4.2 23-09-2013
+
+Bugfixes:
+
+    - [/feature/id] Querying for features using a negative stranded 
+      feature reversed the strand of the retrieved object
+
 1.4.1 09-09-2013
 
 Bugfixes:

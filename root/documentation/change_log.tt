@@ -1,5 +1,13 @@
 <h1>Change Log</h1>
 
+<h2>1.4.2 - 23rd September 2013</h2>
+
+<h3>Bugfixes</h3>
+
+<ul>
+<li><tt>[/feature/id]</tt> Querying for features using a negative stranded feature reversed the strand of the retrieved object</li>
+</ul>
+
 <h2>1.4.1 - 9th September 2013</h2>
 
 <h3>Bugfixes</h3>
