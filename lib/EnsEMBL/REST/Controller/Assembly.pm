@@ -18,9 +18,9 @@ sub info_GET {}
 
 sub info: Chained('species') PathPart('') Args(0) ActionClass('REST') {
   my ($self, $c) = @_;
-  my $assembly_info = try {
-    my $aia = $c->model('Registry')->get_adaptor($c->stash()->{species},'Core','Assembly'); 
-    $aia->fetch_info();
+  my $assembly_info;
+  try {
+    $assembly_info = $c->model('Assembly')->fetch_info(); 
   }
   catch {
       $c->go( 'ReturnError', 'from_ensembl', [$_] );
