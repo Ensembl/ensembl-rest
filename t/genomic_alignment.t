@@ -56,10 +56,7 @@ my $data = get_data();
 #Invalid species_set_group
 #curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040000-106041500?method=EPO;species_set_group=wibble' -H 'Content-type:application/json'
 {
-  warns_like {
-    action_bad_regex("/alignment/slice/region/$species/$region?method=EPO;species_set_group=wibble", qr/wibble/, "Using unsupported species_set_group causes an exception");
-  } qr/Unable to find method_link_species_set with .+ EPO .+ wibble/, 'Checking that correct warning in emitted in background from MLSS Adaptor';
- 
+ action_bad_regex("/alignment/slice/region/$species/$region?method=EPO;species_set_group=wibble", qr/wibble/, "Using unsupported species_set_group causes an exception");
 }
 
 #Invalid species_set
@@ -68,8 +65,8 @@ my $data = get_data();
   action_bad_regex("/alignment/slice/region/$species/$region?method=EPO;species_set=gallus_gallus;species_set=wibble", qr/wibble/, "Using unsupported species_set causes an exception");
 }
 
-#Small region EPO, block
-#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040000-106040050:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
+#Small region EPO, block, tree
+#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
 {
   my $region = '2:106040050-106040100';
 
@@ -77,8 +74,17 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of alignment blocks");
   my $num_alignments = 5;
 
-  is(scalar(@{$json->[0]}), $num_alignments, "number of EPO alignments, block");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO}, "First EPO alignment, block");
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
+  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
+  #Can have 2 alternative trees
+  my $found = 0;
+  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
+    if ($data_tree eq $json->[0]{tree}) {
+       $found = 1;
+    }
+  }
+  is($found, 1, "Single EPO tree");
 }
 
 #Small region EPO align_slice, expanded
@@ -90,8 +96,8 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of alignment blocks");
   my $num_alignments = 5;
 
-  is($num_alignments, scalar(@{$json->[0]}), "number of EPO alignments, align_slice, expanded");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO}, "First EPO alignment, align_slice, expanded");
+  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, align_slice, expanded");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, align_slice, expanded");
 
 }
 
@@ -104,8 +110,8 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of alignment blocks");
   my $num_alignments = 5;
 
-  is($num_alignments, scalar(@{$json->[0]}), "number of EPO alignments, align_slice, expanded");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO_no_gaps}, "First EPO alignment, align_slice, expanded");
+  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, align_slice, expanded");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_no_gaps}, "First EPO alignment, align_slice, expanded");
 
 }
 
@@ -118,8 +124,8 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of short EPO alignment blocks, soft masking");
   my $num_alignments = 3;
 
-  is($num_alignments, scalar(@{$json->[0]}), "number of EPO alignments, block, soft masking");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO_soft}, "First EPO alignment, block, soft masking");
+  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, block, soft masking");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_soft}, "First EPO alignment, block, soft masking");
 
 }
 
@@ -132,8 +138,8 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of EPO alignmens, block, hard masking");
   my $num_alignments = 3;
 
-  is($num_alignments, scalar(@{$json->[0]}), "number of EPO alignments, block, hard masking");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO_hard}, "First EPO alignment, block, hard masking");
+  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, block, hard masking");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_hard}, "First EPO alignment, block, hard masking");
 
 }
 
@@ -146,8 +152,8 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of EPO alignments, slice, soft masking");
   my $num_alignments = 3;
 
-  is($num_alignments, scalar(@{$json->[0]}), "number of EPO alignments, slice, soft masking");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO_soft}, "First EPO alignment, slice, soft masking");
+  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, slice, soft masking");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_soft}, "First EPO alignment, slice, soft masking");
 
 }
 
@@ -160,8 +166,8 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of EPO alignments, slice, hard masking");
   my $num_alignments = 3;
 
-  is($num_alignments, scalar(@{$json->[0]}), "number of EPO alignments, slice, hard masking");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO_hard}, "First EPO alignment, slice, hard masking");
+  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, slice, hard masking");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_hard}, "First EPO alignment, slice, hard masking");
 
 }
 
@@ -174,8 +180,8 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of alignment blocks, block, restricted set");
   my $num_alignments = 2;
 
-  is(scalar(@{$json->[0]}), $num_alignments, "number of EPO alignments, block, restricted set");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO}, "First EPO alignment, block, restricted set");
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block, restricted set");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block, restricted set");
 }
 
 #EPO, slice, restricted species
@@ -187,10 +193,30 @@ my $data = get_data();
   is (scalar(@{$json}), 1, "number of alignment blocks, slice, restricted set ");
   my $num_alignments = 2;
 
-  is(scalar(@{$json->[0]}), $num_alignments, "number of EPO alignments, slice, restricted set");
-  eq_or_diff_data($json->[0][0], $data->{short_EPO}, "First EPO alignment, slice, restricted set");
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, slice, restricted set");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, slice, restricted set");
 }
 
+#EPO, large block, multiple trees
+#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040000-106041500:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
+{
+  my $region = '2:106040050-106041500';
+
+  my $json = json_GET("/alignment/block/region/$species/$region?method=EPO;species_set_group=birds", "large EPO alignment, multiple trees");
+  is (scalar(@{$json}), 2, "number of alignment blocks, large block, multiple trees");
+
+  #expect to find 2 trees (leaf ordering can be different)
+  my $found = 0;
+  foreach my $data_tree (@{$data->{large_EPO_tree}}) {
+      foreach my $json_obj (@$json) {  
+        #print "TREE !$data_tree! !" . $json_obj->{tree} . "!\n";
+         if ($data_tree eq $json_obj->{tree}) {
+      	    $found++;
+    	 }
+      }	  
+  }	  
+  is($found, 2, "Large EPO tree");
+}
 
 #Pairwise, overlaps=none
 #curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106041430-106041480:1?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus;overlaps=none' -H 'Content-type:application/json'
@@ -201,9 +227,9 @@ my $data = get_data();
 	is (scalar(@{$json}), 1, "number of LASTZ_NET alignments, slice, no overlaps");
   	my $num_seqs = 2;
 
-   	is(scalar(@{$json->[0]}), $num_seqs, "number of LASTZ_NET sequences, slice, no overlaps");
+   	is(scalar(@{$json->[0]{alignments}}), $num_seqs, "number of LASTZ_NET sequences, slice, no overlaps");
         for (my $i = 0; $i < $num_seqs; $i++) {   
-	   eq_or_diff_data($json->[0][$i], $data->{LASTZ_NET_no_overlaps}[$i], "Pairwise, slice, no overlaps");
+	   eq_or_diff_data($json->[0]{alignments}[$i], $data->{LASTZ_NET_no_overlaps}[$i], "Pairwise, slice, no overlaps");
         }
 }
 
@@ -216,9 +242,9 @@ my $data = get_data();
 	is (scalar(@{$json}), 1, "number of LASTZ_NET alignments, slice, all overlaps");
   	my $num_seqs = 3;
 
-   	is(scalar(@{$json->[0]}), $num_seqs, "number of LASTZ_NET sequences, slice, all overlaps");
+   	is(scalar(@{$json->[0]{alignments}}), $num_seqs, "number of LASTZ_NET sequences, slice, all overlaps");
         for (my $i = 0; $i < $num_seqs; $i++) {   
-	   eq_or_diff_data($json->[0][$i], $data->{LASTZ_NET_all_overlaps}[$i], "Pairwise, slice, all overlaps");
+	   eq_or_diff_data($json->[0]{alignments}[$i], $data->{LASTZ_NET_all_overlaps}[$i], "Pairwise, slice, all overlaps");
         }
 }
 
@@ -231,9 +257,9 @@ my $data = get_data();
 	is (scalar(@{$json}), 1, "number of LASTZ_NET alignments, slice, restrict overlaps");
   	my $num_seqs = 2;
 
-   	is(scalar(@{$json->[0]}), $num_seqs, "number of LASTZ_NET sequences, slice, restrict overlaps");
+   	is(scalar(@{$json->[0]{alignments}}), $num_seqs, "number of LASTZ_NET sequences, slice, restrict overlaps");
         for (my $i = 0; $i < $num_seqs; $i++) {   
-	   eq_or_diff_data($json->[0][$i], $data->{LASTZ_NET_restrict_overlaps}[$i], "Pairwise, slice, restrict overlaps");
+	   eq_or_diff_data($json->[0]{alignments}[$i], $data->{LASTZ_NET_restrict_overlaps}[$i], "Pairwise, slice, restrict overlaps");
         }
 }
 
@@ -248,10 +274,10 @@ my $data = get_data();
 	is (scalar(@{$json}), $num_blocks, "number of LASTZ_NET alignments, block");
   	my $num_seqs = 2;
 
-   	is(scalar(@{$json->[0]}), $num_seqs, "number of LASTZ_NET sequences, block");
+   	is(scalar(@{$json->[0]{alignments}}), $num_seqs, "number of LASTZ_NET sequences, block");
         for (my $i = 0; $i < $num_blocks; $i++) {   
            for (my $j = 0; $j < $num_seqs; $j++) {   
-	      eq_or_diff_data($json->[$i][$j], $data->{LASTZ_NET_blocks}[$i][$j], "Pairwise, block");
+	      eq_or_diff_data($json->[$i]{alignments}[$j], $data->{LASTZ_NET_blocks}[$i][$j], "Pairwise, block");
            }
         }
 }
@@ -260,6 +286,13 @@ sub get_data {
     my $data;
 
     $data->{short_EPO} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAA--------GAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
+     push @{$data->{short_EPO_tree}}, "((Ggal_2_100370256_100370312[+]:0.0414,Mgal_3_49885207_49885257[+]:0.0414):0.1242,Tgut_2_106040050_106040100[+]:0.1715):0;";
+    push @{$data->{short_EPO_tree}}, "((Mgal_3_49885207_49885257[+]:0.0414,Ggal_2_100370256_100370312[+]:0.0414):0.1242,Tgut_2_106040050_106040100[+]:0.1715):0;";
+
+    push @{$data->{large_EPO_tree}}, "((Mgal_3_49885207_49885557[+]:0.0414,Ggal_2_100370256_100370612[+]:0.0414):0.1242,Tgut_2_106040050_106040400[+]:0.1715):0;";
+    push @{$data->{large_EPO_tree}}, "((Ggal_2_100370256_100370612[+]:0.0414,Mgal_3_49885207_49885557[+]:0.0414):0.1242,Tgut_2_106040050_106040400[+]:0.1715):0;";
+    push @{$data->{large_EPO_tree}}, "(Mgal_3_49885558_49886610[+]:0.1656,Tgut_2_106040401_106041500[+]:0.1715):0;";
+
     $data->{short_EPO_no_gaps} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAAGAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
     $data->{short_EPO_soft} =  {description=>'','end'=>106040550,'seq'=>'TAGTGG-TGAttttttggttttttGCCTGCTGGCCCTCCTTCTTTGTACTCA','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040500,'strand'=>1};
     $data->{short_EPO_hard} =  {description=>'','end'=>106040550,'seq'=>'TAGTGG-TGANNNNNNNNNNNNNNGCCTGCTGGCCCTCCTTCTTTGTACTCA','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040500,'strand'=>1};
@@ -279,7 +312,7 @@ sub get_data {
     push @{$block1}, {description=>'',end=>100371632,seq=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGC',seq_region=>'2',species=>'gallus_gallus',start=>100371599,strand=>1};
     push @{$block2}, {description=>'',end=>106041480,seq=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGCAGTTTACGCTGAATCAC',seq_region=>'2',species=>'taeniopygia_guttata',start=>106041430,strand=>1};
     push @{$block2}, {description=>'',end=>809,seq=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGCAGATTTTGAT-----AT',seq_region=>'AADN03027098.1',species=>'gallus_gallus',start=>764,strand=>1};
-
+ 
    push @{$data->{LASTZ_NET_blocks}}, $block1;
    push @{$data->{LASTZ_NET_blocks}}, $block2;
 
