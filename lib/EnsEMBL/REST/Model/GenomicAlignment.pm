@@ -131,10 +131,10 @@ sub get_alignment {
       #Convert GenomicAlignBlock/GenomicAlignTree object to a hash
       my $these_alignments = $this_genomic_align_block->summary_as_hash($display_species, $mask, $compact_all_alignments);
 
-      #Get newick tree if EPO (the only alignment method which has trees)
+      #Get newick tree if have GenomicAlignTree object
       my $newick_trees;
       my $nh_format = 'simple'; #Only allow simple format for now
-      if ($method eq "EPO") {
+      if ($mlss->method->class =~ /GenomicAlignTree/) {
 	my $newick_tree = $this_genomic_align_block->root->newick_format($nh_format);
 	$align_hash->{'tree'} = $newick_tree;
       }
