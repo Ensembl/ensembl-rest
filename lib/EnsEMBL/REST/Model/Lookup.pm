@@ -285,7 +285,7 @@ sub features_as_hash {
   my ($self, $id, $species, $object_type, $db_type) = @_;
 
   my $c = $self->context();
-  my $format = $c->request->param('format') || 'condensed';
+  my $format = $c->request->param('format') || 'full';
   my $features;
   $features->{id} = $id;
   $features->{species} = $species;
@@ -296,10 +296,22 @@ sub features_as_hash {
     my $obj = $self->find_object($id, $species, $object_type, $db_type);
     if($obj->can('summary_as_hash')) {
       my $summary_hash = $obj->summary_as_hash();
-      $features->{seq_region_name} = $summary_hash->{seq_region_name};
-      $features->{start} = $summary_hash->{start} * 1;
-      $features->{end} = $summary_hash->{end} * 1;
-      $features->{strand} = $summary_hash->{strand} * 1;
+# Not all features have all labels
+# Seq_region_name, start and end are available for genes, transcripts and exons but not translations
+      $features->{seq_region_name} = $summary_hash->{seq_region_name} if defined $summary_hash->{seq_region_name};
+      $features->{start} = $summary_hash->{start} * 1 if defined $summary_hash->{start};
+      $features->{end} = $summary_hash->{end} * 1 if defined $summary_hash->{end};
+      $features->{strand} = $summary_hash->{strand} * 1 if defined $summary_hash->{strand};
+# Translations start and end are genomic coordinates
+      $features->{start} = $summary_hash->{genomic_start} if defined $summary_hash->{genomic_start};
+      $features->{end} = $summary_hash->{genomic_end} if defined $summary_hash->{genomic_end};
+# Display_name and description are available for genes and sometimes for transcripts
+      $features->{display_name} = $summary_hash->{external_name} if defined $summary_hash->{external_name};
+      $features->{description} = $summary_hash->{description} if defined $summary_hash->{description};
+# Biotype, source and logic_name are only available for genes and transcripts
+      $features->{biotype} = $summary_hash->{biotype} if defined $summary_hash->{biotype};
+      $features->{source} = $summary_hash->{source} if defined $summary_hash->{source};
+      $features->{logic_name} = $summary_hash->{logic_name} if defined $summary_hash->{logic_name};
     } else {
       $c->go('ReturnError','custom',[qq{ID '$id' does not support 'full' format type. Please use 'condensed'}]);
     }
