@@ -22,7 +22,7 @@ sub id : Chained('') Args(1) PathPart('lookup/id') {
 
   # output format check
   my $include = $c->request->param('include');
-  my $format = $c->request->param('format') || 'condensed';
+  my $format = $c->request->param('format') || 'full';
   $c->go('ReturnError', 'custom', [qq{The format '$format' is not an understood encoding}]) unless $FORMAT_TYPES->{$format};
 
   my $features;
