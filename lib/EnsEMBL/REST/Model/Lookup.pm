@@ -132,7 +132,7 @@ sub find_object {
   my $r = $c->request();
   my $reg = $c->model('Registry');
   $object_type = $r->param('object_type') if !$object_type;
-  $c->go('ReturnError', 'custom', [qq{Not possible to find a $object_type with the ID '$id' in this release; no species found}]) unless $species;
+  $c->go('ReturnError', 'custom', [qq{Not possible to find the ID '$id' in this release; no species found}]) unless $species;
   my $adaptor = $reg->get_adaptor($species, $db_type, $object_type);
   $c->log()->debug('Found an adaptor '.$adaptor);
   if(! $adaptor->can('fetch_by_stable_id')) {
