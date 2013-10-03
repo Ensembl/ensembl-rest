@@ -16,21 +16,20 @@ use Bio::EnsEMBL::Test::MultiTestDB;
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
 Catalyst::Test->import('EnsEMBL::REST');
 
-my $schema_build = $dba->get_DBAdaptor('core')->_get_schema_build();
-
 is_json_GET(
   '/assembly/info/homo_sapiens',
   { 
-    'assembly.name' => 'GRCh37.p8', 
-    'assembly.date' => '2009-02', 
-    top_level_seq_region_names => [qw/6 X/],
+    'assembly_name' => 'GRCh37.p8', 
+    'assembly_date' => '2009-02', 
+    top_level_region => [
+     {coord_system => 'chromosome', name => '6', length => 171115067},
+     {coord_system => 'chromosome', name => 'X', length => 155270560}],
     karyotype => [qw/6 X/],
-    'genebuild.start_date' => "2010-07-Ensembl",
-    'genebuild.initial_release_date' => "2011-04",
-    schema_build => $schema_build,
-    'genebuild.last_geneset_update' => "2012-10",
-    'genebuild.method' => "full_genebuild",
-    coord_system_versions => [ '', qw/GRCh37 NCBI36 NCBI34 NCBI35/ ],
+    'genebuild_start_date' => "2010-07-Ensembl",
+    'genebuild_initial_release_date' => "2011-04",
+    'genebuild_last_geneset_update' => "2012-10",
+    'genebuild_method' => "full_genebuild",
+    coord_system_versions => [qw/GRCh37 NCBI36 NCBI35 NCBI34/ ],
     default_coord_system_version => 'GRCh37',
   },
   'Checking output of info'
