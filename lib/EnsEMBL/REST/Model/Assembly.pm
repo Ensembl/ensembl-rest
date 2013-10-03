@@ -18,7 +18,7 @@ sub fetch_info {
   my $species = $c->stash->{species};
 
   my $gc = $c->model('Registry')->get_adaptor($species, 'core', 'GenomeContainer');
-  my $csa = $c->model('Registry')->get_adaptor($species, 'core', 'CoordSystemAdaptor');
+  my $csa = $c->model('Registry')->get_adaptor($species, 'core', 'CoordSystem');
   my %assembly_info;
   $assembly_info{top_level_region} = $self->get_slice_info($gc, 'toplevel');
   $assembly_info{karyotype} = $self->get_slice_names($gc, 'karyotype');
