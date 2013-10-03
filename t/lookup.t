@@ -19,14 +19,16 @@ Catalyst::Test->import('EnsEMBL::REST');
 my $basic_id = 'ENSG00000176515';
 my $condensed_response = {object_type => 'Gene', db_type => 'core', species => 'homo_sapiens', id => $basic_id};
 
-is_json_GET("/lookup/id/$basic_id", $condensed_response, 'Get of a known ID will return a value');
-is_json_GET("/lookup/$basic_id", $condensed_response, 'Get of a known ID to the old URL will return a value');
+is_json_GET("/lookup/id/$basic_id?format=condensed", $condensed_response, 'Get of a known ID will return a value');
+is_json_GET("/lookup/$basic_id?format=condensed", $condensed_response, 'Get of a known ID to the old URL will return a value');
 
 my $full_response = {
   %{$condensed_response},
   start => 1080164, end => 1105181, strand => 1, seq_region_name => '6',
+  biotype => 'protein_coding', display_name => 'AL033381.1', logic_name => 'ensembl', source => 'ensembl',
+  description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109  [Source:UniProtKB/TrEMBL;Acc:Q8NAX6]'
 };
-is_json_GET("/lookup/$basic_id?format=full", $full_response, 'Get of a known ID to the old URL will return a value');
+is_json_GET("/lookup/$basic_id", $full_response, 'Get of a known ID to the old URL will return a value');
 
 my $expanded_response = {
   %{$condensed_response},
@@ -41,7 +43,7 @@ my $expanded_response = {
                 ]
                 }]
                 };
-is_json_GET("/lookup/id/$basic_id?expand=1", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
+is_json_GET("/lookup/id/$basic_id?expand=1;format=condensed", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
 
 action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');
 
