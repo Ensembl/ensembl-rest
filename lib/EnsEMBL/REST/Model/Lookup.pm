@@ -184,8 +184,7 @@ sub find_object_location {
   my $r = $c->request;
   my $log = $c->log();
 
-  my ($object_type, $db_type, $species) = map { my $p = $r->param($_); $p; } qw/object_type db_type species/;
-
+  my ($object_type, $db_type, $species, $use_archive) = map { my $p = $r->param($_); $p; } qw/object_type db_type species use_archive/;
   my @captures;
 
   #If all 3 params were specified then let it through. User knows best
@@ -198,11 +197,10 @@ sub find_object_location {
   else {
     $c->log()->debug(sprintf('Looking for %s with %s and %s in %s', $id, ($object_type || q{?}), ($db_type || q{?}), ($species || q{?})));
     my $model_name = $self->lookup_model();
-    $c->log()->debug('Using '.$model_name);
     my $lookup = $c->model($model_name);
-    @captures = $lookup->find_object_location($id, $object_type, $db_type, $species);
+    @captures = $lookup->find_object_location($id, $object_type, $db_type, $species, $use_archive);
     #Check if we any conntent or if the 1st element was false (both mean force a long lookup)
-    if(! @captures || ! $captures[0]) {
+    if(! @captures) {
       $c->log()->debug('Using long database lookup');
       @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
     }
