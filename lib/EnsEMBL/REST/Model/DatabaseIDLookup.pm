@@ -19,7 +19,7 @@ sub build_long_lookup {
 }
 
 sub find_object_location {
-  my ($self, $id, $object_type, $db_type, $species) = @_;
+  my ($self, $id, $object_type, $db_type, $species, $use_archive) = @_;
   my $reg = $self->context->model('Registry');
   
   my @captures;
@@ -30,7 +30,7 @@ sub find_object_location {
   }
   else {
     $self->context->log->debug(sprintf('Looking for %s with %s and %s in %s', $id, ($object_type || q{?}), ($db_type || q{?}), ($species || q{?})));
-    @captures = $reg->get_species_and_object_type($id, $object_type, $species, $db_type, $force_long_lookup);
+    @captures = $reg->get_species_and_object_type($id, $object_type, $species, $db_type, $force_long_lookup, $use_archive);
   }
   
   return @captures;
