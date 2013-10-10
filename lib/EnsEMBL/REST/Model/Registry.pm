@@ -229,6 +229,9 @@ sub _build_species_info {
   my @core_dbadaptors;
   my %groups_lookup;
   my %division_lookup;
+  my %common_lookup;
+  my %taxon_lookup;
+  my %display_lookup;
   my %release_lookup;
   my %processed_db;
   while(my $dba = shift @all_dbadaptors) {
@@ -252,14 +255,20 @@ sub _build_species_info {
         
         if(!$dba->is_multispecies()) {
           $division_lookup{$species} = $mc->get_division() || 'Ensembl';
+          $common_lookup{$species} = $mc->get_common_name();
+          $taxon_lookup{$species} = $mc->get_taxonomy_id();
+          $display_lookup{$species} = $mc->get_display_name();
         }
         else {
           $dbc->sql_helper->execute_no_return(
             -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
-            -PARAMS => ['species.production_name', 'species.division'],
+            -PARAMS => ['species.production_name', 'species.division', 'species.common_name', 'species.display_name', 'species.taxonomy_id'],
             -CALLBACK => sub {
               my ($row) = @_;
               $division_lookup{$row->[0]} = $row->[1];
+              $common_lookup{$row->[0]} = $row->[2];
+              $display_lookup{$row->[0]} = $row->[3];
+              $taxon_lookup{$row->[0]} = $row->[4];
               return;
             }
           );
@@ -273,15 +282,15 @@ sub _build_species_info {
   foreach my $dba (@core_dbadaptors) {
     my $species = $dba->species();
     my $species_lc = ($species);
-    my $mc = $dba->get_adaptor('MetaContainer');
-    my $common_name = $mc->single_value_by_key('species.common_name');
     my $info = {
       name => $species,
       release => $release_lookup{$species},
       aliases => $alias_lookup{$species} || [],
       groups  => $groups_lookup{$species},
       division => $division_lookup{$species},
-      common_name => $common_name,
+      common_name => $common_lookup{$species},
+      display_name => $display_lookup{$species},
+      taxon_id => $taxon_lookup{$species}
     };
     push(@species, $info);
   }
