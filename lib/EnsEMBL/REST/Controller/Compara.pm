@@ -62,11 +62,6 @@ sub fetch_by_gene_symbol : Chained("/") PathPart("homology/symbol") Args(2)  {
     $c->request->param('object', 'gene');
     my $local_genes = $c->model('Lookup')->find_objects_by_symbol($gene_symbol);
     $genes = [grep { $_->slice->is_reference() } @{$local_genes}];
-    # my $adaptor = $c->model('Registry')->get_adaptor( $species, 'Core', 'Gene' );
-    # $c->go('ReturnError', 'custom', ["No core gene adaptor found for $species"]) unless $adaptor;
-    # $c->stash->{gene_adaptor} = $adaptor;
-    # my $external_db = $c->request->param('external_db');
-    # $genes = $adaptor->fetch_all_by_external_name($gene_symbol, $external_db);
   }
   catch {
     $c->log->fatal(qq{No genes found for external id: $gene_symbol});
