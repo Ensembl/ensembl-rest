@@ -327,11 +327,6 @@ sub get_unique_schema_versions {
   foreach my $species (@{$species_info}) {
     $hash{$species->{release}} = 1;
   }
-  # my @dbadaptors = grep { $_->group() eq 'core' } @{$self->_registry()->get_all_DBAdaptors()};
-  # foreach my $dba (@dbadaptors) {
-  #   $hash{$dba->get_MetaContainer()->get_schema_version()} = 1;
-  # }
-  # $self->disconnect_DBAdaptors(@dbadaptors);
   return [map { $_ *1 } keys %hash];
 }
 
