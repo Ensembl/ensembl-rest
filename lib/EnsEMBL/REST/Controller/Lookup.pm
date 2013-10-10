@@ -37,7 +37,29 @@ sub id : Chained('') Args(1) PathPart('lookup/id') {
   $self->status_ok( $c, entity => $features);
 }
 
+sub symbol : Chained('/') PathPart('lookup/symbol') Args(2) {
+  my ($self, $c, $species, $symbol) = @_;
+  $c->stash(species => $species);
+
+  # output format check
+  my $include = $c->request->param('include');
+  my $format = $c->request->param('format') || 'full';
+  $c->go('ReturnError', 'custom', [qq{The format '$format' is not an understood encoding}]) unless $FORMAT_TYPES->{$format};
+
+  my $features;
+  try {
+    $features = $c->model('Lookup')->find_gene_by_symbol($symbol, $species);
+    $c->go('ReturnError', 'custom',  [qq{No valid lookup found for symbol $symbol}]) unless $features->{species};
+      }
+  catch {
+    $c->go('ReturnError', 'from_ensembl', [$_]);
+  };
+
+  $self->status_ok( $c, entity => $features);
+}
+
 sub id_GET {}
+sub symbol_GET {}
 
 __PACKAGE__->meta->make_immutable;
 
