@@ -251,9 +251,9 @@ sub find_gene_by_symbol {
   my $c = $self->context();
   my $species = $c->stash->{'species'};
 
-  my $gene_adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'gene');
+  my $gene_adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'Gene');
   my $gene = $gene_adaptor->fetch_by_display_label($symbol);
-  my $features = $self->features_as_hash($gene->stable_id, $species, 'gene', 'core');
+  my $features = $self->features_as_hash($gene->stable_id, $species, 'Gene', 'core');
 
   my $expand = $c->request->param('expand');
   if ($expand) {
