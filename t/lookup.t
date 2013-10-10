@@ -17,6 +17,7 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
 Catalyst::Test->import('EnsEMBL::REST');
 
 my $basic_id = 'ENSG00000176515';
+my $symbol = "AL033381.1";
 my $condensed_response = {object_type => 'Gene', db_type => 'core', species => 'homo_sapiens', id => $basic_id};
 
 is_json_GET("/lookup/id/$basic_id?format=condensed", $condensed_response, 'Get of a known ID will return a value');
@@ -44,6 +45,8 @@ my $expanded_response = {
                 }]
                 };
 is_json_GET("/lookup/id/$basic_id?expand=1;format=condensed", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
+
+is_json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1;format=condensed", $expanded_response, 'Get of a known symbol returns the same result as with stable id');
 
 action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');
 
