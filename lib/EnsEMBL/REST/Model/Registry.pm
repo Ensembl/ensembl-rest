@@ -273,12 +273,15 @@ sub _build_species_info {
   foreach my $dba (@core_dbadaptors) {
     my $species = $dba->species();
     my $species_lc = ($species);
+    my $mc = $dba->get_adaptor('MetaContainer');
+    my $common_name = $mc->single_value_by_key('species.common_name');
     my $info = {
       name => $species,
       release => $release_lookup{$species},
       aliases => $alias_lookup{$species} || [],
       groups  => $groups_lookup{$species},
       division => $division_lookup{$species},
+      common_name => $common_name,
     };
     push(@species, $info);
   }
