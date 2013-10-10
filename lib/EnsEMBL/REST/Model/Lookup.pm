@@ -246,6 +246,23 @@ sub find_and_locate_object {
   return $features;
 }
 
+sub find_gene_by_symbol {
+  my ($self, $symbol) = @_;
+  my $c = $self->context();
+  my $species = $c->stash->{'species'};
+
+  my $gene_adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'gene');
+  my $gene = $gene_adaptor->fetch_by_display_label($symbol);
+  my $features = $self->features_as_hash($gene->stable_id, $species, 'gene', 'core');
+
+  my $expand = $c->request->param('expand');
+  if ($expand) {
+    $features->{'Transcript'} = $self->Transcript($features->{id}, $species, 'core');
+  }
+
+  return $features;
+}
+
 
 sub Transcript {
   my ($self, $id, $species, $db_type) = @_;
