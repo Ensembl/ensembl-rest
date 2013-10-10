@@ -227,12 +227,7 @@ sub _build_species_info {
   
   my @all_dbadaptors = @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
   my @core_dbadaptors;
-  my %groups_lookup;
-  my %division_lookup;
-  my %common_lookup;
-  my %taxon_lookup;
-  my %display_lookup;
-  my %release_lookup;
+  my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup);
   my %processed_db;
   while(my $dba = shift @all_dbadaptors) {
     my $species = $dba->species();
@@ -254,21 +249,32 @@ sub _build_species_info {
         $release_lookup{$species} = $schema_version;
         
         if(!$dba->is_multispecies()) {
+          my $csa = $dba->get_CoordSystemAdaptor();
           $division_lookup{$species} = $mc->get_division() || 'Ensembl';
           $common_lookup{$species} = $mc->get_common_name();
           $taxon_lookup{$species} = $mc->get_taxonomy_id();
           $display_lookup{$species} = $mc->get_display_name();
+          $assembly_lookup{$species} = $csa->get_default_version();
         }
         else {
           $dbc->sql_helper->execute_no_return(
-            -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
-            -PARAMS => ['species.production_name', 'species.division', 'species.common_name', 'species.display_name', 'species.taxonomy_id'],
+            -SQL => 'select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value, m5.meta_value from meta m1, meta m2, meta m3, meta m4, meta m5 where m1.species_id = m2.species_id and m1.species_id = m3.species_id and m1.species_id = m4.species_id and m1.species_id = m5.species_id and m1.meta_key = ? and m2.meta_key =? and m3.meta_key = ? and m4.meta_key = ? and m4.meta_key = ?',
+            -PARAMS => ['species.production_name', 'species.division', 'species.common_name', 'species.short_name', 'species.taxonomy_id'],
             -CALLBACK => sub {
               my ($row) = @_;
               $division_lookup{$row->[0]} = $row->[1];
               $common_lookup{$row->[0]} = $row->[2];
               $display_lookup{$row->[0]} = $row->[3];
               $taxon_lookup{$row->[0]} = $row->[4];
+              return;
+            }
+          );
+          $dbc->sql_helper->execute_no_return(
+            -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
+            -PARAMS => ['species.production_name', 'species.division'],
+            -CALLBACK => sub {
+              my ($row) = @_;
+              $assembly_lookup{$row->[0]} = $row->[1];
               return;
             }
           );
@@ -290,7 +296,8 @@ sub _build_species_info {
       division => $division_lookup{$species},
       common_name => $common_lookup{$species},
       display_name => $display_lookup{$species},
-      taxon_id => $taxon_lookup{$species}
+      taxon_id => $taxon_lookup{$species},
+      assembly => $assembly_lookup{$species}
     };
     push(@species, $info);
   }
