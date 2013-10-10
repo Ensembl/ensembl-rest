@@ -54,7 +54,7 @@ is_json_GET(
     return $info_species;
   };
 
-  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', common_name => 'human', groups => ['core', 'variation'], aliases => [], release => $schema_version} ]};
+  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'variation'], aliases => [], release => $schema_version} ]};
 
   eq_or_diff_data(
     $get_species->('/info/species', 'Checking only DBA available is the test DBA'), $expected, 
