@@ -24,7 +24,6 @@ sub translation_GET {  }
 sub translation: Chained('/') Args(2) PathPart('map/translation') ActionClass('REST') {
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
-  $c->request->param('object_type', 'translation') unless $c->request->param('object_type');
   my $translation = $c->model('Lookup')->find_object_by_stable_id($id);
   my $ref = ref($translation);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Translation object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Translation';
@@ -38,7 +37,6 @@ sub cdna_GET {  }
 sub cdna: Chained('/') Args(2) PathPart('map/cdna') ActionClass('REST') {
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
-  $c->request->param('object_type', 'transcript') unless $c->request->param('object_type');
   my $transcript = $c->model('Lookup')->find_object_by_stable_id($id);
   my $ref = ref($transcript);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Transcript object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Transcript';
@@ -51,7 +49,6 @@ sub cds_GET {  }
 sub cds: Chained('/') Args(2) PathPart('map/cds') ActionClass('REST') {
   my ($self, $c, $id, $region) = @_;
   $c->stash()->{id} = $id;
-  $c->request->param('object_type', 'transcript') unless $c->request->param('object_type');
   my $transcript = $c->model('Lookup')->find_object_by_stable_id($id);
   my $ref = ref($transcript);
   $c->go('ReturnError', 'custom', ["Expected a Bio::EnsEMBL::Transcript object but got a $ref object back. Check your ID"]) if $ref ne 'Bio::EnsEMBL::Transcript';
