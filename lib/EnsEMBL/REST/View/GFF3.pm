@@ -27,7 +27,7 @@ sub process {
     $gff->print_feature($f);
   }
   $c->res->body(${$output_fh->string_ref()});
-  $c->res->headers->header('Content-Type' => 'text/plain');
+  $c->res->headers->header('Content-Type' => 'text/x-gff3');
   return 1;
 }
 
