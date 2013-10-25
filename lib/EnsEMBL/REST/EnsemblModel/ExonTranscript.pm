@@ -96,10 +96,10 @@ sub SO_term {
 }
 
 sub __resolver {
-  my ($invoker, $package, $method) = @_;
+  my ($self, $package, $method) = @_;
   return sub {
-    my ($self, @args);
-    return $self->$method(@args);
+    my ($local_self, @args) = @_;
+    return $local_self->__proxy()->$method(@args);
   };
 }
 

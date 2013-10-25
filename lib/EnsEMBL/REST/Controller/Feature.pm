@@ -10,6 +10,7 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 __PACKAGE__->config(
   map => {
     'text/x-gff3' => [qw/View GFF3/],
+    'text/x-bed' => [qw/View BED/],
   }
 );
 

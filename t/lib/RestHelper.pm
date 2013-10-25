@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET text_GET gff_GET xml_GET action_bad action_bad_regex/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex/;
 
 use Test::More;
 use Test::Differences;
@@ -56,6 +56,11 @@ sub fasta_GET($$) {
 sub gff_GET($$) {
   my ($url, $msg) = @_;
   return text_GET($url, $msg, 'text/x-gff3');
+}
+
+sub bed_GET($$) {
+  my ($url, $msg) = @_;
+  return text_GET($url, $msg, 'text/x-bed');
 }
 
 sub text_GET($$;$) {
