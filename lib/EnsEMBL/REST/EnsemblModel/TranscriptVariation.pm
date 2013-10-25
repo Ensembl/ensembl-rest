@@ -113,4 +113,64 @@ sub SO_term {
   return 'SO:0001146'; # polypeptide_variation_site
 }
 
+=head seq_region_name
+
+  Description : Returns the stable id of the current Translation
+  Returntype  : A fake slice name which is just the stable id of the attached Translation
+
+=cut
+
+sub seq_region_name {
+  my ($self) = @_;
+  return $self->translation_id();
+}
+
+=head seq_region_start
+
+  Description : Returns the start of the current attached variation feature
+  Returntype  : A start which is just the variation feature's
+
+=cut
+
+sub seq_region_start {
+  my ($self) = @_;
+  return $self->translation_start() || 0;
+}
+
+=head seq_region_end
+
+  Description : Returns the start of the current attached variation feature
+  Returntype  : A start which is just the variation feature's
+
+=cut
+
+sub seq_region_end {
+  my ($self) = @_;
+  return $self->translation_start() || 0;
+}
+
+=head seq_region_strand
+
+  Description : Returns the strand of the current attached protein feature
+  Returntype  : A strand which is just the protein feature's
+
+=cut
+
+sub seq_region_strand {
+  my ($self) = @_;
+  return 1;
+}
+
+=head display_id
+
+  Description : Returns the display id of the feature
+  Returntype  : String display identifier
+
+=cut
+
+sub display_id {
+  my ($self) = @_;
+  return $self->ID();
+}
+
 1;

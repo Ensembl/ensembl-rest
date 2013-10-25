@@ -39,26 +39,37 @@ sub fetch_features {
   
   my $c = $self->context();
   my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
+  my $is_bed = $self->is_content_type($c, 'text/x-bed');
   
   my $allowed_features = $self->allowed_features();
   my $feature = $c->request->parameters->{feature};
   $c->go('ReturnError', 'custom', ["No feature given. Please specify a feature to retrieve from this service"]) if ! $feature;
-  my @features = (ref($feature) eq 'ARRAY') ? @{$feature} : ($feature);
+  my @features = map {lc($_)} ((ref($feature) eq 'ARRAY') ? @{$feature} : ($feature));
+
+  # normalise cdna & cds since they're the same for bed. the processed_feature_types hash will deal with this
+  # bed seraliser does the rest
+  if($is_bed) {
+    @features = map { ($_ eq 'cds') ? 'transcript' : $_ } @features;
+  }
+
+  # record when we've processed a feature type already
+  my %processed_feature_types;
   
   my $slice = $c->stash()->{slice};
   my @final_features;
   foreach my $feature_type (@features) {
-    $feature_type = lc($feature_type);
+    next if exists $processed_feature_types{$feature_type};
     next if $feature_type eq 'none';
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
     my $objects = $self->$feature_type($slice);
-    if($is_gff3) {
+    if($is_gff3 || $is_bed) {
       push(@final_features, @{$objects});
     }
     else {
       push(@final_features, @{$self->to_hash($objects, $feature_type)});
     }
+    $processed_feature_types{$feature_type} = 1;
   }
   
   return \@final_features;
@@ -69,6 +80,7 @@ sub fetch_protein_features {
 
   my $c = $self->context();
   my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
+  my $is_bed = $self->is_content_type($c, 'text/x-bed');
 
   my $feature = $c->request->parameters->{feature};
   my $allowed_features = $self->allowed_translation_features();
@@ -77,21 +89,26 @@ sub fetch_protein_features {
   $feature = 'protein_feature' if !( defined $feature);
   my @features = (ref($feature) eq 'ARRAY') ? @{$feature} : ($feature);
 
-  if($is_gff3) {
+  if($is_gff3 || $is_bed) {
     $c->stash()->{slice} = EnsEMBL::REST::EnsemblModel::TranslationSlice->new(translation => $translation);
   }
 
+  # record when we've processed a feature type already
+  my %processed_feature_types;
+
   foreach my $feature_type (@features) {
+    next if exists $processed_feature_types{$feature_type};
     $feature_type = lc($feature_type);
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
     my $objects = $self->$feature_type($translation);
-    if($is_gff3) {
+    if($is_gff3 || $is_bed) {
       push(@final_features, @{$objects});
     }
     else {
       push(@final_features, @{$self->to_hash($objects, $feature_type)});
     }
+    $processed_feature_types{$feature_type} = 1;
   }
   return \@final_features;
 }
