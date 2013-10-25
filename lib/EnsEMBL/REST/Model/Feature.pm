@@ -52,7 +52,7 @@ sub fetch_features {
     next if $feature_type eq 'none';
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
-    my $objects = $self->$feature_type($c, $slice);
+    my $objects = $self->$feature_type($slice);
     if($is_gff3) {
       push(@final_features, @{$objects});
     }
@@ -85,7 +85,7 @@ sub fetch_protein_features {
     $feature_type = lc($feature_type);
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
-    my $objects = $self->$feature_type($c, $translation);
+    my $objects = $self->$feature_type($translation);
     if($is_gff3) {
       push(@final_features, @{$objects});
     }
@@ -128,16 +128,18 @@ sub to_hash {
 }
 
 sub gene {
-  my ($self, $c, $slice) = @_;
+  my ($self, $slice) = @_;
+  my $c = $self->context();
   my ($dbtype, $load_transcripts, $source, $biotype) = 
     (undef, undef, $c->request->parameters->{source}, $c->request->parameters->{biotype});
-  return $slice->get_all_Genes($self->_get_logic_dbtype($c), $load_transcripts, $source, $biotype);
+  return $slice->get_all_Genes($self->_get_logic_dbtype(), $load_transcripts, $source, $biotype);
 }
 
 sub transcript {
-  my ($self, $c, $slice, $load_exons) = @_;
+  my ($self, $slice, $load_exons) = @_;
+  my $c = $self->context();
   my $biotype = $c->request->parameters->{biotype};
-  my $transcripts = $slice->get_all_Transcripts($load_exons, $self->_get_logic_dbtype($c));
+  my $transcripts = $slice->get_all_Transcripts($load_exons, $self->_get_logic_dbtype());
   if($biotype) {
     my %lookup = map { $_, 1 } @{wrap_array($biotype)};
     $transcripts = [ grep { $lookup{$_->biotype()} } @{$transcripts}];
@@ -146,38 +148,40 @@ sub transcript {
 }
 
 sub cds {
-  my ($self, $c, $slice, $load_exons) = @_;
-  my $transcripts = $self->transcript($c, $slice, 0);
+  my ($self, $slice, $load_exons) = @_;
+  my $transcripts = $self->transcript($slice, 0);
   return EnsEMBL::REST::EnsemblModel::CDS->new_from_Transcripts($transcripts);
 }
 
 sub exon {
-  my ($self, $c, $slice) = @_;
+  my ($self, $slice) = @_;
   my $exons = $slice->get_all_Exons();
   return EnsEMBL::REST::EnsemblModel::ExonTranscript->build_all_from_Exons($exons);
 }
 
 sub repeat {
-  my ($self, $c, $slice) = @_;
+  my ($self, $slice) = @_;
   return $slice->get_all_RepeatFeatures();
 }
 
 sub protein_feature {
-  my ($self, $c, $translation) = @_;
+  my ($self, $translation) = @_;
+  my $c = $self->context();
   my $type = $c->request->parameters->{type};
   my $protein_features = $translation->get_all_ProteinFeatures($type);
   return EnsEMBL::REST::EnsemblModel::TranslationProteinFeature->get_from_ProteinFeatures($protein_features, $translation);
 }
 
 sub transcript_variation {
-  my ($self, $c, $translation) = @_;
+  my ($self, $translation) = @_;
+  my $c = $self->context();
   my $species = $c->stash->{species};
   my $type = $c->request->parameters->{type};
   my @vfs;
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
-  my $so_terms = $self->_get_SO_terms($c);
+  my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
     $transcript_variants = $tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms);
   }
@@ -188,14 +192,15 @@ sub transcript_variation {
 }
 
 sub somatic_transcript_variation {
-  my ($self, $c, $translation) = @_;
+  my ($self, $translation) = @_;
+  my $c = $self->context();
   my $species = $c->stash->{species};
   my $type = $c->request->parameters->{type};
   my @vfs;
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
-  my $so_terms = $self->_get_SO_terms($c);
+  my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
     $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms);
   } 
@@ -219,44 +224,46 @@ sub _filter_transcript_variation {
 }
 
 sub residue_overlap {
-  my ($self, $c, $translation) = @_;
+  my ($self, $translation) = @_;
   return EnsEMBL::REST::EnsemblModel::TranslationSpliceSiteOverlap->get_by_Translation($translation);
 }
 
 sub translation_exon {
-  my ($self, $c, $translation) = @_;
+  my ($self, $translation) = @_;
   return EnsEMBL::REST::EnsemblModel::TranslationExon->get_by_Translation($translation);
 }
 
 sub variation {
-  my ($self, $c, $slice) = @_;
-  return $slice->get_all_VariationFeatures($self->_get_SO_terms($c));
+  my ($self, $slice) = @_;
+  return $slice->get_all_VariationFeatures($self->_get_SO_terms());
 }
 
 sub structural_variation {
-  my ($self, $c, $slice) = @_;
-  my @so_terms = $self->_get_SO_terms($c);
+  my ($self, $slice) = @_;
+  my @so_terms = $self->_get_SO_terms();
   my ($source, $include_evidence, $somatic) = (undef)x3;
   my $sv_class = (@so_terms) ? $so_terms[0] : ();
   return $slice->get_all_StructuralVariationFeatures($source, $include_evidence, $somatic, $sv_class);
 }
 
 sub somatic_variation {
-  my ($self, $c, $slice) = @_;
+  my ($self, $slice) = @_;
+  my $c = $self->context();
   my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
-  return $vfa->fetch_all_somatic_by_Slice_SO_terms($slice, $self->_get_SO_terms($c));
+  return $vfa->fetch_all_somatic_by_Slice_SO_terms($slice, $self->_get_SO_terms());
 }
 
 sub somatic_structural_variation {
-  my ($self, $c, $slice) = @_;
-  my @so_terms = $self->_get_SO_terms($c);
+  my ($self, $slice) = @_;
+  my @so_terms = $self->_get_SO_terms();
   my ($source, $include_evidence, $somatic) = (undef)x3;
   my ($sv_class) = @so_terms;
   return $slice->get_all_somatic_StructuralVariationFeatures($source, $include_evidence, $somatic, $sv_class);
 }
 
 sub constrained {
-  my ($self, $c, $slice) = @_;
+  my ($self, $slice) = @_;
+  my $c = $self->context();
   my $species_set = $c->request->parameters->{species_set} || 'mammals';
   my $compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
   my $mlssa = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'MethodLinkSpeciesSet');
@@ -268,7 +275,8 @@ sub constrained {
 }
 
 sub regulatory {
-  my ($self, $c, $slice) = @_;
+  my ($self, $slice) = @_;
+  my $c = $self->context();
   my $species = $c->stash->{species};
   my $rfa = $c->model('Registry')->get_adaptor( $species, 'funcgen', 'regulatoryfeature');
   $c->go('ReturnError', 'custom', ["No adaptor found for species $species, object regulatoryfeature and db funcgen"]) if ! $rfa;
@@ -276,20 +284,23 @@ sub regulatory {
 }
 
 sub simple {
-  my ($self, $c, $slice) = @_;
-  my ($logic_name, $db_type) = $self->_get_logic_dbtype($c);
+  my ($self, $slice) = @_;
+  my $c = $self->context();
+  my ($logic_name, $db_type) = $self->_get_logic_dbtype();
   return $slice->get_all_SimpleFeatures($logic_name, undef, $db_type);
 }
 
 sub misc {
-  my ($self, $c, $slice) = @_;
+  my ($self, $slice) = @_;
+  my $c = $self->context();
   my $db_type = $c->request->parameters->{db_type};
   my $misc_set = $c->request->parameters->{misc_set} || undef;
   return $slice->get_all_MiscFeatures($misc_set, $db_type);
 }
 
 sub _get_SO_terms {
-  my ($self, $c) = @_;
+  my ($self) = @_;
+  my $c = $self->context();
   my $so_term = $c->request->parameters->{so_term};
   my $terms = (! defined $so_term)  ? [] 
                                     : (ref($so_term) eq 'ARRAY') 
@@ -315,7 +326,8 @@ sub _get_SO_terms {
 }
 
 sub _get_logic_dbtype {
-  my ($self, $c) = @_;
+  my ($self) = @_;
+  my $c = $self->context();
   my $logic_name = $c->request->parameters->{logic_name};
   my $db_type = $c->request->parameters->{db_type};
   return ($logic_name, $db_type);
