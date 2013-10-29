@@ -6,6 +6,7 @@ use Plack::Test;
 use Plack::Builder;
 use HTTP::Request::Common;
 use Time::HiRes;
+use DateTime;
 use POSIX qw/ceil/;
 
 use Plack::Middleware::EnsThrottle::SimpleBackend;
@@ -144,51 +145,6 @@ assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too m
     };
 }
 
-sub assert_basic_rate_limit {
-  my ($rate_limit_middleware, $period_seconds, $period_name, $custom_message) = @_;
-  note 'Testing '.$period_name.' rate limit using '.$rate_limit_middleware;
-  my $app = builder {
-    # Fake the IP of the requesting user
-    enable $default_remote_user_sub;
-    enable $rate_limit_middleware, max_requests => 1, path => sub { 1 },  message => $custom_message;
-    sub {
-      my ($env) = @_;
-      return [ 200, [ 'Content-Type' => 'text/html' ], [ 'hello world' ]];
-    };
-  };
-
-  test_psgi
-    app => $app,
-    client => sub {
-      my ($cb) = @_;
-
-      my $res = $cb->(GET '/');
-      cmp_ok($res->code(), '==', 200, 'Checking we are not limited');
-      $res = $cb->(GET '/');
-      cmp_ok($res->code(), '==', 429, 'Checking we are limited');
-      cmp_ok($res->header('X-RateLimit-Reset'), '<=', $period_seconds, 'Reset header must be less than or equal to a '.$period_name);
-      cmp_ok($res->header('X-RateLimit-Period'), '==', $period_seconds, 'Rate limit period is a '.$period_name);
-      if($custom_message) {
-        is($res->content(), $custom_message, 'Checking output is set to the custom message');
-      }
-    };
-
-  return;
-}
-
-# Subroutine which sleeps the current process until the next second if we are 
-# within 0.3s of it. This gives us a clear run for code to run
-sub sleep_until_next_second {
-  my $time = Time::HiRes::time();
-  my $ceil = ceil($time);
-  my $diff = $ceil-$time;
-  if($diff < 0.3) {
-    note "Sleeping for ${diff} fractions of a second to avoid time related test failures";
-    Time::HiRes::sleep($diff);
-  }
-  return;
-}
-
 {
   note 'Testing multiple rate limit middlewares';
   my $minute_backend = Plack::Middleware::EnsThrottle::SimpleBackend->new();
@@ -214,7 +170,7 @@ sub sleep_until_next_second {
     client => sub {
       my ($cb) = @_;
 
-      sleep_until_next_second();
+      sleep_until_next_minute();
 
       note 'Testing limiting on second first (set to 3 req per second)';
       foreach my $iter (1..3) {
@@ -252,5 +208,68 @@ sub sleep_until_next_second {
     };
 }
 
+# Subroutine which sleeps the current process until the next second if we are 
+# within 0.3s of it. This gives us a clear run for code to run
+sub sleep_until_next_second {
+  my $time = Time::HiRes::time();
+  my $ceil = ceil($time);
+  my $diff = $ceil-$time;
+  if($diff < 0.3) {
+    note "Sleeping for ${diff} fractions of a second to avoid time related test failures";
+    Time::HiRes::sleep($diff);
+  }
+  else {
+    note "Carrying on. We are $diff fraction of a second away from the second. Should be ok";
+  }
+  return;
+}
+
+# Subroutine which sleeps the current process until the next minute if we are 
+# within 3 seconds of it. We also test the second using sleep_until_next_second()
+sub sleep_until_next_minute {
+  my $dt = DateTime->now;
+  my $seconds = $dt->second;
+  my $diff = 60 - $seconds;
+  if($diff < 3) {
+    note "Sleeping for $diff seconds to avoid time related test failure";
+  }
+  else {
+    note "Carrying on. We are $diff seconds away from the minute. Should be ok";
+  }
+  sleep_until_next_second();
+  return;
+}
+
+sub assert_basic_rate_limit {
+  my ($rate_limit_middleware, $period_seconds, $period_name, $custom_message) = @_;
+  note 'Testing '.$period_name.' rate limit using '.$rate_limit_middleware;
+  my $app = builder {
+    # Fake the IP of the requesting user
+    enable $default_remote_user_sub;
+    enable $rate_limit_middleware, max_requests => 1, path => sub { 1 },  message => $custom_message;
+    sub {
+      my ($env) = @_;
+      return [ 200, [ 'Content-Type' => 'text/html' ], [ 'hello world' ]];
+    };
+  };
+
+  test_psgi
+    app => $app,
+    client => sub {
+      my ($cb) = @_;
+
+      my $res = $cb->(GET '/');
+      cmp_ok($res->code(), '==', 200, 'Checking we are not limited');
+      $res = $cb->(GET '/');
+      cmp_ok($res->code(), '==', 429, 'Checking we are limited');
+      cmp_ok($res->header('X-RateLimit-Reset'), '<=', $period_seconds, 'Reset header must be less than or equal to a '.$period_name);
+      cmp_ok($res->header('X-RateLimit-Period'), '==', $period_seconds, 'Rate limit period is a '.$period_name);
+      if($custom_message) {
+        is($res->content(), $custom_message, 'Checking output is set to the custom message');
+      }
+    };
+
+  return;
+}
 
 done_testing();
