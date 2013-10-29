@@ -16,6 +16,7 @@ sub encode_phyloxml {
   $w->cdna(1) if $sequence eq 'cdna';
   $w->no_sequences(1) if $sequence eq 'none';
   my $gt = $c->stash->{$stash_key};
+  $gt->preload();
   my $root = $gt->root();
   $w->write_trees($root);
   $w->finish();
@@ -28,6 +29,7 @@ sub encode_nh {
   $stash_key ||= 'rest';
   my $gt = $c->stash->{$stash_key};
   my $nh_format = $c->request->param('nh_format') || 'simple';
+  $gt->preload();
   my $root = $gt->root();
   my $str = $root->newick_format($nh_format);
   $root->release_tree();
