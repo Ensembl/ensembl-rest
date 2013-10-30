@@ -164,7 +164,6 @@ my $base = '/feature/region/homo_sapiens';
     start => 1026863,
     end => 1027454,
     strand => -1,
-    ID => 'rank = 1',
     feature_type => 'simple',
     score => 0.925,
     external_name => 'rank = 1',
