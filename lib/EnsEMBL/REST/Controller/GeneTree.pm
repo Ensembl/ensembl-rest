@@ -13,8 +13,7 @@ __PACKAGE__->config(
     'text/x-phyloxml+xml' => [qw/View PhyloXML/],
     'text/x-phyloxml'     => [qw/View PhyloXML/], #naughty but needs must
     'text/x-nh'           => [qw/View NHTree/],
-    'application/json'    => [],
-    'text/x-yaml'         => [],
+    'application/json'    => [qw/View JSONTree/],
     'text/xml'            => [qw/View PhyloXML/],
   }
 );
