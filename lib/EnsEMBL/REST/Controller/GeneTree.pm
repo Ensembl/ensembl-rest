@@ -2,6 +2,7 @@ package EnsEMBL::REST::Controller::GeneTree;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
+use EnsEMBL::REST::Builder::TreeHash;
 require EnsEMBL::REST;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
@@ -13,10 +14,15 @@ __PACKAGE__->config(
     'text/x-phyloxml+xml' => [qw/View PhyloXML/],
     'text/x-phyloxml'     => [qw/View PhyloXML/], #naughty but needs must
     'text/x-nh'           => [qw/View NHTree/],
-    'application/json'    => [qw/View JSONTree/],
     'text/xml'            => [qw/View PhyloXML/],
   }
 );
+
+EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
+
+#We want to find every "non-special" format. To generate the regex used then invoke this command:
+#perl -MRegexp::Assemble -e 'my $ra = Regexp::Assemble->new; $ra->add($_) for qw(application\/json text\/javascript application\/x-sereal text\/x-yaml application\/x-msgpack); print $ra->re, "\n"'
+my $CONTENT_TYPE_REGEX = qr/(?-xism:(?:application\/(?:x-(?:msgpack|sereal)|json)|text\/(?:javascript|x-yaml)))/;
 
 sub get_genetree_GET { }
 
@@ -24,7 +30,7 @@ sub get_genetree : Chained('/') PathPart('genetree/id') Args(1) ActionClass('RES
   my ($self, $c, $id) = @_;
   my $s = $c->stash();
   my $gt = $c->model('Lookup')->find_genetree_by_stable_id($id);
-  $self->status_ok( $c, entity => $gt );
+  $self->_set_genetree($c, $gt);
 }
 
 sub get_genetree_by_member_id_GET { }
@@ -34,10 +40,8 @@ sub get_genetree_by_member_id : Chained('/') PathPart('genetree/member/id') Args
    
   my $gt = $c->model('Lookup')->find_genetree_by_member_id($id);
   $c->go('ReturnError', 'custom', ["Could not fetch GeneTree"]) unless $gt;
-  
-  $self->status_ok( $c, entity => $gt);
+  $self->_set_genetree($c, $gt);
 }
-
 
 sub get_genetree_by_symbol_GET { }
 
@@ -57,8 +61,28 @@ sub get_genetree_by_symbol : Chained('/') PathPart('genetree/member/symbol') Arg
   
   my $gt = $c->model('Lookup')->find_genetree_by_member_id($stable_id);
   $c->go('ReturnError', 'custom', ["Could not fetch GeneTree for $symbol,$stable_id"]) unless $gt;
-  $self->status_ok( $c, entity => $gt);
+  $self->_set_genetree($c, $gt);
 }
+
+sub _set_genetree {
+  my ($self, $c, $gt) = @_;
+
+  if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
+    # If it wasn't a special format convert GT into a Hash data structure and let the normal serialisation
+    # code deal with it.
+    my $builder = EnsEMBL::REST::Builder::TreeHash->new();
+    $builder->aligned(1) if $c->request()->param('aligned') || $c->request()->param('phyloxml_aligned');
+    my $sequence = $c->request->param('sequence') || $c->request()->param('phyloxml_sequence') || 'protein';
+    $builder->cdna(1) if $sequence eq 'cdna';
+    $builder->no_sequences(1) if $sequence eq 'none';
+    $gt->preload();
+    my $hash = $builder->convert($gt);
+    return $self->status_ok($c, entity => $hash);
+  }
+  return $self->status_ok($c, entity => $gt);
+}
+
+with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
 
