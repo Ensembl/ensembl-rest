@@ -1,5 +1,14 @@
 <h1>Change Log</h1>
 
+<h2>1.4.3 - 5th November 2013</h2>
+
+<h3>Bugfixes</h3>
+
+<ul>
+<li><tt>[/lookup/id]</tt> and <tt>[/xrefs/symbol]</tt> were using the parameter <tt>object</tt> rather than <tt>object_type</tt></li>
+<li><tt>[/homology]</tt> endpoints would accept only one instance of <tt>target_taxon</tt> and <tt>target_species</tt>. We now allow multiples as intended</li>
+</ul>
+
 <h2>1.4.2 - 23rd September 2013</h2>
 
 <h3>Bugfixes</h3>
