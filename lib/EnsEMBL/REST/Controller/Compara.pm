@@ -167,12 +167,9 @@ sub _method_link_species_sets {
   }
   
   #If someone has requested species then limit by MLSS
-  my $target_species = $c->request->param('target_species') || [];
-  my $ts_ref = ref($target_species);
-  $target_species = [$target_species] if ! $ts_ref|| $ts_ref ne 'ARRAY';
-  my $source_name = $member->genome_db()->name();
-  
-  foreach my $target (@{$target_species}) {
+  my @target_species = $c->request->param('target_species');
+  my $source_name = $member->genome_db()->name();  
+  foreach my $target (@target_species) {
     foreach my $ml_type (@types) {
       my $r = $mlssa->fetch_by_method_link_type_registry_aliases($ml_type, [$source_name, $target]);
       push(@mlss, $r);
@@ -180,12 +177,9 @@ sub _method_link_species_sets {
   }
   
   #Could be taxon identifiers though
-  my $target_taxons = $c->request->param('target_taxon') || [];
-  my $tt_ref = ref($target_taxons);
-  $target_taxons = [$target_taxons] if ! $tt_ref|| $tt_ref ne 'ARRAY';
+  my @target_taxons = $c->request->param('target_taxon');
   my $source_gdb = $member->genome_db();
-  
-  foreach my $taxon (@{$target_taxons}) {
+  foreach my $taxon (@target_taxons) {
     my $gdb = $gdba->fetch_by_taxon_id($taxon);
     foreach my $ml_type (@types) {
       my $gdbs = [$source_gdb, $gdb];
