@@ -1,12 +1,20 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.4.4 - 07-11-2013
+
+Bugfixes
+
+    - [/xrefs] fails to report linkage types for ontology xrefs
+    - [/homology/id] and [/homology/symbol] failed when querying for the 
+      same species as the member
+
 1.4.3 - 05-11-2013
 
 Bugfixes:
 
     - [/lookup/id] and [/xrefs/symbol] were using the parameter object rather than object_type
-    - [/homology] endpoints would accept only one instance of target_taxon and target_species. We now allow multiples as intended
-</ul>
+    - [/homology] endpoints would accept only one instance of target_taxon and target_species. 
+      We now allow multiples as  intended
 
 1.4.2 23-09-2013
 
