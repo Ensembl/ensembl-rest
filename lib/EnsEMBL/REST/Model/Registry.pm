@@ -390,6 +390,15 @@ sub disconnect_DBAdaptors {
   return;
 }
 
+sub get_alias {
+  my ($self, $alias) = @_;
+  my $reg = $self->_registry();
+  if($reg->alias_exists($alias)) {
+    return $reg->get_alias($alias);
+  }
+  return;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
