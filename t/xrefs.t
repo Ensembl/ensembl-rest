@@ -12,6 +12,7 @@ BEGIN {
 use Test::More;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
+use Test::Differences;
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
 Catalyst::Test->import('EnsEMBL::REST');
@@ -38,6 +39,45 @@ my $UPI = 'UPI0000073BC4';
   is(scalar(@{$identity_json}), 1, 'Got 1 UniProt reference back');
   is($identity_json->[0]->{cigar_line}, '132M', 'Checking UniProt cigar line');
   
+}
+
+# Check ontology xrefs
+{
+  my $go_id = 'GO:0043565';
+  my $url = '/xrefs/id/ENSP00000296839?external_db=GO';
+  my $json = json_GET($url, 'Retriving GO xrefs');
+  my $expected = { 
+    db_display_name => 'GO', dbname => 'GO', description => 'sequence-specific DNA binding',
+    info_text => 'Generated via main', info_type => 'DEPENDENT',
+    linkage_types => [qw/IEA/],
+    primary_id => $go_id,
+    display_id => $go_id,
+    synonyms => [],
+    version => '0',
+  };
+  my ($actual) = grep { $_->{primary_id} eq $go_id } @{$json};
+  eq_or_diff_data($actual, $expected, 'Checking GO Xrefs bring along their linkage types');
+}
+
+# Check identity xrefs
+{
+  my $translation_id = 'ENSP00000320396';
+  my $external_id = 'Q8NAX6';
+  my $url = '/xrefs/id/'.$translation_id.'?external_db=Uniprot%';
+  my $json = json_GET($url, 'Retriving identity xrefs for '.$translation_id);
+  my $expected = { 
+    db_display_name => 'UniProtKB/TrEMBL', dbname => 'Uniprot/SPTREMBL', description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109 ',
+    info_text => '', info_type => 'SEQUENCE_MATCH',
+    primary_id => $external_id,
+    display_id => $external_id.'_HUMAN',
+    synonyms => [],
+    version => '0',
+    evalue => undef, score => 705, cigar_line => '132M',
+    ensembl_start => 1, ensembl_end => 132, ensembl_identity => 100,
+    xref_start => 1, xref_end => 132, xref_identity => 100,
+  };
+  my ($actual) = grep { $_->{primary_id} eq $external_id } @{$json};
+  eq_or_diff_data($actual, $expected, 'Checking identity Xrefs bring along their alignment data. Using '.$external_id); 
 }
 
 #Name based xref lookup
