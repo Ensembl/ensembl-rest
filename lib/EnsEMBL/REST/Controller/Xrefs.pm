@@ -129,7 +129,7 @@ sub _encode :Private {
         $enc->{cigar_line}        = $dbe->cigar_line() if $dbe->cigar_line();
         $enc->{evalue}            = ($enc->{evalue}*1) if defined $enc->{evalue}; 
       }
-      when('Bio:EnsEMBL::OntologyXref') {
+      when('Bio::EnsEMBL::OntologyXref') {
         $enc->{linkage_types} = $dbe->get_all_linkage_types();
       }
     }
