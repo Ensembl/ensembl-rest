@@ -5,6 +5,7 @@ use namespace::autoclean;
 use Try::Tiny;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 use Scalar::Util qw/looks_like_number/;
+use URI::Escape;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
@@ -35,6 +36,17 @@ sub classification : Chained('taxonomy_root') PathPart('classification') Args(1)
   $self->status_ok($c, entity => $entity);
 }
 
+sub name_get {}
+sub name : Chained('taxonomy_root') PathPart('name') Args(1) ActionClass('REST') {
+  my ($self, $c, $id) = @_;
+  $id = uri_unescape($id);
+  my $taxons = $self->_name($c,$id);
+  # remove any duplicates in the list
+  my %list = map { $_ => 1 } @$taxons;
+  @$taxons = keys %list;
+  $self->status_ok($c, entity => $self->_encode_array($taxons));  
+}
+
 sub taxon {
   my ($self, $c, $id) = @_;
   my $taxon;
@@ -46,6 +58,14 @@ sub taxon {
   }
   $c->go('ReturnError', 'custom', ["No taxon node found for '$id'"]) if ! $taxon;
   return $taxon;
+}
+
+sub _name {
+  my ($self, $c, $name) = @_;
+  my @taxons;
+  @taxons = @{ $c->stash->{taxon_adaptor}->fetch_all_nodes_by_name($name) };
+  $c->go('ReturnError', 'custom', ["No taxons found with given name '$name'"]) if scalar(@taxons) == 0;
+  return \@taxons;
 }
 
 sub _encode_array {
