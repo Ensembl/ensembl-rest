@@ -212,6 +212,11 @@ sub find_object_location {
     }
     else {
       $log->debug('Found no ID');
+      if ($use_archive) {
+        my $reg = $c->model('Registry');
+        my $lookup = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
+        $c->go('ReturnError', 'custom', ["No lookup database available on server, archive lookup not possible for $id. Please contact the administrator of this server"]) if ! $lookup;
+      }
     }
   }
 

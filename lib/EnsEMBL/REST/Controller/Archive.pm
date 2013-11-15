@@ -33,7 +33,10 @@ sub id: Chained('/') PathPart('archive/id') Args(1) ActionClass('REST') {
   $c->request->param('use_archive', 1);
   my ($stable_id, $version) = split(/\./, $id);
   try {
-    my @results = $c->model('Lookup')->find_object_location($id, undef, 1);
+    my @results = $c->model('Lookup')->find_object_location($stable_id, undef, 1);
+    if (!@results) {
+      $c->go('ReturnError', 'custom', ["$id not found in lookup"]);
+    }
     my $species = $results[0];
     my $aia = $c->model('Registry')->get_adaptor($species,'Core','ArchiveStableID');
     if ($version) {
