@@ -1,0 +1,6 @@
+3	gallus_gallus	9031
+7	meleagris_gallopavo	9103
+42	Ancestral sequences	\N
+60	taeniopygia_guttata	59729
+61	homo_sapiens	9606
+64	multi	\N
