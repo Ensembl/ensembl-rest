@@ -4,11 +4,11 @@ use Moose;
 use namespace::autoclean;
 use Bio::EnsEMBL::Utils::Scalar qw(check_ref);
 
-has 'aligned'       => ( isa => 'Bool', is => 'ro', default => 0);
-has 'cdna'          => ( isa => 'Bool', is => 'ro', default => 0);
-has 'no_sequences'  => ( isa => 'Bool', is => 'ro', default => 0);
-has 'source'        => ( isa => 'Str', is => 'ro', default => 'ensembl');
-has 'type'          => ( isa => 'Str', is => 'ro', default => 'gene tree');
+has 'aligned'       => ( isa => 'Bool', is => 'rw', default => 0);
+has 'cdna'          => ( isa => 'Bool', is => 'rw', default => 0);
+has 'no_sequences'  => ( isa => 'Bool', is => 'rw', default => 0);
+has 'source'        => ( isa => 'Str', is => 'rw', default => 'ensembl');
+has 'type'          => ( isa => 'Str', is => 'rw', default => 'gene tree');
 
 sub convert {
   my ($self, $tree) = @_;
