@@ -23,8 +23,9 @@
     },
 
     'multi' => {
-      'ontology' => 'Bio::EnsEMBL::DBSQL::OntologyDBAdaptor',
-      'compara' => 'Bio::EnsEMBL::Compara::DBSQL::DBAdaptor',
+      'ontology'  => 'Bio::EnsEMBL::DBSQL::OntologyDBAdaptor',
+      'compara'   => 'Bio::EnsEMBL::Compara::DBSQL::DBAdaptor',
+      'stable_ids' => 'Bio::EnsEMBL::DBSQL::DBAdaptor',
     },
   },
 }
