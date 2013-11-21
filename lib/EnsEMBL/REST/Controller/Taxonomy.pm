@@ -36,15 +36,18 @@ sub classification : Chained('taxonomy_root') PathPart('classification') Args(1)
   $self->status_ok($c, entity => $entity);
 }
 
-sub name_get {}
+sub name_GET {}
 sub name : Chained('taxonomy_root') PathPart('name') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   $id = uri_unescape($id);
+  $c->log->debug($id);
+  my $simple = $c->request->param('simple');
   my $taxons = $self->_name($c,$id);
   # remove any duplicates in the list
-  my %list = map { $_ => 1 } @$taxons;
-  @$taxons = keys %list;
-  $self->status_ok($c, entity => $self->_encode_array($taxons));  
+  my %list = map { $_->taxon_id => $_ } @$taxons;
+  @$taxons = map { $list{$_} } keys %list;
+  
+  $self->status_ok($c, entity => $self->_encode_array($taxons,$simple));  
 }
 
 sub taxon {
