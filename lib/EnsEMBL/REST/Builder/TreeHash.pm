@@ -12,8 +12,8 @@ has 'type'          => ( isa => 'Str', is => 'rw', default => 'gene tree');
 
 sub convert {
   my ($self, $tree) = @_;
-  my $hash = $self->_head_node($tree);
-  return $self->_recursive_conversion($tree->root(), $hash);
+  
+  return $self->_head_node($tree);
 }
 
 sub _head_node {
@@ -27,12 +27,15 @@ sub _head_node {
     $hash->{id} = $tree->stable_id();
   }
 
+  $hash->{tree} = 
+    $self->_recursive_conversion($tree->root());
+
   return $hash;
 }
 
 sub _recursive_conversion {
-  my ($self, $tree, $hash) = @_;;
-  my $new_hash = $self->_convert_node($tree, $hash);
+  my ($self, $tree) = @_;;
+  my $new_hash = $self->_convert_node($tree);
   if($tree->get_child_count()) {
     my @converted_children;
     foreach my $child (@{$tree->sorted_children()}) {
@@ -44,11 +47,9 @@ sub _recursive_conversion {
   return $new_hash;
 }
 
-# If $hash is given we will add attributes to the hash. If not 
-# then we will create a new one. 
 sub _convert_node {
-  my ($self, $node, $hash) = @_;
-  $hash ||= {};
+  my ($self, $node) = @_;
+  my $hash;
 
   my $type  = $node->get_tagvalue('node_type');
   my $boot  = $node->get_tagvalue('bootstrap');
@@ -60,20 +61,31 @@ sub _convert_node {
     $hash->{taxonomy} = { id => $taxid + 0, scientific_name => $tax };
   }
   if($boot) {
-    $hash->{boostrap} = $boot + 0;
+    $hash->{confidence} = { type => "boostrap", value => $boot + 0 };
   }
-  if($type && $type ~~ [qw/duplication dubious/]) {
-      $hash->{event} = $type;
+  if($type) { # && $type ~~ [qw/duplication dubious/]) {
+    $hash->{events} = { type => $type };
   }
   
   if(check_ref($node, 'Bio::EnsEMBL::Compara::GeneTreeMember')) {
     my $gene = $node->gene_member();
-    $hash->{name} = $gene->stable_id();
-    $hash->{genome_db_name} = $node->genome_db()->name();
-    $hash->{sequence}->{accession} = $node->stable_id();
-    $hash->{sequence}->{source} = $self->source();
+
+    $hash->{id} = { source => "EnsEMBL", accession => $gene->stable_id() };
+
+    my $genome_db = $node->genome_db();
+    $taxid = $genome_db->taxon_id();
+    $hash->{taxonomy} = 
+      { id => $taxid + 0, scientific_name => $genome_db->taxon->scientific_name() }
+	if $taxid;
+
+    $hash->{sequence} = 
+      { 
+       # type     => 'protein', # are we sure we always have proteins?
+       id       => [ { source => 'EnsEMBL', accession => $node->stable_id() } ],
+       location => sprintf('%s:%d-%d',$gene->chr_name(), $gene->dnafrag_start(), $gene->dnafrag_end())
+      };
     $hash->{sequence}->{name} = $node->display_label() if $node->display_label();
-    $hash->{sequence}->{location} = sprintf('%s:%d-%d',$gene->chr_name(), $gene->chr_start(), $gene->chr_end());
+
     if(! $self->no_sequences()) {
       my $aligned = $self->aligned();
       my $mol_seq;
@@ -84,8 +96,7 @@ sub _convert_node {
         $mol_seq = ($self->cdna()) ? $node->other_sequence('cds') : $node->sequence();
       }
 
-      $hash->{sequence}->{seq} = $mol_seq;
-      $hash->{sequence}->{aligned} = $aligned + 0;
+      $hash->{sequence}->{mol_seq} = { is_aligned => $aligned + 0, seq => $mol_seq };
     }
   }
 
