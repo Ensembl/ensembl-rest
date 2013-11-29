@@ -1,4 +1,4 @@
-package EnsEMBL::REST::Controller::FastVep;
+package EnsEMBL::REST::Controller::PostVep;
 use Moose;
 use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
@@ -53,7 +53,7 @@ BEGIN {
 use Try::Tiny;
 __PACKAGE__->config( 'map' => { 'text/javascript' => ['JSONP'] } );
 
-sub get_species : Chained("/") PathPart("fastvep") CaptureArgs(1) {
+sub get_species : Chained("/") PathPart("postvep") CaptureArgs(1) {
     my ( $self, $c, $species ) = @_;
     $c->stash->{species} = $species;
 
