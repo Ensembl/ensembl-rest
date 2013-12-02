@@ -24,6 +24,7 @@ require EnsEMBL::REST;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
+has 'default_compara' => ( is => 'ro', isa => 'Str', default => 'multi' );
 has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e6);
 
 sub get_adaptors :Private {
@@ -31,7 +32,7 @@ sub get_adaptors :Private {
 
   try {
     my $species = $c->stash()->{species};
-    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'));
+    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'), $self->default_compara());
     my $mlssa = $compara_dba->get_MethodLinkSpeciesSetAdaptor();
     my $gdba = $compara_dba->get_GenomeDBAdaptor();
     my $asa = $compara_dba->get_AlignSliceAdaptor();

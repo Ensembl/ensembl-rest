@@ -36,7 +36,7 @@ sub get_adaptors :Private {
 
   try {
     my $species = $c->stash()->{species};
-    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'));
+    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'), $self->default_compara());
     my $gma = $compara_dba->get_GeneMemberAdaptor();
     my $sma = $compara_dba->get_SeqMemberAdaptor();
     my $ha = $compara_dba->get_HomologyAdaptor();
