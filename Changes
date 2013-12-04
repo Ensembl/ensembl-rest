@@ -1,6 +1,12 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
-1.5.0 - 04-12-2913
+1.5.1 - 04-12-2013
+
+Bugfixes:
+
+    - Removed deprecated methods from Compara
+
+1.5.0 - 04-12-2013
 
 New Features:
 
