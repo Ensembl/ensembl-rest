@@ -8,6 +8,9 @@ use File::Spec;
 use Plack::Builder;
 use Plack::Util;
 
+use Plack::Middleware::EnsThrottle::MemcachedBackend;
+use Cache::Memcached;
+
 my $app = EnsEMBL::REST->psgi_app;
 
 builder {
@@ -24,11 +27,11 @@ builder {
   my $rootdir = File::Spec->rel2abs(File::Spec->catdir($dirname, File::Spec->updir(), File::Spec->updir()));
   my $staticdir = File::Spec->catdir($rootdir, 'root');
 
-  enable 'EnsThrottle::Hour' => (
-    backend => Plack::Middleware::EnsThrottle::MemcachedBackend->new(
-      memcached => Cache::Memcached->new(servers => ['127.0.0.1']), 
+  enable 'EnsThrottle::Hour',
+    backend => Plack::Middleware::EnsThrottle::MemcachedBackend->new({
+      memcached => Cache::Memcached->new(servers => ['127.0.0.1:11211']), 
       expire => 2,
-    ),
+    }),
     max_requests => 11100, #1100 requests per hr (~3 per second)
     client_id_prefix => '3rps_hour',
     message => 'You have exceeded your limit which is 11,100 requests per hour (~3 per second)',
@@ -37,14 +40,13 @@ builder {
       return 1 if $path ne '/';
       return 1 if $path !~ /\/(?:documentation|static|_asset)/;
       return 0;
-    }
-  );
+    };
 
-  enable 'EnsThrottle::Second' => (
-    backend => Plack::Middleware::EnsThrottle::MemcachedBackend->new(
-      memcached => Cache::Memcached->new(servers => ['127.0.0.1']), 
+  enable 'EnsThrottle::Second',
+    backend => Plack::Middleware::EnsThrottle::MemcachedBackend->new({
+      memcached => Cache::Memcached->new(servers => ['127.0.0.1:11211']), 
       expire => 2,
-    ),
+    }),
     max_requests => 6,
     client_id_prefix => '6rps_second',
     retry_after_addition => 1,
@@ -54,8 +56,7 @@ builder {
       return 1 if $path ne '/';
       return 1 if $path !~ /\/(?:documentation|static|_asset)/;
       return 0;
-    }
-  );
+    };
 
     #-------- RECOMMENDED PLUGINS -------- #
 
