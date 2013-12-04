@@ -31,6 +31,8 @@ requires 'Hash::Merge';
 requires 'Catalyst::Plugin::Cache';
 requires 'CHI';
 requires 'XML::Simple';
+requires 'Readonly';
+requires 'Readonly::XS';
 
 # Transient dependencies from Ensembl
 requires 'Parse::RecDescent';
@@ -46,13 +48,13 @@ requires 'XML::Writer';
 recommends 'Plack::Middleware::Assets';
 recommends 'Plack::Middleware::ReverseProxy';
 recommends 'Plack::Middleware::SizeLimit';
-recommends 'Plack::Middleware::Throttle';
 recommends 'Plack::Middleware::CrossOrigin';
 recommends 'Cache::Memcached';
 recommends 'CHI::Driver::Memcached';
 recommends 'Sereal::Encoder';
 recommends 'Data::MessagePack';
 recommends 'Template::Stash::XS';
+recommends 'Net::CIDR::Lite';
 
 
 #Test requirements
