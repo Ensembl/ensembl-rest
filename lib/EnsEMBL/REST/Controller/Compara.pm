@@ -304,10 +304,9 @@ sub _full_encoding {
   
   while(my $h = shift @{$homologies}) {
     my ($src, $trg) = $self->_decode_members($h, $stable_id);
-    my $type = $h->description();
     my $e = {
-      type => $type,
-      subtype => $h->subtype(),
+      type => $h->description(),
+      taxonomy_level => $h->taxonomy_level(),
       dn_ds => $h->dnds_ratio(),
       source => $encode->($src),
       target => $encode->($trg),
@@ -328,7 +327,7 @@ sub _condensed_encoding {
     my $gene_member = $trg->gene_member();
     my $e = {
       type => $h->description(),
-      subtype => $h->subtype(),
+      taxonomy_level => $h->taxonomy_level(),
       id => $gene_member->stable_id(),
       protein_id => $gene_member->get_canonical_SeqMember()->stable_id(),
       species => $gene_member->genome_db->name(),
