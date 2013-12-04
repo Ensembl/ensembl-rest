@@ -16,6 +16,30 @@ limitations under the License.
 
 <h1>Change Log</h1>
 
+<h2>1.5.0 - 4th December 2013</h2>
+
+<h3>New Features</h3>
+<ul>
+  <li>Build a better rate limiter</li>
+  <li>Enable compression on REST site</li>
+  <li>Ensure rate limiter reports the time scale over which rate limiting occurs</li>
+  <li>Faster GeneTree serlialisation; JSON now supported</li>
+  <li>Rate limiter responds with a Retry-After header once limits have been hit</li>
+  <li><tt>[/info/species]</tt> to report common names of species and taxon ids</li>
+  <li><tt>[/lookup/:species/:symbol]</tt> Look up the location of an object based on a symbol</li>
+  <li><tt>[/taxonomy/name]</tt> Allow for searching of Taxonomy nodes by any linked name</li>
+</ul>
+
+<h3>Bugfixes</h3>
+<ul>
+  <li>Detect content in REST does not understand Accepts</li>
+  <li>GFF3 for cds features invalid, duplicate ids for simple features</li>
+  <li>Serialisations choose to send the content-type back as text/plain </li>
+  <li><tt>[/homology]</tt> throws an exception when you ask for orthologues of the species the gene is from</li>
+  <li><tt>[/xrefs/symbol/:species/:symbol]</tt> does not respond to object type filtering</li>
+  <li><tt>[/xrefs]</tt> fails to report linkage types for GO xrefs</li>
+</ul>
+
 <h2>1.4.4 - 7th November 2013</h2>
 
 <h3>Bugfixes</h3>
