@@ -53,7 +53,7 @@ limitations under the License.
 
 <ul>
 <li><tt>[/xrefs]</tt> fails to report linkage types for ontology xrefs</li>
-<li><tt>[/homology/id]<tt> and <tt>[/homology/symbol]</tt> failed when querying for the same species as the member</li>
+<li><tt>[/homology/id]</tt> and <tt>[/homology/symbol]</tt> failed when querying for the same species as the member</li>
 </ul>
 
 <h2>1.4.3 - 5th November 2013</h2>
