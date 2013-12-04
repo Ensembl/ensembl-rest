@@ -276,7 +276,7 @@ sub _client_id {
     $id = $env->{REMOTE_USER};
   }
   else {
-    my $id = $env->{REMOTE_ADDR};
+    $id = $env->{REMOTE_ADDR};
   }
   return $prefix.'_'.$id;
 }
