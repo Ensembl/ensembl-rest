@@ -1,10 +1,49 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.5.0 - 04-12-2913
+
+New Features:
+
+    - Build a better rate limiter
+
+    - Enable compression on REST site
+
+    - Ensure rate limiter reports the time scale over which rate limiting occurs
+
+    - Faster GeneTree serlialisation; JSON now supported
+
+    - Rate limiter responds with a Retry-After header once limits have been hit
+
+    - [/info/species] to report common names of species and taxon ids
+
+    - [/lookup/:species/:symbol] Look up the location of an object based on a
+      symbol
+
+    - [/taxonomy/name] Allow for searching of Taxonomy nodes by any linked name
+
+
+Bugfixes:
+
+    - Detect content in REST does not understand Accepts
+
+    - GFF3 for cds features invalid, duplicate ids for simple features
+
+    - Serialisations choose to send the content-type back as text/plain
+
+    - [/homology] throws an exception when you ask for orthologues of the
+      species the gene is from
+
+    - [/xrefs/symbol/:species/:symbol] does not respond to object type filtering
+
+    - [/xrefs] fails to report linkage types for GO xrefs
+
+
 1.4.4 - 07-11-2013
 
 Bugfixes
 
     - [/xrefs] fails to report linkage types for ontology xrefs
+
     - [/homology/id] and [/homology/symbol] failed when querying for the 
       same species as the member
 
@@ -13,6 +52,7 @@ Bugfixes
 Bugfixes:
 
     - [/lookup/id] and [/xrefs/symbol] were using the parameter object rather than object_type
+
     - [/homology] endpoints would accept only one instance of target_taxon and target_species. 
       We now allow multiples as  intended
 
