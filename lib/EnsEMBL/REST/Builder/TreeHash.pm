@@ -71,12 +71,11 @@ sub _convert_node {
 
   my $type  = $node->get_tagvalue('node_type');
   my $boot  = $node->get_tagvalue('bootstrap');
-  my $taxid = $node->get_tagvalue('taxon_id');
-  my $tax   = $node->get_tagvalue('taxon_name');
+  my $tax   = $node->species_tree_node();
 
   $hash->{branch_length} = $node->distance_to_parent() + 0;
-  if($taxid) {
-    $hash->{taxonomy} = { id => $taxid + 0, scientific_name => $tax };
+  if($tax) {
+    $hash->{taxonomy} = { id => $tax->taxon_id + 0, scientific_name => $tax->node_name };
   }
   if($boot) {
     $hash->{confidence} = { type => "boostrap", value => $boot + 0 };
@@ -91,7 +90,7 @@ sub _convert_node {
     $hash->{id} = { source => "EnsEMBL", accession => $gene->stable_id() };
 
     my $genome_db = $node->genome_db();
-    $taxid = $genome_db->taxon_id();
+    my $taxid = $genome_db->taxon_id();
     $hash->{taxonomy} = 
       { id => $taxid + 0, scientific_name => $genome_db->taxon->scientific_name() }
 	if $taxid;
