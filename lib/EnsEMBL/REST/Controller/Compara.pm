@@ -287,7 +287,7 @@ sub _full_encoding {
         $result->{align_seq} = $member->alignment_string();
       }
       elsif($seq_type eq 'cdna') {
-       $result->{align_seq} = $member->cdna_alignment_string();
+       $result->{align_seq} = $member->alignment_string('cds');
        $result->{align_seq} =~ s/\s//g;
       }
     }
@@ -296,7 +296,7 @@ sub _full_encoding {
         $result->{seq} = $member->sequence();
       }
       elsif($seq_type eq 'cdna') {
-        $result->{seq} = $member->sequence_cds();
+        $result->{seq} = $member->other_sequence('cds');
       }
     }
     return $result;
