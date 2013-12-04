@@ -7,7 +7,6 @@ use File::Basename;
 use File::Spec;
 use Plack::Builder;
 use Plack::Util;
-use Plack::Middleware::Throttle::Backend::Memcached;
 
 my $app = EnsEMBL::REST->psgi_app;
 
@@ -25,19 +24,13 @@ builder {
   my $rootdir = File::Spec->rel2abs(File::Spec->catdir($dirname, File::Spec->updir(), File::Spec->updir()));
   my $staticdir = File::Spec->catdir($rootdir, 'root');
 
-  enable 'Throttle::Hour' => (
-    code    => 429, #Code is HTTP response code for "Too Many Requests"; alternatives include 420 (Twitter; "Enhance your calm")
-    max     => 11100, #11100 requests per hr (~3 per second)
-    backend =>  Plack::Middleware::Throttle::Backend::Memcached->new(
-      driver => 'Cache::Memcached',
-      expire => 3601, #Expire set to 1hr and 1 second
-      args => {
-        servers => ['127.0.0.1:11211'], 
-        no_rehash => 1, 
-        namespace => 'ensrest:throttle_3pr_hr:',
-        debug => 0,
-      }
+  enable 'EnsThrottle::Hour' => (
+    backend => Plack::Middleware::EnsThrottle::MemcachedBackend->new(
+      memcached => Cache::Memcached->new(servers => ['127.0.0.1']), 
+      expire => 2,
     ),
+    max_requests => 11100, #1100 requests per hr (~3 per second)
+    client_id_prefix => '3rps_hour',
     message => 'You have exceeded your limit which is 11,100 requests per hour (~3 per second)',
     path    => sub {
       my ($path) = @_;
@@ -46,25 +39,17 @@ builder {
       return 0;
     }
   );
-  
-  enable 'Throttle::Second' => (
-    code    => 429, #Code is HTTP response code for "Too Many Requests"; alternatives include 420 (Twitter; "Enhance your calm")
-    max     => 6, #6 requests per second
-    #add a second to the Retry-After header value. Means when we burst the 6 per second
-    #we force a user to wait for an additional second (so effectivley they run at 3 req per second)
-    retry_after_addition => 1,
-    backend =>  Plack::Middleware::Throttle::Backend::Memcached->new(
-      driver => 'Cache::Memcached',
+
+  enable 'EnsThrottle::Second' => (
+    backend => Plack::Middleware::EnsThrottle::MemcachedBackend->new(
+      memcached => Cache::Memcached->new(servers => ['127.0.0.1']), 
       expire => 2,
-      args => {
-        servers => ['127.0.0.1:11211'], 
-        no_rehash => 1, 
-        namespace => 'ensrest:throttle_6pr_second:',
-        debug => 0,
-      }
     ),
+    max_requests => 6,
+    client_id_prefix => '6rps_second',
+    retry_after_addition => 1,
     message => 'You have exceeded the limit of 6 requests per second; please reduce your concurrent connections',
-    path    => sub {
+    path  => sub {
       my ($path) = @_;
       return 1 if $path ne '/';
       return 1 if $path !~ /\/(?:documentation|static|_asset)/;
