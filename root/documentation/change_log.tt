@@ -16,6 +16,13 @@ limitations under the License.
 
 <h1>Change Log</h1>
 
+<h2>1.5.1 - 4th December 2013</h2>
+
+<h3>Bugfixes</h3>
+<ul>
+  <li>Removed deprecated methods from Compara</li>
+</ul>
+
 <h2>1.5.0 - 4th December 2013</h2>
 
 <h3>New Features</h3>
