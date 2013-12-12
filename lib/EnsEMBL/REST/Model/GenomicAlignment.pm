@@ -99,7 +99,8 @@ sub get_alignment {
     }
 
     #Must have new object here because of potential tree pruning (calls minimize_tree)
-    my $new_tree = $this_genomic_align_tree->annotate_tree($mask, $display_species);
+    $this_genomic_align_tree->repeatmask($mask);
+    my $new_tree = $this_genomic_align_tree->prune($display_species);
     push @$new_genomic_align_trees, $new_tree;
   }
   
