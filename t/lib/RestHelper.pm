@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex/;
 
 use Test::More;
 use Test::Differences;
@@ -56,6 +56,11 @@ sub json_GET($$) {
 sub seqxml_GET($$) {
   my ($url, $msg) = @_;
   return xml_GET($url, $msg, 'text/x-seqxml+xml');
+}
+
+sub phyloxml_GET($$) {
+  my ($url, $msg) = @_;
+  return xml_GET($url, $msg, 'text/x-phyloxml+xml');
 }
 
 sub xml_GET($$;$) {

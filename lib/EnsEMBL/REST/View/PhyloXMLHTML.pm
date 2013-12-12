@@ -27,7 +27,7 @@ sub get_content {
   return $self->encode_phyloxml($c, $stash_key);
 }
 
-with 'EnsEMBL::REST::Role::GeneTree';
+with 'EnsEMBL::REST::Role::Tree';
 
 __PACKAGE__->meta->make_immutable;
 

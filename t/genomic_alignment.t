@@ -28,6 +28,8 @@ use Test::Differences;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
+use Test::XML::Simple;
+use Test::XPath;
 
 #get databases
 my $zebrafinch = Bio::EnsEMBL::Test::MultiTestDB->new("taeniopygia_guttata");
@@ -56,11 +58,6 @@ my $data = get_data();
   action_bad_regex("/alignment/block/region/$species/$region?mask=wibble", qr/wibble/, "Using unsupported masking type causes an exception");
 }
 
-#Wrong overlap
-{
-  action_bad_regex("/alignment/slice/region/$species/$region?overlaps=wibble", qr/wibble/, "Using unsupported overlap type causes an exception");
-}
-
 #Too large a region
 {
   my $region = '2:1000000..2000000';
@@ -68,18 +65,33 @@ my $data = get_data();
 }
 
 #Invalid species_set_group
-#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040000-106041500?method=EPO;species_set_group=wibble' -H 'Content-type:application/json'
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040000-106041500?method=EPO;species_set_group=wibble' -H 'Content-type:application/json'
 {
- action_bad_regex("/alignment/slice/region/$species/$region?method=EPO;species_set_group=wibble", qr/wibble/, "Using unsupported species_set_group causes an exception");
+ action_bad_regex("/alignment/region/$species/$region?method=EPO;species_set_group=wibble", qr/wibble/, "Using unsupported species_set_group causes an exception");
 }
 
 #Invalid species_set
-#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040000-106041500?method=LASTZ_NET;species_set=gallus_gallus;species_set=wibble' -H 'Content-type:application/json'
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040000-106041500?method=LASTZ_NET;species_set=gallus_gallus;species_set=wibble' -H 'Content-type:application/json'
 {
-  action_bad_regex("/alignment/slice/region/$species/$region?method=EPO;species_set=gallus_gallus;species_set=wibble", qr/wibble/, "Using unsupported species_set causes an exception");
+  action_bad_regex("/alignment/region/$species/$region?method=EPO;species_set=gallus_gallus;species_set=wibble", qr/wibble/, "Using unsupported species_set causes an exception");
 }
 
-#Small region EPO, block, tree
+#Small region EPO slice, tree, deprecated, json
+#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
+{
+  my $region = '2:106040050-106040100';
+
+  action_bad("/alignment/slice/region/$species/$region?method=EPO;species_set_group=birds", "Deprecated method: EPO alignment, slice");
+
+  #is (scalar(@{$json}), 1, "number of alignment blocks");
+ # my $num_alignments = 5;
+
+  #is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, align_slice, expanded");
+  #eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, align_slice, expanded");
+
+}
+
+#Small region EPO, block, tree, json
 #curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
 {
   my $region = '2:106040050-106040100';
@@ -101,123 +113,344 @@ my $data = get_data();
   is($found, 1, "Single EPO tree");
 }
 
-#Small region EPO align_slice, expanded
-#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;expanded=1' -H 'Content-type:application/json'
+#Small region EPO, tree, phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds' -H 'Content-type:text/x-phyloxml+xml'
 {
   my $region = '2:106040050-106040100';
 
-  my $json = json_GET("/alignment/slice/region/$species/$region?method=EPO;species_set_group=birds;expanded=1", "EPO alignment, align_slice, expanded");
-  is (scalar(@{$json}), 1, "number of alignment blocks");
-  my $num_alignments = 5;
+  my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO", "EPO alignment, block HERE");
 
-  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, align_slice, expanded");
-  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, align_slice, expanded");
+  #not sure if this is the best way of doing this but I couldn't figure out how to get all the nodes associated with a particular Scientific node
+   my $location = $data->{short_EPO}{seq_region} .":" . $data->{short_EPO}{start} . "-" . $data->{short_EPO}{end};
+   my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
 
+   $tx->is('count(//p:clade)', 5,"number of clades");
+   $tx->ok('//p:scientific_name="Taeniopygia guttata"', "Scientific name");
+   $tx->ok('//p:location="'.$location.'"', "location");
+   $tx->ok( '//p:mol_seq="' . $data->{short_EPO}{seq}  .'"', "sequence");  
 }
 
-#Small region EPO align_slice, not expanded
-#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;expanded=0' -H 'Content-type:application/json'
+#Small region EPO, tree, aligned, json
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;aligned=1' -H 'Content-type:application/json'
 {
   my $region = '2:106040050-106040100';
 
-  my $json = json_GET("/alignment/slice/region/$species/$region?method=EPO;species_set_group=birds;expanded=0", "EPO alignment, align_slice, expanded");
+  my $json = json_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;aligned=1", "EPO alignment, block");
   is (scalar(@{$json}), 1, "number of alignment blocks");
   my $num_alignments = 5;
 
-  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, align_slice, expanded");
-  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_no_gaps}, "First EPO alignment, align_slice, expanded");
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
+  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
+  #Can have 2 alternative trees
+  my $found = 0;
+  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
+    if ($data_tree eq $json->[0]{tree}) {
+       $found = 1;
+    }
+  }
+  is($found, 1, "Single EPO tree");
+}
+
+#Small region EPO, block, tree, aligned, phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;aligned=1' -H 'Content-type:text/x-phyloxml+xml'
+{
+  my $region = '2:106040050-106040100';
+
+  my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;aligned=1", "EPO alignment HERE");
+
+  #not sure if this is the best way of doing this but I couldn't figure out how to get all the nodes associated with a particular Scientific node
+   my $location = $data->{short_EPO}{seq_region} .":" . $data->{short_EPO}{start} . "-" . $data->{short_EPO}{end};
+   my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
+
+   $tx->is('count(//p:clade)', 5,"number of clades");
+   $tx->ok('//p:scientific_name="Taeniopygia guttata"', "Scientific name");
+   $tx->ok('//p:location="'.$location.'"', "location");
+   $tx->ok( '//p:mol_seq="' . $data->{short_EPO}{seq}  .'"', "sequence");  
 
 }
 
-#Small region, EPO soft masking
-#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040500-106040550:1?method=EPO;species_set_group=birds;mask=soft' -H 'Content-type:application/json'
+#Small region EPO, tree, not aligned, json
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;aligned=0' -H 'Content-type:application/json'
+{
+  my $region = '2:106040050-106040100';
+
+  my $json = json_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;aligned=0", "EPO alignment");
+  is (scalar(@{$json}), 1, "number of alignment blocks");
+  my $num_alignments = 5;
+
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_no_gaps}, "First EPO alignment, block");
+
+  #Can have 2 alternative trees
+  my $found = 0;
+  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
+    if ($data_tree eq $json->[0]{tree}) {
+       $found = 1;
+    }
+  }
+  is($found, 1, "Single EPO tree");
+
+}
+
+#Small region EPO, tree, not aligned, phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;aligned=0' -H 'Content-type:text/x-phyloxml+xml'
+{
+  my $region = '2:106040050-106040100';
+
+  my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;aligned=0", "EPO alignment, AGAIN");
+
+   my $location = $data->{short_EPO}{seq_region} .":" . $data->{short_EPO}{start} . "-" . $data->{short_EPO}{end};
+   my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
+
+   $tx->is('count(//p:clade)', 5,"number of clades");
+   $tx->ok('//p:scientific_name="Taeniopygia guttata"', "Scientific name");
+   $tx->ok('//p:location="'.$location.'"', "location");
+   $tx->ok( '//p:mol_seq="' . $data->{short_EPO_no_gaps}{seq}  .'"', "sequence");  
+
+}
+
+#Small region, EPO soft masking json
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040500-106040550:1?method=EPO;species_set_group=birds;mask=soft' -H 'Content-type:application/json'
 {
   my $region = '2:106040500-106040550';
 
-  my $json = json_GET("/alignment/block/region/$species/$region?method=EPO;species_set_group=birds;mask=soft", "EPO alignment, block, soft masking");
+  my $json = json_GET("/alignment/region/$species/$region?method=EPO;species_set_group=birds;mask=soft", "EPO alignment, soft masking");
   is (scalar(@{$json}), 1, "number of short EPO alignment blocks, soft masking");
   my $num_alignments = 3;
 
-  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, block, soft masking");
-  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_soft}, "First EPO alignment, block, soft masking");
+  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, soft masking");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_soft}, "First EPO alignment, soft masking");
 
 }
 
-#Small region, EPO, slice, hard masking
-#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040500-106040550:1?method=EPO;species_set_group=birds;mask=hard' -H 'Content-type:application/json'
+#Small region, EPO soft masking phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040500-106040550:1?method=EPO;species_set_group=birds;mask=soft' -H 'Content-type:text/x-phyloxml+xml'
+{
+  my $region = '2:106040500-106040550';
+  my $num_alignments = 3;
+  
+  my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;mask=soft", "EPO alignment BROKEN");
+
+   my $location = $data->{short_EPO_soft}{seq_region} .":" . $data->{short_EPO_soft}{start} . "-" . $data->{short_EPO_soft}{end};
+   my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
+   
+   #$phyloxml =~ s/xmlns="http:\/\/www.phyloxml.org"//d;
+   # my $tx = Test::XPath->new(xml => $phyloxml);
+
+   $tx->is('count(//p:clade)', $num_alignments,"number of short EPO alignment blocks, soft masking, phyloxml");
+   $tx->ok('//p:scientific_name="Taeniopygia guttata"', "First EPO alignment, soft masking, Scientific name");
+   $tx->ok('//p:location="'.$location.'"', "First EPO alignment, soft masking, location");
+   $tx->ok( '//p:mol_seq="' . $data->{short_EPO_soft}{seq}  .'"', "First EPO alignment, soft masking, sequence");   
+}
+
+
+#Small region, EPO, hard masking
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040500-106040550:1?method=EPO;species_set_group=birds;mask=hard' -H 'Content-type:application/json'
 {
   my $region = '2:106040500-106040550';
 
-  my $json = json_GET("/alignment/block/region/$species/$region?method=EPO;species_set_group=birds;mask=hard", "EPO alignment, block, hard masking");
-  is (scalar(@{$json}), 1, "number of EPO alignmens, block, hard masking");
+  my $json = json_GET("/alignment/region/$species/$region?method=EPO;species_set_group=birds;mask=hard", "EPO alignment,hard masking");
+  is (scalar(@{$json}), 1, "number of EPO alignmens, hard masking");
   my $num_alignments = 3;
 
-  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, block, hard masking");
-  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_hard}, "First EPO alignment, block, hard masking");
+  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, hard masking");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_hard}, "First EPO alignment, hard masking");
 
 }
 
-#Small region, EPO, slice,  soft masking
-#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106040500-106040550:1?method=EPO;species_set_group=birds;mask=soft;expanded=1' -H 'Content-type:application/json'
+#Small region, EPO hard masking phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040500-106040550:1?method=EPO;species_set_group=birds;mask=hard' -H 'Content-type:text/x-phyloxml+xml'
 {
   my $region = '2:106040500-106040550';
-
-  my $json = json_GET("/alignment/slice/region/$species/$region?method=EPO;species_set_group=birds;mask=soft;expanded=1", "EPO alignment, slice, soft masking");
-  is (scalar(@{$json}), 1, "number of EPO alignments, slice, soft masking");
   my $num_alignments = 3;
+  
+  my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;mask=hard", "EPO alignment, hard masking");
 
-  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, slice, soft masking");
-  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_soft}, "First EPO alignment, slice, soft masking");
+   my $location = $data->{short_EPO_hard}{seq_region} .":" . $data->{short_EPO_hard}{start} . "-" . $data->{short_EPO_hard}{end};
 
+  $phyloxml =~ s/xmlns="http:\/\/www.phyloxml.org"//d;
+  my $tx = Test::XPath->new(xml => $phyloxml);
+   #my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
+
+   $tx->is('count(//clade)', $num_alignments,"number of short EPO alignment blocks, hard masking, phyloxml");
+   $tx->ok('//scientific_name="Taeniopygia guttata"', "First EPO alignment, hard masking, Scientific name");
+   $tx->ok('//location="'.$location.'"', "First EPO alignment, hard masking, location");
+   $tx->ok( '//mol_seq="' . $data->{short_EPO_hard}{seq}  .'"', "First EPO alignment, hard masking, sequence");   
 }
 
-#Small region, EPO, slice, hard masking
-#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106040500-106040550:1?method=EPO;species_set_group=birds;mask=hard;expaned=1' -H 'Content-type:application/json'
+#EPO, restricted species, json
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;display_species_set=gallus_gallus;display_species_set=taeniopygia_guttata' -H 'Content-type:application/json'
 {
-  my $region = '2:106040500-106040550';
+   use Bio::EnsEMBL::Registry;
+   Bio::EnsEMBL::Registry->add_alias("gallus_gallus", "chicken");
+   Bio::EnsEMBL::Registry->add_alias("taeniopygia_guttata", "zebrafinch");
+   my $region = '2:106040050-106040100';
 
-  my $json = json_GET("/alignment/slice/region/$species/$region?method=EPO;species_set_group=birds;mask=hard;expanded=1", "EPO alignment, slice, hard masking");
-  is (scalar(@{$json}), 1, "number of EPO alignments, slice, hard masking");
+  my $json = json_GET("/alignment/region/$species/$region?method=EPO;species_set_group=birds;display_species_set=chicken;display_species_set=zebrafinch", "short EPO alignment, restricted set");
+
+  is (scalar(@{$json}), 1, "number of alignment blocks, restricted set");
   my $num_alignments = 3;
 
-  is($num_alignments, scalar(@{$json->[0]{alignments}}), "number of EPO alignments, slice, hard masking");
-  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_hard}, "First EPO alignment, slice, hard masking");
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, restricted set");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, restricted set");
+}
+
+#EPO, restricted species, phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;display_species_set=chicken;display_species_set=zebrafinch' -H 'Content-type:text/x-phyloxml+xml'
+{
+   use Bio::EnsEMBL::Registry;
+   Bio::EnsEMBL::Registry->add_alias("gallus_gallus", "chicken");
+   Bio::EnsEMBL::Registry->add_alias("taeniopygia_guttata", "zebrafinch");
+   my $region = '2:106040050-106040100';
+   my $num_alignments = 3;
+
+   my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;display_species_set=chicken;display_species_set=zebrafinch", "EPO alignment, restricted set");
+
+   my $location = $data->{short_EPO}{seq_region} .":" . $data->{short_EPO}{start} . "-" . $data->{short_EPO}{end};
+   #$phyloxml =~ s/xmlns="http:\/\/www.phyloxml.org"//d;
+   #my $tx = Test::XPath->new(xml => $phyloxml);
+   my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
+
+   $tx->is('count(//p:clade)', $num_alignments,"number of short EPO alignment blocks, restricted set, phyloxml");
+   $tx->ok('//p:scientific_name="Taeniopygia guttata"', "First EPO alignment, restricted set, Scientific name");
+   $tx->ok('//p:location="'.$location.'"', "First EPO alignment, restricted set, location");
+   $tx->ok( '//p:mol_seq="' . $data->{short_EPO}{seq}  .'"', "First EPO alignment, restricted set, sequence");   
 
 }
 
-#EPO, block, restricted species
-#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;display_species_set=gallus_gallus;display_species_set=taeniopygia_guttata' -H 'Content-type:application/json'
+#Small region EPO, tree, no branch lengths json
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;no_branch_lengths=1' -H 'Content-type:application/json'
 {
   my $region = '2:106040050-106040100';
 
-  my $json = json_GET("/alignment/block/region/$species/$region?method=EPO;species_set_group=birds;display_species_set=gallus_gallus;display_species_set=taeniopygia_guttata", "short EPO alignment, block, restricted set");
-  is (scalar(@{$json}), 1, "number of alignment blocks, block, restricted set");
-  my $num_alignments = 2;
+  my $json = json_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;no_branch_lengths=1", "EPO alignment, block");
+  is (scalar(@{$json}), 1, "number of alignment blocks");
+  my $num_alignments = 5;
 
-  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block, restricted set");
-  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block, restricted set");
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
+  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
+  #Can have 2 alternative trees
+  my $found = 0;
+  foreach my $data_tree (@{$data->{short_EPO_tree_no_branch_lengths}}) {
+    if ($data_tree eq $json->[0]{tree}) {
+       $found = 1;
+    }
+  }
+  is($found, 1, "Single EPO tree");
 }
 
-#EPO, slice, restricted species
-#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;expanded=1;species_set_group=birds;display_species_set=gallus_gallus;display_species_set=taeniopygia_guttata' -H 'Content-type:application/json'
+
+#Small region EPO, tree, no branch lengths phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;no_branch_lengths=1' -H 'Content-type:text/x-phyloxml+xml'
+{
+  my $region = '2:106040050-106040100';
+  my $num_alignments = 5;
+
+  my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;no_branch_lengths=1", "EPO alignment, block HERE");
+
+  #not sure if this is the best way of doing this but I couldn't figure out how to get all the nodes associated with a particular Scientific node
+   my $location = $data->{short_EPO}{seq_region} .":" . $data->{short_EPO}{start} . "-" . $data->{short_EPO}{end};
+   my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
+
+   $tx->is('count(//p:clade)', $num_alignments,"number of clades");
+   $tx->is('count(//p:clade[@branch_length])', 0, "No branch length set");
+   $tx->ok('//p:scientific_name="Taeniopygia guttata"', "First EPO alignment, no branch length, Scientific name");
+   $tx->ok('//p:location="'.$location.'"', "First EPO alignment, no branch length, location");
+   $tx->ok( '//p:mol_seq="' . $data->{short_EPO}{seq}  .'"', "First EPO alignment, no branch length, sequence");  
+}
+
+#Small region EPO, tree, branch lengths json
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;no_branch_lengths=0' -H 'Content-type:application/json'
 {
   my $region = '2:106040050-106040100';
 
-  my $json = json_GET("/alignment/block/region/$species/$region?method=EPO;species_set_group=birds;expanded=1;display_species_set=gallus_gallus;display_species_set=taeniopygia_guttata", "short EPO alignment, slice, restricted set");
-  is (scalar(@{$json}), 1, "number of alignment blocks, slice, restricted set ");
-  my $num_alignments = 2;
+  my $json = json_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;no_branch_lengths=0", "EPO alignment, block");
+  is (scalar(@{$json}), 1, "number of alignment blocks");
+  my $num_alignments = 5;
 
-  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, slice, restricted set");
-  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, slice, restricted set");
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
+  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
+  #Can have 2 alternative trees
+  my $found = 0;
+  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
+    if ($data_tree eq $json->[0]{tree}) {
+       $found = 1;
+    }
+  }
+  is($found, 1, "Single EPO tree");
+}
+
+#Small region EPO, tree, branch lengths phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;no_branch_lengths=0' -H 'Content-type:text/x-phyloxml+xml'
+{
+  my $region = '2:106040050-106040100';
+  my $num_alignments = 5;
+
+  my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;no_branch_lengths=0", "EPO alignment, block HERE");
+
+  #not sure if this is the best way of doing this but I couldn't figure out how to get all the nodes associated with a particular Scientific node
+   my $location = $data->{short_EPO}{seq_region} .":" . $data->{short_EPO}{start} . "-" . $data->{short_EPO}{end};
+   my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
+
+   $tx->is('count(//p:clade)', $num_alignments,"number of clades");
+   $tx->is('count(//p:clade[@branch_length])', $num_alignments, "Branch length set");
+   $tx->ok('//p:scientific_name="Taeniopygia guttata"', "First EPO alignment, branch length, Scientific name");
+   $tx->ok('//p:location="'.$location.'"', "First EPO alignment, branch length, location");
+   $tx->ok( '//p:mol_seq="' . $data->{short_EPO}{seq}  .'"', "First EPO alignment, branch length, sequence");  
+}
+
+#Small region EPO, tree, no compact json (no afffect for EPO)
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;compact=0' -H 'Content-type:application/json'
+{
+  my $region = '2:106040050-106040100';
+
+  my $json = json_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;compact=0", "EPO alignment, block");
+  is (scalar(@{$json}), 1, "number of alignment blocks");
+  my $num_alignments = 5;
+
+  is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
+  eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
+  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
+  #Can have 2 alternative trees
+  my $found = 0;
+  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
+    if ($data_tree eq $json->[0]{tree}) {
+       $found = 1;
+    }
+  }
+  is($found, 1, "Single EPO tree");
+}
+
+#Small region EPO, tree, branch lengths phyloxml
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds;compact=0' -H 'Content-type:text/x-phyloxml+xml'
+{
+  my $region = '2:106040050-106040100';
+  my $num_alignments = 5;
+
+  my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;compact=0", "EPO alignment, block HERE");
+
+  #not sure if this is the best way of doing this but I couldn't figure out how to get all the nodes associated with a particular Scientific node
+   my $location = $data->{short_EPO}{seq_region} .":" . $data->{short_EPO}{start} . "-" . $data->{short_EPO}{end};
+   my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
+
+   $tx->is('count(//p:clade)', $num_alignments,"number of clades");
+   $tx->is('count(//p:clade[@branch_length])', $num_alignments, "Branch length set");
+   $tx->ok('//p:scientific_name="Taeniopygia guttata"', "First EPO alignment, branch length, Scientific name");
+   $tx->ok('//p:location="'.$location.'"', "First EPO alignment, branch length, location");
+   $tx->ok( '//p:mol_seq="' . $data->{short_EPO}{seq}  .'"', "First EPO alignment, branch length, sequence");  
 }
 
 #EPO, large block, multiple trees
-#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106040000-106041500:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040000-106041500:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
 {
   my $region = '2:106040050-106041500';
+  my $number_of_alignment_blocks = 2;   
 
-  my $json = json_GET("/alignment/block/region/$species/$region?method=EPO;species_set_group=birds", "large EPO alignment, multiple trees");
-  is (scalar(@{$json}), 2, "number of alignment blocks, large block, multiple trees");
+  my $json = json_GET("/alignment/region/$species/$region?method=EPO;species_set_group=birds", "large EPO alignment, multiple trees");
+  is (scalar(@{$json}), $number_of_alignment_blocks, "number of alignment blocks, large block, multiple trees");
 
   #expect to find 2 trees (leaf ordering can be different)
   my $found = 0;
@@ -232,69 +465,83 @@ my $data = get_data();
   is($found, 2, "Large EPO tree");
 }
 
-#Pairwise, overlaps=none
-#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106041430-106041480:1?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus;overlaps=none' -H 'Content-type:application/json'
+#EPO, large block, multiple trees
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040000-106041500:1?method=EPO;species_set_group=birds' -H 'Content-type:text/x-phyloxml'
 {
-	my $region = '2:106041430-106041480';
+  my $region = '2:106040050-106041500';
+  my $number_of_alignment_blocks = 2;   
+ 
+   my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?species_set_group=birds;method=EPO;aligned=1", "large EPO alignment, multiple trees");
+     $phyloxml =~ s/xmlns="http:\/\/www.phyloxml.org"//d;
+     my $tx = Test::XPath->new(xml => $phyloxml);
 
-	my $json = json_GET("/alignment/slice/region/$species/$region?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus;overlaps=none", "Pairwise, slice, no overlaps");
-	is (scalar(@{$json}), 1, "number of LASTZ_NET alignments, slice, no overlaps");
-  	my $num_seqs = 2;
+     #my $tx = Test::XPath->new(xml => $phyloxml, xmlns => { x => "http://www.w3.org/2001/XMLSchema-instance", p => "http://www.phyloxml.org"});
 
-   	is(scalar(@{$json->[0]{alignments}}), $num_seqs, "number of LASTZ_NET sequences, slice, no overlaps");
-        for (my $i = 0; $i < $num_seqs; $i++) {   
-	   eq_or_diff_data($json->[0]{alignments}[$i], $data->{LASTZ_NET_no_overlaps}[$i], "Pairwise, slice, no overlaps");
-        }
+    $tx->is('count(//phylogeny)', $number_of_alignment_blocks,"number of  LASTZ_NET blocks, phyloxml");
+
 }
 
-#Pairwise, overlaps=all
-#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106041430-106041480:1?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus;overlaps=all' -H 'Content-type:application/json'
-{
-	my $region = '2:106041430-106041480';
-
-	my $json = json_GET("/alignment/slice/region/$species/$region?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus;overlaps=all", "Pairwise, slice, all overlaps");
-	is (scalar(@{$json}), 1, "number of LASTZ_NET alignments, slice, all overlaps");
-  	my $num_seqs = 3;
-
-   	is(scalar(@{$json->[0]{alignments}}), $num_seqs, "number of LASTZ_NET sequences, slice, all overlaps");
-        for (my $i = 0; $i < $num_seqs; $i++) {   
-	   eq_or_diff_data($json->[0]{alignments}[$i], $data->{LASTZ_NET_all_overlaps}[$i], "Pairwise, slice, all overlaps");
-        }
-}
-
-#Pairwise, overlaps=restrict
-#curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106041430-106041480:1?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus;overlaps=restrict' -H 'Content-type:application/json'
-{
-	my $region = '2:106041430-106041480';
-
-	my $json = json_GET("/alignment/slice/region/$species/$region?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus;overlaps=restrict", "Pairwise, slice, all overlaps");
-	is (scalar(@{$json}), 1, "number of LASTZ_NET alignments, slice, restrict overlaps");
-  	my $num_seqs = 2;
-
-   	is(scalar(@{$json->[0]{alignments}}), $num_seqs, "number of LASTZ_NET sequences, slice, restrict overlaps");
-        for (my $i = 0; $i < $num_seqs; $i++) {   
-	   eq_or_diff_data($json->[0]{alignments}[$i], $data->{LASTZ_NET_restrict_overlaps}[$i], "Pairwise, slice, restrict overlaps");
-        }
-}
 
 #Pairwise, block
-#curl 'http://127.0.0.1:3000/alignment/block/region/taeniopygia_guttata/2:106041430-106041480:1?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus' -H 'Content-type:application/json'
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106041430-106041480:1?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus' -H 'Content-type:application/json'
 {
 	my $region = '2:106041430-106041480';
 
-	my $json = json_GET("/alignment/block/region/$species/$region?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus;overlaps=restrict", "Pairwise, block");
+	my $json = json_GET("/alignment/region/$species/$region?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus", "Pairwise, multiple blocks");
 
 	my $num_blocks = 2;
 	is (scalar(@{$json}), $num_blocks, "number of LASTZ_NET alignments, block");
   	my $num_seqs = 2;
 
    	is(scalar(@{$json->[0]{alignments}}), $num_seqs, "number of LASTZ_NET sequences, block");
+	my $found = 0;
+	#Need to loop round each seq since they may be stored in a different order
         for (my $i = 0; $i < $num_blocks; $i++) {   
            for (my $j = 0; $j < $num_seqs; $j++) {   
-	      eq_or_diff_data($json->[$i]{alignments}[$j], $data->{LASTZ_NET_blocks}[$i][$j], "Pairwise, block");
+	        for (my $k = 0; $k < $num_seqs; $k++) {   
+	        #eq_or_diff_data($json->[$i]{alignments}[$j], $data->{LASTZ_NET_blocks}[$i][$j], "Pairwise, block");
+	         if ($json->[$i]{alignments}[$k]->{end} eq $data->{LASTZ_NET_blocks}[$i][$j]->{end} &&
+		     $json->[$i]{alignments}[$k]->{start} eq $data->{LASTZ_NET_blocks}[$i][$j]->{start} &&
+		     $json->[$i]{alignments}[$k]->{seq} eq $data->{LASTZ_NET_blocks}[$i][$j]->{seq} &&
+		     $json->[$i]{alignments}[$k]->{seq_region} eq $data->{LASTZ_NET_blocks}[$i][$j]->{seq_region}) {
+	            $found++;
+                 }
+              }	      
            }
         }
+	is($found, 4, "LASTZ_NET block");
 }
+
+#Pairwise, block
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106041430-106041480:1?method=LASTZ_NET;species_set=taeniopygia_guttata;species_set=gallus_gallus' -H 'Content-type:text/x-phyloxml+xml'
+{
+	my $region = '2:106041430-106041480';
+	my $num_blocks = 2;
+	my $num_seqs = 2;
+
+	my $phyloxml = phyloxml_GET("/alignment/region/$species/$region?method=LASTZ_NET;aligned=1;species_set=taeniopygia_guttata;species_set=gallus_gallus", "Pairwise, multiple blocks");
+        $phyloxml =~ s/xmlns="http:\/\/www.phyloxml.org"//d;
+
+       my $tx = Test::XPath->new(xml => $phyloxml);
+
+       $tx->is('count(//phylogeny)', $num_blocks,"number of  LASTZ_NET blocks, phyloxml");
+
+	#Loop round the blocks and sequences
+        for (my $i = 0; $i < $num_blocks; $i++) {   
+           for (my $j = 0; $j < $num_seqs; $j++) {   
+	        for (my $k = 0; $k < $num_seqs; $k++) {   
+		   my $location = $data->{LASTZ_NET_blocks}[$i][$j]->{seq_region} .":" . $data->{LASTZ_NET_blocks}[$i][$j]->{start} . "-" . $data->{LASTZ_NET_blocks}[$i][$j]->{end};
+		   my $species  = ucfirst($data->{LASTZ_NET_blocks}[$i][$j]->{species});
+		   $species =~ s/_/ /g;
+
+   		   $tx->ok('//location="'.$location.'"', "LASTZ_NET blocks, phyloxml location");
+		   $tx->ok( '//mol_seq="' . $data->{LASTZ_NET_blocks}[$i][$j]->{seq}  .'"', "LASTZ_NET blocks, sequence");   
+		   $tx->ok('//scientific_name="' . $species  .'"' , "LASTZ_NET blocks, Scientific name");
+		}	      
+           }
+       }
+}
+
 
 sub get_data {
     my $data;
@@ -302,6 +549,9 @@ sub get_data {
     $data->{short_EPO} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAA--------GAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
      push @{$data->{short_EPO_tree}}, "((Ggal_2_100370256_100370312[+]:0.0414,Mgal_3_49885207_49885257[+]:0.0414):0.1242,Tgut_2_106040050_106040100[+]:0.1715):0;";
     push @{$data->{short_EPO_tree}}, "((Mgal_3_49885207_49885257[+]:0.0414,Ggal_2_100370256_100370312[+]:0.0414):0.1242,Tgut_2_106040050_106040100[+]:0.1715):0;";
+
+    push @{$data->{short_EPO_tree_no_branch_lengths}}, "((Ggal_2_100370256_100370312[+],Mgal_3_49885207_49885257[+]),Tgut_2_106040050_106040100[+]);";
+    push @{$data->{short_EPO_tree_no_branch_lengths}}, "((Mgal_3_49885207_49885257[+],Ggal_2_100370256_100370312[+]),Tgut_2_106040050_106040100[+]);";
 
     push @{$data->{large_EPO_tree}}, "((Mgal_3_49885207_49885557[+]:0.0414,Ggal_2_100370256_100370612[+]:0.0414):0.1242,Tgut_2_106040050_106040400[+]:0.1715):0;";
     push @{$data->{large_EPO_tree}}, "((Ggal_2_100370256_100370612[+]:0.0414,Mgal_3_49885207_49885557[+]:0.0414):0.1242,Tgut_2_106040050_106040400[+]:0.1715):0;";
