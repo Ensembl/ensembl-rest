@@ -27,12 +27,29 @@ BEGIN { extends 'Catalyst::Controller::REST'; }
 has 'default_compara' => ( is => 'ro', isa => 'Str', default => 'multi' );
 has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e6);
 
+__PACKAGE__->config(
+  default => 'text/html',
+  map => {
+    'text/html'           => [qw/View PhyloXMLHTML/],
+    'text/x-phyloxml+xml' => [qw/View PhyloXML/],
+    'text/x-phyloxml'     => [qw/View PhyloXML/], #naughty but needs must
+    'text/xml'            => [qw/View PhyloXML/],
+  }
+);
+
+EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
+
+#We want to find every "non-special" format. To generate the regex used then invoke this command:
+#perl -MRegexp::Assemble -e 'my $ra = Regexp::Assemble->new; $ra->add($_) for qw(application\/json text\/javascript application\/x-sereal text\/x-yaml application\/x-msgpack); print $ra->re, "\n"'
+my $CONTENT_TYPE_REGEX = qr/(?-xism:(?:application\/(?:x-(?:msgpack|sereal)|json)|text\/(?:javascript|x-yaml)))/;
+
 sub get_adaptors :Private {
   my ($self, $c) = @_;
 
   try {
     my $species = $c->stash()->{species};
     my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'), $self->default_compara());
+
     my $mlssa = $compara_dba->get_MethodLinkSpeciesSetAdaptor();
     my $gdba = $compara_dba->get_GenomeDBAdaptor();
     my $asa = $compara_dba->get_AlignSliceAdaptor();
@@ -53,37 +70,69 @@ sub get_adaptors :Private {
   };
 }
 
-sub get_slice_species : Chained("/") PathPart("alignment/slice/region") CaptureArgs(1) {
+
+sub get_species : Chained("/") PathPart("alignment/region") CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
   $c->stash->{species} = $species;
 }
 
-sub slice_region_GET { }
+sub region_GET { }
 
-sub slice_region : Chained("get_slice_species") PathPart("") Args(1) ActionClass('REST') {
+sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
     my ( $self, $c, $region ) = @_;
 
-    #getting AlignSlice alignments
-    my $align_slice = 1;
+    #getting GenomicAlignBlock or GenomicAlignTree alignments
     my $alignments;
     try {
-      #$c->log()->debug('Finding the Slice');
       my $slice = $c->model('Lookup')->find_slice($region);
 
       #Check for maximum slice length
       $self->assert_slice_length($c, $slice);
 
-      #$c->log()->debug('Finding the alignment');
-      $alignments = $c->model('GenomicAlignment')->get_alignment($slice, $align_slice);
+      $alignments = $c->model('GenomicAlignment')->get_alignment($slice);
     } catch {
       $c->go('ReturnError', 'from_ensembl', [$_]);
     };
+
+    #Set aligned option (default 1)
+    $c->stash->{"aligned"} = (defined $c->request()->param('aligned')) ? $c->request()->param('aligned') : 1; 
+
+    #Set compact option (default 1)
+    $c->stash->{"compact"} = (defined $c->request->param('compact')) ? $c->request->param('compact') : 1;
+
+    #Set no branch lengths option (default 0, ie display branch lengths)
+    $c->stash->{"no_branch_lengths"} = (defined $c->request->param('no_branch_lengths')) ? $c->request->param('no_branch_lengths') : 0;
+
+    #Never give branch lengths for pairwise, even if requested
+    my $mlss = $alignments->[0]->method_link_species_set;
+    if ($mlss->method->class eq "GenomicAlignBlock.pairwise_alignment") {
+      $c->stash->{"no_branch_lengths"} = 0;
+    } 
+
+    if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
+       my $tree_hash = $c->model('GenomicAlignment')->get_tree_as_hash($alignments);
+      $self->status_ok($c, entity => $tree_hash);
+      return;
+    }
+
     $self->status_ok($c, entity => $alignments);
     return;
 }
 
+#This is deprecated. 
+sub get_slice_species : Chained("/") PathPart("alignment/slice/region") CaptureArgs(1) {
+  my ( $self, $c, $species ) = @_;
+  #$c->stash->{species} = $species;
+
+   $c->go( 'ReturnError', 'custom',
+        [qq{/alignment/slice/region is deprecated. See http://beta.rest.ensembl.org/alignment/region for alternative}] );
+
+}
+
+#This is deprecated and will be forwarded to alignment/region
 sub get_block_species : Chained("/") PathPart("alignment/block/region") CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
+
   $c->stash->{species} = $species;
 }
 
@@ -92,26 +141,11 @@ sub block_region_GET { }
 sub block_region : Chained("get_block_species") PathPart("") Args(1) ActionClass('REST') {
     my ( $self, $c, $region ) = @_;
 
-    #getting GenomicAlignBlock or GenomicAlignTree alignments
-    my $align_slice = 0;
-    my $alignments;
-    try {
-      #$c->log()->debug('Finding the Slice');
-      my $slice = $c->model('Lookup')->find_slice($region);
-
-      #Check for maximum slice length
-      $self->assert_slice_length($c, $slice);
-
-      $alignments = $c->model('GenomicAlignment')->get_alignment($slice, $align_slice);
-    } catch {
-      $c->go('ReturnError', 'from_ensembl', [$_]);
-    };
-    $self->status_ok($c, entity => $alignments);
-    return;
+    $c->detach('EnsEMBL::REST::Controller::GenomicAlignment','region', $region);
 }
 
-
 with 'EnsEMBL::REST::Role::SliceLength';
+with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
 

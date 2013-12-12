@@ -17,6 +17,7 @@ limitations under the License.
 =cut
 
 package EnsEMBL::REST::Model::GenomicAlignment;
+use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 
 use Moose;
 
@@ -39,7 +40,7 @@ sub build_per_context_instance {
 }
 
 sub get_alignment {
-  my ($self, $slice, $align_slice) = @_;
+  my ($self, $slice) = @_;
   my $c = $self->context();
   my $alignments;
 
@@ -70,9 +71,6 @@ sub get_alignment {
     $c->go('ReturnError', 'custom', ["'$mask' is not an allowed value for masking"]) unless $allowed_values{mask}{$mask};
   }
 
-  #If false, gets the low coverage segments as seperate objects
-  my $compact_all_alignments = $c->request->parameters->{compact};
-
   #Get the compara DBAdaptor
   $c->forward('get_adaptors');
   
@@ -82,7 +80,6 @@ sub get_alignment {
     $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_species_set_name($method, $species_set_group);    
     $c->go('ReturnError', 'custom', ["No method_link_specices_set found for method ${method} and species_set_group ${species_set_group} "]) if ! $mlss;
   }
-
   if ($species_set) {
     $species_set = (ref($species_set) eq 'ARRAY') ? $species_set : [$species_set];
     $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_registry_aliases($method, $species_set);
@@ -97,127 +94,98 @@ sub get_alignment {
   }
 
   #Get alignments
-  if ($align_slice) {
-    #Use AlignSlice method
-
-    my $expanded = $c->request->parameters->{expanded} || 0;
-
-    #Check overlap enums
-    my $overlaps = $c->request()->param('overlaps') || q{};
-    if ($overlaps) {
-      $c->go('ReturnError', 'custom', ["'$overlaps' is not an allowed value for overlaps"]) unless $allowed_values{overlaps}{$overlaps};
-    }
-
-    #Reassign text to boolean arguments currently required by the API
-    if ($overlaps eq "none") {
-      $overlaps = 0;
-    } elsif ($overlaps eq "all") {
-      $overlaps = 1;
-    }
-
-    #Get AlignSlice object
-    #??? what about target_slice???
-    my $align_slice = $c->stash->{align_slice_adaptor}->fetch_by_Slice_MethodLinkSpeciesSet($slice, $mlss, $expanded, $overlaps);
-
-    #Convert AlignSlice object into hash
-    my $align_hash;
-    my $these_alignments = $align_slice->summary_as_hash($display_species, $mask);
-
-    $align_hash->{'alignments'} = ratify_summary($c, $these_alignments);
-    push @$alignments, $align_hash;
-
+  #Get either the genomic_align_block_adaptor or genomic_align_tree_adaptor
+  my $genomic_align_set_adaptor;
+  if ($mlss->method->class =~ /GenomicAlignTree/) {
+    $genomic_align_set_adaptor = $c->stash->{genomic_align_tree_adaptor};
   } else {
-    #use GenomicAlignBlock or GenomicAlignTree method
-
-    #Get either the genomic_align_block_adaptor or genomic_align_tree_adaptor
-    my $genomic_align_set_adaptor;
-    if ($mlss->method->class =~ /GenomicAlignTree/) {
-      $genomic_align_set_adaptor = $c->stash->{genomic_align_tree_adaptor};
-    } else {
-      $genomic_align_set_adaptor = $c->stash->{genomic_align_block_adaptor};
-    }
-
-    # Fetching all the GenomicAlignBlock/GenomicAlignTree objects corresponding to this Slice:
-    my $genomic_align_blocks =
-      $genomic_align_set_adaptor->fetch_all_by_MethodLinkSpeciesSet_Slice($mlss, $slice, undef, undef, 'restrict');
+    $genomic_align_set_adaptor = $c->stash->{genomic_align_block_adaptor};
+  }
+  
+  # Fetching all the GenomicAlignBlock/GenomicAlignTree objects corresponding to this Slice:
+  my $genomic_align_blocks =
+    $genomic_align_set_adaptor->fetch_all_by_MethodLinkSpeciesSet_Slice($mlss, $slice, undef, undef, 'restrict');
+  
+  my $new_genomic_align_trees;
+  foreach my $this_genomic_align_tree (@$genomic_align_blocks) {
     
-    #Dump these alignments
-    foreach my $this_genomic_align_block (@$genomic_align_blocks) {
-
-      my $align_hash;
-
-      #Convert GenomicAlignBlock/GenomicAlignTree object to a hash
-      my $these_alignments = $this_genomic_align_block->summary_as_hash($display_species, $mask, $compact_all_alignments);
-
-      #Get newick tree if have GenomicAlignTree object
-      my $newick_trees;
-      my $nh_format = 'simple'; #Only allow simple format for now
-      if ($mlss->method->class =~ /GenomicAlignTree/) {
-	my $newick_tree = $this_genomic_align_block->root->newick_format($nh_format);
-	$align_hash->{'tree'} = $newick_tree;
-      }
-
-      #Tidy up memory
-      if ($this_genomic_align_block->isa("Bio::EnsEMBL::Compara::GenomicAlignTree")) {
-	deep_clean($this_genomic_align_block);
-	$this_genomic_align_block->release_tree();
-      } else {
-	$this_genomic_align_block = undef;
-      }
-
-      #ensure numeric values are actually numeric
-      $align_hash->{'alignments'} = ratify_summary($c, $these_alignments);
-      push @$alignments, $align_hash;
+    #Convert GenomicAlignBlock object into a GenomicAlignTree object
+    if ($mlss->method->class =~ /GenomicAlignBlock/) {
+      $this_genomic_align_tree = $this_genomic_align_tree->get_GenomicAlignTree();
+    } else {
+      $this_genomic_align_tree->annotate_node_type();
     }
+
+    #Must have new object here because of potential tree pruning (calls minimize_tree)
+    $this_genomic_align_tree->repeatmask($mask);
+    my $new_tree = $this_genomic_align_tree->prune($display_species);
+    push @$new_genomic_align_trees, $new_tree;
   }
-  return $alignments;
+  
+  return  $new_genomic_align_trees;
 }
 
-sub deep_clean {
-  my ($genomic_align_tree) = @_;
+sub get_tree_as_hash {
+  my ($self, $genomic_align_trees) = @_;
+  my $c = $self->context();
 
-  my $all_nodes = $genomic_align_tree->get_all_nodes;
-  foreach my $this_genomic_align_node (@$all_nodes) {
-    my $this_genomic_align_group = $this_genomic_align_node->genomic_align_group;
-    next if (!$this_genomic_align_group);
-    foreach my $this_genomic_align (@{$this_genomic_align_group->get_all_GenomicAligns}) {
-      foreach my $key (keys %$this_genomic_align) {
-        if ($key eq "genomic_align_block") {
-          foreach my $this_ga (@{$this_genomic_align->{$key}->get_all_GenomicAligns}) {
-            my $gab = $this_ga->{genomic_align_block};
-            my $gas = $gab->{genomic_align_array};
-            if ($gas) {
-              for (my $i = 0; $i < @$gas; $i++) {
-                delete($gas->[$i]);
-              }
-            }
+   #If false, gets the low coverage segments as seperate objects
+  my $compact_alignments = $c->stash->{compact};
 
-            delete($this_ga->{genomic_align_block}->{genomic_align_array});
-            delete($this_ga->{genomic_align_block}->{reference_genomic_align});
-            undef($this_ga);
-          }
-        }
-        delete($this_genomic_align->{$key});
-      }
-      undef($this_genomic_align);
-    }
-    undef($this_genomic_align_group);
-  }
+  #Use aligned (true) or original (false) sequence
+  my $aligned = $c->stash->{aligned};
+
+  #Do not display branch lengths if true
+  my $no_branch_lengths = $c->stash->{"no_branch_lengths"};
+
+  my $alignments;
+  #Dump these alignments
+   foreach my $this_genomic_align_tree (@$genomic_align_trees) {
+
+     my $align_hash;
+   
+     #Convert GenomicAlignTree object to a hash
+     my $these_alignments = $this_genomic_align_tree->summary_as_hash($compact_alignments, $aligned);
+    
+     #Get newick tree if have GenomicAlignTree object
+     my $newick_trees;
+     my  $nh_format = 'simple'; #Only allow simple format for now
+
+     if (check_ref($this_genomic_align_tree, 'Bio::EnsEMBL::Compara::GenomicAlignTree')) {
+       my $newick_tree ;
+       if ($no_branch_lengths) {
+	 $newick_tree = $this_genomic_align_tree->root->newick_format("ryo", '%{^-n}');
+       } else {
+	 $newick_tree = $this_genomic_align_tree->root->newick_format($nh_format);
+       }
+       $align_hash->{'tree'} = $newick_tree;
+     }
+
+     #Tidy up memory
+     if ($this_genomic_align_tree->isa("Bio::EnsEMBL::Compara::GenomicAlignTree")) {
+       $this_genomic_align_tree->release_tree();
+     } else {
+       $this_genomic_align_tree = undef;
+     }
+    
+     #ensure numeric values are actually numeric
+     $align_hash->{'alignments'} = ratify_summary($these_alignments);
+     push @$alignments, $align_hash;
+   }
+   return $alignments;
 }
-
 
 #Have to do this to force JSON encoding to encode numerics as numerics
 my @KNOWN_NUMERICS = qw( start end strand );
 
 sub ratify_summary {
-  my ($c, $summary) = @_;
+  my ($summary) = @_;
   
   my $hash;
   my $seqs;
   foreach my $aln (@{$summary}) {
     foreach my $key (@KNOWN_NUMERICS) {
       my $v = $aln->{$key};
-      #$c->log()->debug("key $key, $v\n");
       $aln->{$key} = ($v*1) if defined $v;
     }
     #push @$seqs, $aln;
