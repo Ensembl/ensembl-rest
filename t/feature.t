@@ -126,6 +126,61 @@ my $base = '/feature/region/homo_sapiens';
   is(scalar(@{$json}), 1, '1 biotype wibble and protein_coding transcript models');
 }
 
+#trim_(upstream|downstream) queries
+{
+  # positive strand, trim 5'
+  my $region = '6:1081000-1108340';
+  my $json = json_GET("$base/$region?feature=gene;trim_upstream=0", 'Positive strand, no upstream trimming');
+  is(scalar(@{$json}), 1, '1 protein coding gene models expected');
+
+  $json = json_GET("$base/$region?feature=gene;trim_upstream=1", 'Positive stramd, trim upstream');
+  is(scalar(@{$json}), 0, '0 gene models expected');
+  
+  # positive strand, trim 3'
+  $region = '6:1080000-1104000';
+  $json = json_GET("$base/$region?feature=gene;trim_downstream=0", 'Positive strand, no downstream trimming');
+  is(scalar(@{$json}), 1, '1 protein coding gene models expected');
+
+  $json = json_GET("$base/$region?feature=gene;trim_downstream=1", 'Positive strand, trim downstream');
+  is(scalar(@{$json}), 0, '0 gene models expected');
+
+  # positive strand, trim both
+  $region = '6:1081000-1104000';
+  $json = json_GET("$base/$region?feature=gene;trim_upstream=1;trim_downstream=1", 'Positive strand, trim up-downstream');
+  is(scalar(@{$json}), 0, '0 gene models expected');
+
+  $region = '6:1080000-1108000';
+  $json = json_GET("$base/$region?feature=gene;trim_upstream=1;trim_downstream=1", 'Positive strand, trim up-downstream');
+  is(scalar(@{$json}), 1, '1 gene models expected');
+  
+  # negative strand, trim 5'
+  $region = '6:1510000-1515000:-1';
+  $json = json_GET("$base/$region?feature=gene;trim_upstream=0", 'Negative strand, no upstream trimming');
+  is(scalar(@{$json}), 1, '1 protein coding gene models expected');
+
+  $json = json_GET("$base/$region?feature=gene;trim_upstream=1", 'Negative strand, trim upstream');
+  is(scalar(@{$json}), 0, '0 gene models expected');
+
+  # negative strand, trim 3'
+  $region = '6:1514000-1516000:-1';
+  $json = json_GET("$base/$region?feature=gene;trim_downstream=0", 'Negative strand, no downstream trimming');
+  is(scalar(@{$json}), 1, '1 protein coding gene models expected');
+
+  $json = json_GET("$base/$region?feature=gene;trim_downstream=1", 'Negative strand, trim downstream');
+  is(scalar(@{$json}), 0, '0 gene models expected');
+
+  # negative strand, trim both
+  $region = '6:1514000-1515000';
+  $json = json_GET("$base/$region?feature=gene;trim_upstream=1;trim_downstream=1", 'Negative strand, trim up-downstream');
+  is(scalar(@{$json}), 0, '0 gene models expected');
+
+  $region = '6:1513000-1516000';
+  $json = json_GET("$base/$region?feature=gene;trim_upstream=1;trim_downstream=1", 'Negative strand, trim up-downstream');
+  is(scalar(@{$json}), 1, '1 gene models expected');
+  
+}
+
+
 #Query variation DB
 {
   my $region = '6:1000000-1003000';
