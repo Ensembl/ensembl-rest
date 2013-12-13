@@ -80,7 +80,8 @@ sub fetch_features {
     next if $feature_type eq 'none';
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
-    my $objects = $self->$feature_type($slice);
+    # my $objects = $self->$feature_type($slice);
+    my $objects = $self->_trim_features($self->$feature_type($slice));
     if($is_gff3 || $is_bed) {
       push(@final_features, @{$objects});
     }
@@ -168,6 +169,8 @@ sub gene {
   my ($dbtype, $load_transcripts, $source, $biotype) = 
     (undef, undef, $c->request->parameters->{source}, $c->request->parameters->{biotype});
   return $slice->get_all_Genes($self->_get_logic_dbtype(), $load_transcripts, $source, $biotype);
+  # my $genes = $slice->get_all_Genes($self->_get_logic_dbtype(), $load_transcripts, $source, $biotype);
+  # return [ grep { $self->_trim_feature($_) } ] @{$genes};
 }
 
 sub transcript {
@@ -366,6 +369,48 @@ sub _get_logic_dbtype {
   my $logic_name = $c->request->parameters->{logic_name};
   my $db_type = $c->request->parameters->{db_type};
   return ($logic_name, $db_type);
+}
+
+sub _trim_features {
+  my ($self, $features) = @_;
+  my $c = $self->context();
+  my ($trim_upstream, $trim_downstream) = 
+    ($c->request->parameters->{trim_upstream}, 
+     $c->request->parameters->{trim_downstream});
+  
+  return $features
+    unless $trim_upstream or $trim_downstream;
+
+  my $filtered_features;
+  my $slice = $c->stash()->{slice};
+  my ($sstart, $send, $strand) = 
+    ($slice->start, $slice->end, $slice->strand);
+
+  foreach my $feature (@{$features}) {
+    my $trim = 0;
+    my ($start, $end) = 
+      ($feature->seq_region_start,
+       $feature->seq_region_end);
+    if ($trim_upstream and $trim_downstream) {
+      next if $start < $sstart or $end > $send;
+    } elsif ($trim_upstream) {
+      if ($strand == 1) {
+	next if $start < $sstart;
+      } else {
+	next if $end > $send;
+      }
+    } elsif ($trim_downstream) {
+      if ($strand == 1) {
+	next if $end > $send;
+      } else {
+	next if $start < $sstart;
+      }
+    }
+
+    push @{$filtered_features}, $feature;
+  }
+  
+  return $filtered_features;
 }
 
 with 'EnsEMBL::REST::Role::Content';
