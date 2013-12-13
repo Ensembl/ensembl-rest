@@ -377,20 +377,30 @@ sub _trim_features {
   my ($trim_upstream, $trim_downstream) = 
     ($c->request->parameters->{trim_upstream}, 
      $c->request->parameters->{trim_downstream});
-  
+
+  # skip if not interested in trimming
   return $features
     unless $trim_upstream or $trim_downstream;
-
+ 
   my $filtered_features;
   my $slice = $c->stash()->{slice};
   my ($sstart, $send, $strand) = 
     ($slice->start, $slice->end, $slice->strand);
+  my $circular = $slice->is_circular();
 
   foreach my $feature (@{$features}) {
     my $trim = 0;
     my ($start, $end) = 
       ($feature->seq_region_start,
        $feature->seq_region_end);
+
+    # customosised checks in case of
+    # circular chrmosomes
+    next if $circular and 
+      $self->has_to_be_trimmed_in_circ_chr($feature, 
+					   $trim_upstream, 
+					   $trim_downstream);
+
     if ($trim_upstream and $trim_downstream) {
       next if $start < $sstart or $end > $send;
     } elsif ($trim_upstream) {
@@ -411,6 +421,112 @@ sub _trim_features {
   }
   
   return $filtered_features;
+}
+
+sub _has_to_be_trimmed_in_circ_chr {
+  my ($self, $feature, $trim_upstream, $trim_downstream) = @_;
+
+  my $slice = $self->context()->stash()->{slice};
+
+  my ($sstart, $send, $strand) = 
+    ($slice->start, $slice->end, $slice->strand);
+  my $seq_region_len = $slice->seq_region_length();
+
+  my ($seq_region_start, $seq_region_end) = 
+    ($feature->seq_region_start,
+     $feature->seq_region_end);
+
+  my $trim = 0;
+  my ($start, $end);
+
+  if ($strand == 1) { # Positive strand		
+    $start = $seq_region_start - $sstart + 1;
+    $end   = $seq_region_end - $sstart + 1;
+
+    #
+    # TODO
+    # can be optimised, assumed already the chromosome is know to be circular
+    #
+    if ($slice->is_circular()) {
+      # Handle cicular chromosomes.
+
+      if ($start > $end) {
+	# Looking at a feature overlapping the chromsome origin.
+	if ($end > $sstart) { 
+	  # Looking at the region in the beginning of the chromosome.
+	  $start -= $seq_region_len;
+	}
+
+	$end += $seq_region_len if $end < 0;
+      } else {
+	if ($sstart > $send && $end < 0) {
+	  # Looking at the region overlapping the chromosome
+	  # origin and a feature which is at the beginning of the
+	  # chromosome.
+	  $start += $seq_region_len;
+	  $end   += $seq_region_len;
+	}
+      }
+    }
+    
+  } else { # Negative strand
+    $start = $send - $seq_region_end + 1;
+    $end = $send - $seq_region_start + 1;
+
+    if ($slice->is_circular()) {
+      if ($sstart > $send) { # slice spans origin or replication
+	if ($seq_region_start >= $sstart) {
+	  $end += $seq_region_len;
+	  $start += $seq_region_len 
+	    if $seq_region_end > $sstart;
+
+	} elsif ($seq_region_start <= $send) {
+	  # do nothing
+	} elsif ($seq_region_end >= $sstart) {
+	  $start += $seq_region_len;
+	  $end += $seq_region_len;
+
+	} elsif ($seq_region_end <= $send) {
+	  $end += $seq_region_len
+	    if $end < 0;
+
+	} elsif ($seq_region_start > $seq_region_end) {
+	  $end += $seq_region_len;
+
+	} else { }
+      } else {
+	if ($seq_region_start <= $send and $seq_region_end >= $sstart) {
+	  # do nothing
+	} elsif ($seq_region_start > $seq_region_end) {
+	  if ($seq_region_start <= $send) {
+	    $start -= $seq_region_len;
+
+	  } elsif ($seq_region_end >= $sstart) {
+	    $end += $seq_region_len;
+	  } else { }
+	}
+      }
+
+    }
+  }
+
+  if ($trim_upstream and $trim_downstream) {
+    $trim = 1 if $start < 0 or $end > 0;
+  } elsif ($trim_upstream) {
+    if ($strand == 1) {
+      $trim = 1 if $start < $0;
+    } else {
+      $trim = 1 if $end > $0;
+    }
+  } elsif ($trim_downstream) {
+    if ($strand == 1) {
+      $trim = 1 if $end > $0;
+    } else {
+      $trim = 1 if $start < $0;
+    }
+  }
+  
+  return $trim;
 }
 
 with 'EnsEMBL::REST::Role::Content';
