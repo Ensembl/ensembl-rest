@@ -8,3 +8,16 @@ MultiTestDB.conf
 /MYMETA.*
 /Makefile
 /.project
+/blib
+/*.tmp
+/nytprof
+/nytprof.out
+/.cache
+/inc
+/pm_to_blib
+/reg.pm
+/.includepath
+/cover_db
+/tmp
+/temp
+/lookup_cache.json
