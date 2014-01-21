@@ -49,12 +49,14 @@ recommends 'Plack::Middleware::Assets';
 recommends 'Plack::Middleware::ReverseProxy';
 recommends 'Plack::Middleware::SizeLimit';
 recommends 'Plack::Middleware::CrossOrigin';
+recommends 'Plack::Middleware::Deflater';
 recommends 'Cache::Memcached';
 recommends 'CHI::Driver::Memcached';
 recommends 'Sereal::Encoder';
 recommends 'Data::MessagePack';
 recommends 'Template::Stash::XS';
 recommends 'Net::CIDR::Lite';
+recommends 'DateTime';
 
 
 #Test requirements
