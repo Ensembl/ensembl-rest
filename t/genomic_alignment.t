@@ -444,7 +444,7 @@ my $data = get_data();
 }
 
 #EPO, large block, multiple trees
-#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040000-106041500:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
+#curl 'http://127.0.0.1:3000/alignment/region/taeniopygia_guttata/2:106040050-106041500:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
 {
   my $region = '2:106040050-106041500';
   my $number_of_alignment_blocks = 2;   
@@ -542,20 +542,28 @@ my $data = get_data();
        }
 }
 
-
 sub get_data {
     my $data;
 
     $data->{short_EPO} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAA--------GAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
-     push @{$data->{short_EPO_tree}}, "((Ggal_2_100370256_100370312[+]:0.0414,Mgal_3_49885207_49885257[+]:0.0414):0.1242,Tgut_2_106040050_106040100[+]:0.1715):0;";
-    push @{$data->{short_EPO_tree}}, "((Mgal_3_49885207_49885257[+]:0.0414,Ggal_2_100370256_100370312[+]:0.0414):0.1242,Tgut_2_106040050_106040100[+]:0.1715):0;";
 
-    push @{$data->{short_EPO_tree_no_branch_lengths}}, "((Ggal_2_100370256_100370312[+],Mgal_3_49885207_49885257[+]),Tgut_2_106040050_106040100[+]);";
-    push @{$data->{short_EPO_tree_no_branch_lengths}}, "((Mgal_3_49885207_49885257[+],Ggal_2_100370256_100370312[+]),Tgut_2_106040050_106040100[+]);";
+    push @{$data->{short_EPO_tree}},"((meleagris_gallopavo_3_49885207_49885257[+]:0.0414,gallus_gallus_2_100370256_100370312[+]:0.0414)Mgal-Ggal[2]:0.1242,taeniopygia_guttata_2_106040050_106040100[+]:0.1715)Mgal-Ggal-Tgut[3]:0;";
+     push @{$data->{short_EPO_tree}},"((meleagris_gallopavo_3_49885207_49885257[+]:0.0414,gallus_gallus_2_100370256_100370312[+]:0.0414)Mgal-Ggal[2]:0.1242,taeniopygia_guttata_2_106040050_106040100[+]:0.1715)Tgut-Mgal-Ggal[3]:0;";
 
-    push @{$data->{large_EPO_tree}}, "((Mgal_3_49885207_49885557[+]:0.0414,Ggal_2_100370256_100370612[+]:0.0414):0.1242,Tgut_2_106040050_106040400[+]:0.1715):0;";
-    push @{$data->{large_EPO_tree}}, "((Ggal_2_100370256_100370612[+]:0.0414,Mgal_3_49885207_49885557[+]:0.0414):0.1242,Tgut_2_106040050_106040400[+]:0.1715):0;";
-    push @{$data->{large_EPO_tree}}, "(Mgal_3_49885558_49886610[+]:0.1656,Tgut_2_106040401_106041500[+]:0.1715):0;";
+    push @{$data->{short_EPO_tree}}, "((gallus_gallus_2_100370256_100370312[+]:0.0414,meleagris_gallopavo_3_49885207_49885257[+]:0.0414)Ggal-Mgal[2]:0.1242,taeniopygia_guttata_2_106040050_106040100[+]:0.1715)Tgut-Ggal-Mgal[3]:0;";
+    push @{$data->{short_EPO_tree}}, "((gallus_gallus_2_100370256_100370312[+]:0.0414,meleagris_gallopavo_3_49885207_49885257[+]:0.0414)Ggal-Mgal[2]:0.1242,taeniopygia_guttata_2_106040050_106040100[+]:0.1715)Ggal-Mgal-Tgut[3]:0;";
+
+   push @{$data->{short_EPO_tree_no_branch_lengths}}, "((gallus_gallus_2_100370256_100370312[+],meleagris_gallopavo_3_49885207_49885257[+]),taeniopygia_guttata_2_106040050_106040100[+]);";
+   push @{$data->{short_EPO_tree_no_branch_lengths}}, "((meleagris_gallopavo_3_49885207_49885257[+],gallus_gallus_2_100370256_100370312[+]),taeniopygia_guttata_2_106040050_106040100[+]);";
+
+    push @{$data->{large_EPO_tree}}, "((meleagris_gallopavo_3_49885207_49885557[+]:0.0414,gallus_gallus_2_100370256_100370612[+]:0.0414)Mgal-Ggal[2]:0.1242,taeniopygia_guttata_2_106040050_106040400[+]:0.1715)Mgal-Ggal-Tgut[3]:0;";
+    push @{$data->{large_EPO_tree}}, "((meleagris_gallopavo_3_49885207_49885557[+]:0.0414,gallus_gallus_2_100370256_100370612[+]:0.0414)Mgal-Ggal[2]:0.1242,taeniopygia_guttata_2_106040050_106040400[+]:0.1715)Tgut-Mgal-Ggal[3]:0;";
+
+    push @{$data->{large_EPO_tree}}, "((gallus_gallus_2_100370256_100370612[+]:0.0414,meleagris_gallopavo_3_49885207_49885557[+]:0.0414)Ggal-Mgal[2]:0.1242,taeniopygia_guttata_2_106040050_106040400[+]:0.1715)Ggal-Mgal-Tgut[3]:0;";
+    push @{$data->{large_EPO_tree}}, "((gallus_gallus_2_100370256_100370612[+]:0.0414,meleagris_gallopavo_3_49885207_49885557[+]:0.0414)Ggal-Mgal[2]:0.1242,taeniopygia_guttata_2_106040050_106040400[+]:0.1715)Tgut-Ggal-Mgal[3]:0;";
+
+    push @{$data->{large_EPO_tree}}, "(meleagris_gallopavo_3_49885558_49886610[+]:0.1656,taeniopygia_guttata_2_106040401_106041500[+]:0.1715)Tgut-Mgal[2]:0;";
+    push @{$data->{large_EPO_tree}}, "(meleagris_gallopavo_3_49885558_49886610[+]:0.1656,taeniopygia_guttata_2_106040401_106041500[+]:0.1715)Mgal-Tgut[2]:0;";
 
     $data->{short_EPO_no_gaps} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAAGAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
     $data->{short_EPO_soft} =  {description=>'','end'=>106040550,'seq'=>'TAGTGG-TGAttttttggttttttGCCTGCTGGCCCTCCTTCTTTGTACTCA','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040500,'strand'=>1};

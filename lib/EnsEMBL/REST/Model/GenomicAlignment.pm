@@ -141,7 +141,6 @@ sub get_tree_as_hash {
   my $alignments;
   #Dump these alignments
    foreach my $this_genomic_align_tree (@$genomic_align_trees) {
-
      my $align_hash;
    
      #Convert GenomicAlignTree object to a hash
@@ -149,8 +148,15 @@ sub get_tree_as_hash {
     
      #Get newick tree if have GenomicAlignTree object
      my $newick_trees;
-     my  $nh_format = 'simple'; #Only allow simple format for now
-
+     
+     #Only have ancestral sequences for EPO alignments
+     my $nh_format;
+     if ($this_genomic_align_tree->method_link_species_set->method->class =~ /ancestral_alignment/) {
+       $nh_format = 'full';
+     } else {
+       $nh_format = 'simple';
+     }
+    
      if (check_ref($this_genomic_align_tree, 'Bio::EnsEMBL::Compara::GenomicAlignTree')) {
        my $newick_tree ;
        if ($no_branch_lengths) {
