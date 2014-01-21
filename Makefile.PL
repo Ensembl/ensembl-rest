@@ -57,7 +57,7 @@ recommends 'Data::MessagePack';
 recommends 'Template::Stash::XS';
 recommends 'Net::CIDR::Lite';
 recommends 'DateTime';
-
+recommends 'Server::Starter';
 
 #Test requirements
 test_requires 'Test::More' => '0.88';
