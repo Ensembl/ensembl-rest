@@ -1,5 +1,5 @@
 [%#
-Copyright [1999-2013] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 									<li>A burst up-to 6 requests per second is allowed</li>
 						    </ul>
 						    <li>Excessive program-driven use is not permitted</li>
-						    <li>If you plan to use the service in a manner you think may be excessive please contact <a href='mailto:helpdesk@ensembl.org'>Ensembl</a></li>
+						    <li>If you plan to use the service in a manner you think may be excessive please contact <a href='mailto:http://www.ensembl.org/Help/Contact'>Ensembl</a></li>
 						  </ul>
 						  
 						  Failure to comply will result in restriction of access. This can be detected programatically via <a href='#responsecodes'>response codes</a>.
