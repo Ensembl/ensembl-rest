@@ -24,7 +24,7 @@ EnsEMBL::REST - A RESTful API for the access of data from Ensembl and Ensembl co
 
 =head1 AUTHOR
 
-The EnsEMBL Group - helpdesk@ensembl.org
+The EnsEMBL Group - http://www.ensembl.org/Help/Contact
 
 =cut
 
