@@ -96,16 +96,14 @@ builder {
         $app->($env);
       }
     };
+    
+    #------ Plack to set ContentLength header
+    enable "ContentLength";
 
     enable "Deflater",
       content_type =>
       [ 'text/css', 'text/html', 'text/javascript', 'application/javascript' ],
       vary_user_agent => 1;
-
-    #----- Plack to serve static content
-    enable "Static",
-      path => qr{\.(?:js|css|jpe?g|gif|ico|png|html?|swf|txt)$},
-      root => $staticdir;
 
     #----- Javascript & CSS minimisation and expire dates set
     # CSS assets are first
@@ -116,9 +114,11 @@ builder {
       files  => [<$staticdir/static/js/*.js>],
       type   => 'js',
       minify => 1;
-
-    #------ Plack to set ContentLength header
-    enable "ContentLength";
+   
+    #----- Plack to serve static content - THIS MUST COME AFTER ASSETS GENERATION AS THEY HAVE FILE EXTENSIONS
+    enable "Static",
+      path => qr{\.(?:js|css|jpe?g|gif|ico|png|html?|swf|txt)$},
+      root => $staticdir;
 
     #------ END OF PLUGINS -------#
 
