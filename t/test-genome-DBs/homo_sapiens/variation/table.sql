@@ -116,6 +116,7 @@ CREATE TABLE `genotype_code` (
   `genotype_code_id` int(11) unsigned NOT NULL,
   `allele_code_id` int(11) unsigned NOT NULL,
   `haplotype_id` tinyint(2) unsigned NOT NULL,
+  `phased` tinyint(2) unsigned DEFAULT NULL,
   KEY `genotype_code_id` (`genotype_code_id`),
   KEY `allele_code_id` (`allele_code_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -154,7 +155,7 @@ CREATE TABLE `individual_synonym` (
   `synonym_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `individual_id` int(10) unsigned NOT NULL,
   `source_id` int(10) unsigned NOT NULL,
-  `name` int(10) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`synonym_id`),
   KEY `individual_idx` (`individual_id`),
   KEY `name` (`name`,`source_id`)
@@ -175,7 +176,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -209,8 +210,9 @@ CREATE TABLE `phenotype` (
   `name` varchar(50) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`phenotype_id`),
-  UNIQUE KEY `name_idx` (`name`),
-  KEY `stable_idx` (`stable_id`)
+  UNIQUE KEY `desc_idx` (`description`),
+  KEY `stable_idx` (`stable_id`),
+  KEY `name_idx` (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `phenotype_feature` (
@@ -276,7 +278,7 @@ CREATE TABLE `population_synonym` (
   `synonym_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `population_id` int(10) unsigned NOT NULL,
   `source_id` int(10) unsigned NOT NULL,
-  `name` int(10) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`synonym_id`),
   KEY `population_idx` (`population_id`),
   KEY `name` (`name`,`source_id`)
@@ -295,8 +297,12 @@ CREATE TABLE `publication` (
   `authors` varchar(255) DEFAULT NULL,
   `pmid` int(10) DEFAULT NULL,
   `pmcid` varchar(255) DEFAULT NULL,
+  `year` int(10) unsigned DEFAULT NULL,
+  `doi` varchar(50) DEFAULT NULL,
+  `ucsc_id` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`publication_id`),
-  KEY `pmid_idx` (`pmid`)
+  KEY `pmid_idx` (`pmid`),
+  KEY `doi_idx` (`doi`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `read_coverage` (
@@ -339,6 +345,7 @@ CREATE TABLE `source` (
   `url` varchar(255) DEFAULT NULL,
   `type` enum('chip','lsdb') DEFAULT NULL,
   `somatic_status` enum('germline','somatic','mixed') DEFAULT 'germline',
+  `data_types` set('variation','variation_synonym','structural_variation','phenotype_feature','study') DEFAULT NULL,
   PRIMARY KEY (`source_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
@@ -495,7 +502,7 @@ CREATE TABLE `transcript_variation` (
   KEY `variation_feature_idx` (`variation_feature_id`),
   KEY `consequence_type_idx` (`consequence_types`),
   KEY `somatic_feature_idx` (`feature_stable_id`,`somatic`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `translation_md5` (
   `translation_md5_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -516,8 +523,8 @@ CREATE TABLE `variation` (
   `minor_allele` varchar(50) DEFAULT NULL,
   `minor_allele_freq` float DEFAULT NULL,
   `minor_allele_count` int(10) unsigned DEFAULT NULL,
-  `evidence` set('Multiple_observations','Frequency','HapMap','1000Genomes','Cited') DEFAULT NULL,
-  `clinical_significance` set('drug-response','histocompatibility','non-pathogenic','other','pathogenic','probable-non-pathogenic','probable-pathogenic''unknown','untested') DEFAULT NULL,
+  `evidence` set('Multiple_observations','Frequency','HapMap','1000Genomes','Cited','ESP') DEFAULT NULL,
+  `clinical_significance` set('drug-response','histocompatibility','non-pathogenic','other','pathogenic','probable-non-pathogenic','probable-pathogenic','unknown','untested') DEFAULT NULL,
   PRIMARY KEY (`variation_id`),
   UNIQUE KEY `name` (`name`),
   KEY `source_idx` (`source_id`)
@@ -550,7 +557,8 @@ CREATE TABLE `variation_feature` (
   `minor_allele_freq` float DEFAULT NULL,
   `minor_allele_count` int(10) unsigned DEFAULT NULL,
   `alignment_quality` double DEFAULT NULL,
-  `evidence` set('Multiple_observations','Frequency','HapMap','1000Genomes','Cited') DEFAULT NULL,
+  `evidence` set('Multiple_observations','Frequency','HapMap','1000Genomes','Cited','ESP') DEFAULT NULL,
+  `clinical_significance` set('drug-response','histocompatibility','non-pathogenic','other','pathogenic','probable-non-pathogenic','probable-pathogenic','unknown','untested') DEFAULT NULL,
   PRIMARY KEY (`variation_feature_id`),
   KEY `pos_idx` (`seq_region_id`,`seq_region_start`,`seq_region_end`),
   KEY `variation_idx` (`variation_id`),
