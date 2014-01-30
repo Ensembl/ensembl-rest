@@ -1,1 +1,1 @@
-1	100genomes	\N	\N	\N	\N	germline
+1	100genomes	\N	\N	\N	\N	germline	variation

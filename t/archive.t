@@ -39,7 +39,7 @@ my $gene_id = 'ENSG00000054598';
 my $translation_id = "ENSP00000370275";
 my $version = 5;
 
-my $response = {ID => $gene_id, latest => "$gene_id.$version", version => "$version", release => "72", peptide => undef, is_current => "1", type => "Gene", possible_replacement => [], assembly => "GRCh37"};
+my $response = {ID => $gene_id, latest => "$gene_id.$version", version => "$version", release => "75", peptide => undef, is_current => "1", type => "Gene", possible_replacement => [], assembly => "GRCh37"};
 
 is_json_GET("$base/$gene_id", $response, "Return archive for known ID");
 
