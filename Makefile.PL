@@ -20,7 +20,7 @@ requires 'Config::General'; # This should reflect the config file format you've 
                             # See Catalyst::Plugin::ConfigLoader for supported formats
 
 #Ensembl Rest Specific
-requires 'Catalyst::Controller::REST';
+requires 'Catalyst::Action::REST' => '1.11';
 requires 'Catalyst::Plugin::SubRequest';
 requires 'Catalyst::Component::InstancePerContext';
 requires 'Catalyst::View::JSON';
