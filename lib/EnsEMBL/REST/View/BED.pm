@@ -58,6 +58,7 @@ sub _write_Transcript {
   # Not liking this. If we are in this situation we need to re-fetch the transcript
   # just so the thing ends up on the right Slice!
   my $new_transcript = $transcript->transfer($transcript->slice()->seq_region_Slice());
+  $new_transcript->get_all_Exons(); # force exon loading
   my $bed_array = $self->_feature_to_bed_array($transcript);
   my $bed_genomic_start = $bed_array->[1]; #remember this is in 0 coords
   my ($coding_start, $coding_end, $exon_starts_string, $exon_lengths_string, $exon_count, $rgb) = (0,0,q{},q{},0,0);
@@ -66,12 +67,16 @@ sub _write_Transcript {
   # the thick sections. Otherwise we must have a ncRNA or pseudogene
   # and that thick section is just set to the transcript's end
   if($new_transcript->translation()) {
+    my ($cdna_start, $cdna_end) = ($new_transcript->cdna_coding_start(), $new_transcript->cdna_coding_end);
+    if($new_transcript->strand() == -1) {
+      ($cdna_start, $cdna_end) = ($cdna_end, $cdna_start);
+    }
     # Rules are if it's got a coding start we will use it; if not we use the cDNA
-    $coding_start = $self->_cdna_to_genome($new_transcript, $new_transcript->cdna_coding_start());
-    $coding_start--;
+    $coding_start = $self->_cdna_to_genome($new_transcript, $cdna_start);
+    $coding_start--; # convert to 0 based coords
 
     #Same again but for the end
-    $coding_end = $self->_cdna_to_genome($new_transcript, $new_transcript->cdna_coding_end());
+    $coding_end = $self->_cdna_to_genome($new_transcript, $cdna_end);
   }
   else {
     # apparently looking at UCSC's own BED output formats we do not need to bother
