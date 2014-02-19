@@ -81,7 +81,8 @@ sub fetch_features {
     my $allowed = $allowed_features->{$feature_type};
     $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
     # my $objects = $self->$feature_type($slice);
-    my $objects = $self->_trim_features($self->$feature_type($slice));
+    my $load_exons = ($feature_type eq 'transcript' && $is_bed) ? 1 : 0;
+    my $objects = $self->_trim_features($self->$feature_type($slice, $load_exons));
     if($is_gff3 || $is_bed) {
       push(@final_features, @{$objects});
     }
