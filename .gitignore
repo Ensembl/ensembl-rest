@@ -21,3 +21,4 @@ MultiTestDB.conf
 /tmp
 /temp
 /lookup_cache.json
+/GLOB(0*
