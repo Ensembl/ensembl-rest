@@ -256,9 +256,10 @@ sub find_and_locate_object {
   my $expand = $c->request->param('expand');
   if ($expand) {
     my $type;
-    if ($features->{object_type} eq 'Gene') {
+    my $input_type = lc($features->{object_type});
+    if ($input_type eq 'gene') {
       $type = 'Transcript';
-    } elsif ($features->{object_type} eq 'Transcript') {
+    } elsif ($input_type eq 'transcript') {
       $type = 'Exon';
     } else {
       $c->go('ReturnError', 'custom',  ["Include option only available for Genes and Transcripts"]);
