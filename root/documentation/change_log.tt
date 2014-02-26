@@ -16,6 +16,22 @@ limitations under the License.
 
 <h1>Change Log</h1>
 
+<h2>1.6.0 - 26th February 2014</h2>
+
+<h3>New Features</h3>
+<ul>
+        <li><tt>[/feature/]</tt> Trim features from output which overlap 5' or 3' optionally</li>
+        <li><tt>[/alignment/region/]</tt> replaces [/alignment/block/region/] and [/alignment/slice/region/]</li>
+</ul>
+
+<h3>Bugfixes</h3>
+<ul>
+        <li>The example for multiple alignments is wrong</li>
+        <li>XS assert_ref fails with REST feature endpoint</li>
+        <li><tt>[/feature]</tt> BED output is very slow for transcripts</li>
+        <li><tt>[/feature]</tt> BED output; thick and thin ends are incorrect for reverse strand transcripts</li>
+</ul>
+
 <h2>1.5.1 - 4th December 2013</h2>
 
 <h3>Bugfixes</h3>

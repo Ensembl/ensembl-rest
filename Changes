@@ -1,5 +1,25 @@
 This file documents the revision history for Perl extension EnsEMBL::REST.
 
+1.6.0 - 26-02-2014
+
+New Features:
+
+    - [/feature/] Trim features from output which overlap 5' or 3' optionally
+
+    - [/alignment/region/] replaces [/alignment/block/region/] and [/alignment/slice/region/]
+
+
+Bugfixes:
+
+    - The example for multiple alignments is wrong
+
+    - XS assert_ref fails with REST feature endpoint
+
+    - [/feature] BED output is very slow for transcripts
+
+    - [/feature] BED output; thick and thin ends are incorrect for reverse
+      strand transcripts
+
 1.5.1 - 04-12-2013
 
 Bugfixes:
