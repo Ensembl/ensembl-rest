@@ -71,8 +71,12 @@ SQL
       my $parent_id = $transcript->stable_id();
       foreach my $stable_id (@{$hits}) {
         my $rank = 1;
+        my $phase = 0;
         foreach my $exon (@{$transcript->get_all_translateable_Exons}) {
-          my $obj = $class->new($stable_id, $parent_id, $exon, $rank++);
+          $phase = $exon->phase();
+          $phase = 0 if $phase < 0;
+          $phase  =~ tr/12/21/;  # The GFF definition of phase
+          my $obj = $class->new($stable_id, $parent_id, $exon, $phase);
           push(@built, $obj);
         }
       }
@@ -82,12 +86,12 @@ SQL
 }
 
 sub new {
-  my ($class, $stable_id, $parent_id, $exon, $rank) = @_;
+  my ($class, $stable_id, $parent_id, $exon, $phase) = @_;
   my $self = $class->SUPER::new_fast({
     translateable_exon => $exon,
     stable_id => $stable_id,
     parent_id => $parent_id,
-    rank => $rank,
+    phase => $phase,
   });
   return $self;
 }
@@ -124,16 +128,16 @@ sub seq_region_end {
   return $self->translateable_exon()->seq_region_end();
 }
 
-sub rank {
-  my ($self, $rank) = @_;
-  $self->{'rank'} = $rank if defined $rank;
-  return $self->{'rank'};
-}
-
 sub stable_id {
   my ($self, $stable_id) = @_;
   $self->{'stable_id'} = $stable_id if defined $stable_id;
   return $self->{'stable_id'};
+}
+
+sub phase {
+  my ($self, $phase)  = @_;
+  $self->{'phase'} = $phase if defined $phase;
+  return $self->{'phase'};
 }
 
 sub summary_as_hash {
@@ -141,8 +145,7 @@ sub summary_as_hash {
   my $summary = $self->SUPER::summary_as_hash();
   $summary->{Parent} = $self->parent_id;
   $summary->{ID} = $self->stable_id();
-  $summary->{phase} = 0;
-  $summary->{rank} = $self->rank();
+  $summary->{phase} = $self->phase();
   return $summary;
 }
 
