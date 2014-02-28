@@ -34,7 +34,7 @@ fi
 APP_HOME=$(cd $SCRIPT_DIR/../../ && pwd)
 
 # Library path work
-for ensdir in ensembl-variation ensembl-functgenomics ensembl-compara ensembl; do
+for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl; do
   PERL5LIB=$ENS_CVS_ROOT_DIR/$ensdir/modules:$PERL5LIB
 done
 PERL5LIB=$APP_HOME/../bioperl-live:$PERL5LIB
