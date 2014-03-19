@@ -33,7 +33,10 @@ sub get_species : Chained("/") PathPart("vep") CaptureArgs(1) {
     try {
         $c->stash( variation_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
         $c->stash(
-            variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
+          variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
+        $c->stash(
+          structural_variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'StructuralVariationFeature' )
+        );
     } catch {
         $c->go('ReturnError', 'from_ensembl', [$_]);
     };
@@ -62,22 +65,30 @@ sub my_chr_region : Chained("get_species") PathPart("chr_region") {
 sub get_allele : Chained('get_bp_slice') PathPart('') CaptureArgs(1) {
     my ( $self, $c, $allele ) = @_;
     my $s = $c->stash();
-    if ( $allele !~ /^[ATGC-]+$/i ) {
-        my $error_msg = qq{Allele must be A,T,G or C [got: $allele]};
+    if ( $allele !~ /^[ATGC-]+$/i && $allele !~ /INS|DUP|DEL|TDUP/i ) {
+        my $error_msg = qq{Allele must be A,T,G, C, INS, DUP, TDUP or DEL [got: $allele]};
         $c->go( 'ReturnError', 'custom', [$error_msg] );
     }
-    my $reference_base;
-    try {
-        $reference_base = $s->{slice}->subseq( $s->{start}, $s->{end}, $s->{strand} );
-        $s->{reference_base} = $reference_base;
+    
+    my $allele_string;
+    
+    if($allele =~ /INS|DUP|DEL|TDUP/i) {
+      $allele_string = $allele;
     }
-    catch {
-        $c->log->fatal(qq{can't get reference base from slice});
-        $c->go( 'ReturnError', 'from_ensembl', [$_] );
-    };
-    $c->go( 'ReturnError', 'custom', ["request for for consequence of [$allele] matches reference [$reference_base]"] )
-      if $reference_base eq $allele;
-    my $allele_string = $reference_base . '/' . $allele;
+    else {
+      my $reference_base;
+      try {
+          $reference_base = $s->{slice}->subseq( $s->{start}, $s->{end}, $s->{strand} );
+          $s->{reference_base} = $reference_base;
+      }
+      catch {
+          $c->log->fatal(qq{can't get reference base from slice});
+          $c->go( 'ReturnError', 'from_ensembl', [$_] );
+      };
+      $c->go( 'ReturnError', 'custom', ["request for for consequence of [$allele] matches reference [$reference_base]"] )
+        if $reference_base eq $allele;
+      $allele_string = $reference_base . '/' . $allele;
+    }
     $s->{allele_string} = $allele_string;
     $s->{allele}        = $allele;
 }
@@ -105,20 +116,58 @@ sub get_rs_consequences_GET {
 sub build_feature : Private {
     my ( $self, $c ) = @_;
     my $s  = $c->stash();
-    my $vf = try {
-      Bio::EnsEMBL::Variation::VariationFeature->new(
-        -start         => $s->{start},
-        -end           => $s->{end},
-        -strand        => $s->{strand},
-        -allele_string => $s->{allele_string},
-        -slice         => $s->{slice},
-        -adaptor       => $s->{variation_feature_adaptor},
+    
+    my $vf;
+    
+    # build a StructuralVariationFeature
+    if($s->{allele_string} !~ /\//) {
+      
+      # convert to SO term
+      my $allele_string = $s->{allele_string};
+      
+      my %terms = (
+          INS  => 'insertion',
+          DEL  => 'deletion',
+          TDUP => 'tandem_duplication',
+          DUP  => 'duplication'
       );
+      
+      my $so_term = defined $terms{$allele_string} ? $terms{$allele_string} : $allele_string;
+      
+      $vf = try {
+        Bio::EnsEMBL::Variation::StructuralVariationFeature->new(
+          -start          => $s->{start},
+          -end            => $s->{end},
+          -strand         => $s->{strand},
+          -class_SO_term  => $so_term,
+          -slice          => $s->{slice},
+          -adaptor        => $s->{structural_variation_feature_adaptor},
+        );
+      }
+      catch {
+        $c->log->fatal(qq{problem making Bio::EnsEMBL::Variation::StructuralVariationFeature object});
+        $c->go( 'ReturnError', 'from_ensembl', [$_] );
+      };
     }
-    catch {
+    
+    # build a VariationFeature
+    else {
+      $vf = try {
+        Bio::EnsEMBL::Variation::VariationFeature->new(
+          -start         => $s->{start},
+          -end           => $s->{end},
+          -strand        => $s->{strand},
+          -allele_string => $s->{allele_string},
+          -slice         => $s->{slice},
+          -adaptor       => $s->{variation_feature_adaptor},
+        );
+      }
+      catch {
         $c->log->fatal(qq{problem making Bio::EnsEMBL::Variation::VariationFeature object});
         $c->go( 'ReturnError', 'from_ensembl', [$_] );
-    };
+      };
+    }
+    
     $s->{variation_features} = [$vf];
     $c->forward('calc_consequences');
     $self->status_ok( $c, entity => { data => $c->stash->{consequences} } );
@@ -132,7 +181,6 @@ sub calc_consequences : Private {
   my $vfs = $s->{variation_features};
 
   while ( my $vf = shift @{$vfs} ) {
-    my $hgvs_hash = $vf->get_all_hgvs_notations();
     my $r = {
       location => {
         start        => ($vf->start()+0),
@@ -140,10 +188,12 @@ sub calc_consequences : Private {
         strand       => ($vf->strand()+0),
         name         => $vf->slice()->seq_region_name(),
         coord_system => $vf->slice()->coord_system()->name(),
-      },
-      hgvs => $hgvs_hash,
+      }
     };
-    my $master_variant = $vf->variation();
+    
+    $self->_add_fields($vf, $r, qw(get_all_hgvs_notations));
+    
+    my $master_variant = $vf->can('variation') ? $vf->variation() : undef;
     if($master_variant) {
       $r->{name} = $master_variant->name();
       $r->{is_somatic} = ($master_variant->is_somatic() ? 1 : 0);
@@ -183,8 +233,7 @@ sub _encode_transcript_variants {
         name => $gene->external_name(),
         biotype => $transcript->biotype(),
         is_canonical => ($transcript->is_canonical ? 1 : 0),
-      
-        cdna_allele_string => $tv->cdna_allele_string,
+        
         cdna_start => $tv->cdna_start,
         cdna_end => $tv->cdna_end,
         cds_start => $tv->cds_start,
@@ -193,8 +242,13 @@ sub _encode_transcript_variants {
         translation_end => $tv->translation_end,
         intron_number => $tv->intron_number,
         exon_number => $tv->exon_number,
-        codon_position => $tv->codon_position,
       };
+      
+      # may or may not be available
+      for(qw(cdna_allele_string codon_position)) {
+        $r->{$_} = $tv->$_ if $tv->can($_);
+      }
+      
       foreach my $key (@NUMERIC_T_KEYS) {
         my $v = $r->{$key};
         $r->{$key} = $v*1 if defined $v;
@@ -204,20 +258,25 @@ sub _encode_transcript_variants {
       $r->{protein_features} = \@protein_features if @protein_features;
 
       #### START OF ALTERNATIVE ALLELES
-      foreach my $tva (@{$tv->get_all_alternate_TranscriptVariationAlleles()}) {
+      foreach my $tva (@{$tv->get_all_alternate_BaseVariationFeatureOverlapAlleles()}) {
         my $tva_r = {
-          allele_string => $tva->allele_string,
-          display_codon_allele_string => $tva->display_codon_allele_string,
-          codon_allele_string => $tva->codon_allele_string,
-          pep_allele_string => $tva->pep_allele_string,
-          polyphen_prediction => $tva->polyphen_prediction,
-          polyphen_score => $tva->polyphen_score,
-          sift_prediction => $tva->sift_prediction,
-          sift_score => $tva->sift_score,
-          hgvs_transcript => $tva->hgvs_transcript,
-          hgvs_protein => $tva->hgvs_protein,
           consequence_terms => $self->_overlap_consequences($tva),
         };
+        
+        # may or may not be available
+        $self->_add_fields($tva, $tva_r, qw(
+          allele_string
+          display_codon_allele_string
+          codon_allele_string
+          pep_allele_string
+          polyphen_prediction
+          polyphen_score
+          sift_prediction
+          sift_score
+          hgvs_transcript
+          hgvs_protein
+        ));
+        
         foreach my $key (@NUMERIC_TVA_KEYS) {
           my $v = $tva_r->{$key};
           $tva_r->{$key} = $v*1 if defined $v;
@@ -237,14 +296,21 @@ sub _encode_regulatory_variants {
     my ($rfvs) = @_;
     my @results;
     foreach my $rfv (@{$rfvs}) {
-      my $regulatory_feature = $rfv->regulatory_feature;
+      my $regulatory_feature = $rfv->feature;
       my $r = { 
         regulatory_feature_id => $regulatory_feature->stable_id,
         type => $regulatory_feature->feature_type->name,
       };
-      foreach my $rfva (@{$rfv->get_all_alternate_RegulatoryFeatureVariationAlleles()}) {
-        my $terms = $self->_overlap_consequences($rfva);
-        push @{$r->{alleles}},  { allele_string => $rfva->allele_string, consequence_terms => $terms, is_reference => ($rfva->is_reference() ? 1 : 0) };
+      foreach my $rfva (@{$rfv->get_all_BaseVariationFeatureOverlapAlleles()}) {
+        my $rfva_r = {
+          consequence_terms => $self->_overlap_consequences($rfva),
+          is_reference => ($rfva->is_reference() ? 1 : 0)
+        };
+        
+        # may or may not be available
+        $self->_add_fields($rfva, $rfva_r, qw(allele_string));
+        
+        push @{$r->{alleles}}, $rfva_r;
       }
       push(@results, $r);
     }
@@ -261,19 +327,22 @@ sub _encode_motif_variants {
       my $r = {
         type => $mfv->motif_feature->binding_matrix->feature_type->name,
       };
-      foreach my $mfva (@{$mfv->get_all_alternate_MotifFeatureVariationAlleles()}) {
-        my $terms = $self->_overlap_consequences($mfva);
-        my $allele = ($mfv->get_reference_MotifFeatureVariationAllele->feature_seq . '/' . $mfva->feature_seq);
-        my $ra = { 
-          allele_string => $allele,
-          consequence_terms => $terms,
-          is_reference => ($mfva->is_reference() ? 1 : 0),
-          position => ($mfva->motif_start()*1),
-        };
-        my $delta = $mfva->motif_score_delta if $mfva->variation_feature_seq =~ /^[ACGT]+$/;
-        $ra->{motif_score_change} = sprintf( "%.3f", $delta ) if defined $delta;
-        $ra->{high_information_position} = ( $mfva->in_informative_position ? 1 : 0 );
-        push @{$r->{alleles}} , $ra;
+      
+      if($vf->isa('Bio::EnsEMBL::Variation::VariationFeature')) {
+        foreach my $mfva (@{$mfv->get_all_alternate_MotifFeatureVariationAlleles()}) {
+          my $terms = $self->_overlap_consequences($mfva);
+          my $allele = ($mfv->get_reference_BaseVariationFeatureOverlapAllele->feature_seq . '/' . $mfva->feature_seq);
+          my $ra = { 
+            allele_string => $allele,
+            consequence_terms => $terms,
+            is_reference => ($mfva->is_reference() ? 1 : 0),
+            position => ($mfva->motif_start()*1),
+          };
+          my $delta = $mfva->motif_score_delta if $mfva->variation_feature_seq =~ /^[ACGT]+$/;
+          $ra->{motif_score_change} = sprintf( "%.3f", $delta ) if defined $delta;
+          $ra->{high_information_position} = ( $mfva->in_informative_position ? 1 : 0 );
+          push @{$r->{alleles}} , $ra;
+        }
       }
       push(@results, $r);
     }
@@ -288,6 +357,11 @@ sub _overlap_consequences {
 
 sub _process_variants {
   my ($self, $c, $vf, $type, $callback) = @_;
+  
+  if($vf->isa('Bio::EnsEMBL::Variation::StructuralVariationFeature')) {
+    $type =~ s/Variation/StructuralVariation/;
+  }
+  
   my $method = "get_all_$type";
   my $variations = try { 
     my $can = $vf->can($method);
@@ -298,6 +372,14 @@ sub _process_variants {
       $c->go('ReturnError', 'from_ensembl', [$_] );
   };
   return $callback->($variations);
+}
+
+sub _add_fields {
+  my ($source, $target, @list) = @_;
+  
+  for(@list) {
+    $target->{$_} = $source->$_ if $source->can($_);
+  }
 }
 
 __PACKAGE__->meta->make_immutable;
