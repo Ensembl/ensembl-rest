@@ -95,6 +95,7 @@ my $base = '/feature/region/homo_sapiens';
   is($cds->{Parent}, $transcript->{ID}, 'CDS parent is the previous transcript');
   is($cds->{start}, 1101508, 'First CDS starts at first coding point in the second exon');
   is($cds->{end}, 1101531, 'First CDS ends at the second exon');
+  is($cds->{source}, 'ensembl', 'CDS has source ensembl');
 }
 
 # Biotype queries
@@ -300,7 +301,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 gene in this region');
   
-  my $gff_line = qq{6\tensembl\tprotein_coding_gene\t1080164\t1105181\t.\t+\t.\tID=ENSG00000176515;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];external_name=AL033381.1;logic_name=ensembl};
+  my $gff_line = qq{6\tensembl\tgene\t1080164\t1105181\t.\t+\t.\tID=gene:ENSG00000176515;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];external_name=AL033381.1;logic_name=ensembl};
   eq_or_diff($lines[0], $gff_line, 'Expected output gene line from GFF');
 }
 
@@ -310,7 +311,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 repeat in this region');
   
-  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079680\t.\t+\t.\tdescription=AluSq};
+  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079387\t.\t+\t.\tdescription=AluSq};
   eq_or_diff($lines[0], $gff_line, 'Expected output repeat feature line from GFF');
 }
 
