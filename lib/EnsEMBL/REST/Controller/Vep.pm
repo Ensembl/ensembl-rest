@@ -191,7 +191,7 @@ sub calc_consequences : Private {
       }
     };
     
-    $self->_add_fields($vf, $r, qw(get_all_hgvs_notations));
+    $r->{hgvs} = $vf->get_all_hgvs_notations if $vf->can('get_all_hgvs_notations');
     
     my $master_variant = $vf->can('variation') ? $vf->variation() : undef;
     if($master_variant) {
@@ -261,11 +261,11 @@ sub _encode_transcript_variants {
       foreach my $tva (@{$tv->get_all_alternate_BaseVariationFeatureOverlapAlleles()}) {
         my $tva_r = {
           consequence_terms => $self->_overlap_consequences($tva),
+          allele_string => $tva->can('allele_string') ? $tva->allele_string : $vf->class_SO_term
         };
         
         # may or may not be available
         $self->_add_fields($tva, $tva_r, qw(
-          allele_string
           display_codon_allele_string
           codon_allele_string
           pep_allele_string
@@ -304,11 +304,9 @@ sub _encode_regulatory_variants {
       foreach my $rfva (@{$rfv->get_all_BaseVariationFeatureOverlapAlleles()}) {
         my $rfva_r = {
           consequence_terms => $self->_overlap_consequences($rfva),
-          is_reference => ($rfva->is_reference() ? 1 : 0)
+          is_reference => ($rfva->is_reference() ? 1 : 0),
+          allele_string => $rfva->can('allele_string') ? $rfva->allele_string : $vf->class_SO_term
         };
-        
-        # may or may not be available
-        $self->_add_fields($rfva, $rfva_r, qw(allele_string));
         
         push @{$r->{alleles}}, $rfva_r;
       }
@@ -375,7 +373,7 @@ sub _process_variants {
 }
 
 sub _add_fields {
-  my ($source, $target, @list) = @_;
+  my ($self, $source, $target, @list) = @_;
   
   for(@list) {
     $target->{$_} = $source->$_ if $source->can($_);
