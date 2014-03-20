@@ -301,7 +301,7 @@ sub _encode_regulatory_variants {
         regulatory_feature_id => $regulatory_feature->stable_id,
         type => $regulatory_feature->feature_type->name,
       };
-      foreach my $rfva (@{$rfv->get_all_BaseVariationFeatureOverlapAlleles()}) {
+      foreach my $rfva (@{$rfv->get_all_alternate_BaseVariationFeatureOverlapAlleles()}) {
         my $rfva_r = {
           consequence_terms => $self->_overlap_consequences($rfva),
           is_reference => ($rfva->is_reference() ? 1 : 0),
