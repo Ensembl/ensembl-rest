@@ -110,7 +110,7 @@ sub ID {
 sub summary_as_hash {
   my ($self) = @_;
   my $summary = {};
-  $summary->{ID} = $self->ID;
+  $summary->{id} = $self->ID;
   $summary->{start} = $self->translation_start || 0;
   $summary->{end} = $self->translation_start || 0;
   $summary->{translation} = $self->translation_id;
