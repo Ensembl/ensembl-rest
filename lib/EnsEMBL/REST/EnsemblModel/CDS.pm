@@ -152,7 +152,7 @@ sub summary_as_hash {
   my ($self) = @_;
   my $summary = $self->SUPER::summary_as_hash();
   $summary->{Parent} = $self->parent_id;
-  $summary->{ID} = $self->stable_id();
+  $summary->{id} = $self->stable_id();
   $summary->{phase} = $self->phase();
   $summary->{source} = $self->source();
   return $summary;
