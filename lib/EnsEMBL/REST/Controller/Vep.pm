@@ -323,24 +323,27 @@ sub _encode_motif_variants {
     my @results;
     foreach my $mfv (@{$mfvs}) {
       my $r = {
-        type => $mfv->motif_feature->binding_matrix->feature_type->name,
+        type => $mfv->feature->binding_matrix->feature_type->name,
       };
       
-      if($vf->isa('Bio::EnsEMBL::Variation::VariationFeature')) {
-        foreach my $mfva (@{$mfv->get_all_alternate_MotifFeatureVariationAlleles()}) {
-          my $terms = $self->_overlap_consequences($mfva);
-          my $allele = ($mfv->get_reference_BaseVariationFeatureOverlapAllele->feature_seq . '/' . $mfva->feature_seq);
-          my $ra = { 
-            allele_string => $allele,
-            consequence_terms => $terms,
-            is_reference => ($mfva->is_reference() ? 1 : 0),
-            position => ($mfva->motif_start()*1),
-          };
+      foreach my $mfva (@{$mfv->get_all_alternate_BaseVariationFeatureOverlapAlleles()}) {
+        my $terms = $self->_overlap_consequences($mfva);
+        my $ra = { 
+          allele_string => $vf->class_SO_term,
+          consequence_terms => $terms,
+          is_reference => ($mfva->is_reference() ? 1 : 0),
+        };
+        
+        if($vf->isa('Bio::EnsEMBL::Variation::VariationFeature')) {
+          $ra->{allele_string} = ($mfv->get_reference_BaseVariationFeatureOverlapAllele->feature_seq . '/' . $mfva->feature_seq);
+          $ra->{position} = $mfva->motif_start() * 1;
+          
           my $delta = $mfva->motif_score_delta if $mfva->variation_feature_seq =~ /^[ACGT]+$/;
           $ra->{motif_score_change} = sprintf( "%.3f", $delta ) if defined $delta;
           $ra->{high_information_position} = ( $mfva->in_informative_position ? 1 : 0 );
-          push @{$r->{alleles}} , $ra;
         }
+        
+        push @{$r->{alleles}} , $ra;
       }
       push(@results, $r);
     }
