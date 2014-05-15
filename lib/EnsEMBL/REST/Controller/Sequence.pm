@@ -80,7 +80,7 @@ sub region :Chained('get_species') PathPart('') Args(1) ActionClass('REST') {
     my $slice = $c->model('Lookup')->find_slice($region);
     $slice = $self->_enrich_slice($c, $slice);
     $c->log()->debug('Producing the sequence');
-    my $seq = $slice->seq();
+    my $seq = $self->_mask_slice_features($slice, $c);
     $c->stash()->{sequences} = [{
       id => $slice->name(),
       molecule => 'dna',
@@ -116,6 +116,10 @@ sub _process {
     }
     $c->go('ReturnError', 'custom', ["$err Please rerun your request and specify the multiple_sequences parameter"]) if $err;
   }
+  if ($sequence_count == 0) {
+    $c->go('ReturnError', 'custom', ["No sequences returned, please check the type specified is compatible with the object requested"]);
+  }
+
   $s->{sequences} = $sequences;
   return;
 }
@@ -138,7 +142,7 @@ sub _process_feature {
   #Transcripts
   elsif($object->isa('Bio::EnsEMBL::PredictionTranscript')) {
     if($type eq 'cdna') {
-      $seq = $object->spliced_seq();
+      $seq = $object->spliced_seq(1);
     }
     elsif($type eq 'cds') {
       $seq = $object->translateable_seq();
@@ -150,7 +154,7 @@ sub _process_feature {
   }
   elsif($object->isa('Bio::EnsEMBL::Transcript')) {
     if($type eq 'cdna') {
-      $seq = $object->spliced_seq();
+      $seq = $object->spliced_seq(1);
     }
     elsif($type eq 'cds') {
       $seq = $object->translateable_seq();
@@ -190,7 +194,7 @@ sub _process_feature {
   
   if($slice) {
     $slice = $self->_enrich_slice($c, $slice);
-    $seq = $slice->seq();
+    $seq = $self->_mask_slice_features($slice, $c, $type, $object);
     $desc = $slice->name();
   }
   
@@ -233,6 +237,26 @@ sub _mask_slice {
     return $slice->get_repeatmasked_seq(undef, $soft_mask);
   }
   return $slice;
+}
+
+sub _mask_slice_features {
+  my ($self, $slice, $c, $type, $object) = @_;
+  my $seq = $slice->seq();
+  my @features;
+  if (!$c->request()->param('mask')) {
+    if (defined $type) {
+      if ($type eq 'genomic' && !$object->isa('Bio::EnsEMBL::Exon')) {
+        @features = @{ $object->get_all_Introns() };
+        $slice->_mask_features(\$seq, \@features, 1);
+      }
+    } else {
+      @features = @{ $slice->get_all_Exons() };
+      $slice->_mask_features(\$seq, \@features, 1);
+      # Exons have been softmasked, invert casing
+      $seq =~ tr/ACGTacgt/acgtACGT/;
+    }
+  }
+  return $seq; 
 }
 
 sub _write {

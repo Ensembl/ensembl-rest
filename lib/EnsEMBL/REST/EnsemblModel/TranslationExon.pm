@@ -95,7 +95,7 @@ sub summary_as_hash {
   my $summary = { 
     start => $self->start(), 
     end => $self->end(),
-    ID => $self->exon(),
+    id => $self->exon(),
     seq_region_name => $self->translation(),
     rank => $self->rank(),
   };

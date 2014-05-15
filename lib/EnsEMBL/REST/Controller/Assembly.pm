@@ -50,13 +50,25 @@ sub seq_region_GET {}
 
 sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   my ( $self, $c, $name) = @_;
+  my $include_bands = $c->request->param('bands') || 0;
   my $slice = $c->model('Lookup')->find_slice($name);
-  $self->status_ok( $c, entity => { 
-    length => $slice->length(),
-    coordinate_system => $slice->coord_system()->name(),
-    assembly_exception_type => $slice->assembly_exception_type(),
-    is_chromosome => $slice->is_chromosome(),
-  });
+  my $bands = $c->model('Assembly')->get_karyotype_info($slice) if $include_bands;
+  if ($bands && scalar(@$bands) > 0) {
+    $self->status_ok( $c, entity => { 
+      length => $slice->length(),
+      coordinate_system => $slice->coord_system()->name(),
+      assembly_exception_type => $slice->assembly_exception_type(),
+      is_chromosome => $slice->is_chromosome(),
+      karyotype_band => $bands,
+    });
+  } else {
+    $self->status_ok( $c, entity => {
+      length => $slice->length(),
+      coordinate_system => $slice->coord_system()->name(),
+      assembly_exception_type => $slice->assembly_exception_type(),
+      is_chromosome => $slice->is_chromosome(),
+    });
+  }
 }
 
 __PACKAGE__->meta->make_immutable;

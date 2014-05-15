@@ -74,7 +74,7 @@ my $base = '/feature/region/homo_sapiens';
   
   my ($gene) = grep { $_->{feature_type} eq 'gene' } @{$json};
   eq_or_diff_data($gene, {
-    ID => 'ENSG00000176515',
+    id => 'ENSG00000176515',
     biotype => 'protein_coding',
     description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109  [Source:UniProtKB/TrEMBL;Acc:Q8NAX6]',
     end => 1105181,
@@ -88,13 +88,14 @@ my $base = '/feature/region/homo_sapiens';
   }, 'Checking structure of gene model as expected');
   
   my ($transcript) = grep { $_->{feature_type} eq 'transcript' } @{$json};
-  is($transcript->{Parent}, $gene->{ID}, 'Transcript parent is previous gene');
+  is($transcript->{Parent}, $gene->{id}, 'Transcript parent is previous gene');
   
   my ($cds) = sort { $a->{start} <=> $b->{start} } grep { $_->{feature_type} eq 'cds'} @{$json};
-  is($cds->{ID}, 'ENSP00000320396', 'CDS ID is a protein ID');
-  is($cds->{Parent}, $transcript->{ID}, 'CDS parent is the previous transcript');
+  is($cds->{id}, 'ENSP00000320396', 'CDS ID is a protein ID');
+  is($cds->{Parent}, $transcript->{id}, 'CDS parent is the previous transcript');
   is($cds->{start}, 1101508, 'First CDS starts at first coding point in the second exon');
   is($cds->{end}, 1101531, 'First CDS ends at the second exon');
+  is($cds->{source}, 'ensembl', 'CDS has source ensembl');
 }
 
 # Biotype queries
@@ -191,7 +192,7 @@ my $base = '/feature/region/homo_sapiens';
     start => 1001893,
     end => 1001893,
     strand => 1,
-    ID => 'tmp__',
+    id => 'tmp__',
     consequence_type => 'intergenic_variant',
     feature_type => 'variation',
     seq_region_name => '6',
@@ -251,7 +252,7 @@ my $base = '/feature/region/homo_sapiens';
     start => 1040974,
     end => 1216597,
     strand => 1,
-    ID => '',
+    id => '',
     feature_type => 'misc',
     seq_region_name => '6',
     
@@ -269,7 +270,7 @@ my $base = '/feature/region/homo_sapiens';
     start => 1072318,
     end => 1248050,
     strand => 1,
-    ID => '',
+    id => '',
     feature_type => 'misc',
     seq_region_name => '6',
     
@@ -300,7 +301,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 gene in this region');
   
-  my $gff_line = qq{6\tensembl\tprotein_coding_gene\t1080164\t1105181\t.\t+\t.\tID=ENSG00000176515;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];external_name=AL033381.1;logic_name=ensembl};
+  my $gff_line = qq{6\tensembl\tgene\t1080164\t1105181\t.\t+\t.\tID=gene:ENSG00000176515;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];external_name=AL033381.1;logic_name=ensembl};
   eq_or_diff($lines[0], $gff_line, 'Expected output gene line from GFF');
 }
 
@@ -310,7 +311,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 repeat in this region');
   
-  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079680\t.\t+\t.\tdescription=AluSq};
+  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079387\t.\t+\t.\tdescription=AluSq};
   eq_or_diff($lines[0], $gff_line, 'Expected output repeat feature line from GFF');
 }
 
@@ -381,7 +382,7 @@ $base = '/feature/id';
   my $negative_id = 'ENSG00000261730'; #fetch features from a -ve stranded feature
   my $negative_json = json_GET("$base/$negative_id?feature=gene", 'Retriving negative stranded features from a negative stranded feature'); 
   cmp_ok(scalar(@{$negative_json}), '>', 0, 'We got features back');
-  is($negative_json->[0]->{ID}, $negative_id, 'Feature ID was the submitted one to the service');
+  is($negative_json->[0]->{id}, $negative_id, 'Feature ID was the submitted one to the service');
   is($negative_json->[0]->{strand}, -1, 'The strand of the feature must be negative');
 }
 
@@ -427,10 +428,10 @@ $base = '/feature/translation';
   my $id = 'ENSP00000371073';
   my $json = json_GET("$base/$id?feature=translation_exon", 'Getting exon information from a translation');
   cmp_ok(scalar(@{$json}), '==', 6, 'Expect 6 translatable exons');
-  my $expected_exon_one = { start => 1, end => 43, rank => 1, ID => 'ENSE00002753423', feature_type => 'translation_exon', seq_region_name => $id };
+  my $expected_exon_one = { start => 1, end => 43, rank => 1, id => 'ENSE00002753423', feature_type => 'translation_exon', seq_region_name => $id };
   eq_or_diff($json->[0], $expected_exon_one, 'Checking that the 1st exon has the expected location');
 
-  my $expected_exon_two = { start => 43, end => 88, rank => 2, ID => 'ENSE00002909822', feature_type => 'translation_exon', seq_region_name => $id };
+  my $expected_exon_two = { start => 43, end => 88, rank => 2, id => 'ENSE00002909822', feature_type => 'translation_exon', seq_region_name => $id };
   eq_or_diff($json->[1], $expected_exon_two, 'Checking that the 2nd exon has the expected location');
 }
 
