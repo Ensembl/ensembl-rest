@@ -22,6 +22,7 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
+use Data::Dumper;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
@@ -42,43 +43,59 @@ text/x-gff3
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
-sub id_GET {}
-
-
 sub id: Chained('/') PathPart('archive/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
-  my $archive;
   $c->request->param('use_archive', 1);
-  my ($stable_id, $version) = split(/\./, $id);
+}
+
+sub id_GET {
+  my ($self, $c, $id) = @_;
+  my $archive;
+  my $encoded;
   try {
-    my @results = $c->model('Lookup')->find_object_location($stable_id, undef, 1);
-    if (!@results) {
-      $c->go('ReturnError', 'custom', ["$id not found in lookup"]);
-    }
-    my $species = $results[0];
-    my $aia = $c->model('Registry')->get_adaptor($species,'Core','ArchiveStableID');
-    if ($version) {
-      $archive = $aia->fetch_by_stable_id_version($stable_id, $version);
-    } else {
-      $archive = $aia->fetch_by_stable_id($stable_id);
-    }
+    $archive = $self->_fetch_archive_by_id($c,$id);
     if (!$archive) {
       $c->go('ReturnError', 'custom', ["No archive found for $id"]);
     }
     $c->stash(entries => $archive);
-    $c->forward('_encode');
+    $encoded = $self->_encode($c,$archive);
+    $c->log->debug(Dumper $encoded);
   }
   catch {
       $c->go( 'ReturnError', 'from_ensembl', [$_] );
   };
+  $self->status_ok($c, entity => $encoded);
+}
+
+sub id_POST {
+  my ($self, $c) = @_;
+  
+  my $payload = $c->request->body_data();
+  my $ids = $payload->{id};
+  try {
+    foreach my $id (@$ids){
+      my $archive = $self->_fetch_archive_by_id($c,$id);
+      $c->stash(entries => $archive);
+      my $enc = $self->_encode($c,$archive);
+
+      # my $entity = $c->stash->{entity} if (defined($c->stash->{entity}));
+      # push $entity,$enc;
+      # $c->stash(entity => $entity);
+      push @{$c->stash->{entity}},$enc;
+    }
+
+  }
+  catch {
+    $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  };
   $self->status_ok($c, entity => $c->stash->{entity});
 }
 
+
 sub _encode :Private{
-  my ($self, $c) = @_;
+  my ($self, $c, $archive) = @_;
   my ($enc, $peptide, @replacements);
-  my $archive = $c->stash()->{entries};
-  my $aia = $c->model('Registry')->get_adaptor($c->stash()->{species},'Core','ArchiveStableID');
+  # my $aia = $c->model('Registry')->get_adaptor($c->stash()->{species},'Core','ArchiveStableID');
   $peptide = $archive->get_peptide if (!$archive->is_current);
 
   if (!$archive->is_current) {
@@ -100,7 +117,28 @@ sub _encode :Private{
       latest => $archive->get_latest_incarnation->stable_id .".". $archive->get_latest_incarnation->version,
       peptide => $peptide,
   };
-  $c->stash(entity => $enc);
+  return $enc;
+}
+
+sub _fetch_archive_by_id {
+  my ($self,$c,$id) = @_;
+
+  my ($stable_id, $version) = split(/\./, $id);
+  my $archive;
+
+  my @results = $c->model('Lookup')->find_object_location($stable_id, undef, 1);
+  if (!@results) {
+    return;
+  }
+  my $species = $results[0];
+  my $adaptor = $c->model('Registry')->get_adaptor($species,'Core','ArchiveStableID');
+  
+  if ($version) {
+    $archive = $adaptor->fetch_by_stable_id_version($stable_id, $version);
+  } else {
+    $archive = $adaptor->fetch_by_stable_id($stable_id);
+  }
+  return $archive;
 }
 
 __PACKAGE__->meta->make_immutable;
