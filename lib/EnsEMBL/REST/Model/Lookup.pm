@@ -277,6 +277,7 @@ sub find_gene_by_symbol {
 
   my $gene_adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'Gene');
   my $gene = $gene_adaptor->fetch_by_display_label($symbol);
+  $c->go('ReturnError', 'custom',  [qq{No valid lookup found for symbol $symbol}]) unless $gene;
   my $features = $self->features_as_hash($gene->stable_id, $species, 'Gene', 'core');
 
   my $expand = $c->request->param('expand');
