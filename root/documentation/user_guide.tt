@@ -76,6 +76,7 @@ Each datatype resides on a REST endpoint, these are all listed on our <a href="/
 							<tr><td><a href='http://en.wikipedia.org/wiki/PhyloXML'>PhyloXML</a></td><td><tt>text/x-phyloxml+xml</tt></td><td><tt>.phyloxml</tt></td><td>XML phylogenetic serialisation format. Used in <tt>/genetree</tt> end points</td></tr>
 							<tr><td><a href='http://en.wikipedia.org/wiki/XML'>XML</a></td><td><tt>text/xml</tt></td><td><tt>.xml</tt></td><td>-</td></tr>
 							<tr><td><a href='http://en.wikipedia.org/wiki/YAML'>YAML</a></td><td><tt>text/x-yaml</tt></td><td><tt>.yaml</tt></td><td>-</td></tr>
+							<tr><td>Plain text</td><td><tt>text/plain</tt></td><td><tt>.txt</tt></td><td>-</td></tr>
 						</table>
 						
 						<a id='responsecodes'> </a>
