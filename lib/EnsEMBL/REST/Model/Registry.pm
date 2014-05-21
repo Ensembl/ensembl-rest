@@ -48,10 +48,11 @@ has 'verbose' => ( is => 'ro', isa => 'Bool' );
 has 'file' => ( is => 'ro', isa => 'Str' );
 
 # Ensembl Genomes LookUp Support
-has 'lookup_file' => ( is => 'ro', isa => 'Str' );
-has 'lookup_url'  => ( is => 'ro', isa => 'Str' );
-has 'lookup_cache_file'  => ( is => 'ro', isa => 'Str' );
-has 'lookup_no_cache'  => ( is => 'ro', isa => 'Bool' );
+has 'lookup_host' => ( is => 'ro', isa => 'Str' );
+has 'lookup_port' => ( is => 'ro', isa => 'Int' );
+has 'lookup_user' => ( is => 'ro', isa => 'Str' );
+has 'lookup_pass' => ( is => 'ro', isa => 'Str' );
+has 'lookup_dbname' => ( is => 'ro', isa => 'Str' );
 
 # Avoid initiation of the registry
 has 'skip_initation' => ( is => 'ro', isa => 'Bool' );
@@ -96,7 +97,7 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
     );
     $load = 1;
   }
-  if(defined $self->lookup_url() || defined $self->lookup_file()) {
+  if(defined $self->lookup_host() && defined $self->lookup_port() && defined $self->lookup_dbname() && defined $self->lookup_user()) {
     if($LOOKUP_AVAILABLE) {
       $log->info('User submitted EnsemblGenomes lookup information. Building from this');
       $self->_lookup();
@@ -114,7 +115,7 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
   return $class;
 });
 
-has '_lookup' => ( is => 'ro', lazy => 1, builder => '_build_lookup');
+has '_lookup' => ( is => 'rw', lazy => 1, builder => '_build_lookup');
 
 has '_species_info' => ( isa => 'ArrayRef', is => 'ro', lazy => 1, builder => '_build_species_info' );
 
@@ -177,25 +178,11 @@ sub _intern_db_connections {
 
 sub _build_lookup {
   my ($self)= @_;
-  my $log = $self->log();
-  my %args;
-  if($self->lookup_no_cache()) {
-    $log->info('Turning off local Ensembl Genomes LookUp caching');
-    $args{-NO_CACHE} = 1;
-  }
-  if($self->lookup_cache_file()) {
-    $log->info('Using local json cache file '.$self->lookup_cache_file());
-    $args{-CACHE_FILE} = $self->lookup_cache_file();
-  }
-  if($self->lookup_url()) {
-    $log->info('Using LookUp URL '.$self->lookup_url());
-    $args{-URL} = $self->lookup_url();
-  }
-  if($self->lookup_file()) {
-    $log->info('Using LookUp file '.$self->lookup_file());
-    $args{-FILE} = $self->lookup_file();
-  }
-  return Bio::EnsEMBL::LookUp->new(%args);
+  return Bio::EnsEMBL::LookUp->new(-USER=>$self->lookup_user(),
+  -PASS=>$self->lookup_pass(),
+  -HOST=>$self->lookup_host(),
+  -PORT=>$self->lookup_port(),
+  -DBNAME=>$self->lookup_db_name() );
 }
 
 # Logic here is if we were told a compara name we use that
