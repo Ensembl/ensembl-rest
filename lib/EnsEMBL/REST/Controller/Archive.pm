@@ -37,7 +37,7 @@ text/x-gff3
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
-sub id: Chained('/') PathPart('archive/id') Args(1) ActionClass('REST') {
+sub id: Chained('/') PathPart('archive/id') ActionClass('REST') {
   my ($self, $c, $id) = @_;
   $c->request->param('use_archive', 1);
 }
@@ -64,7 +64,7 @@ sub id_GET {
 sub id_POST {
   my ($self, $c) = @_;
   
-  my $payload = $c->request->body_data();
+  my $payload = $c->req->data();
   my $ids = $payload->{id};
   try {
     foreach my $id (@$ids){
