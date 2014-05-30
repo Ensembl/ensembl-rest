@@ -33,7 +33,7 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
-my $base = '/feature/region/homo_sapiens';
+my $base = '/overlap/region/homo_sapiens';
 
 #Null based queries
 {
@@ -346,7 +346,7 @@ sub filter_gff {
 
 ########### ID endpoint testing
 
-$base = '/feature/id';
+$base = '/overlap/id';
 
 #Null based queries
 {
@@ -388,7 +388,7 @@ $base = '/feature/id';
 
 ########### Translation endpoint testing
 
-$base = '/feature/translation';
+$base = '/overlap/translation';
 
 #Null based queries
 {
