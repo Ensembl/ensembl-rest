@@ -16,7 +16,7 @@ limitations under the License.
 
 =cut
 
-package EnsEMBL::REST::Model::Feature;
+package EnsEMBL::REST::Model::Overlap;
 
 use Moose;
 extends 'Catalyst::Model';

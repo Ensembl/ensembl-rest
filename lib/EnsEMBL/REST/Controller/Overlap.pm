@@ -16,7 +16,7 @@ limitations under the License.
 
 =cut
 
-package EnsEMBL::REST::Controller::Feature;
+package EnsEMBL::REST::Controller::Overlap;
 
 use Moose;
 use namespace::autoclean;
@@ -34,7 +34,7 @@ __PACKAGE__->config(
 
 =pod
 
-/feature/region/human/X:1000000..2000000?feature=gene
+/overlap/region/human/X:1000000..2000000?feature=gene
 
 feature = The type of feature to retrieve (gene/transcript/exon/variation/structural_variation/constrained/regulatory)
 db_type = The DB type to use; important if someone is doing queries over a non-default DB (core/otherfeatures)
@@ -51,7 +51,7 @@ BEGIN {extends 'Catalyst::Controller::REST'; }
 
 has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e7);
 
-sub species: Chained('/') PathPart('feature/region') CaptureArgs(1) {
+sub species: Chained('/') PathPart('overlap/region') CaptureArgs(1) {
   my ( $self, $c, $species) = @_;
   $c->stash(species => $species);
 }
@@ -65,7 +65,7 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   try {
     my $slice = $c->model('Lookup')->find_slice($region);
     $self->assert_slice_length($c, $slice);
-    $features = $c->model('Feature')->fetch_features();
+    $features = $c->model('Overlap')->fetch_features();
   }
   catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
@@ -75,7 +75,7 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
 
 =pod
 
-/feature/id/ENSG00000157764
+/overlap/id/ENSG00000157764
 
 feature = The type of feature to retrieve (gene/transcript/exon/variation/structural_variation/constrained/regulatory)
 db_type = The DB type to use; important if someone is doing queries over a non-default DB (core/otherfeatures)
@@ -90,7 +90,7 @@ text/x-gff3
 
 sub id_GET {}
 
-sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
+sub id: Chained('/') PathPart('overlap/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $features;
   try {
@@ -110,7 +110,7 @@ sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
     # my $slice = $feature_slice;
     $c->stash->{slice} = $slice;
 
-    $features = $c->model('Feature')->fetch_features($slice);
+    $features = $c->model('Overlap')->fetch_features($slice);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
@@ -119,7 +119,7 @@ sub id: Chained('/') PathPart('feature/id') Args(1) ActionClass('REST') {
 
 =pod
 
-/feature/translation/ENSP00000288602?type=Superfamily
+/overlap/translation/ENSP00000288602?type=Superfamily
 
 feature = The type of feature to retrieve (default is protein_feature, but can also retrieve transcript_variation)
 db_type = The DB type to use; important if someone is doing queries over a non-default DB (core/otherfeatures)
@@ -134,14 +134,14 @@ text/x-gff3
 
 sub translation_GET {}
 
-sub translation: Chained('/') PathPart('feature/translation') Args(1) ActionClass('REST') {
+sub translation: Chained('/') PathPart('overlap/translation') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $features;
   try {
     $c->log()->debug('Finding the object');
     $c->request->param('object_type', 'translation');
     my $translation = $c->model('Lookup')->find_object_by_stable_id($id);
-    $features = $c->model('Feature')->fetch_protein_features($translation);
+    $features = $c->model('Overlap')->fetch_protein_features($translation);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
