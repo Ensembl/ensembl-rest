@@ -101,6 +101,18 @@ limitations under the License.
 	<p>No optional parameters</p>
 [% END %]
 
+[% FOREACH m IN endpoint.method %]
+  [% IF m == "POST" %]
+    <h3>POST message body format</h3>
+      <p>
+      [% FOREACH argh IN endpoint.postformat %]
+         [% argh %]
+      [% END %]
+      </p>
+
+  [% END %]
+[% END %]
+
 <h2>Example Requests</h2>
 
 [% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget'] %]
@@ -150,7 +162,7 @@ limitations under the License.
   <h3>Resource Information</h3>
   <table class="table table-condensed table-striped">
     <tbody>
-      <tr><td>Methods</td><td>[% endpoint.method %]</td></tr>
+      <tr><td>Methods</td><td>[% endpoint.method.join(',') %]</td></tr>
       <tr><td>Response formats</td><td>[% endpoint.output.join('<br>') %]</td></tr>
     </tbody>
   </table>

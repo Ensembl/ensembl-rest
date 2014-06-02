@@ -53,7 +53,7 @@ sub info :Path('info') :Args(1) {
   if($endpoint_cfg) {
     $endpoint_cfg = $c->model('Documentation')->enrich($endpoint_cfg);
     $c->stash()->{endpoint} = $endpoint_cfg;
-    $c->stash()->{template_title} = $endpoint_cfg->{method} . ' ' . $endpoint_cfg->{endpoint};
+    $c->stash()->{template_title} = join(',',@{ $endpoint_cfg->{method} } ) . ' ' . $endpoint_cfg->{endpoint};
   }
   else {
     $c->response->status(404);
