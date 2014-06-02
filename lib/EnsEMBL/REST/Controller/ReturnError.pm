@@ -27,7 +27,8 @@ __PACKAGE__->config(
     'stash_key' => 'rest',
     'map'       => {
         'text/x-yaml'      => 'YAML::XS',
-        'application/json' => 'JSON::XS'
+        'application/json' => 'JSON::XS',
+        'text/plain'       => 'Data::Serializer',
     }
 );
 
@@ -91,6 +92,7 @@ sub not_found: Path : Args(0) : ActionClass('REST') {
 }
 
 sub not_found_GET { }
+sub not_found_POST { }
 __PACKAGE__->meta->make_immutable;
 
 1;

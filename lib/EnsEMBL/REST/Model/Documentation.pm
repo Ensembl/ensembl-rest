@@ -86,6 +86,7 @@ sub enrich {
     $json->pretty(1);
     my $log = $self->context->log;
     
+    # Modify and validate the possible output formats.
     my $outputs = $endpoint->{output};
     $outputs = [$outputs] unless ref($outputs);
     my %outputs_hash = map { lc($_) => 1 } @{$outputs};
