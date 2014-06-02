@@ -262,7 +262,7 @@ sub _build_species_info {
   
   my @all_dbadaptors = @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
   my @core_dbadaptors;
-  my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup);
+  my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup);
   my %processed_db;
   while(my $dba = shift @all_dbadaptors) {
     my $species = $dba->species();
@@ -290,6 +290,7 @@ sub _build_species_info {
           $taxon_lookup{$species} = $mc->get_taxonomy_id();
           $display_lookup{$species} = $mc->get_display_name();
           $assembly_lookup{$species} = $csa->get_default_version();
+          $accession_lookup{$species} = $mc->single_value_by_key('assembly.accession');
         }
         else {
           $dbc->sql_helper->execute_no_return(
@@ -313,6 +314,15 @@ sub _build_species_info {
               return;
             }
           );
+          $dbc->sql_helper->execute_no_return(
+            -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
+            -PARAMS => ['species.production_name', 'assembly.accession'],
+            -CALLBACK => sub {
+              my ($row) = @_;
+              $accession_lookup{$row->[0]} = $row->[1];
+              return;
+            }
+          );
         }
         
         $processed_db{$db_key} = 1;
@@ -332,6 +342,7 @@ sub _build_species_info {
       common_name => $common_lookup{$species},
       display_name => $display_lookup{$species},
       taxon_id => $taxon_lookup{$species},
+      accession => $accession_lookup{$species},
       assembly => $assembly_lookup{$species}
     };
     push(@species, $info);
