@@ -48,6 +48,7 @@ sub fetch_info {
   $assembly_info{genebuild_last_geneset_update} = $gc->get_genebuild_last_geneset_update;
   $assembly_info{coord_system_versions} = $csa->get_all_versions();
   $assembly_info{default_coord_system_version} = $gc->get_version();
+  $assembly_info{assembly_accession} = $gc->get_accession();
 
   return \%assembly_info;
 }

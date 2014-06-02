@@ -45,6 +45,7 @@ is_json_GET(
     'genebuild_method' => "full_genebuild",
     coord_system_versions => [qw/GRCh37 NCBI36 NCBI35 NCBI34/ ],
     default_coord_system_version => 'GRCh37',
+    assembly_accession => 'GCA_000001405.9',
   },
   'Checking output of info'
 );
