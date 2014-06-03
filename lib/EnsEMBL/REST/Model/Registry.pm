@@ -182,7 +182,7 @@ sub _build_lookup {
   -PASS=>$self->lookup_pass(),
   -HOST=>$self->lookup_host(),
   -PORT=>$self->lookup_port(),
-  -DBNAME=>$self->lookup_db_name() );
+  -DBNAME=>$self->lookup_dbname() );
 }
 
 # Logic here is if we were told a compara name we use that
@@ -280,28 +280,44 @@ sub _build_species_info {
         }
         else {
           $dbc->sql_helper->execute_no_return(
-            -SQL => 'select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value, m5.meta_value from meta m1, meta m2, meta m3, meta m4, meta m5 where m1.species_id = m2.species_id and m1.species_id = m3.species_id and m1.species_id = m4.species_id and m1.species_id = m5.species_id and m1.meta_key = ? and m2.meta_key =? and m3.meta_key = ? and m4.meta_key = ? and m4.meta_key = ?',
-            -PARAMS => ['species.production_name', 'species.division', 'species.common_name', 'species.short_name', 'species.taxonomy_id'],
+            -SQL => q/select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value 
+		from meta m1, meta m2, meta m3, meta m4 
+		where
+		m1.species_id = m2.species_id 
+		and m1.species_id = m3.species_id 
+		and m1.species_id = m4.species_id 
+		and m1.meta_key = ? 
+		and m2.meta_key = ? 
+		and m3.meta_key = ? 
+		and m4.meta_key = ?/,
+            -PARAMS => ['species.production_name', 'species.division', 'species.display_name', 'species.taxonomy_id'],
             -CALLBACK => sub {
               my ($row) = @_;
               $division_lookup{$row->[0]} = $row->[1];
-              $common_lookup{$row->[0]} = $row->[2];
-              $display_lookup{$row->[0]} = $row->[3];
-              $taxon_lookup{$row->[0]} = $row->[4];
+              $display_lookup{$row->[0]} = $row->[2];
+              $taxon_lookup{$row->[0]} = $row->[3];
               return;
             }
           );
           $dbc->sql_helper->execute_no_return(
             -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
-            -PARAMS => ['species.production_name', 'species.division'],
+            -PARAMS => ['species.production_name', 'assembly.default'],
             -CALLBACK => sub {
               my ($row) = @_;
               $assembly_lookup{$row->[0]} = $row->[1];
               return;
             }
           );
-        }
-        
+          $dbc->sql_helper->execute_no_return(
+            -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
+            -PARAMS => ['species.production_name', 'species.common_name'],
+            -CALLBACK => sub {
+              my ($row) = @_;
+              $common_lookup{$row->[0]} = $row->[1];
+              return;
+            }
+          );
+        }        
         $processed_db{$db_key} = 1;
       }
     }
