@@ -1,0 +1,3 @@
+36249	Coanalysis of GWAS with eQTLs reveals disease-tissue associations.	Kang HP, Morgan AA, Chen R, Schadt EE, Butte AJ.	22779046	PMC3392070	2012	\N	\N
+20403	Hepatic venous oxygen saturation monitoring in patients with assisted circulation for severe cardiac failure.	Takano H, Matsuda H, Kaneko M, Sakai K, Matsuwaka R, Takami H, Shintani H, Masai T, Nakano S, Kawashima Y.	1867536	\N	1991	\N	\N
+20404	Cystic fibrosis: a worldwide analysis of CFTR mutations--correlation with incidence data and application to screening.	Bobadilla JL, Macek M Jr, Fine JP, Farrell PM.	12007216	\N	2002	\N	\N

@@ -1,0 +1,5 @@
+4237	11	estd1	Redon 2006 "Global variation in copy number in the human genome." PMID:17122850 [remapped from build NCBI35]	ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd1_Redon_et_al_2006	pubmed/17122850	Control Set
+4246	11	estd55	Pinto 2007 "Copy-number variation in control population cohorts." PMID:17911159 [remapped from build NCBI35]	ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd55_Pinto_et_al_2007	pubmed/17911159	Control Set
+4247	11	estd59	1000 Genomes Project Consortium - Pilot Project. PMID:20981092 [remapped from build NCBI36]	ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd59_1000_Genomes_Consortium_Pilot_Project	pubmed/20981092	\N
+4478	11	estd194	Bentley 2008 "Accurate whole human genome sequencing using reversible terminator chemistry" PMID:18987734 [remapped from build NCBI36]	ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd194_Bentley_et_al_2008	pubmed/18987734	Control Set
+4479	11	estd195	Altshuler 2010 "Integrating common and rare genetic variation in diverse human populations" PMID:20811451 [remapped from build NCBI36]	ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd195_Altshuler_et_al_2010	pubmed/20811451	Control Set
