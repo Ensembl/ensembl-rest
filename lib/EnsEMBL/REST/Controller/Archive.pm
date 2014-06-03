@@ -25,12 +25,6 @@ use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
-__PACKAGE__->config(
-  map => {
-    'text/x-gff3' => [qw/View GFF3/],
-  }
-);
-
 =pod
 
 /archive/id:ENSG00000000001
