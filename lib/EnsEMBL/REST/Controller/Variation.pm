@@ -25,18 +25,11 @@ use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
-__PACKAGE__->config(
-  map => {
-    'text/x-gff3' => [qw/View GFF3/],
-  }
-);
-
 =pod
 
 /variation/species/rs1333049
 
 application/json
-text/x-gff3
 
 =cut
 
