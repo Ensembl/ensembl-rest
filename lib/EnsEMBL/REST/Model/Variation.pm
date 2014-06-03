@@ -49,20 +49,96 @@ sub fetch_variation {
 
 sub to_hash {
   my ($self, $variation) = @_;
-  my $hashed;
+  my $c = $self->context();
+  my $variation_hash;
 
-  $hashed->{name} = $variation->name,
-  $hashed->{source} = $variation->source,
-  $hashed->{ambiguity} = $variation->ambig_code,
-  $hashed->{synonyms} = $variation->get_all_synonyms,
-  $hashed->{ancestral_allele} = $variation->ancestral_allele,
-  $hashed->{var_class} = $variation->var_class,
-  $hashed->{most_severe_consequence} = $variation->display_consequence,
-  $hashed->{MAF} = $variation->minor_allele_frequency,
-  $hashed->{ambiguity_code} = $variation->ambig_code,
-  return $hashed;  
+  $variation_hash->{name} = $variation->name,
+  $variation_hash->{source} = $variation->source_description,
+  $variation_hash->{ambiguity} = $variation->ambig_code,
+  $variation_hash->{synonyms} = $variation->get_all_synonyms,
+  $variation_hash->{ancestral_allele} = $variation->ancestral_allele,
+  $variation_hash->{var_class} = $variation->var_class,
+  $variation_hash->{most_severe_consequence} = $variation->display_consequence,
+  $variation_hash->{MAF} = $variation->minor_allele_frequency,
+  $variation_hash->{evidence} = $variation->get_all_evidence_values();
+  $variation_hash->{clinical_significance} = $variation->get_all_clinical_significance_states() if @{$variation->get_all_clinical_significance_states()};
+  $variation_hash->{mappings} = $self->VariationFeature($variation);
+  $variation_hash->{populations} = $self->Alleles($variation) if $c->request->param('pops');
+  $variation_hash->{genotypes} = $self->Genotypes($variation) if $c->request->param('genotypes');
+
+  return $variation_hash;
 }
 
+sub VariationFeature {
+  my ($self, $variation) = @_;
+
+  my @mappings;
+  my $vfs = $variation->get_all_VariationFeatures();
+  foreach my $vf (@$vfs) {
+    push (@mappings, $self->vf_as_hash($vf));
+  }
+  return \@mappings;
+}
+
+sub vf_as_hash {
+  my ($self, $vf) = @_;
+
+  my $variation_feature;
+  $variation_feature->{location} = $vf->seq_region_name . ":" . $vf->seq_region_start . "-" . $vf->seq_region_end;
+  $variation_feature->{allele_string} = $vf->allele_string;
+
+  return $variation_feature;
+}
+
+sub Genotypes {
+  my ($self, $variation) = @_;
+
+  my @genotypes;
+  my $genotypes = $variation->get_all_IndividualGenotypes;
+  foreach my $gen (@$genotypes) {
+    push (@genotypes, $self->gen_as_hash($gen));
+  }
+  return \@genotypes;
+}
+
+sub gen_as_hash {
+  my ($self, $gen) = @_;
+
+  my $gen_hash;
+  $gen_hash->{genotype} = $gen->genotype_string();
+  $gen_hash->{individual} = $gen->individual->name();
+  $gen_hash->{gender} = $gen->individual->gender();
+  $gen_hash->{submission_id} = $gen->subsnp() if $gen->subsnp;
+
+  return $gen_hash;
+}
+
+sub Alleles {
+  my ($self, $variation) = @_;
+
+  my @populations;
+  my $alleles = $variation->get_all_Alleles();
+  foreach my $allele (@$alleles) {
+    if ($allele->frequency) {
+      push (@populations, $self->pops_as_hash($allele));
+    }
+  }
+
+  return \@populations;
+}
+
+sub pops_as_hash {
+  my ($self, $allele) = @_;
+
+  my $population;
+  $population->{frequency} = $allele->frequency();
+  $population->{population} = $allele->population->name();
+  $population->{allele_count} = $allele->count();
+  $population->{allele} = $allele->allele();
+  $population->{submission_id} = $allele->subsnp() if $allele->subsnp();
+
+  return $population;
+}
 
 
 with 'EnsEMBL::REST::Role::Content';

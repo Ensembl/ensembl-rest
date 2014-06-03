@@ -54,6 +54,7 @@ sub id_GET {}
 sub id: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $variation;
+  my $pops = $c->request->param('pops');
   try {
     $variation = $c->model('Variation')->fetch_variation($id);
   } catch {

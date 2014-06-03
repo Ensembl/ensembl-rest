@@ -1,14 +1,14 @@
-1	1	schema_type	variation
-2	\N	schema_version	74
-3	\N	patch	patch_69_70_a.sql|schema version
-4	\N	patch	patch_69_70_b.sql|drop table flanking_sequence
-5	\N	patch	patch_69_70_c.sql|add freqs_from_gts column to sample table
-6	\N	patch	patch_69_70_d.sql|add regulatory region variation tables
-7	\N	patch	patch_69_70_e.sql|add consequence terms to consequence_types set in variation_feature
-8	\N	patch	patch_70_71_a.sql|schema version
-9	\N	patch	patch_70_71_b.sql|add evidence column
-10	\N	patch	patch_70_71_c.sql|increase size of minor_allele
-11	\N	patch	patch_70_71_d.sql|drop feature_idx from consequence tables
+1	\N	schema_type	variation
+2	\N	schema_version	75
+3	\N	patch	patch_73_74_a.sql|schema version
+4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
+5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
+6	\N	patch	patch_73_74_d.sql|Add data_types to source table
+7	\N	patch	patch_73_74_e.sql|Update indexes for the phenotype table
+8	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
+9	\N	patch	patch_73_74_d.sql|Add data_types to source table
+10	\N	patch	patch_74_75_a.sql|schema version
+11	\N	patch	patch_74_75_b.sql|Drop read_coverage table
 12	\N	patch	patch_70_71_e.sql|create study_variation table
 13	\N	patch	patch_70_71_f.sql|add phenotype_feature and phenotype_feature_attrib
 14	\N	patch	patch_70_71_g.sql|add stable_id column to phenotype
