@@ -22,7 +22,6 @@ use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
 use Data::Dumper;
 use Bio::DB::Fasta;
-use Modern::Perl;
 use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line);
 use Bio::EnsEMBL::Slice;
 
