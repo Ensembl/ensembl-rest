@@ -1,4 +1,4 @@
-[%#
+	[%#
 Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ limitations under the License.
 </thead>
     <tbody>
 	[% FOREACH key IN pair.value %]
-      <tr><td><a href="[% c.uri_for_action('/documentation/info', key) %]">[% endpoints.$key.method.join(',') %] [% endpoints.$key.endpoint %] </a> </td><td> [% endpoints.$key.description %]</td></tr>
+      <tr><td><a href="[% c.uri_for_action('/documentation/info', key) %]">[% endpoints.$key.method %] [% endpoints.$key.endpoint %] </a> </td><td> [% endpoints.$key.description %]</td></tr>
 	[% END %]
     </tbody>
 [% END %]
