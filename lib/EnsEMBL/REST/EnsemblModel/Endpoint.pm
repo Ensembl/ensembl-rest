@@ -27,7 +27,7 @@ has 'group'       => ( isa => 'Str', is => 'ro', required => 1 );
 has 'output'      => ( isa => 'EnsRESTValueList', is => 'ro', required => 1, coerce => 1);
 has 'params'      => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'examples'    => ( isa => 'HashRef', is => 'ro', required => 0 );
-has 'postformat'  => ( isa => 'EnsRESTValueList', is => 'ro', required => 0, coerce => 1);
+has 'postmessage' => ( isa => 'HashRef', is => 'ro', required => 0 );
 
 sub has_required_params {
   my ($self) = @_;
