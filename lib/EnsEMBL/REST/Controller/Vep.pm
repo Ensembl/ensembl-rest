@@ -24,6 +24,12 @@ use Data::Dumper;
 use Bio::DB::Fasta;
 use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line);
 use Bio::EnsEMBL::Slice;
+use Bio::EnsEMBL::Utils::Sequence qw(reverse_comp);
+use Bio::EnsEMBL::Funcgen::MotifFeature;
+use Bio::EnsEMBL::Funcgen::RegulatoryFeature;
+use Bio::EnsEMBL::Funcgen::BindingMatrix;
+
+
 
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
@@ -257,9 +263,9 @@ sub _new_slice_seq {
   return sub {
     my $self = shift;
     my $seq = $fasta_db->seq( $self->seq_region_name, $self->start => $self->end );
+    $seq ||= 'N' x $self->length();
     reverse_comp( \$seq ) if $self->strand < 0;
     # default to a string of Ns if we couldn't get sequence
-    $seq ||= 'N' x $self->length();
     return $seq;
   };
 };
