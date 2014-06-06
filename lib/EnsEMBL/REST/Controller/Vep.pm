@@ -164,6 +164,7 @@ sub get_allele : PathPart('') Args(2) {
 
 # /vep/:species/id/:id
 sub get_id : Chained('get_species') PathPart('id') ActionClass('REST') {
+  my ( $self, $c, $rs_id) = @_;
 
 }
 
@@ -175,8 +176,8 @@ sub get_id_GET {
   my $vfs = $c->stash()->{variation_feature_adaptor}->fetch_all_by_Variation($v);
   $c->stash( variation => $v, variation_features => $vfs );
 
-  my $config = $c->stash->{config};
-  my $consequences = get_all_consequences( $config->{'Controller::Vep'}, $vfs);
+  my $config = $c->config->{'Controller::Vep'};
+  my $consequences = get_all_consequences( $config, $vfs);
   $c->stash->{consequences} = $consequences;
   $self->status_ok( $c, entity => { data => $consequences } );
 }
