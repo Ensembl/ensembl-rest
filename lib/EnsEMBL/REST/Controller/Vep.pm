@@ -85,7 +85,7 @@ sub get_region_POST {
 
   # $c->log->debug(Dumper $post_data);
   my $config = $c->config();
-  # $c->log->debug(Dumper $config->{'Controller::Vep'});
+   #$c->log->debug(Dumper $config->{'Controller::Vep'});
   
   my @variants = @{$post_data->{'variants'}};
   # delete($post_data->{'variants'});
@@ -106,14 +106,15 @@ sub get_region_POST {
     
     # Overwrite Slice->seq method to use a local disk cache when using Human
     my $consequences;
+    my %config = %{$config->{'Controller::Vep'}};
     if ($c->stash->{species} eq 'homo_sapiens') {
       $c->log->debug('Farming human out to Bio::DB');
       no warnings 'redefine';
       local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
-      $consequences = get_all_consequences( $config->{'Controller::Vep'}, \@vfs );
+      $consequences = get_all_consequences( \%config, \@vfs );
     } else {
       $c->log->debug('Query Ensembl');
-      $consequences = get_all_consequences( $config->{'Controller::Vep'}, \@vfs );
+      $consequences = get_all_consequences( \%config, \@vfs );
     }
     $c->stash->{consequences} = $consequences;
 
