@@ -40,12 +40,13 @@ has 'fasta_db' => (
   builder => '_find_fasta_cache',
 );
 
-sub vep : Chained('/') PathPart('vep') CaptureArgs(0) {
-  my ( $self, $c ) = @_;
-}
+has 'fasta' => (
+  isa =>'Str',
+  is =>'ro'
+);
 
-# /vep/consequences/:species
-sub get_species : Chained('vep') PathPart('consequences') CaptureArgs(1) {
+# /vep/:species
+sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
   try {
       $c->stash->{species} = $c->model('Registry')->get_alias($species);
@@ -85,7 +86,13 @@ sub get_region_POST {
   # $c->log->debug(Dumper $post_data);
   my $config = $c->config();
   # $c->log->debug(Dumper $config->{'Controller::Vep'});
-  my @variants = @{$post_data->{'VCF'}};
+  
+  my @variants = @{$post_data->{'variants'}};
+  # delete($post_data->{'variants'});
+  my $user_config = $post_data;
+# handle user config
+
+
   my @vfs;
   foreach my $line (@variants) {
     push @vfs, @{ parse_line($config,$line) };
@@ -98,17 +105,18 @@ sub get_region_POST {
   try {
     
     # Overwrite Slice->seq method to use a local disk cache when using Human
-    my $override; 
-    
+    my $consequences;
     if ($c->stash->{species} eq 'homo_sapiens') {
+      $c->log->debug('Farming human out to Bio::DB');
       no warnings 'redefine';
-      local *Bio::EnsEMBL::Slice::seq = \&_new_slice_seq;
-      my $consequences = get_all_consequences( $config->{'Controller::Vep'}, \@vfs );
-      $c->stash->{consequences} = $consequences;
+      local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
+      $consequences = get_all_consequences( $config->{'Controller::Vep'}, \@vfs );
+    } else {
+      $c->log->debug('Query Ensembl');
+      $consequences = get_all_consequences( $config->{'Controller::Vep'}, \@vfs );
     }
+    $c->stash->{consequences} = $consequences;
 
-    # $c->stash->{variation_features} = \@vfs;
-    # Catalyst chain ended prematurely here.
     $self->status_ok( $c, entity => { data => $c->stash->{consequences} } );
   }
   catch {
@@ -119,7 +127,7 @@ sub get_region_POST {
   };
 }
 
-# /vep/consequences/:species/region/:region/:allele_string
+# /vep/:species/region/:region/:allele_string
 # Only one argument wanted here, but region is still on the stack and needs to be moved out of the way.
 sub get_allele : PathPart('') Args(2) {
     my ( $self, $c, $region, $allele ) = @_;
@@ -154,9 +162,14 @@ sub get_allele : PathPart('') Args(2) {
 }
 
 
-# /vep/consequences/:species/id/:id
-sub get_id : Chained('get_species') PathPart('id') Args(1)  {
+# /vep/:species/id/:id
+sub get_id : Chained('get_species') PathPart('id') ActionClass('REST') {
+
+}
+
+sub get_id_GET {
   my ( $self, $c, $rs_id ) = @_;
+  unless ($rs_id) {$c->go('ReturnError', 'custom', ["rs_id is a required parameter for this endpoint"])}
   my $v = $c->stash()->{variation_adaptor}->fetch_by_name($rs_id);
   $c->go( 'ReturnError', 'custom', [qq{No variation found for RS ID $rs_id}] ) unless $v;
   my $vfs = $c->stash()->{variation_feature_adaptor}->fetch_all_by_Variation($v);
@@ -166,6 +179,12 @@ sub get_id : Chained('get_species') PathPart('id') Args(1)  {
   my $consequences = get_all_consequences( $config->{'Controller::Vep'}, $vfs);
   $c->stash->{consequences} = $consequences;
   $self->status_ok( $c, entity => { data => $consequences } );
+}
+
+sub get_id_POST {
+  my ($self, $c) = @_;
+  my $post_data = $c->req->data;
+
 }
 
 # Cribbed from Utils::VEP
@@ -195,6 +214,7 @@ sub _build_vf {
               adaptor        => $s->{structural_variation_feature_adaptor},
               variation_name => 'temp',
               chr            => $s->{sr_name},
+              slice          => $s->{slice},
               class_SO_term  => $so_term,
           });
       } else {
@@ -221,10 +241,9 @@ sub _build_vf {
 }
 
 sub _find_fasta_cache {
-  my $human_fasta_cache;
-  $human_fasta_cache = __PACKAGE__->config->{'fasta'};
+  my $self = shift;
   
-  my $fasta_db = Bio::DB::Fasta->new($human_fasta_cache);
+  my $fasta_db = Bio::DB::Fasta->new($self->fasta);
   return $fasta_db;
 }
 
@@ -232,15 +251,15 @@ sub _find_fasta_cache {
 sub _new_slice_seq {
   # replacement seq method to read from FASTA DB
   my $self = shift;
-
-  my $fasta_db = $self->fasta_db();
-  my $seq = $fasta_db->seq( $self->seq_region_name, $self->start => $self->end );
-  reverse_comp( \$seq ) if $self->strand < 0;
-
-  # default to a string of Ns if we couldn't get sequence
-  $seq ||= 'N' x $self->length();
-
-  return $seq;
+  my $fasta_db = $self->fasta_db;
+  return sub {
+    my $self = shift;
+    my $seq = $fasta_db->seq( $self->seq_region_name, $self->start => $self->end );
+    reverse_comp( \$seq ) if $self->strand < 0;
+    # default to a string of Ns if we couldn't get sequence
+    $seq ||= 'N' x $self->length();
+    return $seq;
+  };
 };
 
 __PACKAGE__->meta->make_immutable;
