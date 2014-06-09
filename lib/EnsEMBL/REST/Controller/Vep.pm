@@ -162,7 +162,8 @@ sub get_allele : PathPart('') Args(2) {
     $s->{allele_string} = $allele_string;
     $s->{allele}        = $allele;
 
-    my $config = $c->config->{'Controller::Vep'};
+    my $user_config = $c->request->parameters;
+    my $config = $self->_include_user_params($c,$user_config);
     $config->{ga} = $s->{ga};
     my $vf = $self->_build_vf($c);
     my $consequences = get_all_consequences( $config, [$vf]);
@@ -186,7 +187,9 @@ sub get_id_GET {
   my $vfs = $c->stash()->{variation_feature_adaptor}->fetch_all_by_Variation($v);
   $c->stash( variation => $v, variation_features => $vfs );
 
-  my $config = $c->config->{'Controller::Vep'};
+  my $user_config = $c->request->parameters;
+  my $config = $self->_include_user_params($c,$user_config);
+
   my $consequences = get_all_consequences( $config, $vfs);
   $c->stash->{consequences} = $consequences;
   $self->status_ok( $c, entity => { data => $consequences } );
