@@ -24,6 +24,7 @@ require EnsEMBL::REST;
 our $LOOKUP_AVAILABLE = 0;
 eval {
   require Bio::EnsEMBL::LookUp;
+  require Bio::EnsEMBL::RemoteLookUp;
   require Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor;
   require Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor;
   $LOOKUP_AVAILABLE = 1;
