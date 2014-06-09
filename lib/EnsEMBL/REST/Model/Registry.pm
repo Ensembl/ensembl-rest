@@ -194,6 +194,7 @@ sub _build_lookup {
 
   my $tax_dba =
 	Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor->new(
+										  -USER   => $self->lookup_user(),
 										  -PASS => $self->lookup_pass(),
 										  -HOST => $self->lookup_host(),
 										  -PORT => $self->lookup_port(),
