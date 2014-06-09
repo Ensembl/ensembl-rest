@@ -74,7 +74,6 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
 # Arguments must be handled subsequently
 sub get_region : Chained('get_species') PathPart('region') ActionClass('REST') {
   my ( $self, $c, $region ) = @_;
-  
 }
 
 sub get_region_GET {
@@ -90,22 +89,17 @@ sub get_region_POST {
   my $post_data = $c->req->data;
 
   # $c->log->debug(Dumper $post_data);
-  my $config = $c->config();
-   #$c->log->debug(Dumper $config->{'Controller::Vep'});
-  
-  my @variants = @{$post_data->{'variants'}};
-  delete($post_data->{'variants'});
-  my $user_config = $post_data;
+  # $c->log->debug(Dumper $config->{'Controller::Vep'});
   # handle user config
-  my %vep_params = %{ $config->{'Controller::Vep'} };
-  # $c->log->debug("Before ".Dumper \%vep_params);
+  my $config = $self->_include_user_params($c,$post_data);
 
-  # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/hgvs ccds hgnc numbers domains regulatory canonical protein gmaf strip/);
+  my @variants = @{$post_data->{'variants'}};
+  $self->_give_POST_to_VEP($c,\@variants, $config);
+}
 
-  map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys) } keys %{$user_config};
-  my %config = %vep_params;
-  # $c->log->debug("After ".Dumper \%vep_params);
+sub _give_POST_to_VEP {
+  my ($self,$c,$data,$config) = @_;
+  my @variants = @$data;
   my @vfs;
   foreach my $line (@variants) {
     push @vfs, @{ parse_line($config,$line) };
@@ -119,27 +113,29 @@ sub get_region_POST {
     
     # Overwrite Slice->seq method to use a local disk cache when using Human
     my $consequences;
-    %config = %{$config->{'Controller::Vep'}};
     if ($c->stash->{species} eq 'homo_sapiens') {
       $c->log->debug('Farming human out to Bio::DB');
       no warnings 'redefine';
       local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
-      $consequences = get_all_consequences( \%config, \@vfs );
+      $consequences = get_all_consequences( $config, \@vfs );
     } else {
       $c->log->debug('Query Ensembl');
-      $consequences = get_all_consequences( \%config, \@vfs );
+      $consequences = get_all_consequences( $config, \@vfs );
     }
     $c->stash->{consequences} = $consequences;
 
-    $self->status_ok( $c, entity => { data => $c->stash->{consequences} } );
+    $self->status_ok( $c, entity => { data => $consequences } );
   }
   catch {
     $c->log->fatal(qw{Problem Getting Consequences});
     $c->log->fatal($_);
-    $c->log->fatal(Dumper $post_data);
-    $c->go( 'ReturnError', 'custom', [ qq{Problem entry within this batch: } . Dumper $post_data] );
+    $c->log->fatal(Dumper $data);
+    $c->go( 'ReturnError', 'custom', [ qq{Problem entry within this batch: } . Dumper $data] );
   };
 }
+
+
+
 
 # /vep/:species/region/:region/:allele_string
 # Only one argument wanted here, but region is still on the stack and needs to be moved out of the way.
@@ -196,10 +192,14 @@ sub get_id_GET {
   $self->status_ok( $c, entity => { data => $consequences } );
 }
 
+
 sub get_id_POST {
   my ($self, $c) = @_;
   my $post_data = $c->req->data;
-
+  my $config = $self->_include_user_params($c,$post_data);
+  $config->{va} = $c->stash->{variation_adaptor};
+  my @ids = @{$post_data->{'ids'}};
+  $self->_give_POST_to_VEP($c,\@ids,$config);
 }
 
 # Cribbed from Utils::VEP
@@ -276,6 +276,18 @@ sub _new_slice_seq {
     return $seq;
   };
 };
+
+sub _include_user_params {
+  my ($self,$c,$user_config) = @_;
+  # This list stops users altering more crucial variables.
+  my @valid_keys = (qw/hgvs ccds hgnc numbers domains regulatory canonical protein gmaf strip/);
+  
+  my %vep_params = %{ $c->config->{'Controller::Vep'} };
+  # $c->log->debug("Before ".Dumper \%vep_params);
+  map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
+  # $c->log->debug("After ".Dumper \%vep_params);
+  return \%vep_params;
+}
 
 __PACKAGE__->meta->make_immutable;
 
