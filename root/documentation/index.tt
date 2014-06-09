@@ -24,7 +24,7 @@ limitations under the License.
 <tr><th>Resource</th><th>Description</th></tr>
 </thead>
     <tbody>
-	[% FOREACH key IN pair.value %]
+	[% FOREACH key IN pair.value.sort %]
       <tr><td><a href="[% c.uri_for_action('/documentation/info', key) %]">[% endpoints.$key.method %] [% endpoints.$key.endpoint %] </a> </td><td> [% endpoints.$key.description %]</td></tr>
 	[% END %]
     </tbody>
