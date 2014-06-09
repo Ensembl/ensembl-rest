@@ -24,6 +24,8 @@ require EnsEMBL::REST;
 our $LOOKUP_AVAILABLE = 0;
 eval {
   require Bio::EnsEMBL::LookUp;
+  require Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor;
+  require Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor;
   $LOOKUP_AVAILABLE = 1;
 };
 use feature 'switch';
@@ -177,13 +179,35 @@ sub _intern_db_connections {
 }
 
 sub _build_lookup {
-  my ($self)= @_;
-  return Bio::EnsEMBL::LookUp->new(-USER=>$self->lookup_user(),
-  -PASS=>$self->lookup_pass(),
-  -HOST=>$self->lookup_host(),
-  -PORT=>$self->lookup_port(),
-  -DBNAME=>$self->lookup_dbname() );
-}
+  my ($self) = @_;
+
+  my $info_db =
+	Bio::EnsEMBL::DBSQL::DBConnection->new(
+									   -USER   => $self->lookup_user(),
+									   -PASS   => $self->lookup_pass(),
+									   -HOST   => $self->lookup_host(),
+									   -PORT   => $self->lookup_port(),
+									   -DBNAME => $self->lookup_dbname()
+	);
+
+  $info_db->reconnect_when_lost(1);
+
+  my $tax_dba =
+	Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor->new(
+										  -PASS => $self->lookup_pass(),
+										  -HOST => $self->lookup_host(),
+										  -PORT => $self->lookup_port(),
+										  -DBNAME => 'ncbi_taxonomy' );
+  $tax_dba->dbc()->reconnect_when_lost(1);
+
+  my $lookup =
+	Bio::EnsEMBL::RemoteLookUp->new(
+		   Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor->new(
+				 -DBC             => $info_db,
+				 TAXONOMY_ADAPTOR => $tax_dba->get_TaxonomyNodeAdaptor()
+		   ) );
+  return $lookup;
+} ## end sub _build_lookup
 
 # Logic here is if we were told a compara name we use that
 # If not we query the species for the "best" compara (normally depends on division)
