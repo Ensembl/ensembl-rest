@@ -94,11 +94,18 @@ sub get_region_POST {
    #$c->log->debug(Dumper $config->{'Controller::Vep'});
   
   my @variants = @{$post_data->{'variants'}};
-  # delete($post_data->{'variants'});
+  delete($post_data->{'variants'});
   my $user_config = $post_data;
-# handle user config
+  # handle user config
+  my %vep_params = %{ $config->{'Controller::Vep'} };
+  # $c->log->debug("Before ".Dumper \%vep_params);
 
+  # This list stops users altering more crucial variables.
+  my @valid_keys = (qw/hgvs ccds hgnc numbers domains regulatory canonical protein gmaf strip/);
 
+  map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys) } keys %{$user_config};
+  my %config = %vep_params;
+  # $c->log->debug("After ".Dumper \%vep_params);
   my @vfs;
   foreach my $line (@variants) {
     push @vfs, @{ parse_line($config,$line) };
@@ -112,7 +119,7 @@ sub get_region_POST {
     
     # Overwrite Slice->seq method to use a local disk cache when using Human
     my $consequences;
-    my %config = %{$config->{'Controller::Vep'}};
+    %config = %{$config->{'Controller::Vep'}};
     if ($c->stash->{species} eq 'homo_sapiens') {
       $c->log->debug('Farming human out to Bio::DB');
       no warnings 'redefine';
