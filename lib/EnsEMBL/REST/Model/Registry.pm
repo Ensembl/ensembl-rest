@@ -24,7 +24,7 @@ require EnsEMBL::REST;
 our $LOOKUP_AVAILABLE = 0;
 eval {
   require Bio::EnsEMBL::LookUp;
-  require Bio::EnsEMBL::RemoteLookUp;
+  require Bio::EnsEMBL::LookUp::RemoteLookUp;
   require Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor;
   require Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor;
   $LOOKUP_AVAILABLE = 1;
@@ -203,7 +203,7 @@ sub _build_lookup {
   $tax_dba->dbc()->reconnect_when_lost(1);
 
   my $lookup =
-	Bio::EnsEMBL::RemoteLookUp->new(
+	Bio::EnsEMBL::LookUp::RemoteLookUp->new(
 		   Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor->new(
 				 -DBC             => $info_db,
 				 TAXONOMY_ADAPTOR => $tax_dba->get_TaxonomyNodeAdaptor()
