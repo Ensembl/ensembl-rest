@@ -92,7 +92,7 @@ sub get_region_POST {
   # $c->log->debug(Dumper $config->{'Controller::Vep'});
   # handle user config
   my $config = $self->_include_user_params($c,$post_data);
-
+  $config->{va} = $c->stash->{variation_adaptor};
   my @variants = @{$post_data->{'variants'}};
   $self->_give_POST_to_VEP($c,\@variants, $config);
 }
@@ -189,9 +189,9 @@ sub get_id_GET {
 
   my $user_config = $c->request->parameters;
   my $config = $self->_include_user_params($c,$user_config);
+  $config->{format} = 'id';
 
   my $consequences = get_all_consequences( $config, $vfs);
-  $c->stash->{consequences} = $consequences;
   $self->status_ok( $c, entity => { data => $consequences } );
 }
 
