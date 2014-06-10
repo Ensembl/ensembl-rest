@@ -22,7 +22,7 @@ use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
 use Data::Dumper;
 use Bio::DB::Fasta;
-use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line);
+use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line read_cache_info);
 use Bio::EnsEMBL::Slice;
 use Bio::EnsEMBL::Utils::Sequence qw(reverse_comp);
 use Bio::EnsEMBL::Funcgen::MotifFeature;
@@ -93,6 +93,7 @@ sub get_region_POST {
   # handle user config
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
+  read_cache_info($config);
   my @variants = @{$post_data->{'variants'}};
   $self->_give_POST_to_VEP($c,\@variants, $config);
 }
@@ -284,7 +285,7 @@ sub _new_slice_seq {
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
   # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/hgvs ccds hgnc numbers domains regulatory canonical protein gmaf strip/);
+  my @valid_keys = (qw/hgvs ccds numbers domains canonical protein strip maf_1kg maf_esp pubmed/);
   
   my %vep_params = %{ $c->config->{'Controller::Vep'} };
   # $c->log->debug("Before ".Dumper \%vep_params);
