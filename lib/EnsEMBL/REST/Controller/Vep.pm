@@ -93,7 +93,6 @@ sub get_region_POST {
   # handle user config
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
-  read_cache_info($config);
   my @variants = @{$post_data->{'variants'}};
   $self->_give_POST_to_VEP($c,\@variants, $config);
 }
@@ -289,6 +288,7 @@ sub _include_user_params {
   my @valid_keys = (qw/hgvs ccds numbers domains canonical protein strip maf_1kg maf_esp pubmed/);
   
   my %vep_params = %{ $c->config->{'Controller::Vep'} };
+  read_cache_info(\%vep_params);
   # $c->log->debug("Before ".Dumper \%vep_params);
   map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
   # $c->log->debug("After ".Dumper \%vep_params);
