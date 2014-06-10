@@ -120,6 +120,7 @@ sub _give_POST_to_VEP {
       $consequences = get_all_consequences( $config, \@vfs );
     } else {
       $c->log->debug('Query Ensembl');
+      $config->{species} = $c->stash->{species}; # override VEP default for human
       $consequences = get_all_consequences( $config, \@vfs );
     }
     $c->stash->{consequences} = $consequences;
