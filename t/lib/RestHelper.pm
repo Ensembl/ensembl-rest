@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET fasta_GET json_GET seqxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET json_POST seqxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex/;
 
 use Test::More;
 use Test::Differences;
@@ -41,6 +41,21 @@ sub is_json_GET($$$) {
 sub json_GET($$) {
   my ($url, $msg) = @_;
   my $resp = do_GET($url, 'application/json');
+  if(! $resp->is_success()) {
+    my $code = $resp->code();
+    note "Response code $code";
+    return fail($msg);
+  }
+  my $raw = $resp->decoded_content();
+  is_valid_json($raw, "$url | $msg (testing JSON validity)");
+  my $json = eval { decode_json($resp->decoded_content())};
+  return $json if $json;
+  return;
+}
+# Minimal support for JSON requests in keeping with our narrow capabilities
+sub json_POST($$$) {
+  my ($url, $body, $msg) = @_;
+  my $resp = do_POST($url, $body);
   if(! $resp->is_success()) {
     my $code = $resp->code();
     note "Response code $code";
@@ -107,6 +122,29 @@ sub do_GET($;$) {
   $req->header('Content-Type', $content_type);
   
   #Go a level higher until you get out of this package
+  my $parent;
+  my $level = 0;
+  while(1) {
+    ($parent) = caller($level++);
+    if($parent ne __PACKAGE__) {
+      last;
+    }
+  }
+  my $parent_request_name = "${parent}::request";
+  
+  my $resp;
+  {
+    no strict 'refs';
+    $resp = &$parent_request_name($req);
+  }
+  return $resp;
+}
+
+sub do_POST($$) {
+  my ($url, $body) = @_;
+  my @header = ( 'Content-Type' => 'application/json',
+                 Accepts => 'application/json' );
+  my $req = HTTP::Request->new('POST',$url,\@header,$body);
   my $parent;
   my $level = 0;
   while(1) {

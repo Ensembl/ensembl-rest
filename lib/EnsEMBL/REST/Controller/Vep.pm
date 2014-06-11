@@ -113,13 +113,13 @@ sub _give_POST_to_VEP {
     
     # Overwrite Slice->seq method to use a local disk cache when using Human
     my $consequences;
-    if ($c->stash->{species} eq 'homo_sapiens') {
+    if ($c->stash->{species} eq 'homo_sapiens' && defined($config->{fasta})) {
       $c->log->debug('Farming human out to Bio::DB');
       no warnings 'redefine';
       local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
       $consequences = get_all_consequences( $config, \@vfs );
     } else {
-      $c->log->debug('Query Ensembl');
+      $c->log->debug('Query Ensembl database');
       $config->{species} = $c->stash->{species}; # override VEP default for human
       $consequences = get_all_consequences( $config, \@vfs );
     }
