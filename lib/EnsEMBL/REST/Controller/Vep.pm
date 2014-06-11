@@ -186,12 +186,16 @@ sub get_id_GET {
   unless ($rs_id) {$c->go('ReturnError', 'custom', ["rs_id is a required parameter for this endpoint"])}
   my $v = $c->stash()->{variation_adaptor}->fetch_by_name($rs_id);
   $c->go( 'ReturnError', 'custom', [qq{No variation found for RS ID $rs_id}] ) unless $v;
-  my $vfs = $c->stash()->{variation_feature_adaptor}->fetch_all_by_Variation($v);
+  my $vfs = $v->get_all_VariationFeatures();
   $c->stash( variation => $v, variation_features => $vfs );
 
   my $user_config = $c->request->parameters;
   my $config = $self->_include_user_params($c,$user_config);
   $config->{format} = 'id';
+  foreach (@$vfs) {
+    $config->{slice_cache}->{$_->seq_region_name} = $_->slice;
+    $_->{chr} = $_->seq_region_name;
+  }
 
   my $consequences = get_all_consequences( $config, $vfs);
   $self->status_ok( $c, entity => { data => $consequences } );
