@@ -40,8 +40,8 @@ __PACKAGE__->config(
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 #We want to find every "non-special" format. To generate the regex used then invoke this command:
-#perl -MRegexp::Assemble -e 'my $ra = Regexp::Assemble->new; $ra->add($_) for qw(application\/json text\/javascript application\/x-sereal text\/x-yaml application\/x-msgpack); print $ra->re, "\n"'
-my $CONTENT_TYPE_REGEX = qr/(?-xism:(?:application\/(?:x-(?:msgpack|sereal)|json)|text\/(?:javascript|x-yaml)))/;
+#perl -MRegexp::Assemble -e 'my $ra = Regexp::Assemble->new; $ra->add($_) for qw(application\/json text\/javascript text\/x-yaml); print $ra->re, "\n"'
+my $CONTENT_TYPE_REGEX = qr/(?^:(?:text\/(?:javascript|x-yaml)|application\/json))/;
 
 sub get_adaptors :Private {
   my ($self, $c) = @_;
