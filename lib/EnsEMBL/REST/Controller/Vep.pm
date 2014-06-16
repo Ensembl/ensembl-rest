@@ -289,7 +289,7 @@ sub _new_slice_seq {
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
   # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/hgvs ccds numbers domains canonical protein strip maf_1kg maf_esp pubmed/);
+  my @valid_keys = (qw/hgvs ccds numbers domains canonical protein maf_1kg maf_esp pubmed/);
   
   my %vep_params = %{ $c->config->{'Controller::Vep'} };
   read_cache_info(\%vep_params);
