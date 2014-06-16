@@ -50,7 +50,7 @@ limitations under the License.
                 <a class="brand" href="[% service_parent_url %]"><img class="brand" src="[% service_logo %]" alt="Service logo"/></a>
                     <ul class="nav">
                         <li class="active"><a href="/">Endpoints</a></li>
-                        <li><a href="/documentation/user_guide">User Guide</a></li>
+                        <li><a href="http://github.com/Ensembl/ensembl-rest/wiki">User Guide</a></li>
                         <li><a href="/documentation/change_log">Change Log</a></li>
                         <li><a href="http://www.ensembl.org/info/about/index.html">About the Ensembl Project</a></li>
                         <li><a href="http://www.ensembl.org/info/about/contact/">Contact Ensembl</a></li>
