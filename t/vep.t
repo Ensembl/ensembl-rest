@@ -33,21 +33,22 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
-
-my $vep_get = '/vep/human/region/7:86442404-86442404:1/G?content-type=application/json';
+my $vep_get = '/vep/homo_sapiens/region/7:86442404-86442404:1/G?content-type=application/json';
 
 # Test vep/region
 my $json = json_GET($vep_get,'GET a VEP region');
 eq_or_diff($json, 
   { data => [
     {"Consequence" => "intron_variant",
-     "Extra" => {"ENSP" => "ENSP00000441407",
-                 "STRAND" => 1,
-                 "HGVSc" => "ENST00000536043.1:c.941-25751N>G",
-                 "INTRON" => "2/4"},
+     "Extra" => {
+        "GMAF" => "C:0.0399",
+        "STRAND" => 1,
+        "SYMBOL" => "GRM3",
+        "SYMBOL_SOURCE" => "HGNC"
+     },
      "Feature_type" => "Transcript",
      "Uploaded_variation" => "temp",
-     "Existing_variation" => "-",
+     "Existing_variation" => "rs2299222",
      "Allele" => "G",
      "Gene" => "ENSG00000198822",
      "CDS_position" => "-",
@@ -59,13 +60,15 @@ eq_or_diff($json,
      "Location" => "7:86442404"
     },
     {"Consequence" => "intron_variant",
-     "Extra" => {"ENSP" => "ENSP00000398767",
-                 "STRAND" => 1,
-                 "HGVSc" => "ENST00000439827.1:c.1324+25972N>G",
-                 "INTRON" => "3/4"},
+     "Extra" => {
+        "GMAF" => "C:0.0399",
+        "STRAND" => 1,
+        "SYMBOL" => "GRM3",
+        "SYMBOL_SOURCE" => "HGNC"
+     },
      "Feature_type" => "Transcript",
      "Uploaded_variation" => "temp",
-     "Existing_variation" => "-",
+     "Existing_variation" => "rs2299222",
      "Allele" => "G",
      "Gene" => "ENSG00000198822",
      "CDS_position" => "-",
@@ -77,15 +80,15 @@ eq_or_diff($json,
      "Location" => "7:86442404"
      },
      {"Consequence" => "intron_variant",
-      "Extra" => {"ENSP" => "ENSP00000355316",
-                  "STRAND" => 1,
-                  "HGVSc" => "ENST00000361669.2:c.1325-25751N>G",
-                  "INTRON" => "3/5",
-                  "CANONICAL" => "YES",
-                  "CCDS" => "CCDS5600.1"},
+     "Extra" => {
+        "GMAF" => "C:0.0399",
+        "STRAND" => 1,
+        "SYMBOL" => "GRM3",
+        "SYMBOL_SOURCE" => "HGNC"
+     },
       "Feature_type" => "Transcript",
       "Uploaded_variation" => "temp",
-      "Existing_variation" => "-",
+      "Existing_variation" => "rs2299222",
       "Allele" => "G",
       "Gene" => "ENSG00000198822",
       "CDS_position" => "-",
@@ -97,13 +100,15 @@ eq_or_diff($json,
       "Location" => "7:86442404"
       },
       {"Consequence" => "intron_variant",
-       "Extra" => {"ENSP" => "ENSP00000444064",
-                   "STRAND" => 1,
-                   "HGVSc" => "ENST00000546348.1:c.101-25751N>G",
-                   "INTRON" => "1/3"},
+       "Extra" => {
+          "GMAF" => "C:0.0399",
+          "STRAND" => 1,
+          "SYMBOL" => "GRM3",
+          "SYMBOL_SOURCE" => "HGNC"
+       },
        "Feature_type" => "Transcript",
        "Uploaded_variation" => "temp",
-       "Existing_variation" => "-",
+       "Existing_variation" => "rs2299222",
        "Allele" => "G",
        "Gene" => "ENSG00000198822",
        "CDS_position" => "-",
@@ -115,13 +120,15 @@ eq_or_diff($json,
        "Location" => "7:86442404"
        },
        {"Consequence" => "intron_variant",
-        "Extra" => {"ENSP" => "ENSP00000378209",
-                    "STRAND" => 1,
-                    "HGVSc" => "ENST00000394720.2:c.1318+25972N>G",
-                    "INTRON" => "3/4"},
+       "Extra" => {
+          "GMAF" => "C:0.0399",
+          "STRAND" => 1,
+          "SYMBOL" => "GRM3",
+          "SYMBOL_SOURCE" => "HGNC"
+       },
         "Feature_type" => "Transcript",
         "Uploaded_variation" => "temp",
-        "Existing_variation" => "-",
+        "Existing_variation" => "rs2299222",
         "Allele" => "G",
         "Gene" => "ENSG00000198822",
         "CDS_position" => "-",
@@ -133,7 +140,7 @@ eq_or_diff($json,
         "Location" => "7:86442404"}
       ]},'Example vep region get message');
 
-my $vep_post = '/vep/human/region';
+my $vep_post = '/vep/homo_sapiens/region';
 my $vep_post_body = '{ "variants" : ["7  34381884  var1  C  T  . . .",
                                      "7  86442404  var2  T  C  . . ."]}';
 
@@ -146,12 +153,13 @@ eq_or_diff($json,{
       CDS_position => '-',                            
       Codons => undef,                                
       Consequence => 'downstream_gene_variant',       
-      Existing_variation => '-',                      
-      Extra => {                                      
-        CANONICAL => 'YES',                           
-        DISTANCE => 4240,                             
-        STRAND => -1                                  
-      },                                              
+      Existing_variation => '-',
+      "Extra" => {
+        "DISTANCE" => 4240,
+        "STRAND" => -1,
+        "SYMBOL" => "NPSR1-AS1",
+        "SYMBOL_SOURCE" => "HGNC"
+       },
       Feature => 'ENST00000419766',                   
       Feature_type => 'Transcript',                   
       Gene => 'ENSG00000197085',                      
@@ -166,12 +174,12 @@ eq_or_diff($json,{
       CDS_position => '-',                            
       Codons => undef,                                
       Consequence => 'intron_variant',                
-      Existing_variation => '-',                      
+      Existing_variation => 'rs2299222',
       Extra => {                                      
-        ENSP => 'ENSP00000441407',                    
-        HGVSc => 'ENST00000536043.1:c.941-25751T>C',  
-        INTRON => '2/4',                              
-        STRAND => 1                                   
+        GMAF => 'C:0.0399',                    
+        STRAND => 1,  
+        SYMBOL => 'GRM3',                              
+        SYMBOL_SOURCE => 'HGNC'                                   
       },                                              
       Feature => 'ENST00000536043',                   
       Feature_type => 'Transcript',                   
@@ -187,13 +195,13 @@ eq_or_diff($json,{
       CDS_position => '-',                            
       Codons => undef,                                
       Consequence => 'intron_variant',                
-      Existing_variation => '-',                      
-      Extra => {                                      
-        ENSP => 'ENSP00000398767',                    
-        HGVSc => 'ENST00000439827.1:c.1324+25972T>C', 
-        INTRON => '3/4',                              
-        STRAND => 1                                   
-      },                                              
+      Existing_variation => 'rs2299222',
+      Extra => {
+        GMAF => 'C:0.0399',
+        STRAND => 1,
+        SYMBOL => 'GRM3',
+        SYMBOL_SOURCE => 'HGNC'
+      },
       Feature => 'ENST00000439827',                   
       Feature_type => 'Transcript',                   
       Gene => 'ENSG00000198822',                      
@@ -208,15 +216,13 @@ eq_or_diff($json,{
       CDS_position => '-',                            
       Codons => undef,                                
       Consequence => 'intron_variant',                
-      Existing_variation => '-',                      
-      Extra => {                                      
-        CANONICAL => 'YES',                           
-        CCDS => 'CCDS5600.1',                         
-        ENSP => 'ENSP00000355316',                    
-        HGVSc => 'ENST00000361669.2:c.1325-25751T>C', 
-        INTRON => '3/5',                              
-        STRAND => 1                                   
-      },                                              
+      Existing_variation => 'rs2299222',                      
+      Extra => {
+        GMAF => 'C:0.0399',
+        STRAND => 1,
+        SYMBOL => 'GRM3',
+        SYMBOL_SOURCE => 'HGNC'
+      },
       Feature => 'ENST00000361669',                   
       Feature_type => 'Transcript',                   
       Gene => 'ENSG00000198822',                      
@@ -231,13 +237,13 @@ eq_or_diff($json,{
       CDS_position => '-',                            
       Codons => undef,                                
       Consequence => 'intron_variant',                
-      Existing_variation => '-',                      
-      Extra => {                                      
-        ENSP => 'ENSP00000444064',                    
-        HGVSc => 'ENST00000546348.1:c.101-25751T>C',  
-        INTRON => '1/3',                              
-        STRAND => 1                                   
-      },                                              
+      Existing_variation => 'rs2299222',                      
+      Extra => {
+        GMAF => 'C:0.0399',
+        STRAND => 1,
+        SYMBOL => 'GRM3',
+        SYMBOL_SOURCE => 'HGNC'
+      },
       Feature => 'ENST00000546348',                   
       Feature_type => 'Transcript',                   
       Gene => 'ENSG00000198822',                      
@@ -252,13 +258,13 @@ eq_or_diff($json,{
       CDS_position => '-',                            
       Codons => undef,                                
       Consequence => 'intron_variant',                
-      Existing_variation => '-',                      
-      Extra => {                                      
-        ENSP => 'ENSP00000378209',                    
-        HGVSc => 'ENST00000394720.2:c.1318+25972T>C', 
-        INTRON => '3/4',                              
-        STRAND => 1                                   
-      },                                              
+      Existing_variation => 'rs2299222',                      
+      Extra => {
+        GMAF => 'C:0.0399',
+        STRAND => 1,
+        SYMBOL => 'GRM3',
+        SYMBOL_SOURCE => 'HGNC'
+      },
       Feature => 'ENST00000394720',                   
       Feature_type => 'Transcript',                   
       Gene => 'ENSG00000198822',                      
@@ -271,30 +277,34 @@ eq_or_diff($json,{
 },'VEP region POST');
 
 # test vep/id
-my $vep_id_get = '/vep/human/id/rs186950277?content-type=application/json';
+my $vep_id_get = '/vep/homo_sapiens/id/rs186950277?content-type=application/json';
 $json = json_GET($vep_id_get,'GET consequences for Variation ID');
 eq_or_diff($json, {                                          
   data => [                                
     {                                      
       Allele => 'A',                       
       Consequence => 'intergenic_variant', 
-      Existing_variation => '-',           
-      Extra => {},                         
+      Existing_variation => 'rs186950277',           
+      Extra => {
+        GMAF => 'A:0.0014'
+      },                         
       Location => '8:60403074',            
       Uploaded_variation => 'rs186950277'  
     },                                     
     {                                      
       Allele => 'T',                       
       Consequence => 'intergenic_variant', 
-      Existing_variation => '-',           
-      Extra => {},                         
+      Existing_variation => 'rs186950277',           
+      Extra => {
+        GMAF => 'A:0.0014'
+      },
       Location => '8:60403074',            
       Uploaded_variation => 'rs186950277'  
     }                                      
   ]                                        
 },'VEP id GET');
 
-my $vep_id_post = '/vep/human/id';
+my $vep_id_post = '/vep/homo_sapiens/id';
 my $vep_id_body = '{ "ids" : ["rs186950277", "rs17081232" ]}';
 $json = json_POST($vep_id_post,$vep_id_body,'VEP ID list POST');
 eq_or_diff($json,{                                         
@@ -302,24 +312,30 @@ eq_or_diff($json,{
     {                                     
       Allele => 'A',                      
       Consequence => 'intergenic_variant',
-      Existing_variation => '-',          
-      Extra => {},                        
+      Existing_variation => 'rs17081232',          
+      Extra => {
+        GMAF => 'A:0.2443'
+      },
       Location => '4:32305409',           
       Uploaded_variation => 'rs17081232'  
     },                                    
     {                                     
       Allele => 'A',                      
       Consequence => 'intergenic_variant',
-      Existing_variation => '-',          
-      Extra => {},                        
+      Existing_variation => 'rs186950277',          
+      Extra => {
+        GMAF => 'A:0.0014'
+      },
       Location => '8:60403074',           
       Uploaded_variation => 'rs186950277' 
     },                                    
     {                                     
       Allele => 'T',                      
       Consequence => 'intergenic_variant',
-      Existing_variation => '-',          
-      Extra => {},                        
+      Existing_variation => 'rs186950277',
+      Extra => {
+        GMAF => 'A:0.0014'
+      },
       Location => '8:60403074',           
       Uploaded_variation => 'rs186950277' 
     }                                     
