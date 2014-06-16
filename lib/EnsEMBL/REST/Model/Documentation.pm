@@ -107,16 +107,6 @@ sub enrich {
       }
     }
     
-    if(EnsEMBL::REST->config()->{sereal} && $outputs_hash{'json'} && ! exists $outputs_hash{'sereal'}) {
-      push(@{$outputs}, 'sereal');
-      $endpoint->{output} = $outputs;
-    }
-
-    if(EnsEMBL::REST->config()->{msgpack} && $outputs_hash{'json'} && ! exists $outputs_hash{'msgpack'}) {
-      push(@{$outputs}, 'msgpack');
-      $endpoint->{output} = $outputs;
-    }
-
     #Build each output example
     foreach my $id ( keys %{ $endpoint->{examples} } ) {
         my $eg = $endpoint->{examples}->{$id};
