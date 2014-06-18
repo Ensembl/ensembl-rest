@@ -27,7 +27,7 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
-sub species: Chained('/') PathPart('assembly/info') CaptureArgs(1) {
+sub species: Chained('/') PathPart('info/assembly') CaptureArgs(1) {
   my ( $self, $c, $species) = @_;
   $c->stash(species => $species);
 }
