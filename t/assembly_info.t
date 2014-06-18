@@ -31,7 +31,7 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
 Catalyst::Test->import('EnsEMBL::REST');
 
 is_json_GET(
-  '/assembly/info/homo_sapiens',
+  '/info/assembly/homo_sapiens',
   { 
     'assembly_name' => 'GRCh37.p8', 
     'assembly_date' => '2009-02', 
@@ -51,11 +51,11 @@ is_json_GET(
 );
 
 is_json_GET(
-  '/assembly/info/homo_sapiens/6',
+  '/info/assembly/homo_sapiens/6',
   {assembly_exception_type => 'REF', coordinate_system => 'chromosome', is_chromosome => 1, length => 171115067 },
   'Checking info of region 6 matches expected'
 );
 
-action_bad('/assembly/info/homo_sapiens/wibble', 'Checking a bogus region results in no information');
+action_bad('/info/assembly/homo_sapiens/wibble', 'Checking a bogus region results in no information');
 
 done_testing();
