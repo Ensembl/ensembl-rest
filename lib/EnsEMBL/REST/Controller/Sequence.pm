@@ -51,6 +51,9 @@ sub id_GET { }
 sub id :Path('id') Args(1) ActionClass('REST') {
   my ($self, $c, $stable_id) = @_;
   $c->stash->{id} = $stable_id;
+  if ($c->request->param('mask') && $c->request->param('mask_feature')) {
+    $c->go('ReturnError', 'custom', [qq{'You cannot mask both repeats and features on the same sequence'}]);
+  }
   
   try {
     $c->log()->debug('Finding the object');
@@ -74,6 +77,9 @@ sub get_species :Chained('/') PathPart('sequence/region') CaptureArgs(1) {
 
 sub region :Chained('get_species') PathPart('') Args(1) ActionClass('REST') {
   my ($self, $c, $region) = @_;
+  if ($c->request->param('mask') && $c->request->param('mask_feature')) {
+    $c->go('ReturnError', 'custom', [qq{'You cannot mask both repeats and features on the same sequence'}]);
+  }
   
   try {
     $c->log()->debug('Finding the Slice');
@@ -133,6 +139,7 @@ sub _process_feature {
   my $seq;
   my $slice;
   my $desc;
+  my $mask_feature = $c->request->param('mask_feature');
   
   #Translations
   if($object->isa('Bio::EnsEMBL::Translation')) {
@@ -142,7 +149,7 @@ sub _process_feature {
   #Transcripts
   elsif($object->isa('Bio::EnsEMBL::PredictionTranscript')) {
     if($type eq 'cdna') {
-      $seq = $object->spliced_seq(1);
+      $seq = $object->spliced_seq($mask_feature);
     }
     elsif($type eq 'cds') {
       $seq = $object->translateable_seq();
@@ -154,7 +161,7 @@ sub _process_feature {
   }
   elsif($object->isa('Bio::EnsEMBL::Transcript')) {
     if($type eq 'cdna') {
-      $seq = $object->spliced_seq(1);
+      $seq = $object->spliced_seq($mask_feature);
     }
     elsif($type eq 'cds') {
       $seq = $object->translateable_seq();
@@ -243,7 +250,7 @@ sub _mask_slice_features {
   my ($self, $slice, $c, $type, $object) = @_;
   my $seq = $slice->seq();
   my @features;
-  if (!$c->request()->param('mask')) {
+  if ($c->request()->param('mask_feature')) {
     if (defined $type) {
       if ($type eq 'genomic' && !$object->isa('Bio::EnsEMBL::Exon')) {
         @features = @{ $object->get_all_Introns() };
