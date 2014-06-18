@@ -49,7 +49,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 # CDNA ID based lookup
 {
   my $id = 'ENST00000314040';
-  my $url = '/sequence/id/'.$id.'?type=cdna';
+  my $url = '/sequence/id/'.$id.'?type=cdna;mask_feature=1';
   my $seq = $seqs{$id.'_cdna'};
   is_json_GET(
     $url,
@@ -120,7 +120,7 @@ Catalyst::Test->import('EnsEMBL::REST');
   is_json_GET(
     '/sequence/id/'.$id,
     {
-      seq => $seq->seq,
+      seq => uc($seq->seq),
       id => $id,
       desc => ($seq->desc ? $seq->desc : undef),
       molecule => 'dna',
@@ -165,7 +165,7 @@ Catalyst::Test->import('EnsEMBL::REST');
   is_json_GET(
     '/sequence/region/homo_sapiens/'.$region,
     {
-      seq => $seq->seq,
+      seq => uc($seq->seq),
       id => $seq->desc,
       molecule => 'dna',
     },
