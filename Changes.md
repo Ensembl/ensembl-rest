@@ -24,7 +24,9 @@ More features will appear over time, but these will not interfere with the exist
 
   * HTTPS support for clients with confidentiality concerns
 
-  * Deployment to Embassy Cloud. The REST service is now hosted on the EBI's cloud infrastructure, enabling the scaling of resources to meet user needs.
+  * The rate limiter is more permissive. We have stepped up the rate limit from three requests per second to fifteen per second.
+
+  * [/sequence/*] endpoints now report sequence with contextual soft-masking for features through the mask_feature option. This allows the finding of feature boundaries in raw sequence. IDs of type "cds" mask the UTRs, and IDs of type gene mask introns.
 
 ## Bugfixes:
 
