@@ -28,7 +28,7 @@ More features will appear over time, but these will not interfere with the exist
 
 ## Bugfixes:
 
-  * Spelling of [/ontology/descendants] changed to [/ontology/descendents]
+  * Spelling of [/ontology/descendents] changed to [/ontology/descendants]
 
   * Documentation overhaul to better explain endpoints and parameters
 
