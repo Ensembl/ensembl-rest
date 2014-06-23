@@ -94,6 +94,10 @@ sub get_region_POST {
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
   my @variants = @{$post_data->{'variants'}};
+  if (scalar(@variants) > $config->{max_post_size}) {
+    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$config->{max_post_size}.' variant lines per POST' ] );
+  }
+
   $self->_give_POST_to_VEP($c,\@variants, $config);
 }
 
@@ -208,6 +212,9 @@ sub get_id_POST {
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
   my @ids = @{$post_data->{'ids'}};
+  if (scalar(@ids) > $config->{max_post_size}) {
+    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$config->{max_post_size}.' variant lines per POST' ] );
+  }
   $self->_give_POST_to_VEP($c,\@ids,$config);
 }
 
@@ -295,6 +302,14 @@ sub _include_user_params {
   read_cache_info(\%vep_params);
   # $c->log->debug("Before ".Dumper \%vep_params);
   map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
+
+  # Inject check_existing option into VEP config for options that rely upon it.
+  # check_existing causes a performance drop, so is kept off by default
+  # gmaf is not currently in the list of accepted arguments, but consider it future-proofing.
+  if ($user_config->{maf_1kg} || $user_config->{maf_esp} || $user_config->{pubmed} || $user_config->{gmaf}) {
+    $vep_params{check_existing} = 1;
+  }
+
   # $c->log->debug("After ".Dumper \%vep_params);
   return \%vep_params;
 }
