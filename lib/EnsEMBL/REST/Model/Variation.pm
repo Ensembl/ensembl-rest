@@ -65,6 +65,7 @@ sub to_hash {
   $variation_hash->{mappings} = $self->VariationFeature($variation);
   $variation_hash->{populations} = $self->Alleles($variation) if $c->request->param('pops');
   $variation_hash->{genotypes} = $self->Genotypes($variation) if $c->request->param('genotypes');
+  $variation_hash->{phenotypes} = $self->Phenotypes($variation) if $c->request->param('phenotypes');
 
   return $variation_hash;
 }
@@ -111,6 +112,38 @@ sub gen_as_hash {
   $gen_hash->{submission_id} = $gen->subsnp() if $gen->subsnp;
 
   return $gen_hash;
+}
+
+sub Phenotypes {
+  my ($self, $variation) = @_;
+
+  my @phenotypes;
+  my $phenotypes = $variation->get_all_PhenotypeFeatures;
+  foreach my $phen (@$phenotypes) {
+    push (@phenotypes, $self->phen_as_hash($phen));
+  }
+  return \@phenotypes;
+}
+
+sub phen_as_hash {
+  my ($self, $phen) = @_;
+
+  my $phen_hash;
+  $phen_hash->{trait} = $phen->phenotype->description;
+  $phen_hash->{source} = $phen->source;
+  $phen_hash->{study} = $phen->study->external_reference;
+  $phen_hash->{genes} = $phen->associated_gene;
+  $phen_hash->{variants} = $phen->variation_names;
+  $phen_hash->{risk_allele} = $phen->risk_allele if $phen->risk_allele;
+  $phen_hash->{pvalue} = $phen->p_value if $phen->p_value;
+  $phen_hash->{beta_coefficient} = $phen->beta_coefficient if $phen->beta_coefficient;
+
+  my $associated_studies = $phen->associated_studies;
+  foreach my $study (@$associated_studies) {
+    push (@{$phen_hash->{evidence}}, $study->name);
+  }
+
+  return $phen_hash;
 }
 
 sub Alleles {
