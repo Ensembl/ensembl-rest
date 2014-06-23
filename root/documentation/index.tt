@@ -20,7 +20,7 @@ limitations under the License.
 [% FOREACH pair IN groups.pairs %]
 <thead>
 
-<tr><td><h3>	[% pair.key %]</h3></td><td></td></tr>
+<tr><td><h3 id="[% pair.key.replace('\W+','_') %]">	[% pair.key %]</h3></td><td></td></tr>
 <tr><th>Resource</th><th>Description</th></tr>
 </thead>
     <tbody>
