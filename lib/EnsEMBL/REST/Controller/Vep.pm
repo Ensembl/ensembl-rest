@@ -36,7 +36,6 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 BEGIN { 
   extends 'Catalyst::Controller::REST';
 }
-__PACKAGE__->config( 'map' => { 'text/javascript' => ['JSONP'] } );
 use Try::Tiny;
 
 has 'fasta_db' => (
@@ -50,6 +49,13 @@ has 'fasta' => (
   isa =>'Str',
   is =>'ro'
 );
+
+has 'max_post_size' => (
+  isa => 'Int',
+  is => 'ro',
+  default => 1000
+);
+
 
 # /vep/:species
 sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
@@ -94,10 +100,8 @@ sub get_region_POST {
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
   my @variants = @{$post_data->{'variants'}};
-  my $max = $config->{max_post_size};
-  $max ||= 1000;
-  if (scalar(@variants) > $max) {
-    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$max.' variant lines per POST' ] );
+  if (scalar(@variants) > $self->max_post_size) {
+    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$self->max_post_size.' variant lines per POST' ] );
   }
 
   $self->_give_POST_to_VEP($c,\@variants, $config);
@@ -214,10 +218,8 @@ sub get_id_POST {
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
   my @ids = @{$post_data->{'ids'}};
-  my $max = $config->{max_post_size};
-  $max ||= 1000;
-  if (scalar(@ids) > $max) {
-    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$max.' variant lines per POST' ] );
+  if (scalar(@ids) > $self->max_post_size) {
+    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$self->max_post_size.' variant lines per POST' ] );
   }
   $self->_give_POST_to_VEP($c,\@ids,$config);
 }
