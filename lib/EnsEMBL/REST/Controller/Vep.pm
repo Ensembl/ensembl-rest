@@ -94,8 +94,10 @@ sub get_region_POST {
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
   my @variants = @{$post_data->{'variants'}};
-  if (scalar(@variants) > $config->{max_post_size}) {
-    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$config->{max_post_size}.' variant lines per POST' ] );
+  my $max = $config->{max_post_size};
+  $max ||= 1000;
+  if (scalar(@variants) > $max) {
+    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$max.' variant lines per POST' ] );
   }
 
   $self->_give_POST_to_VEP($c,\@variants, $config);
@@ -212,8 +214,10 @@ sub get_id_POST {
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
   my @ids = @{$post_data->{'ids'}};
-  if (scalar(@ids) > $config->{max_post_size}) {
-    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$config->{max_post_size}.' variant lines per POST' ] );
+  my $max = $config->{max_post_size};
+  $max ||= 1000;
+  if (scalar(@ids) > $max) {
+    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$max.' variant lines per POST' ] );
   }
   $self->_give_POST_to_VEP($c,\@ids,$config);
 }
