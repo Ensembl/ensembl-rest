@@ -177,7 +177,7 @@ sub get_allele : PathPart('') Args(2) {
     my $user_config = $c->request->parameters;
     my $config = $self->_include_user_params($c,$user_config);
     $config->{ga} = $s->{ga};
-    $config->{format} = {id}; # Set a format value to silence the VEP in single formatless requests.
+    $config->{format} = 'id'; # Set a format value to silence the VEP in single formatless requests.
     my $vf = $self->_build_vf($c);
     my $consequences = get_all_consequences( $config, [$vf]);
     # $c->log->debug(Dumper $consequences);
