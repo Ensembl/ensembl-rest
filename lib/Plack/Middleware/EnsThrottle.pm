@@ -128,6 +128,7 @@ sub prepare_app {
   croak "Cannot continue. No path given" unless $path;
   croak "path must be an CODE ref" if ref($path) ne 'CODE';
   if(! $self->backend()) {
+    carp "Memcache unreachable, running without.";
     $self->backend(Plack::Middleware::EnsThrottle::SimpleBackend->new());
   }
   return;
