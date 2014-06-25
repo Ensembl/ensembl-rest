@@ -101,7 +101,7 @@ sub _encode :Private{
   }
 
   $enc = {
-      ID => $archive->stable_id,
+      id => $archive->stable_id,
       version => $archive->version,
       release => $archive->release,
       is_current => $archive->is_current,
