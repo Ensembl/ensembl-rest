@@ -128,10 +128,12 @@ sub _give_POST_to_VEP {
       no warnings 'redefine';
       local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
       $consequences = get_all_consequences( $config, \@vfs );
+      $consequences = $self->map_consequences($c, $consequences);
     } else {
       $c->log->debug('Query Ensembl database');
       $config->{species} = $c->stash->{species}; # override VEP default for human
       $consequences = get_all_consequences( $config, \@vfs );
+      $consequences = $self->map_consequences($c, $consequences);
     }
     $c->stash->{consequences} = $consequences;
 
@@ -180,6 +182,7 @@ sub get_allele : PathPart('') Args(2) {
     $config->{format} = 'id'; # Set a format value to silence the VEP in single formatless requests.
     my $vf = $self->_build_vf($c);
     my $consequences = get_all_consequences( $config, [$vf]);
+    $consequences = $self->map_consequences($c, $consequences);
     # $c->log->debug(Dumper $consequences);
     $c->stash->{consequences} = $consequences;
     $self->status_ok( $c, entity => { data => $consequences } );
@@ -209,7 +212,20 @@ sub get_id_GET {
   }
 
   my $consequences = get_all_consequences( $config, $vfs);
+  $consequences = $self->map_consequences($c, $consequences);
   $self->status_ok( $c, entity => { data => $consequences } );
+}
+
+sub map_consequences {
+  my ($self, $c, $consequences) = @_;
+  foreach my $consequence (@$consequences) {
+    my $extra = $consequence->{'Extra'};
+    foreach my $key (keys %$extra) {
+      $consequence->{$key} = $extra->{$key};
+    }
+    delete $consequence->{'Extra'};
+  }
+  return $consequences;
 }
 
 
