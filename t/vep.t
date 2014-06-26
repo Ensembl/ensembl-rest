@@ -309,6 +309,9 @@ eq_or_diff($json,{
     }                                     
   ]                                       
 },'VEP id POST');
-
+my $body = '{ "blurb" : "stink" }';
+# Test malformed messages
+action_bad_post($vep_post,$body, qr/key in your POST/, 'Using a bad message format causes an exception');
+action_bad_post($vep_id_post,$body, qr/key in your POST/, 'Using a bad message format causes an exception');
 
 done_testing();
