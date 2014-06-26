@@ -48,6 +48,7 @@ sub fetch_info {
   $assembly_info{genebuild_last_geneset_update} = $gc->get_genebuild_last_geneset_update;
   $assembly_info{coord_system_versions} = $csa->get_all_versions();
   $assembly_info{default_coord_system_version} = $gc->get_version();
+  $assembly_info{assembly_accession} = $gc->get_accession();
 
   return \%assembly_info;
 }
@@ -66,12 +67,37 @@ sub get_slice_info {
   return \@toplevels;
 }
 
+sub get_karyotype_info {
+  my ($self, $slice) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my @karyotype_info;
+  my $karyotype_bands = $slice->get_all_KaryotypeBands();
+  foreach my $band (@$karyotype_bands) {
+    push @karyotype_info, $band->summary_as_hash;
+  }
+
+  return \@karyotype_info;
+} 
+
 sub features_as_hash {
   my ($self, $slice) = @_;
-  my $features;
+  my $c = $self->context();
+  my $include_bands = $c->request->param('bands') || 0;
+  my ($features, $bands);
   $features->{coord_system} = $slice->coord_system_name();
   $features->{name} = $slice->seq_region_name();
   $features->{length} = $slice->length();
+  # Only look for bands if slice is a chromosome
+  # Reduces performance issues
+  if ($include_bands && $slice->is_chromosome) {
+    $bands = $self->get_karyotype_info($slice);
+    if (scalar(@$bands) > 0) {
+      $features->{bands} = $bands;
+    }
+  }
   return $features;
 }
 

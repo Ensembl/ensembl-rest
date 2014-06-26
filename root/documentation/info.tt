@@ -59,7 +59,7 @@ limitations under the License.
 </tbody>
 </table>
 [% ELSE %]
-<p>No required parameters</p>
+   <p>No required parameters</p>
 [% END %]
 
 <h3>Optional</h3>
@@ -99,7 +99,20 @@ limitations under the License.
 	</table>
 [% ELSE %]
 	<p>No optional parameters</p>
+	<br/>
 [% END %]
+
+[% IF endpoint.method.0 == "POST" %]
+
+  <h2>Message</h2>
+  <table class="table table-condensed table-striped">
+    <tbody>
+      <tr><td><b>Content-type</b></td><td><b>Format</b></td><td><b>Example</b></td></tr>
+      <tr><td>[% endpoint.postmessage.type %]</td><td>[% endpoint.postmessage.format %]</td><td>[% endpoint.postmessage.body %]</td></tr>
+    </tbody>
+  </table>
+
+[% ELSE %]
 
 <h2>Example Requests</h2>
 
@@ -145,14 +158,20 @@ limitations under the License.
 	</div>
   <br>
 [% END %]
+
+[% END %]
+
 </div>
 <div class="span2">
   <h3>Resource Information</h3>
   <table class="table table-condensed table-striped">
     <tbody>
-      <tr><td>Methods</td><td>[% endpoint.method %]</td></tr>
+      <tr><td>Methods</td><td>[% endpoint.method.join(',') %]</td></tr>
       <tr><td>Response formats</td><td>[% endpoint.output.join('<br>') %]</td></tr>
     </tbody>
   </table>
 </div>
+
+
+
 </div>

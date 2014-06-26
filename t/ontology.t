@@ -32,7 +32,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 my $term = "SO:0001506";
 
-is_json_GET("ontology/descendents/$term?zero_distance=0",
+is_json_GET("ontology/descendants/$term?zero_distance=0",
    [
        {
            "ontology" => "SO",
@@ -55,7 +55,7 @@ is_json_GET("ontology/descendents/$term?zero_distance=0",
    ], 'Check functionality of zero-distance flag'
 );
 
-is_json_GET("ontology/descendents/$term?zero_distance=1",
+is_json_GET("ontology/descendants/$term?zero_distance=1",
    [
        {
            "accession" => "SO:0001506",
@@ -87,7 +87,7 @@ is_json_GET("ontology/descendents/$term?zero_distance=1",
    ], 'Check functionality of zero-distance flag'
 );
 
-is_json_GET("ontology/descendents/$term?closest_terms=1",
+is_json_GET("ontology/descendants/$term?closest_terms=1",
    [
        {
            "ontology" => "SO",
@@ -101,7 +101,7 @@ is_json_GET("ontology/descendents/$term?closest_terms=1",
    ], 'Check functionality of closest terms flag'
 );
 
-is_json_GET("ontology/descendents/$term?ontology=blibble",
+is_json_GET("ontology/descendants/$term?ontology=blibble",
    [], 'Ontology option');
    
 # No test data for subset flag :(   

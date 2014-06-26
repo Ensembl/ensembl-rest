@@ -42,7 +42,7 @@ Your directory structure should look like this after installation:
  \------- ensembl
  \------- ensembl-compara
  \------- ensembl-external
- \------- ensembl-functgenomics
+ \------- ensembl-funcgen
  \------- ensembl-rest
  \------- ensembl-tools
  \------- ensembl-variation
@@ -134,7 +134,7 @@ Using bash we bring each modules directory onto the library path:
   PERL5LIB=${PWD}/ensembl/modules:${PERL5LIB}
   PERL5LIB=${PWD}/ensembl-compara/modules:${PERL5LIB}
   PERL5LIB=${PWD}/ensembl-variation/modules:${PERL5LIB}
-  PERL5LIB=${PWD}/ensembl-functgenomics/modules:${PERL5LIB}
+  PERL5LIB=${PWD}/ensembl-funcgen/modules:${PERL5LIB}
   export PERL5LIB
 ```
 

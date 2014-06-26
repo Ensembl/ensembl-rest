@@ -75,8 +75,8 @@ sub ancestors : Chained('ontology_root') PathPart('ancestors') Args(1) ActionCla
   $self->status_ok($c, entity => $self->_encode_array($terms));
 }
 
-sub descendents_GET {}
-sub descendents : Chained('ontology_root') PathPart('descendents') Args(1) ActionClass('REST') {
+sub descendants_GET {}
+sub descendants : Chained('ontology_root') PathPart('descendants') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $term = $self->term($c, $id);
   my $r = $c->request();

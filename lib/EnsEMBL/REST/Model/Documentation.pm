@@ -86,6 +86,7 @@ sub enrich {
     $json->pretty(1);
     my $log = $self->context->log;
     
+    # Modify and validate the possible output formats.
     my $outputs = $endpoint->{output};
     $outputs = [$outputs] unless ref($outputs);
     my %outputs_hash = map { lc($_) => 1 } @{$outputs};
@@ -99,23 +100,13 @@ sub enrich {
       if(! exists $endpoint->{params}->{callback}) {
         $endpoint->{params}->{callback} = {
           type => 'String', 
-          description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="/documentation/user_guide">the user guide</a>.', 
+          description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="http://github.com/Ensembl/ensembl-rest/wiki">the user guide</a>.', 
           required => 0,
           example => [qw/randomlygeneratedname/]
         };
       }
     }
     
-    if(EnsEMBL::REST->config()->{sereal} && $outputs_hash{'json'} && ! exists $outputs_hash{'sereal'}) {
-      push(@{$outputs}, 'sereal');
-      $endpoint->{output} = $outputs;
-    }
-
-    if(EnsEMBL::REST->config()->{msgpack} && $outputs_hash{'json'} && ! exists $outputs_hash{'msgpack'}) {
-      push(@{$outputs}, 'msgpack');
-      $endpoint->{output} = $outputs;
-    }
-
     #Build each output example
     foreach my $id ( keys %{ $endpoint->{examples} } ) {
         my $eg = $endpoint->{examples}->{$id};

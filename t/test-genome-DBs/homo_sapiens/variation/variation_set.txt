@@ -1,0 +1,41 @@
+1	All failed variations	Variations that have failed the Ensembl QC checks	179
+3	Affy GenomeWideSNP_6.0	Variants from the Affymetrix Genome-Wide Human SNP Array 6.0	333
+4	Illumina_Human660W-quad	Variants from the Illumina Human660W-quad whole genome genotyping array designed for association studies	334
+5	Illumina_1M-duo	Variants from the Illumina Human1M-duo v3 whole genome genotyping array designed for association studies	335
+6	Affy GeneChip 500K	Variants from the Affymetrix GeneChip Human Mapping 500K Array Set	332
+8	Illumina_HumanOmni1-Quad	Variants from the Illumina HumanOmni1-Quad whole genome genotyping array designed for association studies	338
+10	OMIM phenotype variants	Variations linked to entries in the Online Mendelian Inheritance in Man (OMIM) database	194
+15	ENSEMBL:Venter	Variants genotyped in Craig Venter	177
+16	ENSEMBL:Watson	Variants genotyped in James Watson	178
+17	COSMIC phenotype variants	Phenotype annotations of somatic mutations found in human cancers from the COSMIC project	197
+20	1000 Genomes - AFR	Variants genotyped in African individuals by the 1000 Genomes project (phase 1)	277
+21	1000 Genomes - AMR	Variants genotyped in admixed American individuals by the 1000 Genomes project (phase 1)	278
+22	1000 Genomes - ASN	Variants genotyped in East Asian individuals by the 1000 Genomes project (phase 1)	279
+23	1000 Genomes - EUR	Variants genotyped in European individuals by the 1000 Genomes project (phase 1)	280
+24	1000 Genomes - All - common	Variants genotyped by the 1000 Genomes project (phase 1) with frequency of at least 1%	281
+25	1000 Genomes - AFR - common	Variants genotyped in African individuals by the 1000 Genomes project (phase 1) with frequency of at least 1%	282
+26	1000 Genomes - AMR - common	Variants genotyped in admixed American individuals by the 1000 Genomes project (phase 1) with frequency of at least 1%	283
+27	1000 Genomes - ASN - common	Variants genotyped in East Asian individuals by the 1000 Genomes project (phase 1) with frequency of at least 1%	284
+28	1000 Genomes - EUR - common	Variants genotyped in European individuals by the 1000 Genomes project (phase 1) with frequency of at least 1%	285
+32	1000 Genomes - High coverage - Trios	Variations called by the 1000 Genomes project on high coverage sequence data from two family trios (Pilot 2)	161
+33	Illumina_HumanHap650Y	Variants from the Illumina HumanHap650Y v3.0 whole genome genotyping array designed for association studies	340
+34	Illumina_HumanOmni2.5	Variants from the Illumina HumanOmni2.5 4v1 whole genome genotyping array designed for association studies	341
+35	Illumina_Human610_Quad	Variants from the Illumina Human610_Quad v1_B whole genome genotyping array designed for association studies	342
+36	Illumina_HumanHap550	Variants from the Illumina Human550 v3.0 whole genome genotyping array designed for association studies	343
+41	HapMap - CEU	Variations which have been assayed by The International HapMap Project from CEU individuals	257
+42	HapMap - HCB	Variations which have been assayed by The International HapMap Project from HCB individuals	258
+43	HapMap - JPT	Variations which have been assayed by The International HapMap Project from JPT individuals	259
+44	HapMap - YRI	Variations which have been assayed by The International HapMap Project from YRI individuals	260
+47	Rosalynn Gill	Variants genotyped in Rosalynn Gill	230
+48	Anonymous Korean	Variants genotyped in an anonymous Korean individual	231
+49	Anonymous Irish Male	Variants genotyped in an anonymous Irish Male	232
+50	Misha Angrist	Variants genotyped in Misha Angrist	233
+51	Henry Louis Gates Jr	Variants genotyped in Henry Louis Gates Jr	234
+52	Henry Louis Gates Sr	Variants genotyped in Henry Louis Gates Sr	235
+53	Marjolein Kriek	Variants genotyped in Marjolein Kriek	236
+54	Stephen Quake	Variants genotyped in Stephen Quake	237
+55	Saqqaq	Variants genotyped in a Palaeo-Eskimo Saqqaq individual	238
+56	Seong-Jin Kim	Variants genotyped in Seong-Jin Kim	240
+57	YanHang	Variants genotyped in a Han Chinese individual (YanHuang Project)	241
+64	clinically associated	Variants described by ClinVar as being probable-pathogenic, pathogenic, drug-response or histocompatibility	345
+37	Illumina_HumanOmni5	Variants from the Illumina HumanOmni5v1 whole genome genotyping array designed for association studies	354

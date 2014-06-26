@@ -27,10 +27,11 @@ use Bio::EnsEMBL::Utils::Scalar qw/split_array/;
 my $SPLIT = 1000;
 
 sub new {
-  my ($class, $proxy_exon, $parent_id, $rank) = @_;
+  my ($class, $proxy_exon, $parent_id, $rank, $source) = @_;
   my $self = $class->SUPER::new($proxy_exon);
   $self->{parent_id} = $parent_id;
   $self->{rank} = $rank;
+  $self->{source} = $source;
   return $self;
 }
 
@@ -55,15 +56,15 @@ sub _build_from_Exon_list {
     my @in_placeholders = ('?') x $length;
     my $in = join(',', @in_placeholders);
     my $sql = <<SQL;
-select et.exon_id, et.rank, t.stable_id 
+select et.exon_id, et.rank, t.stable_id, t.source 
 from exon_transcript et 
 join transcript t using (transcript_id) 
 where et.exon_id IN (${in})
 SQL
     my $callback = sub {
       my ($row, $value) = @_;
-      my ($exon_id, $rank, $stable_id) = @{$row};
-      my $result = [$rank, $stable_id];
+      my ($exon_id, $rank, $stable_id, $source) = @{$row};
+      my $result = [$rank, $stable_id, $source];
       if ( defined $value ) {
         push( @{$value}, $result );
         return;
@@ -78,8 +79,8 @@ SQL
     foreach my $exon (@{$exons}) {
       my $hits = $lookup->{$exon->dbID()};
       foreach my $hit (@{$hits}) {
-        my ($rank, $stable_id) = @{$hit};
-        my $obj = $class->new($exon, $stable_id, $rank);
+        my ($rank, $stable_id, $source) = @{$hit};
+        my $obj = $class->new($exon, $stable_id, $rank, $source);
         push(@built, $obj);
       }
     }
@@ -99,12 +100,19 @@ sub parent_id {
   return $self->{'parent_id'};
 }
 
+sub source {
+  my ($self, $source) = @_;
+  $self->{'source'} = $source if defined $source;
+  return $self->{'source'};
+}
+
 sub summary_as_hash {
   my ($self) = @_;
   my $proxy = $self->__proxy();
   my $exon_summary = $proxy->summary_as_hash();
   $exon_summary->{Parent} = $self->parent_id();
   $exon_summary->{rank} = $self->rank();
+  $exon_summary->{source} = $self->source();
   return $exon_summary;
 }
 

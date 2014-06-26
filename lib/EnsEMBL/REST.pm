@@ -62,7 +62,7 @@ use Catalyst qw/
 /;
 
 
-our $VERSION = '1.6.0';
+our $VERSION = '2.0.0';
 
 # Configure the application.
 #
@@ -103,22 +103,6 @@ sub turn_on_config_serialisers {
     $package->config(
       map => {
         'text/javascript'     => 'JSONP',
-      }
-    );
-  }
-  
-  if($class->config->{sereal}) {
-    $package->config(
-      map => {
-        'application/x-sereal'     => 'Sereal',
-      }
-    );
-  }
-  
-  if($class->config->{msgpack}) {
-    $package->config(
-      map => {
-        'application/x-msgpack' => 'MessagePack'
       }
     );
   }

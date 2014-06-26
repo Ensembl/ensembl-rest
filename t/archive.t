@@ -39,19 +39,19 @@ my $gene_id = 'ENSG00000054598';
 my $translation_id = "ENSP00000370275";
 my $version = 5;
 
-my $response = {ID => $gene_id, latest => "$gene_id.$version", version => "$version", release => "75", peptide => undef, is_current => "1", type => "Gene", possible_replacement => [], assembly => "GRCh37"};
+my $response = {id => $gene_id, latest => "$gene_id.$version", version => "$version", release => "75", peptide => undef, is_current => "1", type => "Gene", possible_replacement => [], assembly => "GRCh37"};
 
 is_json_GET("$base/$gene_id", $response, "Return archive for known ID");
 
 is_json_GET("$base/$gene_id.$version", $response, "Return archive for known ID with version");
 
 my $old_version = $version - 1;
-$response = {ID => $gene_id, latest => "$gene_id.$version", version => "$old_version", release => "67", peptide => undef, is_current => "", type => "Gene", possible_replacement => [  { score => '0.953586', stable_id => 'ENSG00000054598' }], assembly => "GRCh37"};
+$response = {id => $gene_id, latest => "$gene_id.$version", version => "$old_version", release => "67", peptide => undef, is_current => "", type => "Gene", possible_replacement => [  { score => '0.953586', stable_id => 'ENSG00000054598' }], assembly => "GRCh37"};
 
 is_json_GET("$base/$gene_id.".$old_version, $response, "Return archive for known ID with older version");
 
 $version = 1;
-$response = {ID => $translation_id, latest => "$translation_id.$version", version => "$version", release => "39", peptide =>
+$response = {id => $translation_id, latest => "$translation_id.$version", version => "$version", release => "39", peptide =>
 "MTTEGGPPPAPLRRACSPVPGALQAALMSPPPAAAAAAAAAPETTSSSSSSSSASCASSSSSSNSASAPSAACKSAGGGGAGAGSGGAKKASSGLRRPEKPPYSYIALIVMAIQSSPSKRLTLSEIYQFLQARFPFFRGAYQGWKNSVRHNLSLNECFIKLPKGLGRPGKGHYWTIDPASEFMFEEGSFRRRPRGFRRKCQALKPMYHRVVSGLGFGASLLPQGFDFQAPPSAPLGCHSQGGYGGLDMMPAGYDAGAGAPSHAHPHHHHHHHVPHMSPNPGSTYMASCPVPAGPGGVGAAGGGGGGDYGPDSSSSPVPSSPAMASAIECHSPYTSPAAHWSSPGASPYLKQPPALTPSSNPAASAGLHSSMSSYSLEQSYLHQNAREDLSVGLPRYQHHSTPVCDRKDFVLNFNGISSFHPSASGSYYHHHHQSVCQDIKPCVM", is_current => "", type => "Translation", possible_replacement => [ { score => '0.941244', stable_id => 'ENSP00000259806' }], assembly => "NCBI36"};
 
 is_json_GET("$base/$translation_id", $response, "Return archive for peptide");

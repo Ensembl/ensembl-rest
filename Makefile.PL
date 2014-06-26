@@ -20,7 +20,7 @@ requires 'Config::General'; # This should reflect the config file format you've 
                             # See Catalyst::Plugin::ConfigLoader for supported formats
 
 #Ensembl Rest Specific
-requires 'Catalyst::Controller::REST';
+requires 'Catalyst::Action::REST' => '1.11';
 requires 'Catalyst::Plugin::SubRequest';
 requires 'Catalyst::Component::InstancePerContext';
 requires 'Catalyst::View::JSON';
@@ -52,8 +52,6 @@ recommends 'Plack::Middleware::CrossOrigin';
 recommends 'Plack::Middleware::Deflater';
 recommends 'Cache::Memcached';
 recommends 'CHI::Driver::Memcached';
-recommends 'Sereal::Encoder';
-recommends 'Data::MessagePack';
 recommends 'Template::Stash::XS';
 recommends 'Net::CIDR::Lite';
 recommends 'DateTime';

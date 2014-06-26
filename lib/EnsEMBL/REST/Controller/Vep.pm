@@ -20,50 +20,143 @@ package EnsEMBL::REST::Controller::Vep;
 use Moose;
 use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
+use Data::Dumper;
+use Bio::DB::Fasta;
+use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line read_cache_info);
+use Bio::EnsEMBL::Slice;
+use Bio::EnsEMBL::Utils::Sequence qw(reverse_comp);
+use Bio::EnsEMBL::Funcgen::MotifFeature;
+use Bio::EnsEMBL::Funcgen::RegulatoryFeature;
+use Bio::EnsEMBL::Funcgen::BindingMatrix;
+
+
+
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
-BEGIN { extends 'Catalyst::Controller::REST'; }
-
+BEGIN { 
+  extends 'Catalyst::Controller::REST';
+}
 use Try::Tiny;
-__PACKAGE__->config( 'map' => { 'text/javascript' => ['JSONP'] } );
 
-sub get_species : Chained("/") PathPart("vep") CaptureArgs(1) {
-    my ( $self, $c, $species ) = @_;
-    $c->stash->{species} = $species;
-    try {
-        $c->stash( variation_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
-        $c->stash(
-            variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
-    } catch {
-        $c->go('ReturnError', 'from_ensembl', [$_]);
-    };
+has 'fasta_db' => (
+  isa => 'Bio::DB::Fasta',
+  is => 'ro',
+  lazy => 1,
+  builder => '_find_fasta_cache',
+);
+
+has 'fasta' => (
+  isa =>'Str',
+  is =>'ro'
+);
+
+has 'max_post_size' => (
+  isa => 'Int',
+  is => 'ro',
+  default => 1000
+);
+
+
+# /vep/:species
+sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
+  my ( $self, $c, $species ) = @_;
+  try {
+      $c->stash->{species} = $c->model('Registry')->get_alias($species);
+      $c->stash( variation_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
+      $c->stash(
+          variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
+      $c->stash(
+          structural_variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'StructuralVariationFeature' ) );
+      $c->stash(ga => $c->model('Registry')->get_adaptor($species, 'Core', 'Gene'));
+  } catch {
+      $c->go('ReturnError', 'from_ensembl', [$_]);
+  };
+  $c->log->debug('Working with species '.$species);
 }
 
-sub get_bp_slice : Chained("get_species") PathPart("") CaptureArgs(1) {
-    my ( $self, $c, $region ) = @_;
-    my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
-    $c->model('Lookup')->find_slice( $sr_name );
+
+# WARNING: Do not combine REST auto-dispatch with Args() or CaptureArgs()
+# It prevents the dispatcher from recognising the GET and POST methods
+# Arguments must be handled subsequently
+sub get_region : Chained('get_species') PathPart('region') ActionClass('REST') {
+  my ( $self, $c, $region ) = @_;
 }
 
-sub get_rs_variations : Chained('get_species') PathPart('id') CaptureArgs(1) {
-    my ( $self, $c, $rs_id ) = @_;
-    my $v = $c->stash()->{variation_adaptor}->fetch_by_name($rs_id);
-    $c->go( 'ReturnError', 'custom', [qq{No variation found for RS ID $rs_id}] ) unless $v;
-    my $vfs = $c->stash()->{variation_feature_adaptor}->fetch_all_by_Variation($v);
-    $c->stash( variation => $v, variation_features => $vfs );
+sub get_region_GET {
+  my ( $self, $c, $region ) = @_;
+  my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
+  $c->model('Lookup')->find_slice( $sr_name );
+  $self->status_ok( $c, entity => { data => $region } );
+  $c->forward('get_allele');
 }
 
-sub my_chr_region : Chained("get_species") PathPart("chr_region") {
-    my ( $self, $c ) = @_;
-    $c->go( 'ReturnError', 'custom',
-        [qq{/chr_region/ in uri is deprecated. See http://beta.rest.ensembl.org/info/vep for new format}] );
+sub get_region_POST {
+  my ( $self, $c ) = @_;
+  my $post_data = $c->req->data;
+
+  # $c->log->debug(Dumper $post_data);
+  # $c->log->debug(Dumper $config->{'Controller::Vep'});
+  # handle user config
+  my $config = $self->_include_user_params($c,$post_data);
+  $config->{va} = $c->stash->{variation_adaptor};
+  my @variants = @{$post_data->{'variants'}};
+  if (scalar(@variants) > $self->max_post_size) {
+    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$self->max_post_size.' variant lines per POST' ] );
+  }
+
+  $self->_give_POST_to_VEP($c,\@variants, $config);
 }
 
-sub get_allele : Chained('get_bp_slice') PathPart('') CaptureArgs(1) {
-    my ( $self, $c, $allele ) = @_;
+sub _give_POST_to_VEP {
+  my ($self,$c,$data,$config) = @_;
+  my @variants = @$data;
+  my @vfs;
+  foreach my $line (@variants) {
+    push @vfs, @{ parse_line($config,$line) };
+    # $c->log->debug(Dumper @vfs);
+  }
+  if ( !@vfs ) {
+    $c->log->fatal(qq{no variant features found in post data});
+    $c->go( 'ReturnError', 'no_content', [qq{no variant features found in post data}] );
+  }
+  try {
+    
+    # Overwrite Slice->seq method to use a local disk cache when using Human
+    my $consequences;
+    if ($c->stash->{species} eq 'homo_sapiens' && defined($config->{fasta})) {
+      $c->log->debug('Farming human out to Bio::DB');
+      no warnings 'redefine';
+      local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
+      $consequences = get_all_consequences( $config, \@vfs );
+    } else {
+      $c->log->debug('Query Ensembl database');
+      $config->{species} = $c->stash->{species}; # override VEP default for human
+      $consequences = get_all_consequences( $config, \@vfs );
+    }
+    $c->stash->{consequences} = $consequences;
+
+    $self->status_ok( $c, entity => { data => $consequences } );
+  }
+  catch {
+    $c->log->fatal(qw{Problem Getting Consequences});
+    $c->log->fatal($_);
+    $c->log->fatal(Dumper $data);
+    $c->go( 'ReturnError', 'custom', [ qq{Problem entry within this batch: } . Dumper $data] );
+  };
+}
+
+
+
+
+# /vep/:species/region/:region/:allele_string
+# Only one argument wanted here, but region is still on the stack and needs to be moved out of the way.
+sub get_allele : PathPart('') Args(2) {
+    my ( $self, $c, $region, $allele ) = @_;
+    $c->log->debug($allele);
     my $s = $c->stash();
-    if ( $allele !~ /^[ATGC-]+$/i ) {
-        my $error_msg = qq{Allele must be A,T,G or C [got: $allele]};
+    my @allowed_alleles = ('A', 'C', 'T', 'G', '-', 'INS', 'DEL', 'TDUP', 'DUP');
+    if ( ! grep {$_ eq uc($allele)} @allowed_alleles) {
+        my $error_msg = qq{Allele must be A,T,G,C or SO term [got: $allele]};
         $c->go( 'ReturnError', 'custom', [$error_msg] );
     }
     my $reference_base;
@@ -75,229 +168,157 @@ sub get_allele : Chained('get_bp_slice') PathPart('') CaptureArgs(1) {
         $c->log->fatal(qq{can't get reference base from slice});
         $c->go( 'ReturnError', 'from_ensembl', [$_] );
     };
-    $c->go( 'ReturnError', 'custom', ["request for for consequence of [$allele] matches reference [$reference_base]"] )
+    $c->go( 'ReturnError', 'custom', ["request for consequence of [$allele] matches reference [$reference_base]"] )
       if $reference_base eq $allele;
     my $allele_string = $reference_base . '/' . $allele;
     $s->{allele_string} = $allele_string;
     $s->{allele}        = $allele;
+
+    my $user_config = $c->request->parameters;
+    my $config = $self->_include_user_params($c,$user_config);
+    $config->{ga} = $s->{ga};
+    $config->{format} = 'id'; # Set a format value to silence the VEP in single formatless requests.
+    my $vf = $self->_build_vf($c);
+    my $consequences = get_all_consequences( $config, [$vf]);
+    # $c->log->debug(Dumper $consequences);
+    $c->stash->{consequences} = $consequences;
+    $self->status_ok( $c, entity => { data => $consequences } );
 }
 
-sub get_consequences : Chained('get_allele') PathPart('consequences') Args(0) ActionClass('REST') {
-    my ( $self, $c ) = @_;
+
+# /vep/:species/id/:id
+sub get_id : Chained('get_species') PathPart('id') ActionClass('REST') {
+  my ( $self, $c, $rs_id) = @_;
+
 }
 
-sub get_consequences_GET {
-    my ( $self, $c ) = @_;
-    $c->forward('build_feature');
-    $self->status_ok( $c, entity => { data => $c->stash->{consequences} } );
+sub get_id_GET {
+  my ( $self, $c, $rs_id ) = @_;
+  unless ($rs_id) {$c->go('ReturnError', 'custom', ["rs_id is a required parameter for this endpoint"])}
+  my $v = $c->stash()->{variation_adaptor}->fetch_by_name($rs_id);
+  $c->go( 'ReturnError', 'custom', [qq{No variation found for RS ID $rs_id}] ) unless $v;
+  my $vfs = $v->get_all_VariationFeatures();
+  $c->stash( variation => $v, variation_features => $vfs );
+
+  my $user_config = $c->request->parameters;
+  my $config = $self->_include_user_params($c,$user_config);
+  $config->{format} = 'id';
+  foreach (@$vfs) {
+    $config->{slice_cache}->{$_->seq_region_name} = $_->slice;
+    $_->{chr} = $_->seq_region_name;
+  }
+
+  my $consequences = get_all_consequences( $config, $vfs);
+  $self->status_ok( $c, entity => { data => $consequences } );
 }
 
-sub get_rs_consequences : Chained('get_rs_variations') PathPart('consequences') Args(0) ActionClass('REST') {
-    my ( $self, $c ) = @_;
+
+sub get_id_POST {
+  my ($self, $c) = @_;
+  my $post_data = $c->req->data;
+  my $config = $self->_include_user_params($c,$post_data);
+  $config->{va} = $c->stash->{variation_adaptor};
+  my @ids = @{$post_data->{'ids'}};
+  if (scalar(@ids) > $self->max_post_size) {
+    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$self->max_post_size.' variant lines per POST' ] );
+  }
+  $self->_give_POST_to_VEP($c,\@ids,$config);
 }
 
-sub get_rs_consequences_GET {
-    my ( $self, $c ) = @_;
-    $c->forward('calc_consequences');
-    $self->status_ok( $c, entity => { data => $c->stash->{consequences} } );
-}
-
-sub build_feature : Private {
-    my ( $self, $c ) = @_;
-    my $s  = $c->stash();
-    my $vf = try {
-      Bio::EnsEMBL::Variation::VariationFeature->new(
-        -start         => $s->{start},
-        -end           => $s->{end},
-        -strand        => $s->{strand},
-        -allele_string => $s->{allele_string},
-        -slice         => $s->{slice},
-        -adaptor       => $s->{variation_feature_adaptor},
-      );
+# Cribbed from Utils::VEP
+# Turns a series of parameters into a VariationFeature object
+sub _build_vf {
+  my ($self, $c) = @_;
+  my $s = $c->stash;
+  my $vf;
+  try {
+      if($s->{allele_string} !~ /\//) {
+          my $so_term;
+          
+          # convert to SO term
+          my %terms = (
+              INS  => 'insertion',
+              DEL  => 'deletion',
+              TDUP => 'tandem_duplication',
+              DUP  => 'duplication'
+          );
+          
+          $so_term = defined $terms{$s->{allele_string}} ? $terms{$s->{allele_string}} : $s->{allele_string};
+          
+          $vf = Bio::EnsEMBL::Variation::StructuralVariationFeature->new_fast({
+              start          => $s->{start},
+              end            => $s->{end},
+              strand         => $s->{strand},
+              adaptor        => $s->{structural_variation_feature_adaptor},
+              variation_name => 'temp',
+              chr            => $s->{sr_name},
+              slice          => $s->{slice},
+              class_SO_term  => $so_term,
+          });
+      } else {
+        $vf = Bio::EnsEMBL::Variation::VariationFeature->new_fast(
+            {
+                start         => $s->{start},
+                end           => $s->{end},
+                strand        => $s->{strand},
+                allele_string => $s->{allele_string},
+                variation_name => 'temp',
+                mapped_weight  => 1,
+                chr            => $s->{sr_name},
+                slice          => $s->{slice},
+                adaptor        => $s->{variation_feature_adaptor},
+            }
+        );
+      }
     }
     catch {
         $c->log->fatal(qq{problem making Bio::EnsEMBL::Variation::VariationFeature object});
         $c->go( 'ReturnError', 'from_ensembl', [$_] );
     };
-    $s->{variation_features} = [$vf];
-    $c->forward('calc_consequences');
-    $self->status_ok( $c, entity => { data => $c->stash->{consequences} } );
+  return $vf;
 }
 
-sub calc_consequences : Private {
-  my ( $self, $c ) = @_;
-  my $s = $c->stash();
-
-  my @all_results;
-  my $vfs = $s->{variation_features};
-
-  while ( my $vf = shift @{$vfs} ) {
-    my $hgvs_hash = $vf->get_all_hgvs_notations();
-    my $r = {
-      location => {
-        start        => ($vf->start()+0),
-        end          => ($vf->end()+0),
-        strand       => ($vf->strand()+0),
-        name         => $vf->slice()->seq_region_name(),
-        coord_system => $vf->slice()->coord_system()->name(),
-      },
-      hgvs => $hgvs_hash,
-    };
-    my $master_variant = $vf->variation();
-    if($master_variant) {
-      $r->{name} = $master_variant->name();
-      $r->{is_somatic} = ($master_variant->is_somatic() ? 1 : 0);
-    }
-    
-    my $transcript_variants = $self->_encode_transcript_variants($c, $vf);
-    my $regulatory_variants = $self->_encode_regulatory_variants($c, $vf);
-    my $motif_variants = $self->_encode_motif_variants($c, $vf);
-    
-    $r->{transcripts} = $transcript_variants if @{$transcript_variants};
-    $r->{regulatory} = $regulatory_variants if @{$regulatory_variants};
-    $r->{motifs} = $motif_variants if @{$motif_variants};
-    push(@all_results, $r);
-  }
-
-  $s->{consequences} = \@all_results;
+sub _find_fasta_cache {
+  my $self = shift;
+  
+  my $fasta_db = Bio::DB::Fasta->new($self->fasta);
+  return $fasta_db;
 }
 
-my @NUMERIC_T_KEYS = qw/cdna_start cdna_end cds_start cds_end translation_start translation_end codon_position/;
-my @NUMERIC_TVA_KEYS = qw/polyphen_score sift_score/;
-sub _encode_transcript_variants {
-  my ($self, $c, $vf) = @_;
-  return $self->_process_variants($c, $vf, 'TranscriptVariations', sub {
-    my ($tvs) = @_;
-    my @results;
-    foreach my $tv (@{$tvs}) {
-      my $transcript = $tv->transcript();
-      my $translation = $transcript->translation();
-      my $gene = $transcript->get_Gene();
-    
-      my ($ccds) = grep { $_->database eq 'CCDS' } @{ $transcript->get_all_DBEntries };
-      my @protein_features = map { { name => $_->hseqname(), db => $_->analysis->display_label }  } @{$tv->get_overlapping_ProteinFeatures()};
-    
-      my $r = {
-        gene_id => $gene->stable_id(),
-        transcript_id => $transcript->stable_id(),
-        name => $gene->external_name(),
-        biotype => $transcript->biotype(),
-        is_canonical => ($transcript->is_canonical ? 1 : 0),
-      
-        cdna_allele_string => $tv->cdna_allele_string,
-        cdna_start => $tv->cdna_start,
-        cdna_end => $tv->cdna_end,
-        cds_start => $tv->cds_start,
-        cds_end => $tv->cds_end,
-        translation_start => $tv->translation_start,
-        translation_end => $tv->translation_end,
-        intron_number => $tv->intron_number,
-        exon_number => $tv->exon_number,
-        codon_position => $tv->codon_position,
-      };
-      foreach my $key (@NUMERIC_T_KEYS) {
-        my $v = $r->{$key};
-        $r->{$key} = $v*1 if defined $v;
-      }
-      $r->{ccds} = $ccds->display_id if $ccds;
-      $r->{translation_stable_id} = $translation->stable_id() if $translation;
-      $r->{protein_features} = \@protein_features if @protein_features;
 
-      #### START OF ALTERNATIVE ALLELES
-      foreach my $tva (@{$tv->get_all_alternate_TranscriptVariationAlleles()}) {
-        my $tva_r = {
-          allele_string => $tva->allele_string,
-          display_codon_allele_string => $tva->display_codon_allele_string,
-          codon_allele_string => $tva->codon_allele_string,
-          pep_allele_string => $tva->pep_allele_string,
-          polyphen_prediction => $tva->polyphen_prediction,
-          polyphen_score => $tva->polyphen_score,
-          sift_prediction => $tva->sift_prediction,
-          sift_score => $tva->sift_score,
-          hgvs_transcript => $tva->hgvs_transcript,
-          hgvs_protein => $tva->hgvs_protein,
-          consequence_terms => $self->_overlap_consequences($tva),
-        };
-        foreach my $key (@NUMERIC_TVA_KEYS) {
-          my $v = $tva_r->{$key};
-          $tva_r->{$key} = $v*1 if defined $v;
-        }
-        push @{$r->{alleles}}, $tva_r;
-      }
-    
-      push(@results, $r);
-    }
-    return \@results;
-  });
-}
-
-sub _encode_regulatory_variants {
-  my ($self, $c, $vf) = @_;
-  return $self->_process_variants($c, $vf, 'RegulatoryFeatureVariations', sub {
-    my ($rfvs) = @_;
-    my @results;
-    foreach my $rfv (@{$rfvs}) {
-      my $regulatory_feature = $rfv->regulatory_feature;
-      my $r = { 
-        regulatory_feature_id => $regulatory_feature->stable_id,
-        type => $regulatory_feature->feature_type->name,
-      };
-      foreach my $rfva (@{$rfv->get_all_alternate_RegulatoryFeatureVariationAlleles()}) {
-        my $terms = $self->_overlap_consequences($rfva);
-        push @{$r->{alleles}},  { allele_string => $rfva->allele_string, consequence_terms => $terms, is_reference => ($rfva->is_reference() ? 1 : 0) };
-      }
-      push(@results, $r);
-    }
-    return \@results;
-  });
-}
-
-sub _encode_motif_variants {
-  my ($self, $c, $vf) = @_;
-  return $self->_process_variants($c, $vf, 'MotifFeatureVariations', sub {
-    my ($mfvs) = @_;
-    my @results;
-    foreach my $mfv (@{$mfvs}) {
-      my $r = {
-        type => $mfv->motif_feature->binding_matrix->feature_type->name,
-      };
-      foreach my $mfva (@{$mfv->get_all_alternate_MotifFeatureVariationAlleles()}) {
-        my $terms = $self->_overlap_consequences($mfva);
-        my $allele = ($mfv->get_reference_MotifFeatureVariationAllele->feature_seq . '/' . $mfva->feature_seq);
-        my $ra = { 
-          allele_string => $allele,
-          consequence_terms => $terms,
-          is_reference => ($mfva->is_reference() ? 1 : 0),
-          position => ($mfva->motif_start()*1),
-        };
-        my $delta = $mfva->motif_score_delta if $mfva->variation_feature_seq =~ /^[ACGT]+$/;
-        $ra->{motif_score_change} = sprintf( "%.3f", $delta ) if defined $delta;
-        $ra->{high_information_position} = ( $mfva->in_informative_position ? 1 : 0 );
-        push @{$r->{alleles}} , $ra;
-      }
-      push(@results, $r);
-    }
-    return \@results;
-  });
-}
-
-sub _overlap_consequences {
-  my ($self, $v) = @_;
-  return [map { $_->SO_term } @{ $v->get_all_OverlapConsequences }];
-}
-
-sub _process_variants {
-  my ($self, $c, $vf, $type, $callback) = @_;
-  my $method = "get_all_$type";
-  my $variations = try { 
-    my $can = $vf->can($method);
-    $can->($vf);
-  }
-  catch {
-      $c->log->fatal(qq{problem fetching $type: $_});
-      $c->go('ReturnError', 'from_ensembl', [$_] );
+sub _new_slice_seq {
+  # replacement seq method to read from FASTA DB
+  my $self = shift;
+  my $fasta_db = $self->fasta_db;
+  return sub {
+    my $self = shift;
+    my $seq = $fasta_db->seq( $self->seq_region_name, $self->start => $self->end );
+    $seq ||= 'N' x $self->length();
+    reverse_comp( \$seq ) if $self->strand < 0;
+    # default to a string of Ns if we couldn't get sequence
+    return $seq;
   };
-  return $callback->($variations);
+};
+
+sub _include_user_params {
+  my ($self,$c,$user_config) = @_;
+  # This list stops users altering more crucial variables.
+  my @valid_keys = (qw/hgvs ccds numbers domains canonical protein maf_1kg maf_esp pubmed/);
+  
+  my %vep_params = %{ $c->config->{'Controller::Vep'} };
+  read_cache_info(\%vep_params);
+  # $c->log->debug("Before ".Dumper \%vep_params);
+  map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
+
+  # Inject check_existing option into VEP config for options that rely upon it.
+  # check_existing causes a performance drop, so is kept off by default
+  # gmaf is not currently in the list of accepted arguments, but consider it future-proofing.
+  if ($user_config->{maf_1kg} || $user_config->{maf_esp} || $user_config->{pubmed} || $user_config->{gmaf}) {
+    $vep_params{check_existing} = 1;
+  }
+
+  # $c->log->debug("After ".Dumper \%vep_params);
+  return \%vep_params;
 }
 
 __PACKAGE__->meta->make_immutable;

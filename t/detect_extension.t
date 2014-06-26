@@ -33,8 +33,6 @@ maps('nh', 'text/x-nh');
 maps('fasta', 'text/x-fasta');
 maps('gff3', 'text/x-gff3');
 maps('bed', 'text/x-bed');
-maps('sereal', 'application/x-sereal');
-maps('msgpack', 'application/x-msgpack');
 
 empty($_) for qw/gff/;
 
