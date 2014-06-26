@@ -99,7 +99,10 @@ sub get_region_POST {
   # handle user config
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
-  my @variants = @{$post_data->{'variants'}};
+  unless (exists $post_data->{variants}) {
+    $c->go( 'ReturnError', 'custom', [ ' Cannot find "variants" key in your POST. Please check the format of your message against the documentation' ] );
+  }
+  my @variants = @{$post_data->{variants}};
   if (scalar(@variants) > $self->max_post_size) {
     $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$self->max_post_size.' variant lines per POST' ] );
   }
@@ -234,7 +237,10 @@ sub get_id_POST {
   my $post_data = $c->req->data;
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
-  my @ids = @{$post_data->{'ids'}};
+  unless (exists $post_data->{ids}) {
+    $c->go( 'ReturnError', 'custom', [ ' Cannot find "ids" key in your POST. Please check the format of your message against the documentation' ] );
+  }
+  my @ids = @{$post_data->{ids}};
   if (scalar(@ids) > $self->max_post_size) {
     $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$self->max_post_size.' variant lines per POST' ] );
   }

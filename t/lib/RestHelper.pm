@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET fasta_GET json_GET json_POST seqxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET json_POST seqxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex action_bad_post/;
 
 use Test::More;
 use Test::Differences;
@@ -182,6 +182,18 @@ sub action_bad {
     return fail("$url | $msg");
   }
   return pass("$url | $msg");
+}
+
+sub action_bad_post {
+  my ($url, $body, $regex, $msg) = @_;
+  my $resp = do_POST($url,$body);
+  if($resp->is_success()) {
+    return fail("$url | $msg | ".$resp->content);
+  }
+  my $content = $resp->decoded_content();
+  my $ok = like($content, $regex, "$url | $msg");
+  diag explain $content unless $ok;
+  return $ok;
 }
 
 1;
