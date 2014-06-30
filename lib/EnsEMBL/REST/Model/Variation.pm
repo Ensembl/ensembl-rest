@@ -86,6 +86,11 @@ sub vf_as_hash {
 
   my $variation_feature;
   $variation_feature->{location} = $vf->seq_region_name . ":" . $vf->seq_region_start . "-" . $vf->seq_region_end;
+  $variation_feature->{strand} = $vf->seq_region_strand;
+  $variation_feature->{start} = $vf->seq_region_start;
+  $variation_feature->{end} = $vf->seq_region_end;
+  $variation_feature->{seq_region_name} = $vf->seq_region_name;
+  $variation_feature->{coord_system} = $vf->coord_system_name;
   $variation_feature->{allele_string} = $vf->allele_string;
 
   return $variation_feature;
