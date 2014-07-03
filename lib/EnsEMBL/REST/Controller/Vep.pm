@@ -86,7 +86,7 @@ sub get_region_GET {
   my ( $self, $c, $region ) = @_;
   my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
   $c->model('Lookup')->find_slice( $sr_name );
-  $self->status_ok( $c, entity => { data => $region } );
+  $self->status_ok( $c, entity => $region );
   $c->forward('get_allele');
 }
 
@@ -130,17 +130,15 @@ sub _give_POST_to_VEP {
       $c->log->debug('Farming human out to Bio::DB');
       no warnings 'redefine';
       local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
-      $consequences = get_all_consequences( $config, \@vfs );
-      $consequences = $self->map_consequences($c, $consequences);
+      $consequences = $self->get_consequences($c, $config, \@vfs);
     } else {
       $c->log->debug('Query Ensembl database');
       $config->{species} = $c->stash->{species}; # override VEP default for human
-      $consequences = get_all_consequences( $config, \@vfs );
-      $consequences = $self->map_consequences($c, $consequences);
+      $consequences = $self->get_consequences($c, $config, \@vfs);
     }
     $c->stash->{consequences} = $consequences;
 
-    $self->status_ok( $c, entity => { data => $consequences } );
+    $self->status_ok( $c, entity => $consequences );
   }
   catch {
     $c->log->fatal(qw{Problem Getting Consequences});
@@ -183,11 +181,10 @@ sub get_allele : PathPart('') Args(2) {
     $config->{ga} = $s->{ga};
     $config->{format} = 'id'; # Set a format value to silence the VEP in single formatless requests.
     my $vf = $self->_build_vf($c);
-    my $consequences = get_all_consequences( $config, [$vf]);
-    $consequences = $self->map_consequences($c, $consequences);
+    my $consequences = $self->get_consequences($c, $config, [$vf]);
     # $c->log->debug(Dumper $consequences);
     $c->stash->{consequences} = $consequences;
-    $self->status_ok( $c, entity => { data => $consequences } );
+    $self->status_ok( $c, entity => $consequences );
 }
 
 
@@ -213,19 +210,28 @@ sub get_id_GET {
     $_->{chr} = $_->seq_region_name;
   }
 
-  my $consequences = get_all_consequences( $config, $vfs);
-  $consequences = $self->map_consequences($c, $consequences);
-  $self->status_ok( $c, entity => { data => $consequences } );
+  my $consequences = $self->get_consequences($c, $config, $vfs);
+  $self->status_ok( $c, entity => $consequences );
 }
 
-sub map_consequences {
-  my ($self, $c, $consequences) = @_;
-  foreach my $consequence (@$consequences) {
-    my $extra = $consequence->{'Extra'};
-    foreach my $key (keys %$extra) {
-      $consequence->{$key} = $extra->{$key};
+sub get_consequences {
+  my ($self, $c, $config, $vfs) = @_;
+  my $user_config = $c->request->parameters;
+  my $version = $user_config->{version} || $config->{version} || 3;
+  if ($version == 2) {
+    delete $config->{rest};
+    $config->{gmaf} = 1;
+  }
+  my $consequences = get_all_consequences( $config, $vfs);
+  if ($version == 2) {
+    foreach my $consequence (@$consequences) {
+      my $extra = $consequence->{'Extra'};
+      foreach my $key (keys %$extra) {
+        $consequence->{$key} = $extra->{$key};
+      }
+      delete $consequence->{'Extra'};
     }
-    delete $consequence->{'Extra'};
+    $consequences = { data => $consequences };
   }
   return $consequences;
 }
@@ -324,21 +330,14 @@ sub _new_slice_seq {
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
   # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/hgvs ccds numbers domains canonical protein maf_1kg maf_esp pubmed/);
+  my @valid_keys = (qw/hgvs ccds numbers domains canonical protein xref_refseq version/);
   
   my %vep_params = %{ $c->config->{'Controller::Vep'} };
   read_cache_info(\%vep_params);
   # $c->log->debug("Before ".Dumper \%vep_params);
   map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
 
-  # Inject check_existing option into VEP config for options that rely upon it.
-  # check_existing causes a performance drop, so is kept off by default
-  # gmaf is not currently in the list of accepted arguments, but consider it future-proofing.
-  if ($user_config->{maf_1kg} || $user_config->{maf_esp} || $user_config->{pubmed} || $user_config->{gmaf}) {
-    $vep_params{check_existing} = 1;
-  }
-
-  # $c->log->debug("After ".Dumper \%vep_params);
+ # $c->log->debug("After ".Dumper \%vep_params);
   return \%vep_params;
 }
 
