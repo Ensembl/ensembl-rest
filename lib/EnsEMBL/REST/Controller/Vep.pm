@@ -159,8 +159,7 @@ sub get_allele : PathPart('') Args(2) {
     my ( $self, $c, $region, $allele ) = @_;
     $c->log->debug($allele);
     my $s = $c->stash();
-    my @allowed_alleles = ('A', 'C', 'T', 'G', '-', 'INS', 'DEL', 'TDUP', 'DUP');
-    if ( ! grep {$_ eq uc($allele)} @allowed_alleles) {
+    if ( $allele !~ /^[ATGC-]+$/i && $allele !~ /INS|DUP|DEL|TDUP/i ) {
         my $error_msg = qq{Allele must be A,T,G,C or SO term [got: $allele]};
         $c->go( 'ReturnError', 'custom', [$error_msg] );
     }
