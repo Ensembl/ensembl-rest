@@ -55,7 +55,6 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 
   # -Debug
 use Catalyst qw/
-  -Debug
   ConfigLoader
   Static::Simple
   SubRequest
@@ -63,7 +62,7 @@ use Catalyst qw/
 /;
 
 
-our $VERSION = '2.0.0';
+our $VERSION = '3.0.0';
 
 # Configure the application.
 #
