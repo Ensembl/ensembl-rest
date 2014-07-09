@@ -55,6 +55,7 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 
   # -Debug
 use Catalyst qw/
+  -Debug
   ConfigLoader
   Static::Simple
   SubRequest

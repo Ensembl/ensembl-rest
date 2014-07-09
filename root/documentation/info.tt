@@ -116,14 +116,12 @@ limitations under the License.
 
 <h2>Example Requests</h2>
 
-[% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget'] %]
+[% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget', 'ajax'] %]
 
 [% FOREACH p IN endpoint.examples.pairs %]
-	
 	[% NEXT IF p.value.disable %]
-	
 	[% filtered_uri = p.value.example.uri.replace('\+', '%2B') %]
-	
+
 	<h3><a href="[% filtered_uri %]">[% filtered_uri %]</a></h3>
 	<br>
 	<ul class="nav nav-pills">
@@ -155,8 +153,38 @@ limitations under the License.
 <!-- WGET EXAMPLE -->
 [% INCLUDE documentation/examples/wget.tt %]
 
-	</div>
+<!-- AJAX EXAMPLE -->
+<div class='tab-pane' id='ajax[% p.value.id %]'>
+</div>
+
+</div>
   <br>
+
+  <!-- FILLING THE AJAX TAB -->
+ 	<script>
+ 	$.ajax( {
+ 	  url : "[% filtered_uri %]",
+ 	  type : "GET",
+	  beforeSend : function () {
+	     $("#ajax[% p.value.id %]").append("<img src='../../static/img/e-loader.gif'>");
+	     return true;
+	  },
+ 	  success : function (resp) {
+	  $("#ajax[% p.value.id %]").empty();
+	  try {
+	      var json = JSON.stringify(resp, undefined, 2);
+	      $("#ajax[% p.value.id %]").append("<pre class=\"pre-scrollable prettyprint\">" + [% FILTER html %]json[% END %] + "</pre>")
+	  } catch (e) {
+	      var xmlSerial = new XMLSerializer();
+	      var xml_str = xmlSerial.serializeToString(resp);
+	     $("#ajax[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\" class=\"pre-scrollable prettyprint\"></pre>");
+	     $("#pre[% p.value.id %]").text([% FILTER html %]xml_str[% END %]);
+ 	  }
+   	}});
+ 	</script>
+   <!-- END FILLING AJAX TAB -->
+
+
 [% END %]
 
 [% END %]
