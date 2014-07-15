@@ -30,11 +30,11 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
 # Config variable used to control the name of the schema NCBI Taxa tables are held in
-has taxonomy => ( is => 'ro', isa => 'Str', default => 'compara' );
+has taxonomy => ( is => 'ro', isa => 'Str', default => 'multi' );
 
 sub taxonomy_root: Chained('/') PathPart('taxonomy') CaptureArgs(0) {
   my ( $self, $c) = @_;
-  $c->stash(taxon_adaptor => $c->model('Registry')->get_adaptor('multi', $self->taxonomy(), 'NCBITaxon'));
+  $c->stash(taxon_adaptor => $c->model('Registry')->get_adaptor($self->taxonomy(), 'compara', 'NCBITaxon'));
 }
 
 sub id_GET {}
