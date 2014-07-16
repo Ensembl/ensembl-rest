@@ -24,6 +24,9 @@ require EnsEMBL::REST;
 our $LOOKUP_AVAILABLE = 0;
 eval {
   require Bio::EnsEMBL::LookUp;
+  require Bio::EnsEMBL::LookUp::RemoteLookUp;
+  require Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor;
+  require Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor;
   $LOOKUP_AVAILABLE = 1;
 };
 use feature 'switch';
@@ -48,10 +51,11 @@ has 'verbose' => ( is => 'ro', isa => 'Bool' );
 has 'file' => ( is => 'ro', isa => 'Str' );
 
 # Ensembl Genomes LookUp Support
-has 'lookup_file' => ( is => 'ro', isa => 'Str' );
-has 'lookup_url'  => ( is => 'ro', isa => 'Str' );
-has 'lookup_cache_file'  => ( is => 'ro', isa => 'Str' );
-has 'lookup_no_cache'  => ( is => 'ro', isa => 'Bool' );
+has 'lookup_host' => ( is => 'ro', isa => 'Str' );
+has 'lookup_port' => ( is => 'ro', isa => 'Int' );
+has 'lookup_user' => ( is => 'ro', isa => 'Str' );
+has 'lookup_pass' => ( is => 'ro', isa => 'Str' );
+has 'lookup_dbname' => ( is => 'ro', isa => 'Str' );
 
 # Avoid initiation of the registry
 has 'skip_initation' => ( is => 'ro', isa => 'Bool' );
@@ -96,7 +100,7 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
     );
     $load = 1;
   }
-  if(defined $self->lookup_url() || defined $self->lookup_file()) {
+  if(defined $self->lookup_host() && defined $self->lookup_port() && defined $self->lookup_dbname() && defined $self->lookup_user()) {
     if($LOOKUP_AVAILABLE) {
       $log->info('User submitted EnsemblGenomes lookup information. Building from this');
       $self->_lookup();
@@ -114,7 +118,7 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
   return $class;
 });
 
-has '_lookup' => ( is => 'ro', lazy => 1, builder => '_build_lookup');
+has '_lookup' => ( is => 'rw', lazy => 1, builder => '_build_lookup');
 
 has '_species_info' => ( isa => 'ArrayRef', is => 'ro', lazy => 1, builder => '_build_species_info' );
 
@@ -176,27 +180,36 @@ sub _intern_db_connections {
 }
 
 sub _build_lookup {
-  my ($self)= @_;
-  my $log = $self->log();
-  my %args;
-  if($self->lookup_no_cache()) {
-    $log->info('Turning off local Ensembl Genomes LookUp caching');
-    $args{-NO_CACHE} = 1;
-  }
-  if($self->lookup_cache_file()) {
-    $log->info('Using local json cache file '.$self->lookup_cache_file());
-    $args{-CACHE_FILE} = $self->lookup_cache_file();
-  }
-  if($self->lookup_url()) {
-    $log->info('Using LookUp URL '.$self->lookup_url());
-    $args{-URL} = $self->lookup_url();
-  }
-  if($self->lookup_file()) {
-    $log->info('Using LookUp file '.$self->lookup_file());
-    $args{-FILE} = $self->lookup_file();
-  }
-  return Bio::EnsEMBL::LookUp->new(%args);
-}
+  my ($self) = @_;
+
+  my $info_db =
+	Bio::EnsEMBL::DBSQL::DBConnection->new(
+									   -USER   => $self->lookup_user(),
+									   -PASS   => $self->lookup_pass(),
+									   -HOST   => $self->lookup_host(),
+									   -PORT   => $self->lookup_port(),
+									   -DBNAME => $self->lookup_dbname()
+	);
+
+  $info_db->reconnect_when_lost(1);
+
+  my $tax_dba =
+	Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor->new(
+										  -USER   => $self->lookup_user(),
+										  -PASS => $self->lookup_pass(),
+										  -HOST => $self->lookup_host(),
+										  -PORT => $self->lookup_port(),
+										  -DBNAME => 'ncbi_taxonomy' );
+  $tax_dba->dbc()->reconnect_when_lost(1);
+
+  my $lookup =
+	Bio::EnsEMBL::LookUp::RemoteLookUp->new(
+		   Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor->new(
+				 -DBC             => $info_db,
+				 TAXONOMY_ADAPTOR => $tax_dba->get_TaxonomyNodeAdaptor()
+		   ) );
+  return $lookup;
+} ## end sub _build_lookup
 
 # Logic here is if we were told a compara name we use that
 # If not we query the species for the "best" compara (normally depends on division)
@@ -294,20 +307,28 @@ sub _build_species_info {
         }
         else {
           $dbc->sql_helper->execute_no_return(
-            -SQL => 'select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value, m5.meta_value from meta m1, meta m2, meta m3, meta m4, meta m5 where m1.species_id = m2.species_id and m1.species_id = m3.species_id and m1.species_id = m4.species_id and m1.species_id = m5.species_id and m1.meta_key = ? and m2.meta_key =? and m3.meta_key = ? and m4.meta_key = ? and m4.meta_key = ?',
-            -PARAMS => ['species.production_name', 'species.division', 'species.common_name', 'species.short_name', 'species.taxonomy_id'],
+            -SQL => q/select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value 
+		from meta m1, meta m2, meta m3, meta m4 
+		where
+		m1.species_id = m2.species_id 
+		and m1.species_id = m3.species_id 
+		and m1.species_id = m4.species_id 
+		and m1.meta_key = ? 
+		and m2.meta_key = ? 
+		and m3.meta_key = ? 
+		and m4.meta_key = ?/,
+            -PARAMS => ['species.production_name', 'species.division', 'species.display_name', 'species.taxonomy_id'],
             -CALLBACK => sub {
               my ($row) = @_;
               $division_lookup{$row->[0]} = $row->[1];
-              $common_lookup{$row->[0]} = $row->[2];
-              $display_lookup{$row->[0]} = $row->[3];
-              $taxon_lookup{$row->[0]} = $row->[4];
+              $display_lookup{$row->[0]} = $row->[2];
+              $taxon_lookup{$row->[0]} = $row->[3];
               return;
             }
           );
           $dbc->sql_helper->execute_no_return(
             -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
-            -PARAMS => ['species.production_name', 'species.division'],
+            -PARAMS => ['species.production_name', 'assembly.default'],
             -CALLBACK => sub {
               my ($row) = @_;
               $assembly_lookup{$row->[0]} = $row->[1];
@@ -323,8 +344,16 @@ sub _build_species_info {
               return;
             }
           );
-        }
-        
+          $dbc->sql_helper->execute_no_return(
+            -SQL => 'select m1.meta_value, m2.meta_value from meta m1 join meta m2 on (m1.species_id = m2.species_id) where m1.meta_key = ? and m2.meta_key =?',
+            -PARAMS => ['species.production_name', 'species.common_name'],
+            -CALLBACK => sub {
+              my ($row) = @_;
+              $common_lookup{$row->[0]} = $row->[1];
+              return;
+            }
+          );
+        }        
         $processed_db{$db_key} = 1;
       }
     }
