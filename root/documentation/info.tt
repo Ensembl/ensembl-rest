@@ -46,7 +46,7 @@ limitations under the License.
       [% IF p.value.default.defined %] [% p.value.default %] [% ELSE %] - [% END %]
     </var></td>
     <td>
-			[% IF p.value.example %] 
+			[% IF p.value.example %]
       [% FOREACH eg IN p.value.example %]
         <var>[% eg %]</var><br>
       [% END %]
@@ -85,7 +85,7 @@ limitations under the License.
         [% IF p.value.default.defined %] [% p.value.default %] [% ELSE %] - [% END %]
       </var></td>
       <td>
-				[% IF p.value.example %] 
+				[% IF p.value.example %]
 	      [% FOREACH eg IN p.value.example %]
 	        <var>[% eg %]</var><br>
 	      [% END %]
@@ -116,7 +116,7 @@ limitations under the License.
 
 <h2>Example Requests</h2>
 
-[% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget', 'ajax'] %]
+[% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget'] %]
 
 [% FOREACH p IN endpoint.examples.pairs %]
 	[% NEXT IF p.value.disable %]
@@ -131,9 +131,30 @@ limitations under the License.
 		[% END %]
 	</ul>
 	<div class='tab-content'>
-		<div class='tab-pane active' id='example[% p.value.id %]'>
-			<pre class="pre-scrollable prettyprint">[% FILTER html %][% p.value.response %][% END %]</pre>
-		</div>
+    <!-- START FILLING AJAX TAB -->
+    <script>
+    $.ajax( {
+      url : "[% filtered_uri %]",
+      type : "GET",
+     beforeSend : function () {
+        $("#example[% p.value.id %]").append("<img src='../../static/img/e-loader.gif'>");
+        return true;
+     },
+      success : function (resp) {
+     $("#example[% p.value.id %]").empty();
+     try {
+         var json = JSON.stringify(resp, undefined, 2);
+         $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable prettyprint\">" + [% FILTER html %]json[% END %] + "</pre>")
+     } catch (e) {
+         var xmlSerial = new XMLSerializer();
+         var xml_str = xmlSerial.serializeToString(resp);
+        $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\" class=\"pre-scrollable prettyprint\"></pre>");
+        $("#pre[% p.value.id %]").text([% FILTER html %]xml_str[% END %]);
+      }
+      }});
+    </script>
+    <!-- END FILLING AJAX TAB -->
+    <div class='tab-pane active' id='example[% p.value.id %]'></div>
 
 <!-- PERL EXAMPLE -->
 [% INCLUDE documentation/examples/perl.tt %]
@@ -153,41 +174,11 @@ limitations under the License.
 <!-- WGET EXAMPLE -->
 [% INCLUDE documentation/examples/wget.tt %]
 
-<!-- AJAX EXAMPLE -->
-<div class='tab-pane' id='ajax[% p.value.id %]'>
 </div>
 
-</div>
-  <br>
+[% END %] <!-- End FOREACH on endpoint examplesv -->
 
-  <!-- FILLING THE AJAX TAB -->
- 	<script>
- 	$.ajax( {
- 	  url : "[% filtered_uri %]",
- 	  type : "GET",
-	  beforeSend : function () {
-	     $("#ajax[% p.value.id %]").append("<img src='../../static/img/e-loader.gif'>");
-	     return true;
-	  },
- 	  success : function (resp) {
-	  $("#ajax[% p.value.id %]").empty();
-	  try {
-	      var json = JSON.stringify(resp, undefined, 2);
-	      $("#ajax[% p.value.id %]").append("<pre class=\"pre-scrollable prettyprint\">" + [% FILTER html %]json[% END %] + "</pre>")
-	  } catch (e) {
-	      var xmlSerial = new XMLSerializer();
-	      var xml_str = xmlSerial.serializeToString(resp);
-	     $("#ajax[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\" class=\"pre-scrollable prettyprint\"></pre>");
-	     $("#pre[% p.value.id %]").text([% FILTER html %]xml_str[% END %]);
- 	  }
-   	}});
- 	</script>
-   <!-- END FILLING AJAX TAB -->
-
-
-[% END %]
-
-[% END %]
+[% END %] <!-- End ELSE of POST versus GET -->
 
 </div>
 <div class="span2">
