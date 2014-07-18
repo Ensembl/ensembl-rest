@@ -81,7 +81,7 @@ sub find_genetree_by_member_id {
   
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
   my $ma = $dba->get_GeneMemberAdaptor;
-  my $member = $ma->fetch_by_source_stable_id('ENSEMBLGENE',$id);
+  my $member = $ma->fetch_by_stable_id($id);
   $c->go('ReturnError', 'custom', ["Could not fetch GeneTree Member"]) unless $member;
   
   my $gta = $dba->get_GeneTreeAdaptor;
