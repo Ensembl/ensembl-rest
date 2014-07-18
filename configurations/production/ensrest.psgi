@@ -30,11 +30,11 @@ builder {
   enable 'EnsThrottle::Hour',
     backend => Plack::Middleware::EnsThrottle::MemcachedBackend->new({
       memcached => Cache::Memcached->new(servers => ['127.0.0.1:11211']), 
-      expire => 2,
+      expire => 7200,
     }),
-    max_requests => 11100, #1100 requests per hr (~3 per second)
-    client_id_prefix => '3rps_hour',
-    message => 'You have exceeded your limit which is 11,100 requests per hour (~3 per second)',
+    max_requests => 55000, #55000 requests per hr (~15 per second)
+    client_id_prefix => '15rps_hour',
+    message => 'You have exceeded your limit which is 55,000 requests per hour (~15 per second)',
     path    => sub {
       my ($path) = @_;
       return 1 if $path ne '/';
@@ -47,10 +47,10 @@ builder {
       memcached => Cache::Memcached->new(servers => ['127.0.0.1:11211']), 
       expire => 2,
     }),
-    max_requests => 6,
-    client_id_prefix => '6rps_second',
+    max_requests => 16,
+    client_id_prefix => '16rps_second',
     retry_after_addition => 1,
-    message => 'You have exceeded the limit of 6 requests per second; please reduce your concurrent connections',
+    message => 'You have exceeded the limit of 15 requests per second; please reduce your concurrent connections',
     path  => sub {
       my ($path) = @_;
       return 1 if $path ne '/';
