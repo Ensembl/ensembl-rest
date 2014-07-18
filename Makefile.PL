@@ -53,7 +53,6 @@ recommends 'Plack::Middleware::Deflater';
 recommends 'Cache::Memcached';
 recommends 'CHI::Driver::Memcached';
 recommends 'Template::Stash::XS';
-recommends 'Net::CIDR::Lite';
 recommends 'DateTime';
 recommends 'Server::Starter';
 
@@ -65,6 +64,7 @@ test_requires 'Test::XML::Simple';
 test_requires 'Test::XPath';
 test_requires 'HTTP::Request::Common';
 test_requires 'Plack::Test';
+test_requires 'Net::CIDR::Lite';
 catalyst;
 
 install_script glob('script/*.pl');
