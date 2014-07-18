@@ -313,3 +313,9 @@
 227	11	Uncertain Significance
 228	11	Uncertain Significance: likely benign
 229	11	Uncertain Significance: likely pathogenic
+367	419	Multiple_observations
+368	419	Frequency
+369	419	HapMap
+370	419	1000Genomes
+371	419	Cited
+372	419	ESP
