@@ -380,8 +380,8 @@ CREATE TABLE `karyotype` (
   `seq_region_id` int(10) unsigned NOT NULL,
   `seq_region_start` int(10) unsigned NOT NULL,
   `seq_region_end` int(10) unsigned NOT NULL,
-  `band` varchar(40) NOT NULL,
-  `stain` varchar(40) NOT NULL,
+  `band` varchar(40) DEFAULT NULL,
+  `stain` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`karyotype_id`),
   KEY `region_band_idx` (`seq_region_id`,`band`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -468,7 +468,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=1021 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1024 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -741,44 +741,6 @@ CREATE TABLE `simple_feature` (
   KEY `analysis_idx` (`analysis_id`),
   KEY `hit_idx` (`display_label`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=80;
-
-CREATE TABLE `splicing_event` (
-  `splicing_event_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(134) DEFAULT NULL,
-  `gene_id` int(10) unsigned NOT NULL,
-  `seq_region_id` int(10) unsigned NOT NULL,
-  `seq_region_start` int(10) unsigned NOT NULL,
-  `seq_region_end` int(10) unsigned NOT NULL,
-  `seq_region_strand` tinyint(2) NOT NULL,
-  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`splicing_event_id`),
-  KEY `gene_idx` (`gene_id`),
-  KEY `seq_region_idx` (`seq_region_id`,`seq_region_start`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-CREATE TABLE `splicing_event_feature` (
-  `splicing_event_feature_id` int(10) unsigned NOT NULL,
-  `splicing_event_id` int(10) unsigned NOT NULL,
-  `exon_id` int(10) unsigned NOT NULL,
-  `transcript_id` int(10) unsigned NOT NULL,
-  `feature_order` int(10) unsigned NOT NULL,
-  `transcript_association` int(10) unsigned NOT NULL,
-  `type` enum('constitutive_exon','exon','flanking_exon') DEFAULT NULL,
-  `start` int(10) unsigned NOT NULL,
-  `end` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`splicing_event_feature_id`,`exon_id`,`transcript_id`),
-  KEY `se_idx` (`splicing_event_id`),
-  KEY `transcript_idx` (`transcript_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-CREATE TABLE `splicing_transcript_pair` (
-  `splicing_transcript_pair_id` int(10) unsigned NOT NULL,
-  `splicing_event_id` int(10) unsigned NOT NULL,
-  `transcript_id_1` int(10) unsigned NOT NULL,
-  `transcript_id_2` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`splicing_transcript_pair_id`),
-  KEY `se_idx` (`splicing_event_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `stable_id_event` (
   `old_stable_id` varchar(128) DEFAULT NULL,
