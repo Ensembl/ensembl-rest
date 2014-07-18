@@ -22,7 +22,8 @@ limitations under the License.
 <head>
         <script src="/static/js/20-prettify.js"></script>
         <script src="/static/js/30-jquery-1.11.1.min.js"></script>
-        
+	<script src="/static/js/highlight/highlight.pack.js"></script>
+
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>Ensembl Rest API - [% template_title %]</title>
@@ -31,6 +32,7 @@ limitations under the License.
 	[% ELSE %]
 	<link href="/static/css/10-bootstrap.css" rel="stylesheet"/>
 	<link href="/static/css/20-prettify.css" rel="stylesheet"/>
+       	<link href="/static/js/highlight/styles/default.css" rel="stylesheet"/>
 	<link href="/static/css/50-additional.css" rel="stylesheet"/>
 	<link href="/static/css/51-docs.css" rel="stylesheet"/>
 	[% END %]

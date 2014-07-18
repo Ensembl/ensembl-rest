@@ -120,6 +120,7 @@ limitations under the License.
 
 [% FOREACH p IN endpoint.examples.pairs %]
 	[% NEXT IF p.value.disable %]
+
 	[% filtered_uri = p.value.example.uri.replace('\+', '%2B') %]
 
 	<h3><a href="[% filtered_uri %]">[% filtered_uri %]</a></h3>
@@ -131,6 +132,7 @@ limitations under the License.
 		[% END %]
 	</ul>
 	<div class='tab-content'>
+	<div class='tab-pane active' id='example[% p.value.id %]'></div>
     <!-- START FILLING AJAX TAB -->
     <script>
     $.ajax( {
@@ -141,20 +143,31 @@ limitations under the License.
         return true;
      },
       success : function (resp) {
-     $("#example[% p.value.id %]").empty();
      try {
          var json = JSON.stringify(resp, undefined, 2);
-         $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable prettyprint\">" + [% FILTER html %]json[% END %] + "</pre>")
+         $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]json[% END %] + "</code></pre>")
+	 $("#example[% p.value.id %]").each (function (i, block) {
+	      hljs.highlightBlock(block);
+	      $("#example[% p.value.id %]>img").remove();
+	 })
      } catch (e) {
          var xmlSerial = new XMLSerializer();
          var xml_str = xmlSerial.serializeToString(resp);
-        $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\" class=\"pre-scrollable prettyprint\"></pre>");
-        $("#pre[% p.value.id %]").text([% FILTER html %]xml_str[% END %]);
+         $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\" class=\"pre-scrollable prettyprint\"></pre>");
+         $("#pre[% p.value.id %]").text([% FILTER html %]xml_str[% END %]);
+	 $("#example[% p.value.id %]").each (function (i, block) {
+	      hljs.highlightBlock(block);
+	      $("#example[% p.value.id %]>img").remove();
+	 })
       }
-      }});
+      },
+      error : function (resp, msg) {
+         $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\">" + resp.responseText + "</pre>");
+         $("#example[% p.value.id %]>img").remove();
+      }
+      });
     </script>
     <!-- END FILLING AJAX TAB -->
-    <div class='tab-pane active' id='example[% p.value.id %]'></div>
 
 <!-- PERL EXAMPLE -->
 [% INCLUDE documentation/examples/perl.tt %]
