@@ -106,6 +106,16 @@ sub turn_on_config_serialisers {
       }
     );
   }
+
+  if($class->config->{html}) {
+    $package->config(default => 'text/html');
+    $package->config(
+      map => {
+        'text/html' => 'YAML::HTML'
+      }
+    );
+  }
+
   return;
 }
 
