@@ -47,10 +47,13 @@ sub encode_phyloxml {
 
   #genomic alignments
   if (ref($trees) eq 'ARRAY') {
-    #default aligned state is 1
+
     $w = Bio::EnsEMBL::Compara::Graph::GenomicAlignTreePhyloXMLWriter->new(
       -SOURCE => 'Ensembl', -HANDLE => $string_handle
     );
+
+    #default aligned state is 1
+    $w->aligned($c->stash->{"aligned"});
 
     #Set compact_alignments and no_branch_length option to Bio::EnsEMBL::Compara::Graph::PhyloXMLWriter
     $w->compact_alignments($c->stash->{'compact'});
