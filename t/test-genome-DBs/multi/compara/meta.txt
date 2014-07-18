@@ -1,4 +1,4 @@
-18	\N	schema_version	75
+23	\N	schema_version	76
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -16,3 +16,9 @@
 19	\N	patch	patch_74_75_a.sql|schema_version
 20	\N	patch	patch_74_75_b.sql|genome_db_haskaryo_highcov
 21	\N	patch	patch_74_75c.sql|species_tree_root_256
+22	\N	patch	patch_74_75c.sql|species_tree_root_256
+24	\N	patch	patch_75_76_a.sql|schema_version
+25	\N	patch	patch_75_76_b.sql|drop_domain_sitewise
+26	\N	patch	patch_75_76_c.sql|homoeologues
+27	\N	patch	patch_75_76_d.sql|gene_member_seq_member
+28	\N	patch	patch_75_76_e.sql|genome_db.name

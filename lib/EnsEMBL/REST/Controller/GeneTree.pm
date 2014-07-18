@@ -20,7 +20,7 @@ package EnsEMBL::REST::Controller::GeneTree;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
-use EnsEMBL::REST::Builder::TreeHash;
+use Bio::EnsEMBL::Compara::Utils::GeneTreeHash;
 require EnsEMBL::REST;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
@@ -88,13 +88,12 @@ sub _set_genetree {
   if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
     # If it wasn't a special format convert GT into a Hash data structure and let the normal serialisation
     # code deal with it.
-    my $builder = EnsEMBL::REST::Builder::TreeHash->new();
-    $builder->aligned(1) if $c->request()->param('aligned') || $c->request()->param('phyloxml_aligned');
-    my $sequence = $c->request->param('sequence') || $c->request()->param('phyloxml_sequence') || 'protein';
-    $builder->cdna(1) if $sequence eq 'cdna';
-    $builder->no_sequences(1) if $sequence eq 'none';
+    my $aligned = $c->request()->param('aligned') || $c->request()->param('phyloxml_aligned') ? 1 : 0;
+    my $sequence = $c->request()->param('sequence') || $c->request()->param('phyloxml_sequence') || 'protein';
+    my $cdna = $sequence eq 'cdna' ? 1 : 0;
+    my $no_sequences = $sequence eq 'none' ? 1 : 0;
     $gt->preload();
-    my $hash = $builder->convert($gt);
+    my $hash = Bio::EnsEMBL::Compara::Utils::GeneTreeHash->convert ($gt, -no_sequences => $no_sequences, -aligned => $aligned, -cdna => $cdna, -species_common_name => 0, -exon_boundaries => 0, -gaps => 0, -full_tax_info => 0);
     return $self->status_ok($c, entity => $hash);
   }
   return $self->status_ok($c, entity => $gt);

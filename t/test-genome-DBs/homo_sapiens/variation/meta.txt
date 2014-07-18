@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	75
+2	\N	schema_version	76
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -35,3 +35,12 @@
 35	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
 36	\N	patch	patch_73_74_d.sql|Add data_types to source table
 37	\N	patch	patch_73_74_e.sql|Update indexes for the phenotype table
+38	\N	patch	patch_75_76_a.sql|schema version
+39	\N	patch	patch_75_76_b.sql|Change evidence storage in Variation & Variation_feature table to attribs
+40	\N	patch	patch_75_76_c.sql|Add new table and extra column to population table to specify if population is to be displayed seperately on the PopulationGenetics page and if so with what priority
+41	\N	patch	patch_75_76_d.sql|Restore read_coverage table
+42	\N	patch	patch_75_76_e.sql|Add has_coverage flag to individual table
+43	\N	patch	patch_75_76_f.sql|Add index on the source_id column in variation_feature and phenotype_feature
+44	\N	patch	patch_75_76_g.sql|update variation and variation_feature to use the same clinical significance terms as ClinVar
+45	\N	patch	patch_75_76_h.sql|Replace the column clinical_significance_attrib_id by clinical_significance in structural_variation
+46	\N	patch	patch_75_76_i.sql|Add tables required for HGVS index creation

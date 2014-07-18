@@ -19,7 +19,8 @@ limitations under the License.
 package EnsEMBL::REST::Role::Tree;
 use Moose::Role;
 use namespace::autoclean;
-use Bio::EnsEMBL::Compara::Graph::PhyloXMLWriter;
+use Bio::EnsEMBL::Compara::Graph::GeneTreePhyloXMLWriter;
+use Bio::EnsEMBL::Compara::Graph::GenomicAlignTreePhyloXMLWriter;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 use IO::String;
 
@@ -28,11 +29,13 @@ sub encode_phyloxml {
 
   $stash_key ||= 'rest';
   my $string_handle = IO::String->new();
-  my $w = Bio::EnsEMBL::Compara::Graph::PhyloXMLWriter->new(
+  my $w;
+
+  # GeneTree parameters
+  $w = Bio::EnsEMBL::Compara::Graph::GeneTreePhyloXMLWriter->new(
     -SOURCE => 'Ensembl', -HANDLE => $string_handle
   );
-  
-  #Gene Tree parameters
+
   $w->aligned(1) if $c->request()->param('aligned') || $c->request()->param('phyloxml_aligned');
   my $sequence = $c->request->param('sequence') || $c->request()->param('phyloxml_sequence') || 'protein';
   $w->cdna(1) if $sequence eq 'cdna';
@@ -43,8 +46,13 @@ sub encode_phyloxml {
   my $roots;
 
   #genomic alignments
-  if (ref($trees) eq 'ARRAY') { 
-    #default aligned state is 1 
+  if (ref($trees) eq 'ARRAY') {
+
+    $w = Bio::EnsEMBL::Compara::Graph::GenomicAlignTreePhyloXMLWriter->new(
+      -SOURCE => 'Ensembl', -HANDLE => $string_handle
+    );
+
+    #default aligned state is 1
     $w->aligned($c->stash->{"aligned"});
 
     #Set compact_alignments and no_branch_length option to Bio::EnsEMBL::Compara::Graph::PhyloXMLWriter
@@ -53,20 +61,21 @@ sub encode_phyloxml {
     
     foreach my $tree (@$trees) {
       if (check_ref($tree, 'Bio::EnsEMBL::Compara::GenomicAlignTree')) {
-	push @$roots, $tree->root();
+	push @$roots, $tree;
       } else {
 	$c->go('ReturnError', 'custom', ["An array of Bio::EnsEMBL::Compara::GenomicAlignTree objects is currently only supported"]);
       }
     }
-  } else {
+  } elsif ($c->namespace eq 'genetree') {
     #gene tree
     $trees->preload();
-    push @$roots, $trees->root();
+    push @$roots, $trees;
   }
   $w->write_trees($roots);
   $w->finish();
 
   #Free tree structure
+  ## mp12 17-Jul-2014: No needed since *PhyloXMLWriter's free the trees. But I suppose it doesn't harm to double check
   foreach my $root (@$roots) {
     $root->release_tree();
   }
@@ -79,10 +88,10 @@ sub encode_nh {
   $stash_key ||= 'rest';
   my $gt = $c->stash->{$stash_key};
   my $nh_format = $c->request->param('nh_format') || 'simple';
-  $gt->preload();
+  $gt->preload() if ($gt->can('preload'));
   my $root = $gt->root();
   my $str = $root->newick_format($nh_format);
-  $root->release_tree();
+  $root->release_tree() if ($root->can('release_tree'));
   return \$str;
 }
 

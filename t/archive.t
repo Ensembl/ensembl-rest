@@ -28,6 +28,7 @@ use Test::Differences;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
+use Bio::EnsEMBL::ApiVersion qw/software_version/;
 use Bio::EnsEMBL::Registry;
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
@@ -38,8 +39,9 @@ my $base = '/archive/id';
 my $gene_id = 'ENSG00000054598';
 my $translation_id = "ENSP00000370275";
 my $version = 5;
+my $release = software_version();
 
-my $response = {id => $gene_id, latest => "$gene_id.$version", version => "$version", release => "75", peptide => undef, is_current => "1", type => "Gene", possible_replacement => [], assembly => "GRCh37"};
+my $response = {id => $gene_id, latest => "$gene_id.$version", version => "$version", release => "$release", peptide => undef, is_current => "1", type => "Gene", possible_replacement => [], assembly => "GRCh37"};
 
 is_json_GET("$base/$gene_id", $response, "Return archive for known ID");
 

@@ -1,3 +1,4 @@
+419	evidence	Variant evidence status	Evidence status for a variant
 1	SO_accession		Sequence Ontology accession
 2	SO_term		Sequence Ontology term
 3	display_term		Ensembl display term
