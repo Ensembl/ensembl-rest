@@ -115,7 +115,7 @@ sub _process {
   if($sequence_count > 1 && ! $multiple_sequences) {
     my $err;
     if($object->isa('Bio::EnsEMBL::Gene') && $type ne 'genomic') {
-      $err = qq{Requesting a gene and type not equal to "genomic" can result in multiple sequences. $sequence_count sequencs detected.};
+      $err = qq{Requesting a gene and type not equal to "genomic" can result in multiple sequences. $sequence_count sequences detected.};
     }
     elsif($object->isa('Bio::EnsEMBL::Transcript') && ! $object->isa('Bio::EnsEMBL::PredictionTranscript') && $type eq 'protein') {
       $err = qq{Requesting a transcript and type "protein" can result in multiple sequences. $sequence_count sequences detected.};
