@@ -5,4 +5,9 @@
 7	patch	patch_71_72_d.sql|patch_version_fix
 8	patch	patch_71_72_e.sql|is_obsolete
 1	schema_type	ontology
-5	schema_version	72
+5	schema_version	76
+10	patch	patch_72_73_a.sql|schema_version
+11	patch	patch_72_73_b.sql|meta_species
+13	patch	patch_73_74_a.sql|schema_version
+15	patch	patch_74_75_a.sql|schema_version
+16	patch	patch_75_76_a.sql|schema_version
