@@ -57,7 +57,6 @@ BEGIN { extends 'Catalyst::Controller::REST' }
 use Catalyst qw/
   ConfigLoader
   Static::Simple
-  SubRequest
   Cache
 /;
 
@@ -77,7 +76,7 @@ __PACKAGE__->config(
   name => 'EnsEMBL::REST',
   # Disable deprecated behavior needed by old applications
   disable_component_resolution_regex_fallback => 1,
-  
+
   #Allow key = [val] to become an array
   'Plugin::ConfigLoader' => {
     driver => {

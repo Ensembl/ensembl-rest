@@ -55,7 +55,7 @@ sub merged_config {
   my ($self) = @_;
   my $merged_cfg = $self->_merged_config();
   return $merged_cfg if $merged_cfg;
-  
+
   my $paths = wrap_array($self->paths());
   my $log = $self->context->log();
 
@@ -85,34 +85,34 @@ sub enrich {
     my $json = JSON->new();
     $json->pretty(1);
     my $log = $self->context->log;
-    
+
     # Modify and validate the possible output formats.
     my $outputs = $endpoint->{output};
     $outputs = [$outputs] unless ref($outputs);
     my %outputs_hash = map { lc($_) => 1 } @{$outputs};
-    
+
     #Add JSONP if available
     if(EnsEMBL::REST->config->{jsonp} && exists $outputs_hash{'json'} && ! exists $outputs_hash{'jsonp'}) {
       push(@{$outputs}, 'jsonp');
       $endpoint->{output} = $outputs;
-    
+
       #Now add it as a parameter if missing
       if(! exists $endpoint->{params}->{callback}) {
         $endpoint->{params}->{callback} = {
-          type => 'String', 
-          description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="http://github.com/Ensembl/ensembl-rest/wiki">the user guide</a>.', 
+          type => 'String',
+          description => 'Name of the callback subroutine to be returned by the requested JSONP response. Required ONLY when using JSONP as the serialisation method. Please see <a href="http://github.com/Ensembl/ensembl-rest/wiki">the user guide</a>.',
           required => 0,
           example => [qw/randomlygeneratedname/]
         };
       }
     }
-    
+
     #Build each output example
     foreach my $id ( keys %{ $endpoint->{examples} } ) {
         my $eg = $endpoint->{examples}->{$id};
         next if $eg->{enriched};
         next if $eg->{disable};
-        $eg->{id}  = $id; 
+        $eg->{id}  = $id;
         $self->_request_example($endpoint, $eg);
         $eg->{enriched} = 1;
     }
@@ -123,7 +123,6 @@ sub enrich {
 sub _request_example {
   my ($self, $endpoint, $eg) = @_;
   my $c = $self->context();
-  my $log = $c->log();
   my $path    = $eg->{path};
   my $capture = $eg->{capture} || [];
   my $params  = $eg->{params} || {};
@@ -133,28 +132,11 @@ sub _request_example {
   my $param_string = $self->_hash_to_params($params);
   $eg->{true_root_uri} = $eg->{uri};
   $eg->{uri} = $eg->{uri} .'?'. $param_string;
-  
+
   my ($example_host, $example_uri) = $self->_url($eg, $c);
   $eg->{example}->{host} = $example_host;
   $eg->{example}->{uri} = $example_uri;
-  
-  my $cache = $c->cache;
-  my $key = $endpoint->{key}.'++'.$eg->{id};
-  
-  $eg->{response} = $cache->compute($key, { expires_in => $self->example_expire_time() }, sub {
-    my $content_type = $eg->{content};
-    my $json = JSON->new();
-    $json->pretty(1);
-    $log->debug('About to run the URL '.$eg->{true_root_uri}.'?'.$param_string);
-    my $subreq_res = $c->subreq_res( $eg->{true_root_uri}, {}, { %{$params}, 'content-type', $content_type} );
-    my $sub_result = $subreq_res->body;
-    $log->warn(join ("\n", @{ $c->error })) if @{ $c->error };
-    if ($content_type eq 'application/json' ) {
-      $sub_result = $json->encode( decode_json( $sub_result  ) );
-    }
-    return $sub_result;
-  });
-  
+
   return;
 }
 

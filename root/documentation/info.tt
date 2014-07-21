@@ -46,7 +46,7 @@ limitations under the License.
       [% IF p.value.default.defined %] [% p.value.default %] [% ELSE %] - [% END %]
     </var></td>
     <td>
-			[% IF p.value.example %] 
+			[% IF p.value.example %]
       [% FOREACH eg IN p.value.example %]
         <var>[% eg %]</var><br>
       [% END %]
@@ -85,7 +85,7 @@ limitations under the License.
         [% IF p.value.default.defined %] [% p.value.default %] [% ELSE %] - [% END %]
       </var></td>
       <td>
-				[% IF p.value.example %] 
+				[% IF p.value.example %]
 	      [% FOREACH eg IN p.value.example %]
 	        <var>[% eg %]</var><br>
 	      [% END %]
@@ -119,11 +119,10 @@ limitations under the License.
 [% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget'] %]
 
 [% FOREACH p IN endpoint.examples.pairs %]
-	
 	[% NEXT IF p.value.disable %]
-	
+
 	[% filtered_uri = p.value.example.uri.replace('\+', '%2B') %]
-	
+
 	<h3><a href="[% filtered_uri %]">[% filtered_uri %]</a></h3>
 	<br>
 	<ul class="nav nav-pills">
@@ -133,9 +132,42 @@ limitations under the License.
 		[% END %]
 	</ul>
 	<div class='tab-content'>
-		<div class='tab-pane active' id='example[% p.value.id %]'>
-			<pre class="pre-scrollable prettyprint">[% FILTER html %][% p.value.response %][% END %]</pre>
-		</div>
+	<div class='tab-pane active' id='example[% p.value.id %]'></div>
+    <!-- START FILLING AJAX TAB -->
+    <script>
+    $.ajax( {
+      url : "[% filtered_uri %]",
+      type : "GET",
+     beforeSend : function () {
+        $("#example[% p.value.id %]").append("<img src='../../static/img/e-loader.gif'>");
+        return true;
+     },
+      success : function (resp) {
+     try {
+         var json = JSON.stringify(resp, undefined, 2);
+         $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]json[% END %] + "</code></pre>")
+	 $("#example[% p.value.id %]").each (function (i, block) {
+	      hljs.highlightBlock(block);
+	      $("#example[% p.value.id %]>img").remove();
+	 })
+     } catch (e) {
+         var xmlSerial = new XMLSerializer();
+         var xml_str = xmlSerial.serializeToString(resp);
+         $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\" class=\"pre-scrollable prettyprint\"></pre>");
+         $("#pre[% p.value.id %]").text([% FILTER html %]xml_str[% END %]);
+	 $("#example[% p.value.id %]").each (function (i, block) {
+	      hljs.highlightBlock(block);
+	      $("#example[% p.value.id %]>img").remove();
+	 })
+      }
+      },
+      error : function (resp, msg) {
+         $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\">" + resp.responseText + "</pre>");
+         $("#example[% p.value.id %]>img").remove();
+      }
+      });
+    </script>
+    <!-- END FILLING AJAX TAB -->
 
 <!-- PERL EXAMPLE -->
 [% INCLUDE documentation/examples/perl.tt %]
@@ -155,11 +187,11 @@ limitations under the License.
 <!-- WGET EXAMPLE -->
 [% INCLUDE documentation/examples/wget.tt %]
 
-	</div>
-  <br>
-[% END %]
+</div>
 
-[% END %]
+[% END %] <!-- End FOREACH on endpoint examplesv -->
+
+[% END %] <!-- End ELSE of POST versus GET -->
 
 </div>
 <div class="span2">

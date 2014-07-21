@@ -20,6 +20,10 @@ limitations under the License.
 
 <html lang="en">
 <head>
+        <script src="/static/js/20-prettify.js"></script>
+        <script src="/static/js/30-jquery-1.11.1.min.js"></script>
+	<script src="/static/js/highlight/highlight.pack.js"></script>
+
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>Ensembl Rest API - [% template_title %]</title>
@@ -28,6 +32,7 @@ limitations under the License.
 	[% ELSE %]
 	<link href="/static/css/10-bootstrap.css" rel="stylesheet"/>
 	<link href="/static/css/20-prettify.css" rel="stylesheet"/>
+       	<link href="/static/js/highlight/styles/default.css" rel="stylesheet"/>
 	<link href="/static/css/50-additional.css" rel="stylesheet"/>
 	<link href="/static/css/51-docs.css" rel="stylesheet"/>
 	[% END %]
@@ -43,7 +48,7 @@ limitations under the License.
   <![endif]-->
 </head>
 <body data-spy="scroll" data-target=".bs-docs-sidebar" onload="prettyPrint()">
-<div class="container">		
+<div class="container">
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
@@ -55,15 +60,15 @@ limitations under the License.
                         <li><a href="http://www.ensembl.org/info/about/index.html">About the Ensembl Project</a></li>
                         <li><a href="http://www.ensembl.org/info/about/contact/">Contact Ensembl</a></li>
                     </ul>
-            </div><!-- container--> 
-        </div><!-- navbar-inner--> 
-    </div><!-- navbar--> 
+            </div><!-- container-->
+        </div><!-- navbar-inner-->
+    </div><!-- navbar-->
     <br>
 
     <span class="message">[% status_msg %]</span>
     <span class="error">[% error_msg %]</span>
     [% content %]
-</div><!-- container--> 
+</div><!-- container-->
 
 <footer class="footer">
 	<div class="container">
@@ -77,7 +82,7 @@ limitations under the License.
 <script src='[% c.request.env.$psg.1 %]'></script>
 [% ELSE %]
 <script src="/static/js/10-bootstrap.js"></script>
-<script src="/static/js/20-prettify.js"></script>
+
 [% END %]
 
 

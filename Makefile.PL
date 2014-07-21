@@ -10,7 +10,7 @@ name 'EnsEMBL-REST';
 license 'ensembl';
 all_from 'lib/EnsEMBL/REST.pm';
 
-requires 'Catalyst::Runtime' => '5.90015';
+requires 'Catalyst::Runtime';
 requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Action::RenderView';
@@ -20,7 +20,7 @@ requires 'Config::General'; # This should reflect the config file format you've 
                             # See Catalyst::Plugin::ConfigLoader for supported formats
 
 #Ensembl Rest Specific
-requires 'Catalyst::Action::REST' => '1.11';
+requires 'Catalyst::Action::REST';
 requires 'Catalyst::Plugin::SubRequest';
 requires 'Catalyst::Component::InstancePerContext';
 requires 'Catalyst::View::JSON';
@@ -57,7 +57,7 @@ recommends 'DateTime';
 recommends 'Server::Starter';
 
 #Test requirements
-test_requires 'Test::More' => '0.88';
+test_requires 'Test::More';
 test_requires 'Test::Differences';
 test_requires 'Test::JSON';
 test_requires 'Test::XML::Simple';
