@@ -285,7 +285,7 @@ sub _build_vf {
               start          => $s->{start},
               end            => $s->{end},
               strand         => $s->{strand},
-              adaptor        => $s->{structural_variation_feature_adaptor},
+              adaptor        => $s->{svfa},
               variation_name => 'temp',
               chr            => $s->{sr_name},
               slice          => $s->{slice},
@@ -302,7 +302,7 @@ sub _build_vf {
                 mapped_weight  => 1,
                 chr            => $s->{sr_name},
                 slice          => $s->{slice},
-                adaptor        => $s->{variation_feature_adaptor},
+                adaptor        => $s->{vfa},
             }
         );
       }
@@ -345,6 +345,12 @@ sub _include_user_params {
   read_cache_info(\%vep_params);
   # $c->log->debug("Before ".Dumper \%vep_params);
   map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
+  
+  if ($c->stash->{species} ne 'homo_sapiens') {
+    delete $vep_params{cache};
+    delete $vep_params{fasta};
+    $vep_params{database} = 1;
+  }
   
   # add adaptors
   $vep_params{$_} = $c->stash->{$_} for qw(va vfa svfa tva csa sa ga), map {$_.'_adaptor'} @REG_FEAT_TYPES;
