@@ -207,7 +207,7 @@ sub get_id : Chained('get_species') PathPart('id') ActionClass('REST') {
 sub get_id_GET {
   my ( $self, $c, $rs_id ) = @_;
   unless ($rs_id) {$c->go('ReturnError', 'custom', ["rs_id is a required parameter for this endpoint"])}
-  my $v = $c->stash()->{variation_adaptor}->fetch_by_name($rs_id);
+  my $v = $c->stash()->{va}->fetch_by_name($rs_id);
   $c->go( 'ReturnError', 'custom', [qq{No variation found for RS ID $rs_id}] ) unless $v;
   my $vfs = $v->get_all_VariationFeatures();
   $c->stash( variation => $v, variation_features => $vfs );
