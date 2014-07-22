@@ -99,6 +99,7 @@ sub get_region_POST {
   # handle user config
   my $config = $self->_include_user_params($c,$post_data);
   $config->{va} = $c->stash->{variation_adaptor};
+  $config->{vfa} = $c->stash->{variation_feature_adaptor};
   unless (exists $post_data->{variants}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "variants" key in your POST. Please check the format of your message against the documentation' ] );
   }
@@ -133,6 +134,8 @@ sub _give_POST_to_VEP {
       $consequences = $self->get_consequences($c, $config, \@vfs);
     } else {
       $c->log->debug('Query Ensembl database');
+      delete $config->{cache};
+      $config->{database} = 1;
       $config->{species} = $c->stash->{species}; # override VEP default for human
       $consequences = $self->get_consequences($c, $config, \@vfs);
     }
