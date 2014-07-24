@@ -70,7 +70,7 @@ sub id_POST {
   $self->status_ok( $c, entity => $feature_hash);
 }
 
-sub symbol : Chained('/') PathPart('lookup/symbol') Args(2) {
+sub symbol : Chained('/') PathPart('lookup/symbol') Args(1) ActionClass('REST') {
   my ($self, $c, $species, $symbol) = @_;
   $c->stash(species => $species);
 
