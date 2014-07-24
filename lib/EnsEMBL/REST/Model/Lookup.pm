@@ -155,7 +155,7 @@ sub find_object {
   my $r = $c->request();
   my $reg = $c->model('Registry');
   $object_type = $r->param('object_type') if !$object_type;
-  Catalyst::Exception->throw("ID '$id' not found");
+  Catalyst::Exception->throw("ID '$id' not found") unless $species;
   # $c->go('ReturnError', 'custom', [qq{Not possible to find the ID '$id' in any of the species available in this release}]) unless $species;
   my $adaptor = $reg->get_adaptor($species, $db_type, $object_type);
   $c->log()->debug('Found an adaptor '.$adaptor);
