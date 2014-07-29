@@ -125,7 +125,7 @@ sub get_slice_species : Chained("/") PathPart("alignment/slice/region") CaptureA
   #$c->stash->{species} = $species;
 
    $c->go( 'ReturnError', 'custom',
-        [qq{/alignment/slice/region is deprecated. See http://beta.rest.ensembl.org/alignment/region for alternative}] );
+        [qq{/alignment/slice/region is deprecated. See http://rest.ensembl.org/alignment/region for alternative}] );
 
 }
 
