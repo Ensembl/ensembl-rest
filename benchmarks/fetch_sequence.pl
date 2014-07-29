@@ -28,7 +28,7 @@ my @ids;
 open my $fh, '<', $file or die "Cannot open $file: $!";
 while(my $line = <$fh>) {
   chomp $line;
-  my ($id) = $line =~ /^http:\/\/beta.rest.ensembl.org\/sequence\/id\/(.+)\?/;
+  my ($id) = $line =~ /^http:\/\/rest.ensembl.org\/sequence\/id\/(.+)\?/;
   my ($type) = $line =~ /type=([a-z]+)$/;
   push(@ids, [$id, $type]);
 }

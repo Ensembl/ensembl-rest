@@ -18,7 +18,7 @@ use strict;
 use warnings;
 
 use Bio::EnsEMBL::Registry;
-my $base_url = 'http://beta.rest.ensembl.org/sequence/id/';
+my $base_url = 'http://rest.ensembl.org/sequence/id/';
 Bio::EnsEMBL::Registry->load_registry_from_db(-HOST => 'useastdb.ensembl.org', -PORT => 5306, -USER => 'anonymous');
 my %table_counts;
 

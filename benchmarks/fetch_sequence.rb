@@ -10,7 +10,7 @@ ids=[]
 file='./random_ids.local.fixed.txt'
 # file=ARGV[0]
 File.open( file ).each do |line|
-  if line =~ /^http:\/\/beta.rest.ensembl.org\/sequence\/id\/(.+)\?/
+  if line =~ /^http:\/\/rest.ensembl.org\/sequence\/id\/(.+)\?/
     id_array = [$1]
     if line =~ /type=([a-z]+)$/ 
       id_array.push($1)
@@ -24,7 +24,7 @@ if ARGV[1]
   iters = ARGV[1].to_int
 end
 
-url = URI.parse('http://beta.rest.ensembl.org')
+url = URI.parse('http://rest.ensembl.org')
 http = Net::HTTP.new(url.path, url.port)
 puts iters
 (1..iters).each do |iter|
