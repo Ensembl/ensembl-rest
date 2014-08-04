@@ -42,7 +42,7 @@ export PERL5LIB
 export ENS_REST_LOG4PERL=$APP_HOME'/configurations/production/log4perl.conf'
 
 # Server settings for starman
-WORKERS=15
+WORKERS=45
 BACKLOG=1024
 MAXREQUESTS=10000
 RESTART_INTERVAL=1
