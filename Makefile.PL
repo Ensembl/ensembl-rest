@@ -21,7 +21,6 @@ requires 'Config::General'; # This should reflect the config file format you've 
 
 #Ensembl Rest Specific
 requires 'Catalyst::Action::REST';
-requires 'Catalyst::Plugin::SubRequest';
 requires 'Catalyst::Component::InstancePerContext';
 requires 'Catalyst::View::JSON';
 requires 'Catalyst::View::TT';
