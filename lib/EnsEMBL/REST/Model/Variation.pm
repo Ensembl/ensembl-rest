@@ -19,6 +19,7 @@ limitations under the License.
 package EnsEMBL::REST::Model::Variation;
 
 use Moose;
+use Catalyst::Exception qw(throw);
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
@@ -36,12 +37,12 @@ sub fetch_variation {
   my $c = $self->context();
   my $species = $c->stash->{species};
 
-  $c->go('ReturnError', 'custom', ["No variation given. Please specify a variation to retrieve from this service"]) if ! $variation_id;
+  Catalyst::Exception->throw("No variation given. Please specify a variation to retrieve from this service") if ! $variation_id;
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
   my $variation = $vfa->fetch_by_name($variation_id);
   if (!$variation) {
-    $c->go('ReturnError', 'custom', ["$variation_id not found for $species"]);
+    Catalyst::Exception->throw("$variation_id not found for $species");
   }
   return $self->to_hash($variation);
 }
