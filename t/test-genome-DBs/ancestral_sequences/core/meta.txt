@@ -1,0 +1,6 @@
+1	\N	schema_version	77
+804	\N	schema_type	core
+805	\N	patch	patch_75_76_a.sql|schema_version
+806	\N	patch	patch_75_76_b.sql|allow_null_karyotype
+807	\N	patch	patch_75_76_c.sql|remove_alternative_splicing
+808	\N	patch	patch_76_77_a.sql|schema_version

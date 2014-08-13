@@ -1,0 +1,9 @@
+1	1	schema_type	funcgen
+2	\N	schema_version	76
+3	\N	patch	patch_75_76_a.sql|schema_version
+4	\N	patch	patch_75_76_b.sql|result/feature_set.experiment_id & experiment/input_subset.display_url/archive_id
+5	\N	patch	patch_75_76_c.sql|cell_type.display_label
+6	\N	patch	patch_75_76_d.sql|feature_set.type mirna; object_xref.ensembl_object_type add MirnaTargetFeature
+7	\N	patch	patch_75_76_e.sql|add has_evidence, cell_type_count to regulatory_feature
+8	\N	patch	patch_75_76_f.sql|add feature_type.class Transcription Start Site
+9	\N	patch	patch_75_76_g.sql|mirna_target_feature
