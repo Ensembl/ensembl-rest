@@ -107,7 +107,7 @@ builder {
 
     #----- Javascript & CSS minimisation and expire dates set
     # CSS assets are first
-    enable "Assets", files => [<$staticdir/static/css/*.css>];
+    enable "Assets", files => [<$staticdir/static/css/*.css>, "$staticdir/static/js/highlight/styles/default.css"];
 
     #Javascript assets are second
     enable "Assets",
