@@ -238,6 +238,15 @@ jsonp=1
   # default_source=.
 </View::GFF3>
 
+<View::HTML>
+  # To configure any templates to your own needs provide new includes 
+  # here and replace the template toolkit file. Pay attention to order 
+  # (1st defined is 1st consulted)
+
+  # INCLUDE_PATH __path_to(alternative/root)__
+  INCLUDE_PATH __path_to(root)__
+</View::HTML>
+
 <Plugin::Cache>
   <backend>
     #Default 
