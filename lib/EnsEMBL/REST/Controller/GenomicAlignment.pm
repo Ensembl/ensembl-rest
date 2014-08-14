@@ -104,6 +104,7 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
     $c->stash->{"no_branch_lengths"} = (defined $c->request->param('no_branch_lengths')) ? $c->request->param('no_branch_lengths') : 0;
 
     #Never give branch lengths for pairwise, even if requested
+    $c->go("ReturnError", "custom", ["no alignment available for this region"]) if !$alignments;
     my $mlss = $alignments->[0]->method_link_species_set;
     if ($mlss->method->class eq "GenomicAlignBlock.pairwise_alignment") {
       $c->stash->{"no_branch_lengths"} = 0;
