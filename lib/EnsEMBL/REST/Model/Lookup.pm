@@ -320,8 +320,13 @@ sub find_genes_by_symbol_list {
   my ($self, $list) = @_;
   my %genes;
   while (my $symbol = shift @$list) {
-    my $gene = find_gene_by_symbol($self,$symbol);
-    $genes{$symbol} = $gene if $gene;
+    try {
+      my $gene = find_gene_by_symbol($self,$symbol);
+      $genes{$symbol} = $gene if $gene;
+    }
+    catch {
+      
+    };
   }
   return \%genes;
 }

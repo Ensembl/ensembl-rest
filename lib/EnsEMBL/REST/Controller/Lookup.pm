@@ -52,7 +52,7 @@ sub id_GET {
     $c->go('ReturnError', 'custom',  [qq{No valid lookup found for ID $id}]) unless $features->{species};
   }
   catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok( $c, entity => $features);
 }
@@ -70,7 +70,7 @@ sub id_POST {
   $self->status_ok( $c, entity => $feature_hash);
 }
 
-sub symbol : Chained('/') PathPart('lookup/symbol') Args(1) ActionClass('REST') {
+sub symbol : Chained('/') PathPart('lookup/symbol') ActionClass('REST') {
   my ($self, $c, $species, $symbol) = @_;
   $c->stash(species => $species);
 
@@ -86,24 +86,27 @@ sub symbol_GET {
   try {
     $features = $c->model('Lookup')->find_gene_by_symbol($symbol);
     $c->go('ReturnError', 'custom',  [qq{No valid lookup found for symbol $symbol}]) unless $features->{species};
-      }
+  }
   catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok( $c, entity => $features);
 }
 
 sub symbol_POST {
-  my ($self,$c);
+  my ($self,$c) = @_;
   my $post_data = $c->req->data;
+  unless (exists $post_data->{'symbols'}) {
+    $c->go('ReturnError', 'custom', [qq{POST body must contain 'symbols' key with array of values}]);
+  }
   my $symbol_list = $post_data->{'symbols'};
   my $feature_hash;
   try {
-    $feature_hash = $c->model('Lookup')->find_and_locate_list($symbol_list);
-  }
-  catch {
-    $c->go('ReturnError','from_ensembl', [$_]);
+    $feature_hash = $c->model('Lookup')->find_genes_by_symbol_list($symbol_list);
   };
+  # catch {
+  #   $c->go('ReturnError','custom', [qq{$_}]);
+  # };
   $self->status_ok( $c, entity => $feature_hash);
 }
 
