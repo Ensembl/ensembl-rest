@@ -5,7 +5,7 @@ CREATE TABLE `alt_id` (
   PRIMARY KEY (`alt_id`),
   UNIQUE KEY `term_alt_idx` (`term_id`,`alt_id`),
   KEY `accession_idx` (`accession`(50))
-) ENGINE=MyISAM ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `closure` (
   `closure_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -17,7 +17,7 @@ CREATE TABLE `closure` (
   PRIMARY KEY (`closure_id`),
   UNIQUE KEY `child_parent_idx` (`child_term_id`,`parent_term_id`,`subparent_term_id`,`ontology_id`),
   KEY `parent_subparent_idx` (`parent_term_id`,`subparent_term_id`)
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
 CREATE TABLE `meta` (
   `meta_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -26,7 +26,7 @@ CREATE TABLE `meta` (
   `species_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `key_value_idx` (`meta_key`,`meta_value`)
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
 CREATE TABLE `ontology` (
   `ontology_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -34,7 +34,7 @@ CREATE TABLE `ontology` (
   `namespace` varchar(64) NOT NULL,
   PRIMARY KEY (`ontology_id`),
   UNIQUE KEY `name_namespace_idx` (`name`,`namespace`)
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
 CREATE TABLE `relation` (
   `relation_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -46,14 +46,14 @@ CREATE TABLE `relation` (
   PRIMARY KEY (`relation_id`),
   UNIQUE KEY `child_parent_idx` (`child_term_id`,`parent_term_id`,`relation_type_id`,`intersection_of`,`ontology_id`),
   KEY `parent_idx` (`parent_term_id`)
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
 CREATE TABLE `relation_type` (
   `relation_type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   PRIMARY KEY (`relation_type_id`),
   UNIQUE KEY `name_idx` (`name`)
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
 CREATE TABLE `subset` (
   `subset_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -61,7 +61,7 @@ CREATE TABLE `subset` (
   `definition` varchar(128) NOT NULL,
   PRIMARY KEY (`subset_id`),
   UNIQUE KEY `name_idx` (`name`)
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
 CREATE TABLE `synonym` (
   `synonym_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -70,7 +70,7 @@ CREATE TABLE `synonym` (
   PRIMARY KEY (`synonym_id`),
   UNIQUE KEY `term_synonym_idx` (`term_id`,`synonym_id`),
   KEY `name_idx` (`name`(50))
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
 CREATE TABLE `term` (
   `term_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -85,5 +85,5 @@ CREATE TABLE `term` (
   UNIQUE KEY `accession_idx` (`accession`),
   UNIQUE KEY `ontology_acc_idx` (`ontology_id`,`accession`),
   KEY `name_idx` (`name`)
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
