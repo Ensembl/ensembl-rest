@@ -72,6 +72,7 @@ sub id_POST {
 
 sub symbol : Chained('/') PathPart('lookup/symbol') ActionClass('REST') {
   my ($self, $c, $species, $symbol) = @_;
+  unless (defined $species) { $c->go('ReturnError', 'custom', [qq{Species must be provided as part of the URL.}])}
   $c->stash(species => $species);
 
   # output format check
