@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET fasta_GET json_GET json_POST seqxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex action_bad_post/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET is_json_POST json_POST seqxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex action_bad_post/;
 
 use Test::More;
 use Test::Differences;
@@ -67,6 +67,14 @@ sub json_POST($$$) {
   return $json if $json;
   return;
 }
+
+sub is_json_POST($$$$) {
+  my ($url, $data, $expected, $msg) = @_;
+  my $json = json_POST($url, $data, $msg);
+  return eq_or_diff_data($json, $expected, "$url | $msg") if $json;
+  return;
+}
+
 
 sub seqxml_GET($$) {
   my ($url, $msg) = @_;

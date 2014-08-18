@@ -36,6 +36,7 @@ text/x-gff3
 =cut
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
+with 'EnsEMBL::REST::Role::PostLimiter';
 
 sub id: Chained('/') PathPart('archive/id') ActionClass('REST') {
   my ($self, $c, $id) = @_;
@@ -66,6 +67,7 @@ sub id_POST {
   
   my $payload = $c->req->data();
   my $ids = $payload->{id};
+  $self->assert_message_size($c,$ids);
   try {
     foreach my $id (@$ids){
       my $archive = $self->_fetch_archive_by_id($c,$id);

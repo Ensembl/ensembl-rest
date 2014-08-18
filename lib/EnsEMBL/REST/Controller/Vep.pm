@@ -29,14 +29,14 @@ use Bio::EnsEMBL::Funcgen::MotifFeature;
 use Bio::EnsEMBL::Funcgen::RegulatoryFeature;
 use Bio::EnsEMBL::Funcgen::BindingMatrix;
 
-
+use Try::Tiny;
 
 require EnsEMBL::REST;
+
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 BEGIN { 
   extends 'Catalyst::Controller::REST';
 }
-use Try::Tiny;
 
 has 'fasta_db' => (
   isa => 'Bio::DB::Fasta',
@@ -50,11 +50,7 @@ has 'fasta' => (
   is =>'ro'
 );
 
-has 'max_post_size' => (
-  isa => 'Int',
-  is => 'ro',
-  default => 1000
-);
+with 'EnsEMBL::REST::Role::PostLimiter';
 
 
 # /vep/:species
@@ -112,9 +108,7 @@ sub get_region_POST {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "variants" key in your POST. Please check the format of your message against the documentation' ] );
   }
   my @variants = @{$post_data->{variants}};
-  if (scalar(@variants) > $self->max_post_size) {
-    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$self->max_post_size.' variant lines per POST' ] );
-  }
+  $self->assert_post_size($c,\@variants);
 
   $self->_give_POST_to_VEP($c,\@variants, $config);
 }
@@ -253,9 +247,7 @@ sub get_id_POST {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "ids" key in your POST. Please check the format of your message against the documentation' ] );
   }
   my @ids = @{$post_data->{ids}};
-  if (scalar(@ids) > $self->max_post_size) {
-    $c->go( 'ReturnError', 'custom', [ ' Batch size too big. Keep under '.$self->max_post_size.' variant lines per POST' ] );
-  }
+  $self->assert_post_size($c,\@ids);
   $self->_give_POST_to_VEP($c,\@ids,$config);
 }
 
@@ -318,7 +310,6 @@ sub _find_fasta_cache {
   my $fasta_db = Bio::DB::Fasta->new($self->fasta);
   return $fasta_db;
 }
-
 
 sub _new_slice_seq {
   # replacement seq method to read from FASTA DB
