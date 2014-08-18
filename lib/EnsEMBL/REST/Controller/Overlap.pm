@@ -68,7 +68,7 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
     $features = $c->model('Overlap')->fetch_features();
   }
   catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $features );
 }
@@ -112,7 +112,7 @@ sub id: Chained('/') PathPart('overlap/id') Args(1) ActionClass('REST') {
 
     $features = $c->model('Overlap')->fetch_features($slice);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $features );
 }
@@ -143,7 +143,7 @@ sub translation: Chained('/') PathPart('overlap/translation') Args(1) ActionClas
     my $translation = $c->model('Lookup')->find_object_by_stable_id($id);
     $features = $c->model('Overlap')->fetch_protein_features($translation);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $features );
 }

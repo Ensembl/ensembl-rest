@@ -91,7 +91,7 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
 
       $alignments = $c->model('GenomicAlignment')->get_alignment($slice);
     } catch {
-      $c->go('ReturnError', 'from_ensembl', [$_]);
+      $c->go('ReturnError', 'custom', [qq/$_/]);
     };
 
     #Set aligned option (default 1)

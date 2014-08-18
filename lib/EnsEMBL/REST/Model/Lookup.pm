@@ -53,7 +53,6 @@ sub find_genetree_by_stable_id {
     my ($species, $object_type, $db_type) = $self->find_object_location($id);
     if($species) {
       my $gta = $reg->get_adaptor($species, $db_type, $object_type);
-      # $c->go('ReturnError', 'custom', ["No adaptor found for ID $id, species $species, object $object_type and db $db_type"]) if ! $gta;
       Catalyst::Exception->throw("No adaptor found for ID $id, species $species, object $object_type and db $db_type") unless $gta;
       $gt = $gta->fetch_by_stable_id($id);
     }
@@ -69,7 +68,6 @@ sub find_genetree_by_stable_id {
     }
   }
   return $gt if $gt;
-  # $c->go('ReturnError', 'custom', ["No GeneTree found for ID $id"]);
   Catalyst::Exception->throw("No GeneTree found for ID $id");
 }
 
@@ -80,13 +78,11 @@ sub find_genetree_by_member_id {
   my $reg = $c->model('Registry');
 
   my ($species, $object_type, $db_type) = $self->find_object_location($id);
-  # $c->go('ReturnError', 'custom', ["Unable to find given object: $id"]) unless $species;
   Exception::Catalyst->throw("Unable to find given object: $id") unless $species;
 
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
   my $ma = $dba->get_GeneMemberAdaptor;
   my $member = $ma->fetch_by_stable_id($id);
-  # $c->go('ReturnError', 'custom', ["Could not fetch GeneTree Member"]) unless $member;
   Exception->Catalyst->throw("Could not fetch GeneTree Member") unless $member;
 
   my $gta = $dba->get_GeneTreeAdaptor;
@@ -156,7 +152,6 @@ sub find_object {
   my $reg = $c->model('Registry');
   $object_type = $r->param('object_type') if !$object_type;
   Catalyst::Exception->throw("ID '$id' not found") unless $species;
-  # $c->go('ReturnError', 'custom', [qq{Not possible to find the ID '$id' in any of the species available in this release}]) unless $species;
   my $adaptor = $reg->get_adaptor($species, $db_type, $object_type);
   $c->log()->debug('Found an adaptor '.$adaptor);
   if(! $adaptor->can('fetch_by_stable_id')) {
@@ -164,7 +159,6 @@ sub find_object {
   }
   my $final_obj = $adaptor->fetch_by_stable_id($id);
   Catalyst::Exception->throw("No object found for ID $id") unless $final_obj;
-  # $c->go('ReturnError', 'custom', ["No object found for ID $id"]) unless $final_obj;
   $c->stash()->{object} = $final_obj;
   return $final_obj;
 }
@@ -240,7 +234,6 @@ sub find_object_location {
       if ($use_archive) {
         my $reg = $c->model('Registry');
         my $lookup = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
-        # $c->go('ReturnError', 'custom', ["No lookup database available on server, archive lookup not possible for $id. Please contact the administrator of this server"]) if ! $lookup;
         Catalyst::Exception->throw("No lookup database available on server, archive lookup not possible for $id. Please contact the administrator of this server") unless $lookup;
       }
     }
@@ -271,7 +264,6 @@ sub find_and_locate_object {
       $type = 'Exon';
     } else {
       Catalyst::Exception->throw("Include option only available for Genes and Transcripts");
-      # $c->go('ReturnError', 'custom',  ["Include option only available for Genes and Transcripts"]);
     }
     $features->{$type} = $self->$type($features->{id}, $species, $db_type);
   }
@@ -305,7 +297,6 @@ sub find_gene_by_symbol {
   my $gene_adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'Gene');
   my $gene = $gene_adaptor->fetch_by_display_label($symbol);
   Catalyst::Exception->throw(qq{No valid lookup found for symbol $symbol}) unless $gene;
-  # $c->go('ReturnError', 'custom',  [qq{No valid lookup found for symbol $symbol}]) unless $gene;
   my $features = $self->features_as_hash($gene->stable_id, $species, 'Gene', 'core');
 
   my $expand = $c->request->param('expand');
@@ -396,7 +387,6 @@ sub features_as_hash {
       $features->{logic_name} = $summary_hash->{logic_name} if defined $summary_hash->{logic_name};
     } else {
       Catalyst::Exception->throw(qq{ID '$id' does not support 'full' format type. Please use 'condensed'});
-      # $c->go('ReturnError','custom',[qq{ID '$id' does not support 'full' format type. Please use 'condensed'}]);
     }
   }
 
@@ -412,13 +402,11 @@ sub find_slice {
   # or this
   my $db_type = $s->{db_type} || 'core';
   my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, 'slice');
-  # $c->go('ReturnError', 'custom', ["Do not know anything about the species $species and core database"]) unless $adaptor;
   Catalyst::Exception->throw("Do not know anything about the species $species and core database") unless $adaptor;
   my $coord_system_name = $c->request->param('coord_system') || 'toplevel';
   my $coord_system_version = $c->request->param('coord_system_version');
   my ($no_warnings, $no_fuzz, $ucsc_matching) = (undef, undef, 1);
   my $slice = $adaptor->fetch_by_location($region, $coord_system_name, $coord_system_version, $no_warnings, $no_fuzz, $ucsc_matching);
-  # $c->go('ReturnError', 'custom', ["No slice found for location $region"]) unless $slice;
   Catalyst::Exception->throw("No slice found for location $region") unless $slice;
   $s->{slice} = $slice;
   return $slice;
@@ -430,11 +418,9 @@ sub decode_region {
   my $s = $c->stash();
   my $species = $s->{species};
   my $adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'slice');
-  # $c->go('ReturnError', 'custom', ["Do not know anything about the species $species and core database"]) unless $adaptor;
   Catalyst::Exception->throw("Do not know anything about the species $species and core database")unless $adaptor;
   my ($sr_name, $start, $end, $strand) = $adaptor->parse_location_to_values($region, $no_warnings, $no_errors);
   $strand = 1 if ! defined $strand;
-  # $c->go('ReturnError', 'custom', ["Could not decode region $region"]) unless $sr_name;
   Catalyst::Exception->throw("Could not decode region $region") unless $sr_name;
   $s->{sr_name} = $sr_name;
   $s->{start} = $start;

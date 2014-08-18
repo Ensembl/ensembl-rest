@@ -20,7 +20,7 @@ package EnsEMBL::REST::Model::Overlap;
 
 use Moose;
 extends 'Catalyst::Model';
-
+use Catalyst::Exception;
 use EnsEMBL::REST::EnsemblModel::ExonTranscript;
 use EnsEMBL::REST::EnsemblModel::CDS;
 use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
@@ -43,9 +43,9 @@ has 'allowed_translation_features' => ( isa => 'HashRef', is => 'ro', lazy => 1,
   };
 });
 
-with 'Catalyst::Component::InstancePerContext';
-
 has 'context' => (is => 'ro');
+
+with 'Catalyst::Component::InstancePerContext', 'EnsEMBL::REST::Role::Content';
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
@@ -61,7 +61,7 @@ sub fetch_features {
   
   my $allowed_features = $self->allowed_features();
   my $feature = $c->request->parameters->{feature};
-  $c->go('ReturnError', 'custom', ["No feature given. Please specify a feature to retrieve from this service"]) if ! $feature;
+  Catalyst::Exception->throw("No feature given. Please specify a feature to retrieve from this service") if ! $feature;
   my @features = map {lc($_)} ((ref($feature) eq 'ARRAY') ? @{$feature} : ($feature));
 
   # normalise cdna & cds since they're the same for bed. the processed_feature_types hash will deal with this
@@ -79,7 +79,8 @@ sub fetch_features {
     next if exists $processed_feature_types{$feature_type};
     next if $feature_type eq 'none';
     my $allowed = $allowed_features->{$feature_type};
-    $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
+
+    Catalyst::Exception->throw("The feature type $feature_type is not understood") if ! $allowed;
     # my $objects = $self->$feature_type($slice);
     my $load_exons = ($feature_type eq 'transcript' && $is_bed) ? 1 : 0;
     my $objects = $self->_trim_features($self->$feature_type($slice, $load_exons));
@@ -120,7 +121,7 @@ sub fetch_protein_features {
     next if exists $processed_feature_types{$feature_type};
     $feature_type = lc($feature_type);
     my $allowed = $allowed_features->{$feature_type};
-    $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
+    Catalyst::Exception->throw("The feature type $feature_type is not understood") if ! $allowed;
     my $objects = $self->$feature_type($translation);
     if($is_gff3 || $is_bed) {
       push(@final_features, @{$objects});
@@ -306,10 +307,10 @@ sub constrained {
   my $species_set = $c->request->parameters->{species_set} || 'mammals';
   my $compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
   my $mlssa = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'MethodLinkSpeciesSet');
-  $c->go('ReturnError', 'custom', ["No adaptor found for compara Multi and adaptor MethodLinkSpeciesSet"]) if ! $mlssa;
+  Catalyst::Exception->throw("No adaptor found for compara Multi and adaptor MethodLinkSpeciesSet") if ! $mlssa;
   my $method_list = $mlssa->fetch_by_method_link_type_species_set_name('GERP_CONSTRAINED_ELEMENT', $species_set);
   my $cea = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'ConstrainedElement');
-  $c->go('ReturnError', 'custom', ["No adaptor found for compara Multi and adaptor ConstrainedElement"]) if ! $cea;
+  Catalyst::Exception->throw("No adaptor found for compara Multi and adaptor ConstrainedElement") if ! $cea;
   return $cea->fetch_all_by_MethodLinkSpeciesSet_Slice($method_list, $slice);
 }
 
@@ -318,7 +319,7 @@ sub regulatory {
   my $c = $self->context();
   my $species = $c->stash->{species};
   my $rfa = $c->model('Registry')->get_adaptor( $species, 'funcgen', 'regulatoryfeature');
-  $c->go('ReturnError', 'custom', ["No adaptor found for species $species, object regulatoryfeature and db funcgen"]) if ! $rfa;
+  Catalyst::Exception->throw("No adaptor found for species $species, object regulatoryfeature and db funcgen") if ! $rfa;
   return $rfa->fetch_all_by_Slice($slice);
 }
 
@@ -350,10 +351,10 @@ sub _get_SO_terms {
     if($term =~ /^SO\:/) {
       my $ontology_term = $c->model('Lookup')->ontology_accession_to_OntologyTerm($term);
       if(!$ontology_term) {
-        $c->go('ReturnError', 'custom', ["The SO accession '${term}' could not be found in our ontology database"]);
+        Catalyst::Exception->throw("The SO accession '${term}' could not be found in our ontology database");
       }
       if ($ontology_term->is_obsolete) {
-        $c->go('ReturnError', 'custom', ["The SO accession '${term}' is obsolete"]);
+        Catalyst::Exception->throw("The SO accession '${term}' is obsolete");
       }
       push(@final_terms, $ontology_term->name());
     }
@@ -530,7 +531,7 @@ sub _has_to_be_trimmed_in_circ_chr {
   return $trim;
 }
 
-with 'EnsEMBL::REST::Role::Content';
+
 
 __PACKAGE__->meta->make_immutable;
 
