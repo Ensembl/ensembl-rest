@@ -33,7 +33,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory segmentation motif/
   };
 });
 
