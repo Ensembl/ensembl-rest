@@ -31,21 +31,33 @@ sub build_per_context_instance {
   return $self->new({ context => $c, %$self, @args });
 }
 
+
 sub fetch_regulatory {
   my $self    = shift
-  my $regf_id = shift;
+  my $regf_id = shift ||
+   Catalyst::Exception->throw("No regulatory feature stable ID given. Please specify an stable ID to retrieve from this service");
 
-  my $c = $self->context();
-  my $species = $c->stash->{species};
+  my $c          = $self->context;
+  my $ctype_name = $c->request->parameters->{cell_type};
+  my $species    = $c->stash->{species};
+  my $dba        = $c->model('Registry')->get_adaptor($species, 'funcgen') ||
+    $c->go('ReturnError', 'custom', ["No funcgen DBAdaptor found for species $species"]);
 
-  Catalyst::Exception->throw("No regulatory feature stable ID given. Please specify an stable ID to retrieve from this service") if ! $regf_id;
+  my ($fset);
 
-  my $rfa  = $c->model('Registry')->get_adaptor($species, 'Regulation', 'RegulatoryFeature');
-  my $regf = $rfa->fetch_by_stable_id($regf_id);
+  if(defined $ctype_name){
+    $fset = $dba->get_FeatureSetAdaptor->fetch_by_name('RegulatoryFeatures:'.$ctype_name) ||  
+     $c->go('ReturnError', 'custom', ["No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:$ctype_name"]);
+  }
+
+  my $regf = $dba->get_RegulatoryFeatureAdaptor->fetch_by_stable_id($regf_id, $fset);
   
   if (! $regf) {
-    Catalyst::Exception->throw("$regf_id not found for $species");
+    $ctype_name = '('.$ctype_name.')' if defined $ctype_name;
+    Catalyst::Exception->throw("$regf_id${ctype_name} not found for $species");
   }
+
+  #Add support to include_attributes here by embedding hash summaries
 
   return $regf->summary_as_hash;
 }
