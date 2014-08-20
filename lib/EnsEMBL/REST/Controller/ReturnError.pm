@@ -26,9 +26,10 @@ __PACKAGE__->config(
     'default'   => 'application/json',
     'stash_key' => 'rest',
     'map'       => {
-        'text/x-yaml'      => 'YAML::XS',
-        'application/json' => 'JSON::XS',
-        'text/plain'       => 'Data::Serializer',
+        'text/x-yaml'       => 'YAML::XS',
+        'application/json'  => 'JSON::XS',
+        'text/plain'        => 'JSON::XS',
+        'text/html'         => 'YAML::HTML',
     }
 );
 
