@@ -114,7 +114,7 @@ sub _plain {
   my $stringfh = IO::String->new();
   foreach my $entity (@{$sequences}) {
     print $stringfh $entity->{seq};
-    print "\n" if $count > 1;
+    print $stringfh "\n" if $count > 1;
   }
   return $stringfh->string_ref();
 }
