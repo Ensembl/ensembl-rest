@@ -88,6 +88,7 @@ my $id_response = {
     db_type => "core",
     strand => -1,
     id => "ENSG00000167393",
+    assembly_name => 'GRCh37',
     start => 294698
   }
 };
@@ -108,6 +109,7 @@ my $symbol_response = {
     source => 'ensembl',
     species => 'homo_sapiens',
     start => 1080164,
+    assembly_name => 'GRCh37',
     strand => 1                                                                                                                        
   },
 
@@ -124,6 +126,7 @@ my $symbol_response = {
     source => 'ensembl',
     species => 'homo_sapiens',
     start => 1186753,
+    assembly_name => 'GRCh37',
     strand => 1
   } 
 };
