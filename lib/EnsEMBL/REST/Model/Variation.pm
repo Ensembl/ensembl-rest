@@ -91,6 +91,7 @@ sub vf_as_hash {
   $variation_feature->{end} = $vf->seq_region_end;
   $variation_feature->{seq_region_name} = $vf->seq_region_name;
   $variation_feature->{coord_system} = $vf->coord_system_name;
+  $variation_feature->{assembly_name} = $vf->slice->coord_system->version;
   $variation_feature->{allele_string} = $vf->allele_string;
 
   return $variation_feature;
