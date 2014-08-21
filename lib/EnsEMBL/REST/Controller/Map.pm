@@ -27,7 +27,7 @@ BEGIN { extends 'Catalyst::Controller::REST'; }
 
 sub region : Chained('/') CaptureArgs(1) PathPart('map') {
   my ( $self, $c, $species) = @_;
-  $c->{stash}->{species} = $species;
+  $c->stash->{species} = $species;
   try {
     $c->stash->{slice_adaptor} = $c->model('Registry')->get_adaptor( $species, 'Core', 'Slice' );
   }
