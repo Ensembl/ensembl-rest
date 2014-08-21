@@ -136,6 +136,11 @@ sub seq_region_end {
   return $self->translateable_exon()->seq_region_end();
 }
 
+sub assembly_name {
+  my ($self) = @_;
+  return $self->translateable_exon()->slice()->coord_system()->version();
+}
+
 sub stable_id {
   my ($self, $stable_id) = @_;
   $self->{'stable_id'} = $stable_id if defined $stable_id;
@@ -155,6 +160,7 @@ sub summary_as_hash {
   $summary->{id} = $self->stable_id();
   $summary->{phase} = $self->phase();
   $summary->{source} = $self->source();
+  $summary->{assembly_name} = $self->assembly_name();
   return $summary;
 }
 
