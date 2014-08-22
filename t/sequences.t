@@ -157,6 +157,25 @@ Catalyst::Test->import('EnsEMBL::REST');
   is(@{$json}, 10, 'Expect 10 CDNAs linked');
 }
 
+# Gene to protein text/plain multiple sequences (with and without param)
+{
+  my $id = 'ENSG00000112699';
+  my $url = "/sequence/id/${id}?type=protein;content-type=text/plain";
+  action_bad_regex(
+    $url,
+    qr/multiple_sequences parameter"}/, 
+    'Error when querying for text/plain sequence with a gene and asking for protein'
+  );
+
+  # Now for the good version. Check we have 2 sequences returned each on their own line
+  my $text = text_GET($url.';multiple_sequences=1', 'Retriving multiple sequences in text/plain');
+  my $fh = IO::String->new($text);
+  my @rows = <$fh>;
+  close $fh;
+  is(scalar(@rows), 2, 'Expect 2 lines of text coming from the service') or diag explain \@rows;
+}
+
+
 # DNA Region; good
 {
   my $region = '6:1080164-1105181';
