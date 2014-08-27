@@ -249,6 +249,52 @@ my $base = '/overlap/region/homo_sapiens';
     [], 'Getting simple_feature no entries with bogus logic_name as JSON');
 }
 
+#Regulatory feature testing
+{
+  my $region = '6:1020000..1025449';
+  is_json_GET("$base/$region?feature=regulatory", [{
+    start => 1024250,
+    end => 1025449,
+    bound_start => 1024250,
+    bound_end => 1025449,
+    seq_region_name => '6',
+    strand => 0,
+    feature_type => 'regulatory',
+    ID => 'ENSR00001208657',
+    activity_evidence => 1,
+    description => "Predicted promoter flanking region",
+    cell_type => "MultiCell",
+  }], 'Getting regulatory_feature as JSON');
+}
+
+#Motif feature testing
+{
+  my $region = '6:1020000..1030000';
+  is_json_GET("$base/$region?feature=motif", [{
+    start => 1027627,
+    end => 1027634,
+    strand => 1,
+    feature_type => 'motif',
+    score => 0.942,
+    seq_region_name => '6',
+    binding_matrix => 'MA0281.1',
+    motif_feature_type => 'USF1'
+  }], 'Getting motif_feature as JSON');
+}
+
+#Segmentation feature testing
+{
+  my $region = '6:1020000..1020449';
+  is_json_GET("$base/$region?feature=segmentation;cell_type=K562", [{
+    start => 1019450,
+    end => 1020449,
+    feature_type => 'segmentation',
+    seq_region_name => '6',
+    cell_type => 'K562',
+    segmentation_feature_type => "Predicted heterochromatin",
+  }], 'Getting segmentation_feature as JSON');
+}
+
 #Misc feature
 {
   my $region = '6:1070000..1080000';

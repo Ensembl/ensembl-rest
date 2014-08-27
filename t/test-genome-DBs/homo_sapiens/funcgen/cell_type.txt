@@ -1,0 +1,2 @@
+19	MultiCell	\N	An aggregation of multiple cell types	\N	\N	\N
+14	K562	\N	Human myelogenous leukaemia cell line	female	efo:EFO_0002067	blood
