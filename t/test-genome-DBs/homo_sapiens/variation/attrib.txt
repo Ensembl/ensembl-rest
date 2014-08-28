@@ -137,11 +137,11 @@
 80	3	NMD_TRANSCRIPT
 150	5	ncRNA
 81	1	SO:0001619
-82	2	nc_transcript_variant
+82	2	non_coding_transcript_variant
 263	6	23
 83	3	WITHIN_NON_CODING_GENE
 307	1	SO:0001792
-308	2	non_coding_exon_variant
+308	2	non_coding_transcript_exon_variant
 119	6	20
 152	5	miRNA
 84	1	SO:0001620

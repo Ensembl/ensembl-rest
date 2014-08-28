@@ -1,61 +1,61 @@
-1874445	27506	86442404	86442404	1	1748253	T/C	rs2299222	1	\N	1	cluster,freq,submitter,hapmap,1000Genome	intron_variant		2	0	C	0.0399449	87	1	\N	\N
-3416243	27520	25997105	25997105	1	2979980	C/A	rs4492973	1	\N	1	cluster,doublehit,1000Genome	intergenic_variant		2	0	C	0.0528007	115	1	\N	\N
-4279031	27522	37954967	37954967	1	3776807	G/A	rs6129257	1	\N	1	hapmap	downstream_gene_variant		2	0	\N	\N	\N	1	\N	\N
-5296660	27508	45411130	45411130	1	4770800	T/A	rs7569578	1	\N	1	cluster,freq,doublehit,hapmap,1000Genome	nc_transcript_variant,intron_variant,downstream_gene_variant		2	0	A	0.164371	358	1	\N	\N
-5423644	27524	103937974	103937974	1	4897829	C/A	rs7698608	1	\N	1	cluster,freq,doublehit,hapmap,1000Genome	NMD_transcript_variant,5_prime_UTR_variant,intron_variant,downstream_gene_variant		2	0	C	0.448577	977	1	\N	\N
-6390520	27517	48845481	48845481	1	5808764	C/T	rs9882584	1	\N	1	cluster,freq,doublehit,hapmap,1000Genome	intron_variant		2	0	C	0.293388	639	1	\N	\N
-6711141	27508	192191539	192191539	1	6106976	T/C	rs10193249	1	\N	1	cluster	nc_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N
-8616242	27525	120500599	120500599	1	7930418	G/A	rs12360064	1	\N	1	hapmap	nc_transcript_variant,NMD_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N
-9795856	27524	32305409	32305409	1	9051025	G/A	rs17081232	1	\N	1	cluster,freq,1000Genome	intergenic_variant		2	0	A	0.244261	532	1	\N	\N
-10891016	27506	146988289	146988289	1	10089212	G/A	rs34490520	1	\N	1	cluster,freq,1000Genome	intron_variant		2	0	A	0.0224977	49	0.997766971588135	\N	\N
-15275234	27504	6303493	6303493	1	14128071	-/GT	rs67521280	1	\N	1	\N	intergenic_variant	1	14	0	\N	\N	\N	0.978519976139069	\N	\N
-20835079	27517	190713344	190713344	1	18671529	T/A	rs77284492	1	\N	1	cluster,freq,1000Genome	intergenic_variant		2	0	A	0.0119376	26	1	\N	\N
-27164692	27515	1239146	1239146	1	24098261	G/A	rs114402518	1	\N	1	cluster,freq,1000Genome	intergenic_variant		2	0	A	0.00918274	20	1	\N	\N
-29136727	27523	34381884	34381884	1	25992950	C/G	rs117161559	1	\N	1	freq,1000Genome	intergenic_variant		2	0	G	0.00688705	15	1	\N	\N
-29558567	27506	117232346	117232346	1	26469702	C/T	rs121908760	1	\N	1	\N	stop_gained,downstream_gene_variant		2	0	\N	\N	\N	1	pathogenic	\N
-30157455	27525	49973686	49973686	1	27085574	C/T	rs138574806	1	\N	1	1000Genome	intron_variant		2	0	T	0.000918274	2	1	\N	\N
-33303674	27512	23821095	23821095	1	30220007	G/A	rs142276873	1	\N	1	cluster,1000Genome	NMD_transcript_variant,intron_variant		2	0	A	0.123049	268	1	\N	\N
-42630412	27509	56744087	56744087	1	39404961	C/T	rs182218163	1	\N	1	1000Genome	NMD_transcript_variant,intron_variant,upstream_gene_variant		2	0	T	0.000459137	1	1	\N	\N
-43836173	27516	112994601	112994601	1	40717093	C/T	rs183531458	1	\N	1	1000Genome	nc_transcript_variant,intron_variant		2	0	T	0.000604595	1	1	\N	\N
-67490013	1000859905	112994552	112994552	1	40717093	C/T	rs183531458	1	\N	1	1000Genome	nc_transcript_variant,intron_variant		2	0	T	0.000604595	0	1	\N	\N
-44015884	27521	41312074	41312074	1	40763453	A/C	rs183577856	1	\N	1	cluster,1000Genome	nc_transcript_variant,NMD_transcript_variant,intron_variant,upstream_gene_variant		2	0	C	0.000918274	2	1	\N	\N
-44269065	27515	88478741	88478741	1	41158182	A/G	rs183972897	1	\N	1	1000Genome	intergenic_variant		2	0	G	0.00137741	3	1	\N	\N
-47294881	27523	60403074	60403074	1	44132876	G/A/T	rs186950277	1	\N	1	1000Genome	intergenic_variant		2	0	A	0.00137741	3	1	\N	\N
-47662734	27514	4742369	4742369	1	44527501	C/T	rs187345249	1	\N	1	cluster,1000Genome	downstream_gene_variant,upstream_gene_variant		2	0	T	0.000459137	1	1	\N	\N
-52711238	27508	139024149	139024149	1	49574443	A/G	rs192396716	1	\N	1	1000Genome	intergenic_variant		2	0	G	0.000459137	1	1	\N	\N
-59652493	27512	40228819	40228819	1	56515594	A/G	rs371163522	1	\N	1	\N	nc_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N
-60267168	27514	66344873	66344873	1	57137110	G/A	rs371828972	1	\N	1	\N	intergenic_variant		2	0	\N	\N	\N	1	\N	\N
-61197138	27513	41490275	41490275	1	57993427	G/A	rs372745831	1	\N	1	\N	nc_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N
-65177138	27508	140957003	140957003	1	61997151	C/G	rs377040510	1	\N	1	\N	intergenic_variant		2	0	\N	\N	\N	1	\N	\N
-69175964	27513	25744274	25744274	1	63646321	C/T	COSM946275	1	\N	26	\N	missense_variant,downstream_gene_variant		2	1	\N	\N	\N	\N	\N	\N
-1	27515	1000013	1000013	1	1	G/C/T/A	tmp__	1	\N	1	\N	intergenic_variant		1	1	\N	\N	\N	\N	\N	\N
-2	27515	1001893	1001893	1	1	T/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-3	27515	1002722	1002722	1	1	A/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-4	27515	1005279	1005282	1	1	TCTC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-5	27515	1005400	1005401	1	1	CG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-6	27515	1006379	1006378	1	1	-/G	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N
-7	27515	1012604	1012607	1	1	GTGC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-8	27515	1017022	1017022	1	1	C/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-9	27515	1017596	1017602	1	1	ATATAAG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-10	27515	1020726	1020725	1	1	-/CCCA	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N
-11	27515	1034103	1034102	1	1	-/GA	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N
-12	27515	1034577	1034576	1	1	-/TG	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N
-13	27515	1036483	1036484	1	1	AA/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-14	27515	1047081	1047082	1	1	CT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-15	27515	1057556	1057566	1	1	GTGTCACACAT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-16	27515	1058037	1058039	1	1	CTT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-17	27515	1058038	1058040	1	1	TTG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-18	27515	1060917	1060920	1	1	ATCT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-19	27515	1062193	1062192	1	1	-/AC	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N
-20	27515	1062445	1062452	1	1	AACAACAC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-21	27515	1062621	1062624	1	1	ATAC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-22	27515	1062641	1062640	1	1	-/AT	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N
-23	27515	1069174	1069177	1	1	TCTG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-24	27515	1069178	1069181	1	1	TCTT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-25	27515	1069372	1069375	1	1	ATGT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-26	27515	1071046	1071047	1	1	CC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-27	27515	1082829	1082831	1	1	ATG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-28	27515	1084925	1084924	1	1	-/GCT	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N
-29	27515	1089831	1089834	1	1	CCTG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
-30	27515	1089958	1089957	1	1	-/CTTCTACC	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N
-31	27515	1097196	1097198	1	1	GAA/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N
+1874445	27506	86442404	86442404	1	1748253	T/C	rs2299222	1	\N	1	cluster,freq,submitter,hapmap,1000Genome	intron_variant		2	0	C	0.0399449	87	1	\N	\N	1
+3416243	27520	25997105	25997105	1	2979980	C/A	rs4492973	1	\N	1	cluster,doublehit,1000Genome	intergenic_variant		2	0	C	0.0528007	115	1	\N	\N	1
+4279031	27522	37954967	37954967	1	3776807	G/A	rs6129257	1	\N	1	hapmap	downstream_gene_variant		2	0	\N	\N	\N	1	\N	\N	1
+5296660	27508	45411130	45411130	1	4770800	T/A	rs7569578	1	\N	1	cluster,freq,doublehit,hapmap,1000Genome	non_coding_transcript_variant,intron_variant,downstream_gene_variant		2	0	A	0.164371	358	1	\N	\N	1
+5423644	27524	103937974	103937974	1	4897829	C/A	rs7698608	1	\N	1	cluster,freq,doublehit,hapmap,1000Genome	NMD_transcript_variant,5_prime_UTR_variant,intron_variant,downstream_gene_variant		2	0	C	0.448577	977	1	\N	\N	1
+6390520	27517	48845481	48845481	1	5808764	C/T	rs9882584	1	\N	1	cluster,freq,doublehit,hapmap,1000Genome	intron_variant		2	0	C	0.293388	639	1	\N	\N	1
+6711141	27508	192191539	192191539	1	6106976	T/C	rs10193249	1	\N	1	cluster	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
+8616242	27525	120500599	120500599	1	7930418	G/A	rs12360064	1	\N	1	hapmap	non_coding_transcript_variant,NMD_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
+9795856	27524	32305409	32305409	1	9051025	G/A	rs17081232	1	\N	1	cluster,freq,1000Genome	intergenic_variant		2	0	A	0.244261	532	1	\N	\N	1
+10891016	27506	146988289	146988289	1	10089212	G/A	rs34490520	1	\N	1	cluster,freq,1000Genome	intron_variant		2	0	A	0.0224977	49	0.997766971588135	\N	\N	1
+15275234	27504	6303493	6303493	1	14128071	-/GT	rs67521280	1	\N	1	\N	intergenic_variant	1	14	0	\N	\N	\N	0.978519976139069	\N	\N	0
+20835079	27517	190713344	190713344	1	18671529	T/A	rs77284492	1	\N	1	cluster,freq,1000Genome	intergenic_variant		2	0	A	0.0119376	26	1	\N	\N	1
+27164692	27515	1239146	1239146	1	24098261	G/A	rs114402518	1	\N	1	cluster,freq,1000Genome	intergenic_variant		2	0	A	0.00918274	20	1	\N	\N	1
+29136727	27523	34381884	34381884	1	25992950	C/G	rs117161559	1	\N	1	freq,1000Genome	intergenic_variant		2	0	G	0.00688705	15	1	\N	\N	1
+29558567	27506	117232346	117232346	1	26469702	C/T	rs121908760	1	\N	1	\N	stop_gained,downstream_gene_variant		2	0	\N	\N	\N	1	pathogenic	\N	1
+30157455	27525	49973686	49973686	1	27085574	C/T	rs138574806	1	\N	1	1000Genome	intron_variant		2	0	T	0.000918274	2	1	\N	\N	1
+33303674	27512	23821095	23821095	1	30220007	G/A	rs142276873	1	\N	1	cluster,1000Genome	NMD_transcript_variant,intron_variant		2	0	A	0.123049	268	1	\N	\N	1
+42630412	27509	56744087	56744087	1	39404961	C/T	rs182218163	1	\N	1	1000Genome	NMD_transcript_variant,intron_variant,upstream_gene_variant		2	0	T	0.000459137	1	1	\N	\N	1
+43836173	27516	112994601	112994601	1	40717093	C/T	rs183531458	1	\N	1	1000Genome	non_coding_transcript_variant,intron_variant		2	0	T	0.000604595	1	1	\N	\N	1
+67490013	1000859905	112994552	112994552	1	40717093	C/T	rs183531458	1	\N	1	1000Genome	non_coding_transcript_variant,intron_variant		2	0	T	0.000604595	0	1	\N	\N	1
+44015884	27521	41312074	41312074	1	40763453	A/C	rs183577856	1	\N	1	cluster,1000Genome	non_coding_transcript_variant,NMD_transcript_variant,intron_variant,upstream_gene_variant		2	0	C	0.000918274	2	1	\N	\N	1
+44269065	27515	88478741	88478741	1	41158182	A/G	rs183972897	1	\N	1	1000Genome	intergenic_variant		2	0	G	0.00137741	3	1	\N	\N	1
+47294881	27523	60403074	60403074	1	44132876	G/A/T	rs186950277	1	\N	1	1000Genome	intergenic_variant		2	0	A	0.00137741	3	1	\N	\N	1
+47662734	27514	4742369	4742369	1	44527501	C/T	rs187345249	1	\N	1	cluster,1000Genome	downstream_gene_variant,upstream_gene_variant		2	0	T	0.000459137	1	1	\N	\N	1
+52711238	27508	139024149	139024149	1	49574443	A/G	rs192396716	1	\N	1	1000Genome	intergenic_variant		2	0	G	0.000459137	1	1	\N	\N	1
+59652493	27512	40228819	40228819	1	56515594	A/G	rs371163522	1	\N	1	\N	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
+60267168	27514	66344873	66344873	1	57137110	G/A	rs371828972	1	\N	1	\N	intergenic_variant		2	0	\N	\N	\N	1	\N	\N	1
+61197138	27513	41490275	41490275	1	57993427	G/A	rs372745831	1	\N	1	\N	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
+65177138	27508	140957003	140957003	1	61997151	C/G	rs377040510	1	\N	1	\N	intergenic_variant		2	0	\N	\N	\N	1	\N	\N	1
+69175964	27513	25744274	25744274	1	63646321	C/T	COSM946275	1	\N	26	\N	missense_variant,downstream_gene_variant		2	1	\N	\N	\N	\N	\N	\N	1
+1	27515	1000013	1000013	1	1	G/C/T/A	tmp__	1	\N	1	\N	intergenic_variant		1	1	\N	\N	\N	\N	\N	\N	1
+2	27515	1001893	1001893	1	1	T/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+3	27515	1002722	1002722	1	1	A/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+4	27515	1005279	1005282	1	1	TCTC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+5	27515	1005400	1005401	1	1	CG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+6	27515	1006379	1006378	1	1	-/G	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N	1
+7	27515	1012604	1012607	1	1	GTGC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+8	27515	1017022	1017022	1	1	C/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+9	27515	1017596	1017602	1	1	ATATAAG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+10	27515	1020726	1020725	1	1	-/CCCA	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N	1
+11	27515	1034103	1034102	1	1	-/GA	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N	1
+12	27515	1034577	1034576	1	1	-/TG	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N	1
+13	27515	1036483	1036484	1	1	AA/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+14	27515	1047081	1047082	1	1	CT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+15	27515	1057556	1057566	1	1	GTGTCACACAT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+16	27515	1058037	1058039	1	1	CTT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+17	27515	1058038	1058040	1	1	TTG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+18	27515	1060917	1060920	1	1	ATCT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+19	27515	1062193	1062192	1	1	-/AC	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N	1
+20	27515	1062445	1062452	1	1	AACAACAC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+21	27515	1062621	1062624	1	1	ATAC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+22	27515	1062641	1062640	1	1	-/AT	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N	1
+23	27515	1069174	1069177	1	1	TCTG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+24	27515	1069178	1069181	1	1	TCTT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+25	27515	1069372	1069375	1	1	ATGT/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+26	27515	1071046	1071047	1	1	CC/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+27	27515	1082829	1082831	1	1	ATG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+28	27515	1084925	1084924	1	1	-/GCT	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N	1
+29	27515	1089831	1089834	1	1	CCTG/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1
+30	27515	1089958	1089957	1	1	-/CTTCTACC	tmp__	1	\N	1	\N	intergenic_variant		9	0	\N	\N	\N	\N	\N	\N	1
+31	27515	1097196	1097198	1	1	GAA/-	tmp__	1	\N	1	\N	intergenic_variant		11	0	\N	\N	\N	\N	\N	\N	1

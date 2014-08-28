@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	76
+2	\N	schema_version	77
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -44,3 +44,10 @@
 44	\N	patch	patch_75_76_g.sql|update variation and variation_feature to use the same clinical significance terms as ClinVar
 45	\N	patch	patch_75_76_h.sql|Replace the column clinical_significance_attrib_id by clinical_significance in structural_variation
 46	\N	patch	patch_75_76_i.sql|Add tables required for HGVS index creation
+47	\N	patch	patch_76_77_a.sql|schema version
+48	\N	patch	patch_76_77_b.sql|Add new column to Variation table to flag whether variants should be displayed or not
+49	\N	patch	patch_76_77_c.sql|update SO consequence terms
+50	\N	patch	patch_76_77_d.sql|update SO terms in attrib table
+51	\N	patch	patch_76_77_e.sql|add variation_attrib table
+52	\N	patch	patch_76_77_f.sql|Add new variation_set_id column to individual table
+53	\N	patch	patch_76_77_g.sql|Add new column to Variation_feature table to flag whether variants should be displayed or not
