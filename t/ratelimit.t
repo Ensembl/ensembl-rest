@@ -16,6 +16,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 use Plack::Test;
 use Plack::Builder;
 use HTTP::Request::Common;
@@ -37,6 +38,16 @@ my $default_remote_user_sub = sub {
     $app->($env);
   };
 };
+
+# First check if we build the object it'll die without key attributes
+throws_ok { Plack::Middleware::EnsThrottle::Second->new()->prepare_app() } 
+  qr/Cannot continue.+max_requests/, 'No max_requests given caught';
+throws_ok { Plack::Middleware::EnsThrottle::Second->new(max_requests => 1)->prepare_app() } 
+  qr/Cannot continue.+path/, 'No path given caught';
+throws_ok { Plack::Middleware::EnsThrottle::Second->new(max_requests => 1, path => '/a')->prepare_app() } 
+  qr/Cannot continue.+CODE/, 'No path coderef given caught'; 
+throws_ok { Plack::Middleware::EnsThrottle::Second->new(max_requests => 1, path => sub {})->prepare_app() } 
+  qr/Cannot continue.+backend/, 'No backend given caught'; 
 
 note 'Fist pass rate limit tests using basic values. More complicated examples to follow';
 assert_basic_rate_limit('EnsThrottle::Second', 1, 'second');
@@ -74,7 +85,7 @@ assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too m
       max_requests => 1,
       whitelist => '192.168.2.1',
       blacklist => ['192.167.0.0-192.167.255.255'],
-      client_id_prefix => 'second';
+      client_id_prefix => 'second', backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
 
     sub {
       my ($env) = @_;
@@ -175,7 +186,7 @@ assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too m
     enable 'EnsThrottle::Second', 
       path => sub { 1 },
       max_requests => 3,
-      client_id_prefix => 'second';
+      client_id_prefix => 'second', backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
     sub { [ 200, [ 'Content-Type' => 'text/html' ], [ 'hello world' ]]; };
   };
 
@@ -239,12 +250,12 @@ sub sleep_until_next_second {
 }
 
 # Subroutine which sleeps the current process until the next minute if we are 
-# within 3 seconds of it. We also test the second using sleep_until_next_second()
+# within 4 seconds of it. We also test the second using sleep_until_next_second()
 sub sleep_until_next_minute {
   my $dt = DateTime->now;
   my $seconds = $dt->second;
   my $diff = 60 - $seconds;
-  if($diff < 3) {
+  if($diff < 4) {
     note "Sleeping for $diff seconds to avoid time related test failure";
   }
   else {
@@ -260,7 +271,7 @@ sub assert_basic_rate_limit {
   my $app = builder {
     # Fake the IP of the requesting user
     enable $default_remote_user_sub;
-    enable $rate_limit_middleware, max_requests => 1, path => sub { 1 },  message => $custom_message;
+    enable $rate_limit_middleware, max_requests => 1, path => sub { 1 },  message => $custom_message, backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
     sub {
       my ($env) = @_;
       return [ 200, [ 'Content-Type' => 'text/html' ], [ 'hello world' ]];

@@ -27,7 +27,8 @@ Plack::Middleware::EnsThrottle
 # Simple in process rate limiting (using a simple hash backend and limiting everything)
 enable 'EnsThrottle::Second',
   max_requests => 10,
-  path => sub { 1 };
+  path => sub { 1 },
+  backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
 
 # Distributed using memcached with whitelists, blacklists and 
 enable 'EnsThrottle::Second',
@@ -126,11 +127,8 @@ sub prepare_app {
   $self->whitelist($self->_populate_cidr($self->whitelist));
   my $path = $self->path();
   croak "Cannot continue. No path given" unless $path;
-  croak "path must be an CODE ref" if ref($path) ne 'CODE';
-  if(! $self->backend()) {
-    carp "Memcache unreachable, running without.";
-    $self->backend(Plack::Middleware::EnsThrottle::SimpleBackend->new());
-  }
+  croak "Cannot continue. path must be an CODE ref" if ref($path) ne 'CODE';
+  croak "Cannot continue. No backend given. Please instatiate a MemcachedBackend or SimpleBackend" if ! $self->backend();
   return;
 }
 
