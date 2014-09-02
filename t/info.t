@@ -99,9 +99,9 @@ is_json_GET(
 # /info/analysis/:species
 {
   my $analysis_json = json_GET('/info/analysis/homo_sapiens', 'Get analysis hash');
-  cmp_ok(scalar(keys %{$analysis_json}), '==', 32, 'Ensuring we have the right number of analyses available');
+  cmp_ok(scalar(keys %{$analysis_json}), '==', 35, 'Ensuring we have the right number of analyses available');
   my %unique_groups = map { $_, 1 } map { @{$_} } values %{$analysis_json};
-  eq_or_diff_data(\%unique_groups, {core => 1}, 'Checking there is only one group with analyses');
+  eq_or_diff_data(\%unique_groups, {core => 1, funcgen => 1}, 'Checking there is only one group with analyses');
 
   is_json_GET('/info/analysis/wibble', {}, 'Bogus species means empty hash');
 }
