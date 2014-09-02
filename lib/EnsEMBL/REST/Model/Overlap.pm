@@ -33,7 +33,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory segmentation motif/
   };
 });
 
@@ -314,14 +314,62 @@ sub constrained {
   return $cea->fetch_all_by_MethodLinkSpeciesSet_Slice($method_list, $slice);
 }
 
+
 sub regulatory {
-  my ($self, $slice) = @_;
-  my $c = $self->context();
-  my $species = $c->stash->{species};
-  my $rfa = $c->model('Registry')->get_adaptor( $species, 'funcgen', 'regulatoryfeature');
-  Catalyst::Exception->throw("No adaptor found for species $species, object regulatoryfeature and db funcgen") if ! $rfa;
-  return $rfa->fetch_all_by_Slice($slice);
+  my $self       = shift;
+  my $slice      = shift;
+  my $c          = $self->context();
+  my $ctype_name = $c->request->parameters->{cell_type};
+  my $species    = $c->stash->{species};
+
+  my ($fset);
+
+  if(defined $ctype_name){
+    $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:'.$ctype_name) ||  
+     Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:$ctype_name");
+  }else {
+    $ctype_name = "MultiCell";
+    $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:MultiCell') ||  
+     Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:MultiCell");
+  }
+
+  my $rfa = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature');
+ 
+  return $rfa->fetch_all_by_Slice_FeatureSets($slice, [$fset]);
 }
+
+
+sub segmentation {
+  my $self       = shift;
+  my $slice      = shift;
+  my $c          = $self->context();
+  my $ctype_name = $c->request->parameters->{cell_type};
+  my $species    = $c->stash->{species};
+  my $fset	 = undef;
+
+  if(defined $ctype_name){
+    $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('Segmentation:'.$ctype_name) 
+            || Catalyst::Exception->throw("No $species segmentation FeatureSet available with name: Segmentation:$ctype_name");
+  }
+  else{
+    Catalyst::Exception->throw("Must provide a cell_type parameter for a segmentation overlap query");
+  }
+
+  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'SegmentationFeature')->fetch_all_by_Slice_FeatureSets($slice, [$fset]);
+}
+
+
+sub motif {
+  my $self    = shift;
+  my $slice   = shift;
+  my $c       = $self->context;
+  my $species = $c->stash->{species};
+  my $mfa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'motiffeature') ||
+   Catalyst::Exception->throw("No adaptor found for species $species, object MotifFeature and DB funcgen");
+  return $mfa->fetch_all_by_Slice($slice);
+}
+
+
 
 sub simple {
   my ($self, $slice) = @_;
@@ -337,6 +385,7 @@ sub misc {
   my $misc_set = $c->request->parameters->{misc_set} || undef;
   return $slice->get_all_MiscFeatures($misc_set, $db_type);
 }
+
 
 sub _get_SO_terms {
   my ($self) = @_;

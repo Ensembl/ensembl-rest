@@ -1,0 +1,5 @@
+19	RegulatoryFeature	Regulatory Feature	16	Regulatory Feature	SO:0005836	regulatory_region
+179363	Promoter Flanking Region	Regulatory Feature	16	Predicted promoter flanking region	SO:0001952	promoter_flanking_region
+178980	USF1	Transcription Factor	70	USF1 Transcription Factor Binding	SO:0000235	TF_binding_site
+179460	Predicted heterochromatin	Segmentation State	83	Predicted heterochromatin	NULL
+179033	SegmentationState	Segmentation State	83	Regulatory genome segment	NULL	NULL

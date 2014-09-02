@@ -1,0 +1,2 @@
+607	19	16	19	RegulatoryFeatures:MultiCell	regulatory	MultiCell consensus RegulatoryFeatures	Reg.Feats MultiCell	NULL
+620	179033	83	14	Segmentation:K562	segmentation	K562 Segway_18 segmentation	K562 segmentation	NULL

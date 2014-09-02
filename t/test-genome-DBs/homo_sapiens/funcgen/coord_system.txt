@@ -1,0 +1,1 @@
+2472	chromosome	GRCh37	1	default_version	76_38	4	1	1
