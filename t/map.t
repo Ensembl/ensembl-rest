@@ -68,11 +68,11 @@ Catalyst::Test->import('EnsEMBL::REST');
 my $basic_mapping = { mappings => [
   {
     "seq_region_name"=>"6","gap"=>0,"coord_system"=>"chromosome",
-    "strand"=>1,"rank"=>0,"end"=>1101531,"start"=>1101529
+    "strand"=>1,"rank"=>0,"end"=>1101531,"start"=>1101529, "assembly_name" => "GRCh37"
   },
   {
     "seq_region_name"=>"6","gap"=>0,"coord_system"=>"chromosome",
-    "strand"=>1,"rank"=>0,"end"=>1102043,"start"=>1102041
+    "strand"=>1,"rank"=>0,"end"=>1102043,"start"=>1102041, "assembly_name" => "GRCh37"
   }
 ]};
 

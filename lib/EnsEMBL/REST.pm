@@ -62,7 +62,7 @@ use Catalyst qw/
 /;
 
 
-our $VERSION = '3.0.0';
+our $VERSION = '3.0.1';
 
 # Configure the application.
 #
@@ -106,6 +106,16 @@ sub turn_on_config_serialisers {
       }
     );
   }
+
+  if($class->config->{html}) {
+    $package->config(default => 'text/html');
+    $package->config(
+      map => {
+        'text/html' => 'YAML::HTML'
+      }
+    );
+  }
+
   return;
 }
 

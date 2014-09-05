@@ -121,7 +121,7 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   foreach my $stable_id ( @{ $s->{stable_ids} } ) {
     my $member = try { 
       $c->log->debug('Searching for gene member linked to ', $stable_id);
-      $s->{gene_member_adaptor}->fetch_by_source_stable_id( "ENSEMBLGENE", $stable_id );
+      $s->{gene_member_adaptor}->fetch_by_stable_id( $stable_id );
     }
     catch {
       $c->log->error(qq{Stable Id not found id db: $stable_id});

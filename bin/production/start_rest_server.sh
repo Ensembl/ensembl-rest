@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-exec > >(tee /var/log/rest-server-start.log|logger -t rest-server-start -s 2>/dev/console) 2>&1
-
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 PORT=5000
@@ -24,10 +21,9 @@ APP="perl5/ensembl-rest"
 PIDFILE="$HOME/$APP.pid"
 STATUS="$HOME/$APP.status"
 
-export HOME=/home/ubuntu
-export ENS_CVS_ROOT_DIR=$HOME/perl5/ensembl-api
-if [ -z "$ENS_CVS_ROOT_DIR" ]; then
-  export ENS_CVS_ROOT_DIR=$(cd $SCRIPT_DIR/../../../ && pwd)
+export ENS_GIT_ROOT_DIR=$HOME/src
+if [ -z "$ENS_GIT_ROOT_DIR" ]; then
+  export ENS_GIT_ROOT_DIR=$(cd $SCRIPT_DIR/../../../ && pwd)
 fi
 
 # The actual path on disk to the application.
@@ -35,7 +31,7 @@ APP_HOME=$(cd $SCRIPT_DIR/../../ && pwd)
 
 # Library path work
 for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl; do
-  PERL5LIB=$ENS_CVS_ROOT_DIR/$ensdir/modules:$PERL5LIB
+  PERL5LIB=$ENS_GIT_ROOT_DIR/$ensdir/modules:$PERL5LIB
 done
 PERL5LIB=$APP_HOME/../bioperl-live:$PERL5LIB
 PERL5LIB=$APP_HOME/lib:$PERL5LIB
@@ -46,7 +42,7 @@ export PERL5LIB
 export ENS_REST_LOG4PERL=$APP_HOME'/configurations/production/log4perl.conf'
 
 # Server settings for starman
-WORKERS=15
+WORKERS=45
 BACKLOG=1024
 MAXREQUESTS=10000
 RESTART_INTERVAL=1
@@ -55,8 +51,8 @@ RESTART_INTERVAL=1
 TDP_HOME="$HOME/$APP"
 export TDP_HOME
 
-ERROR_LOG="$HOME/logs/$APP.error.log"
-ACCESS_LOG="$HOME/logs/$APP.access.log"
+ERROR_LOG="$HOME/$APP.error.log"
+ACCESS_LOG="$HOME/$APP.access.log"
 
 export ENSEMBL_REST_CONFIG=$APP_HOME/configurations/production/ensembl_rest.conf
 STARMAN="starman --backlog $BACKLOG --max-requests $MAXREQUESTS --workers $WORKERS --access-log $ACCESS_LOG --error-log $ERROR_LOG $APP_HOME/configurations/production/ensrest.psgi"

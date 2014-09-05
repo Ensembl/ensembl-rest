@@ -27,7 +27,7 @@ BEGIN { extends 'Catalyst::Controller::REST'; }
 
 sub region : Chained('/') CaptureArgs(1) PathPart('map') {
   my ( $self, $c, $species) = @_;
-  $c->{stash}->{species} = $species;
+  $c->stash->{species} = $species;
   try {
     $c->stash->{slice_adaptor} = $c->model('Registry')->get_adaptor( $species, 'Core', 'Slice' );
   }
@@ -161,6 +161,7 @@ sub map_mappings {
   my @r;
   my $seq_region_name = $transcript->seq_region_name();
   my $coord_system = $transcript->coord_system_name();
+  my $assembly_name = $transcript->slice->coord_system->version();
   foreach my $m (@{$mapped}) {
     my $strand = 0;
     my $gap = 0;
@@ -178,6 +179,7 @@ sub map_mappings {
       gap => $gap,
       seq_region_name => $seq_region_name,
       coord_system => $coord_system,
+      assembly_name => $assembly_name,
     });
   }
   return \@r;

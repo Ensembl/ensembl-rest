@@ -22,7 +22,7 @@ use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
 use Data::Dumper;
 use Bio::DB::Fasta;
-use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line read_cache_info);
+use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line read_cache_info @REG_FEAT_TYPES);
 use Bio::EnsEMBL::Slice;
 use Bio::EnsEMBL::Utils::Sequence qw(reverse_comp);
 use Bio::EnsEMBL::Funcgen::MotifFeature;
@@ -62,15 +62,24 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
   try {
       $c->stash->{species} = $c->model('Registry')->get_alias($species);
-      $c->stash( variation_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
-      $c->stash(
-          variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
-      $c->stash(
-          structural_variation_feature_adaptor => $c->model('Registry')->get_adaptor( $species, 'Variation', 'StructuralVariationFeature' ) );
-      $c->stash(ga => $c->model('Registry')->get_adaptor($species, 'Core', 'Gene'));
+      
+      # get variation adaptors
+      $c->stash( va   => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
+      $c->stash( tva  => $c->model('Registry')->get_adaptor( $species, 'Variation', 'TranscriptVariation' ) );
+      $c->stash( vfa  => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
+      $c->stash( svfa => $c->model('Registry')->get_adaptor( $species, 'Variation', 'StructuralVariationFeature' ) );
+      
+      # get core adaptors
+      $c->stash( csa  => $c->model('Registry')->get_adaptor( $species, 'Core',      'CoordSystem' ) );
+      $c->stash( ga   => $c->model('Registry')->get_adaptor( $species, 'Core',      'Gene' ) );
+      $c->stash( sa   => $c->model('Registry')->get_adaptor( $species, 'Core',      'Slice' ) );
+      
+      # get regulatory adaptors
+      $c->stash($_.'_adaptor' => $c->model('Registry')->get_adaptor($species, 'Funcgen', $_)) for @REG_FEAT_TYPES;
   } catch {
       $c->go('ReturnError', 'from_ensembl', [$_]);
   };
+  
   $c->log->debug('Working with species '.$species);
 }
 
@@ -98,7 +107,7 @@ sub get_region_POST {
   # $c->log->debug(Dumper $config->{'Controller::Vep'});
   # handle user config
   my $config = $self->_include_user_params($c,$post_data);
-  $config->{va} = $c->stash->{variation_adaptor};
+  
   unless (exists $post_data->{variants}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "variants" key in your POST. Please check the format of your message against the documentation' ] );
   }
@@ -178,7 +187,6 @@ sub get_allele : PathPart('') Args(2) {
 
     my $user_config = $c->request->parameters;
     my $config = $self->_include_user_params($c,$user_config);
-    $config->{ga} = $s->{ga};
     $config->{format} = 'id'; # Set a format value to silence the VEP in single formatless requests.
     my $vf = $self->_build_vf($c);
     my $consequences = $self->get_consequences($c, $config, [$vf]);
@@ -197,7 +205,7 @@ sub get_id : Chained('get_species') PathPart('id') ActionClass('REST') {
 sub get_id_GET {
   my ( $self, $c, $rs_id ) = @_;
   unless ($rs_id) {$c->go('ReturnError', 'custom', ["rs_id is a required parameter for this endpoint"])}
-  my $v = $c->stash()->{variation_adaptor}->fetch_by_name($rs_id);
+  my $v = $c->stash()->{va}->fetch_by_name($rs_id);
   $c->go( 'ReturnError', 'custom', [qq{No variation found for RS ID $rs_id}] ) unless $v;
   my $vfs = $v->get_all_VariationFeatures();
   $c->stash( variation => $v, variation_features => $vfs );
@@ -241,7 +249,6 @@ sub get_id_POST {
   my ($self, $c) = @_;
   my $post_data = $c->req->data;
   my $config = $self->_include_user_params($c,$post_data);
-  $config->{va} = $c->stash->{variation_adaptor};
   unless (exists $post_data->{ids}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "ids" key in your POST. Please check the format of your message against the documentation' ] );
   }
@@ -276,7 +283,7 @@ sub _build_vf {
               start          => $s->{start},
               end            => $s->{end},
               strand         => $s->{strand},
-              adaptor        => $s->{structural_variation_feature_adaptor},
+              adaptor        => $s->{svfa},
               variation_name => 'temp',
               chr            => $s->{sr_name},
               slice          => $s->{slice},
@@ -293,7 +300,7 @@ sub _build_vf {
                 mapped_weight  => 1,
                 chr            => $s->{sr_name},
                 slice          => $s->{slice},
-                adaptor        => $s->{variation_feature_adaptor},
+                adaptor        => $s->{vfa},
             }
         );
       }
@@ -336,6 +343,15 @@ sub _include_user_params {
   read_cache_info(\%vep_params);
   # $c->log->debug("Before ".Dumper \%vep_params);
   map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
+  
+  if ($c->stash->{species} ne 'homo_sapiens') {
+    delete $vep_params{cache};
+    delete $vep_params{fasta};
+    $vep_params{database} = 1;
+  }
+  
+  # add adaptors
+  $vep_params{$_} = $c->stash->{$_} for qw(va vfa svfa tva csa sa ga), map {$_.'_adaptor'} @REG_FEAT_TYPES;
 
  # $c->log->debug("After ".Dumper \%vep_params);
   return \%vep_params;

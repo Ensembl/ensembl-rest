@@ -52,7 +52,7 @@ is_json_GET(
 
 is_json_GET(
   '/info/assembly/homo_sapiens/6',
-  {assembly_exception_type => 'REF', coordinate_system => 'chromosome', is_chromosome => 1, length => 171115067 },
+  {assembly_exception_type => 'REF', coordinate_system => 'chromosome', is_chromosome => 1, length => 171115067, assembly_name => 'GRCh37' },
   'Checking info of region 6 matches expected'
 );
 

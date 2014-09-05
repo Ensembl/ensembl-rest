@@ -104,6 +104,7 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
     $c->stash->{"no_branch_lengths"} = (defined $c->request->param('no_branch_lengths')) ? $c->request->param('no_branch_lengths') : 0;
 
     #Never give branch lengths for pairwise, even if requested
+    $c->go("ReturnError", "custom", ["no alignment available for this region"]) if !$alignments;
     my $mlss = $alignments->[0]->method_link_species_set;
     if ($mlss->method->class eq "GenomicAlignBlock.pairwise_alignment") {
       $c->stash->{"no_branch_lengths"} = 0;
@@ -125,7 +126,7 @@ sub get_slice_species : Chained("/") PathPart("alignment/slice/region") CaptureA
   #$c->stash->{species} = $species;
 
    $c->go( 'ReturnError', 'custom',
-        [qq{/alignment/slice/region is deprecated. See http://beta.rest.ensembl.org/alignment/region for alternative}] );
+        [qq{/alignment/slice/region is deprecated. See http://rest.ensembl.org/alignment/region for alternative}] );
 
 }
 
