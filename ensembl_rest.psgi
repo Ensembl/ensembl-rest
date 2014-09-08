@@ -8,5 +8,6 @@ my $app = EnsEMBL::REST->apply_default_middlewares(EnsEMBL::REST->psgi_app);
 
 builder {
   enable 'DetectExtension';
+  enable 'EnsemblRestHeaders';
   $app;
 }
