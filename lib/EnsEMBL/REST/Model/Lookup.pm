@@ -379,6 +379,8 @@ sub features_as_hash {
 # Translations start and end are genomic coordinates
       $features->{start} = $summary_hash->{genomic_start} if defined $summary_hash->{genomic_start};
       $features->{end} = $summary_hash->{genomic_end} if defined $summary_hash->{genomic_end};
+# Translation length provided separately
+      $features->{length} = $summary_hash->{length} if defined $summary_hash->{length};
 # Display_name and description are available for genes and sometimes for transcripts
       $features->{display_name} = $summary_hash->{external_name} if defined $summary_hash->{external_name};
       $features->{description} = $summary_hash->{description} if defined $summary_hash->{description};
