@@ -39,6 +39,7 @@ generated/TranscriptConsequences.java
 ## History
 
 * Creation Pierre Lindenbaum Sept-2014
+* 15 Sept 2014 changed cdna_start and cds_start to xsd:positiveInteger as https://github.com/Ensembl/ensembl-variation/commit/62e76085b7b80b85ddddc5fc63a9227347b9e090
 
       </xsd:documentation>
   </xsd:annotation>
@@ -243,19 +244,9 @@ generated/TranscriptConsequences.java
         <xsd:attribute name="canonical" type="xsd:positiveInteger"/>
         <xsd:attribute name="ccds" type="xsd:normalizedString"/>
         <xsd:attribute name="cds_end" type="xsd:positiveInteger"/>
-        <xsd:attribute name="cds_start" type="xsd:normalizedString">
-          <xsd:annotation>
-            <xsd:documentation>not an integer because it could be '?' see http://grch37.rest.ensembl.org/vep/human/region/3:38674710-38674712:1/TT</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="cdna_end" type="xsd:positiveInteger">
-                  
-		</xsd:attribute>
-        <xsd:attribute name="cdna_start" type="xsd:normalizedString">
-          <xsd:annotation>
-            <xsd:documentation>not an integer because it could be '?' see http://grch37.rest.ensembl.org/vep/human/region/3:38674711-38674713:1/CG</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
+        <xsd:attribute name="cds_start" type="xsd:positiveInteger"/>
+        <xsd:attribute name="cdna_end" type="xsd:positiveInteger"/>
+        <xsd:attribute name="cdna_start" type="xsd:positiveInteger"/>
         <xsd:attribute name="codons" type="xsd:normalizedString"/>
         <xsd:attribute name="distance" type="xsd:int"/>
         <xsd:attribute name="exon" type="xsd:normalizedString"/>
