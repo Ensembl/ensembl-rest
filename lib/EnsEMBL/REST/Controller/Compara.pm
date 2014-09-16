@@ -274,14 +274,17 @@ sub _full_encoding {
   my $encode = sub {
     my ($member) = @_;
     my $gene = $member->gene_member();
+    my $genome_db = $gene->genome_db();
+    my $taxon_id = $genome_db->taxon_id();
     my $result = {
       id => $gene->stable_id(),
-      species => $gene->genome_db()->name(),
+      species => $genome_db->name(),
       perc_id => ($member->perc_id()*1),
       perc_pos => ($member->perc_pos()*1),
       cigar_line => $member->cigar_line(),
       protein_id => $gene->get_canonical_SeqMember()->stable_id(),
     };
+    $result->{taxon_id} = ($taxon_id+0) if defined $taxon_id;
     if($aligned && $member->cigar_line()) {
       if($seq_type eq 'protein') {
         $result->{align_seq} = $member->alignment_string();
