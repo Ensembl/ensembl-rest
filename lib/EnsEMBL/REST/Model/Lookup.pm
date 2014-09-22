@@ -388,6 +388,9 @@ sub features_as_hash {
       $features->{biotype} = $summary_hash->{biotype} if defined $summary_hash->{biotype};
       $features->{source} = $summary_hash->{source} if defined $summary_hash->{source};
       $features->{logic_name} = $summary_hash->{logic_name} if defined $summary_hash->{logic_name};
+      if (lc($object_type) eq 'transcript') {
+        $features->{is_canonical} = $obj->is_canonical;
+      }
     } else {
       Catalyst::Exception->throw(qq{ID '$id' does not support 'full' format type. Please use 'condensed'});
     }
