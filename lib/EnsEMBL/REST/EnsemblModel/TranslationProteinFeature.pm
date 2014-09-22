@@ -81,6 +81,7 @@ sub summary_as_hash {
 	my ($self) = @_;
 	my $summary = $self->protein_feature->summary_as_hash();
 	$summary->{seq_region_name} = $self->translation()->stable_id();
+        $summary->{Parent} = $self->translation->transcript->stable_id();
 	return $summary;
 }
 
