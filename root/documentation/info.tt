@@ -143,14 +143,16 @@ limitations under the License.
         return true;
      },
       success : function (resp) {
-     try {
+
+      // If it has a documentElement we assume it is xml
+      if (resp.documentElement == undefined) {
          var json = JSON.stringify(resp, undefined, 2);
          $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]json[% END %] + "</code></pre>")
 	 $("#example[% p.value.id %]").each (function (i, block) {
 	      hljs.highlightBlock(block);
 	      $("#example[% p.value.id %]>img").remove();
 	 })
-     } catch (e) {
+     } else {
          var xmlSerial = new XMLSerializer();
          var xml_str = xmlSerial.serializeToString(resp);
          $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\" class=\"pre-scrollable prettyprint\"></pre>");
