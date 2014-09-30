@@ -146,12 +146,21 @@ limitations under the License.
 
       // If it has a documentElement we assume it is xml
       if (resp.documentElement == undefined) {
-         var json = JSON.stringify(resp, undefined, 2);
-         $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]json[% END %] + "</code></pre>")
-	 $("#example[% p.value.id %]").each (function (i, block) {
-	      hljs.highlightBlock(block);
-	      $("#example[% p.value.id %]>img").remove();
-	 })
+         if (typeof (resp) === "string") {
+            $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]resp[% END %] + "</code></pre>");
+    	    $("#example[% p.value.id %]").each (function (i, block) {
+                $("#example[% p.value.id %]>img").remove();
+            })
+
+         } else {
+            var json = JSON.stringify(resp, undefined, 2);
+            $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]json[% END %] + "</code></pre>")
+	    $("#example[% p.value.id %]").each (function (i, block) {
+	         hljs.highlightBlock(block);
+	         $("#example[% p.value.id %]>img").remove();
+	    })
+         }
+
      } else {
          var xmlSerial = new XMLSerializer();
          var xml_str = xmlSerial.serializeToString(resp);
