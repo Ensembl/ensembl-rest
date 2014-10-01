@@ -32,7 +32,7 @@ limitations under the License.
 	[% ELSE %]
 	<link href="/static/css/10-bootstrap.css" rel="stylesheet"/>
 	<link href="/static/css/20-prettify.css" rel="stylesheet"/>
-       	<link href="/static/js/highlight/styles/default.css" rel="stylesheet"/>
+       	<link href="/static/css/25-default.css" rel="stylesheet"/>
 	<link href="/static/css/50-additional.css" rel="stylesheet"/>
 	<link href="/static/css/51-docs.css" rel="stylesheet"/>
 	[% END %]
