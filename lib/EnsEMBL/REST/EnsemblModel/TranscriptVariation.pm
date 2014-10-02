@@ -36,6 +36,7 @@ sub new {
   $self->{residues} = $transcript_variant->pep_allele_string;
   $self->sift($tva->sift_score);
   $self->{polyphen} = $tva->polyphen_score;
+  $self->{parent} = $transcript_variant->transcript->stable_id();
   $self->minor_allele_frequency($proxy_vf->minor_allele_frequency);
   return $self;
 }
@@ -101,6 +102,12 @@ sub translation_start {
   return $self->{'translation_start'};
 }
 
+sub parent {
+  my ($self, $parent) = @_;
+  $self->{'parent'} = $parent if defined $parent;
+  return $self->{'parent'};
+}
+
 sub ID {
   my ($self, $id) = @_;
   $self->{'ID'} = $id if defined $id;
@@ -120,6 +127,7 @@ sub summary_as_hash {
   $summary->{residues} = $self->residues;
   $summary->{sift} = $self->sift;
   $summary->{polyphen} = $self->polyphen;
+  $summary->{Parent} = $self->parent;
   $summary->{minor_allele_frequency} = $self->minor_allele_frequency;
 
   $summary->{seq_region_name} = $summary->{translation};
