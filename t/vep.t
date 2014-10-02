@@ -494,6 +494,8 @@ $vep_output =
   colocated_variants =>
   [{
     allele_string => "G/A/T",
+    afr_maf => 0,
+    asn_maf => 0,
     amr_maf => "0.01",
     clin_sig => [],
     end => 60403074,
@@ -566,6 +568,8 @@ $vep_output =
   colocated_variants =>
   [{
     allele_string => "G/A/T",
+    afr_maf => 0,
+    asn_maf => 0,
     amr_maf => "0.01",
     clin_sig => [],
     end => 60403074,
