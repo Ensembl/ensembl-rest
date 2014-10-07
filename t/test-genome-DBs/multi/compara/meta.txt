@@ -1,4 +1,4 @@
-23	\N	schema_version	77
+30	\N	schema_version	77
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -22,4 +22,5 @@
 26	\N	patch	patch_75_76_c.sql|homoeologues
 27	\N	patch	patch_75_76_d.sql|gene_member_seq_member
 28	\N	patch	patch_75_76_e.sql|genome_db.name
-29      \N      patch   patch_76_77_a.sql|schema_version
+29	0		
+31	\N	patch	patch_76_77_a.sql|schema_version
