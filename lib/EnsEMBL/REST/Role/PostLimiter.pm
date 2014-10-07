@@ -35,8 +35,12 @@ sub _load_post_conf {
   my $config_name = ref($self);
   $config_name =~ s/Catalyst:://;
   $config_name =~ s/EnsEMBL::REST:://;
-  my %config = %{ EnsEMBL::REST->config()->{$config_name} };
-  return $config{max_post_size};
+  my $config = EnsEMBL::REST->config()->{$config_name};
+  if (defined $config && defined $config->{max_post_size}) {
+    return $config->{max_post_size};
+  } else {
+    return 1000; # Fallback limit for missing configurations, particularly in the test suite
+  }
 }
 
 sub assert_post_size {
