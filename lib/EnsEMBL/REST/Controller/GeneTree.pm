@@ -30,6 +30,7 @@ __PACKAGE__->config(
   map => {
     'text/html'           => [qw/View PhyloXMLHTML/],
     'text/x-phyloxml+xml' => [qw/View PhyloXML/],
+    'text/x-orthoxml+xml' => [qw/View OrthoXML/],
     'text/x-phyloxml'     => [qw/View PhyloXML/], #naughty but needs must
     'text/x-nh'           => [qw/View NHTree/],
     'text/xml'            => [qw/View PhyloXML/],

@@ -19,6 +19,7 @@ limitations under the License.
 package EnsEMBL::REST::Role::Tree;
 use Moose::Role;
 use namespace::autoclean;
+use Bio::EnsEMBL::Compara::Graph::OrthoXMLWriter;
 use Bio::EnsEMBL::Compara::Graph::GeneTreePhyloXMLWriter;
 use Bio::EnsEMBL::Compara::Graph::GenomicAlignTreePhyloXMLWriter;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
@@ -82,6 +83,29 @@ sub encode_phyloxml {
 
   return $string_handle->string_ref();
 }
+
+
+sub encode_orthoxml {
+  my ($self, $c, $stash_key) = @_;
+
+  $stash_key ||= 'rest';
+  my $string_handle = IO::String->new();
+  my $w;
+
+  # GeneTree parameters
+  $w = Bio::EnsEMBL::Compara::Graph::OrthoXMLWriter->new(
+    -SOURCE => 'Ensembl', -HANDLE => $string_handle
+  );
+
+  my $tree = $c->stash->{$stash_key};
+  $tree->preload();
+
+  $w->write_trees($tree);
+  $w->finish();
+
+  return $string_handle->string_ref();
+}
+
 
 sub encode_nh {
   my ($self, $c, $stash_key) = @_;
