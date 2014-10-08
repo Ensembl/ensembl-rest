@@ -58,5 +58,39 @@ $response = {id => $translation_id, latest => "$translation_id.$version", versio
 
 is_json_GET("$base/$translation_id", $response, "Return archive for peptide");
 
+my $id_body = qq{
+{ "id" : [
+    "ENST00000429181", "ENSG00000262424"
+  ]
+}
+};
+
+my $id_response = [
+{
+    assembly => 'GRCh37',
+    id => 'ENST00000429181',
+    is_current => '1',
+    latest => 'ENST00000429181.1',
+    peptide => undef,
+    possible_replacement => [],
+    release => '78',
+    type => 'Transcript',
+    version => '1'
+  },
+  {
+    assembly => 'GRCh37',
+    id => 'ENSG00000262424',
+    is_current => '1',
+    latest => 'ENSG00000262424.2',
+    peptide => undef,
+    possible_replacement => [],
+    release => '78',
+    type => 'Gene',
+    version => '2'
+  }
+];
+
+is_json_POST("$base", $id_body, $id_response,'Archive ID POST test');
+
 
 done_testing();

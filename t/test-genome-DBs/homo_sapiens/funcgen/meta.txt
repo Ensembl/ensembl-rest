@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	76
+2	\N	schema_version	78
 3	\N	patch	patch_75_76_a.sql|schema_version
 4	\N	patch	patch_75_76_b.sql|result/feature_set.experiment_id & experiment/input_subset.display_url/archive_id
 5	\N	patch	patch_75_76_c.sql|cell_type.display_label
