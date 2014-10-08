@@ -16,7 +16,7 @@ limitations under the License.
 
 =cut
 
-package EnsEMBL::REST::Controller::Compara;
+package EnsEMBL::REST::Controller::Homology;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
