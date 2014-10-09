@@ -23,6 +23,8 @@ use Try::Tiny;
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
+with 'EnsEMBL::REST::Role::PostLimiter';
+
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
@@ -60,8 +62,8 @@ sub id_GET {
 sub id_POST {
   my ($self, $c) = @_;
   my $post_data = $c->req->data;
-
   my $id_list = $post_data->{'ids'};
+  $self->assert_post_size($id_list);
   my $feature_hash;
   try {
     $feature_hash = $c->model('Lookup')->find_and_locate_list($id_list);
@@ -101,6 +103,7 @@ sub symbol_POST {
     $c->go('ReturnError', 'custom', [qq{POST body must contain 'symbols' key with array of values}]);
   }
   my $symbol_list = $post_data->{'symbols'};
+  $self->assert_post_size($c,$symbol_list);
   my $feature_hash;
   try {
     $feature_hash = $c->model('Lookup')->find_genes_by_symbol_list($symbol_list);
