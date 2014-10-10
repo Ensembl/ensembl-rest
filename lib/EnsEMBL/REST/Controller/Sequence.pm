@@ -90,36 +90,59 @@ sub id_POST {
   if (@errors) { $c->go('ReturnError', 'custom', [join(',',@errors)]) };
 }
 
-sub region_GET { }
 
 sub get_species :Chained('/') PathPart('sequence/region') CaptureArgs(1) {
   my ($self, $c, $species) = @_;
   $c->stash()->{species} = $species;
 }
 
-sub region :Chained('get_species') PathPart('') Args(1) ActionClass('REST') {
+sub region_GET {
   my ($self, $c, $region) = @_;
+  try {
+    $self->_get_region_sequence($c,$region);
+  } catch {
+    $c->go('ReturnError','custom','Failure to retrieve sequence for '.$region);
+  };
+  $self->_write($c);
+}
+
+sub region_POST {
+  my ($self, $c);
+  my $post_data = $c->request->data;
+  my $regions = $post_data->{'regions'};
+  $self->assert_post_size($c,$regions);
+  my @errors;
+  try {
+    foreach my $reg (@$regions) {
+      $self->_get_region_sequence($c,$reg);
+    }
+  } 
+  $self->_write($c);
+}
+
+sub region :Chained('get_species') PathPart('')  ActionClass('REST') {
+  my ($self, $c) = @_;
   if ($c->request->param('mask') && $c->request->param('mask_feature')) {
     $c->go('ReturnError', 'custom', [qq{'You cannot mask both repeats and features on the same sequence'}]);
   }
-  
+}
+
+sub _get_region_sequence {
+  my ($self, $c, $region) = @_;
+  my $seq_stash = $c->stash()->{sequences};
   try {
-    $c->log()->debug('Finding the Slice');
     my $slice = $c->model('Lookup')->find_slice($region);
     $slice = $self->_enrich_slice($c, $slice);
-    $c->log()->debug('Producing the sequence');
     my $seq = $self->_mask_slice_features($slice, $c);
-    $c->stash()->{sequences} = [{
+    push @$seq_stash, {
       id => $slice->name(),
       molecule => 'dna',
       seq => $seq,
-    }];
-    $c->log()->debug('Pushing out the entity');
-    $self->_write($c);
+    };
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    Catalyst::Exception->throw($_);
   };
-  return;
+  $c->stash()->{sequences} = $seq_stash;
 }
 
 sub _process {
