@@ -107,8 +107,8 @@ sub region_GET {
 }
 
 sub region_POST {
-  my ($self, $c);
-  my $post_data = $c->request->data;
+  my ($self, $c) = @_;
+  my $post_data = $c->req->data;
   my $regions = $post_data->{'regions'};
   $self->assert_post_size($c,$regions);
   my @errors;
@@ -116,13 +116,13 @@ sub region_POST {
     foreach my $reg (@$regions) {
       $self->_get_region_sequence($c,$reg);
     }
-  } 
+  };
   $self->_write($c);
 }
 
-sub region :Chained('get_species') PathPart('')  ActionClass('REST') {
+sub region :Chained('get_species') PathPart('') ActionClass('REST') {
   my ($self, $c) = @_;
-  if ($c->request->param('mask') && $c->request->param('mask_feature')) {
+  if ($c->req->param('mask') && $c->req->param('mask_feature')) {
     $c->go('ReturnError', 'custom', [qq{'You cannot mask both repeats and features on the same sequence'}]);
   }
 }
