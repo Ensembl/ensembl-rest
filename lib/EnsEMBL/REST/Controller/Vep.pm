@@ -56,6 +56,9 @@ with 'EnsEMBL::REST::Role::PostLimiter';
 # /vep/:species
 sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
+  $c->stash->{species} = $c->model('Registry')->get_alias($species);
+  my $has_variation = $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation');
+  if (!$has_variation) { $c->go('ReturnError', 'custom', ["Species $species does not have any variation features"]); }
   try {
       $c->stash->{species} = $c->model('Registry')->get_alias($species);
       
