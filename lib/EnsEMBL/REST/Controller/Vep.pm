@@ -66,7 +66,9 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
       $c->stash( svfa => $c->model('Registry')->get_adaptor( $species, 'Variation', 'StructuralVariationFeature' ) );
       
       # get core adaptors
-      $c->stash( csa  => $c->model('Registry')->get_adaptor( $species, 'Core',      'CoordSystem' ) );
+      my $coord_system_adaptor = $c->model('Registry')->get_adaptor( $species, 'Core',      'CoordSystem' );
+      $c->stash->{assembly} = $coord_system_adaptor->get_default_version();
+      $c->stash( csa  => $coord_system_adaptor );
       $c->stash( ga   => $c->model('Registry')->get_adaptor( $species, 'Core',      'Gene' ) );
       $c->stash( sa   => $c->model('Registry')->get_adaptor( $species, 'Core',      'Slice' ) );
       
@@ -90,7 +92,7 @@ sub get_region : Chained('get_species') PathPart('region') ActionClass('REST') {
 sub get_region_GET {
   my ( $self, $c, $region ) = @_;
   my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
-  $c->model('Lookup')->find_slice( $sr_name );
+  my $slice = $c->model('Lookup')->find_slice( $sr_name );
   $self->status_ok( $c, entity => $region );
   $c->forward('get_allele');
 }
@@ -219,6 +221,7 @@ sub get_id_GET {
 sub get_consequences {
   my ($self, $c, $config, $vfs) = @_;
   my $user_config = $c->request->parameters;
+  $config->{assembly} = $c->stash->{assembly};
   my $version = $user_config->{version} || $config->{version} || 3;
   if ($version == 2) {
     delete $config->{rest};
