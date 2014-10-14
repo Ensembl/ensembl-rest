@@ -73,7 +73,10 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
       $c->stash( sa   => $c->model('Registry')->get_adaptor( $species, 'Core',      'Slice' ) );
       
       # get regulatory adaptors
-      $c->stash($_.'_adaptor' => $c->model('Registry')->get_adaptor($species, 'Funcgen', $_)) for @REG_FEAT_TYPES;
+      my $is_funcgen = $c->model('Registry')->get_adaptor($species, 'Funcgen', 'CoordSystem');
+      if ($is_funcgen) {
+        $c->stash($_.'_adaptor' => $c->model('Registry')->get_adaptor($species, 'Funcgen', $_)) for @REG_FEAT_TYPES;
+      }
   } catch {
       $c->go('ReturnError', 'from_ensembl', [$_]);
   };
@@ -346,6 +349,7 @@ sub _include_user_params {
   
   # add adaptors
   $vep_params{$_} = $c->stash->{$_} for qw(va vfa svfa tva csa sa ga), map {$_.'_adaptor'} @REG_FEAT_TYPES;
+  if (!$c->stash->{'RegulatoryFeature'}) { delete $vep_params{regulatory}; };
 
  # $c->log->debug("After ".Dumper \%vep_params);
   return \%vep_params;
