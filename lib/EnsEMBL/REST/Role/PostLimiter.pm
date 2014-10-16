@@ -46,7 +46,7 @@ sub _load_post_conf {
 sub assert_post_size {
   my ($self, $c, $list) = @_;
   my $max_size = $self->max_post_size;
-  return unless $max_size;
+  return unless ($max_size && $list);
   my $post_size = scalar @$list;
 
   if($post_size > $max_size) {

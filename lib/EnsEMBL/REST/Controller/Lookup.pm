@@ -63,7 +63,7 @@ sub id_POST {
   my ($self, $c) = @_;
   my $post_data = $c->req->data;
   my $id_list = $post_data->{'ids'};
-  $self->assert_post_size($id_list);
+  $self->assert_post_size($c,$id_list);
   my $feature_hash;
   try {
     $feature_hash = $c->model('Lookup')->find_and_locate_list($id_list);
