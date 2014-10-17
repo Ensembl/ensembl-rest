@@ -16,7 +16,7 @@ limitations under the License.
 
 =cut
 
-package EnsEMBL::REST::Controller::Compara;
+package EnsEMBL::REST::Controller::Homology;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
@@ -25,6 +25,17 @@ require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
+
+__PACKAGE__->config(
+  map => {
+    'text/x-orthoxml+xml' => [qw/View OrthoXML_homology/],
+  }
+);
+
+#We want to find every "non-special" format. To generate the regex used then invoke this command:
+#perl -MRegexp::Assemble -e 'my $ra = Regexp::Assemble->new; $ra->add($_) for qw(application\/json text\/javascript text\/xml ); print $ra->re, "\n"'
+my $CONTENT_TYPE_REGEX = qr/(?^:(?:text\/(?:javascript|xml)|application\/json))/;
+
 
 my $FORMAT_LOOKUP = { full => '_full_encoding', condensed => '_condensed_encoding' };
 my $TYPE_TO_COMPARA_TYPE = { orthologues => 'ENSEMBL_ORTHOLOGUES', paralogues => 'ENSEMBL_PARALOGUES', projections => 'ENSEMBL_PROJECTIONS', all => ''};
@@ -157,10 +168,9 @@ sub get_orthologs : Args(0) ActionClass('REST') {
     catch {
       $c->go('ReturnError', 'from_ensembl', [$_] );
     };
-    my $encoded_homologies = $self->$target($c, $all_homologies, $stable_id);
     push(@final_homologies, {
       id => $stable_id,
-      homologies => $encoded_homologies,
+      homologies => $all_homologies,
     });
   }
   
@@ -258,11 +268,6 @@ sub _method_link_species_sets {
   return \@mlss;
 }
 
-sub get_orthologs_GET {
-  my ( $self, $c ) = @_;
-  $self->status_ok( $c, entity => { data => $c->stash->{homology_data} } );
-}
-
 sub _full_encoding {
   my ($self, $c, $homologies, $stable_id) = @_;
   my @output;
@@ -355,6 +360,29 @@ sub _decode_members {
   }
   return ($src, $trg);
 }
+
+sub get_orthologs_GET {
+  my ( $self, $c ) = @_;
+
+  if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
+    my $format = $c->request->param('format') || 'full';
+    my $target = $FORMAT_LOOKUP->{$format};
+    foreach my $ref (@{$c->stash->{homology_data}}) {
+        $ref->{homologies} = $self->$target($c, $ref->{homologies}, $ref->{id});
+    }
+    return $self->status_ok( $c, entity => { data => $c->stash->{homology_data} } );
+
+  } else {
+    # Let's use the OrthoXML writer
+    my @homologies;
+    foreach my $ref (@{$c->stash->{homology_data}}) {
+      push @homologies, @{$ref->{homologies}};
+    }
+    return $self->status_ok($c, entity => \@homologies);
+  }
+}
+
+with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
 
