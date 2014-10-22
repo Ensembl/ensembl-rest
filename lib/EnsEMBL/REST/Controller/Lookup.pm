@@ -63,7 +63,8 @@ sub id_POST {
   my ($self, $c) = @_;
   my $post_data = $c->req->data;
   my $id_list = $post_data->{'ids'};
-  $self->assert_post_size($id_list);
+  unless (defined $id_list) {$c->go('ReturnError','custom',[q{POST body must contain 'ids' key with an array of ids}]) }
+  $self->assert_post_size($c,$id_list);
   my $feature_hash;
   try {
     $feature_hash = $c->model('Lookup')->find_and_locate_list($id_list);

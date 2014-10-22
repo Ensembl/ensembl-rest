@@ -46,6 +46,9 @@ sub _load_post_conf {
 sub assert_post_size {
   my ($self, $c, $list) = @_;
   my $max_size = $self->max_post_size;
+  unless (defined($list)) {
+    $c->go('ReturnError','custom',[qq{You sent no data to this endpoint. Please check the POST format in the documentation}]);
+  }
   return unless $max_size;
   my $post_size = scalar @$list;
 

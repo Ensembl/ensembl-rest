@@ -318,7 +318,7 @@ sub _write {
   my $s = $c->stash();
   my $data = $s->{sequences};
   if ((defined $data && scalar @$data == 0) || !defined $data) {
-    $self->status_not_found($c, message => 'No ID found');
+    $self->status_not_found($c, message => 'No results found');
   }
   if($c->request->param('multiple_sequences')) {
     $self->status_ok($c, entity => $data);
