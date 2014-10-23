@@ -92,7 +92,9 @@ my $id_response = {
     start => 294698
   }
 };
-
+# use Data::Dumper;
+# my $tribble = do_POST("/lookup/id",$id_body);
+# note('trouble at mill:'.Dumper $tribble);
 is_json_POST("/lookup/id",$id_body,$id_response,"Try to do an ID post query");
 
 my $symbol_response = {
