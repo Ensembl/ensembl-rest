@@ -37,12 +37,12 @@ Catalyst::Test->import('EnsEMBL::REST');
     {"mappings" => [{
       "original" => {
         "seq_region_name" => "6","strand" => 1,
-        "coordinate_system" => "chromosome","end" => 171115067,
+        "coord_system" => "chromosome","end" => 171115067,
         "start" => 1,"assembly" => "GRCh37"
       },
       "mapped" => {
         "seq_region_name" => "6","strand" => 1,
-        "coordinate_system" => "chromosome","end" => 171115067,
+        "coord_system" => "chromosome","end" => 171115067,
         "start" => 1,"assembly" => "GRCh37"
       }}]},
     'Asserting internal mapping works as expected'

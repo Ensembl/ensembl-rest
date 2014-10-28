@@ -130,7 +130,7 @@ sub map_data : Private {
       my $mapped_slice = $segment->to_Slice;
       my $mapped_data = {
         original => {
-          coordinate_system => $old_cs_name,
+          coord_system => $old_cs_name,
           assembly => $old_version,
           seq_region_name => $old_sr_name,
           start => ($old_start + $segment->from_start() - 1),
@@ -138,7 +138,7 @@ sub map_data : Private {
           strand => $old_strand,
         },
         mapped => {
-          coordinate_system => $mapped_slice->coord_system->name,
+          coord_system => $mapped_slice->coord_system->name,
           assembly => $mapped_slice->coord_system->version,
           seq_region_name => $mapped_slice->seq_region_name(),
           start => $mapped_slice->start() * 1,
