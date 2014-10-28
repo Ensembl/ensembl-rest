@@ -319,23 +319,21 @@ sub regulatory {
   my $self       = shift;
   my $slice      = shift;
   my $c          = $self->context();
-  my $ctype_name = $c->request->parameters->{cell_type};
+  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
   my $species    = $c->stash->{species};
+  my @fsets      = ();
 
-  my ($fset);
-
-  if(defined $ctype_name){
-    $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:'.$ctype_name) ||  
-     Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:$ctype_name");
+  if(scalar @ctypes > 0){
+    foreach my $ctype_name (@ctypes) {
+      push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:'.$ctype_name) ||  
+       Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:$ctype_name");
+    }
   }else {
-    $ctype_name = "MultiCell";
-    $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:MultiCell') ||  
+    push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:MultiCell') ||  
      Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:MultiCell");
   }
 
-  my $rfa = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature');
- 
-  return $rfa->fetch_all_by_Slice_FeatureSets($slice, [$fset]);
+  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature')->fetch_all_by_Slice_FeatureSets($slice, \@fsets);
 }
 
 
@@ -343,19 +341,21 @@ sub segmentation {
   my $self       = shift;
   my $slice      = shift;
   my $c          = $self->context();
-  my $ctype_name = $c->request->parameters->{cell_type};
+  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
   my $species    = $c->stash->{species};
-  my $fset	 = undef;
+  my @fsets	 = ();
 
-  if(defined $ctype_name){
-    $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('Segmentation:'.$ctype_name) 
-            || Catalyst::Exception->throw("No $species segmentation FeatureSet available with name: Segmentation:$ctype_name");
+  if(scalar @ctypes > 0){
+    foreach my $ctype_name (@ctypes) {
+      push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('Segmentation:'.$ctype_name) 
+              || Catalyst::Exception->throw("No $species segmentation FeatureSet available with name: Segmentation:$ctype_name");
+    }
   }
   else{
     Catalyst::Exception->throw("Must provide a cell_type parameter for a segmentation overlap query");
   }
 
-  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'SegmentationFeature')->fetch_all_by_Slice_FeatureSets($slice, [$fset]);
+  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'SegmentationFeature')->fetch_all_by_Slice_FeatureSets($slice, \@fsets);
 }
 
 
