@@ -296,6 +296,34 @@ my $base = '/overlap/region/homo_sapiens';
   }], 'Getting segmentation_feature as JSON');
 }
 
+#Probe feature testing
+{
+  my $region = '6:1020000..1030000';
+  is_json_GET("$base/$region?feature=array_probe", [{
+    start => 1020569,
+    end => 1020593,
+    feature_type => 'array_probe',
+    seq_region_name => '6',
+    strand => 1,
+    probe_length => '25',
+    array_probe_names => {'HuEx-1_0-st-v2' => '1256969'},
+  }], 'Getting probe_feature as JSON');
+}
+
+#Annotated feature testing
+{
+  my $region = '6:1020000..1030000';
+  is_json_GET("$base/$region?feature=chipseq", [{
+    start => 1024000,
+    end => 1024940,
+    feature_type => 'chipseq',
+    seq_region_name => '6',
+    strand => 0,
+    chipseq_feature_type => 'H3K27me3',
+    cell_type => 'K562'
+  }], 'Getting probe_feature as JSON');
+}
+
 #Misc feature
 {
   my $region = '6:1070000..1080000';
