@@ -408,6 +408,11 @@ sub find_slice {
   # or this
   my $db_type = $s->{db_type} || 'core';
   my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, 'slice');
+  my ($chromosome, $start, $end) = $region =~ /^([0-9]+):([0-9]+)\-([0-9]+)/;
+  Catalyst::Exception->throw("Location $region not understood") unless $chromosome;
+  Catalyst::Exception->throw("$start is not a valid start") if $start < 0;
+  Catalyst::Exception->throw("$end is not a valid end") if $end < 0;
+  Catalyst::Exception->throw("$start should be smaller than $end") if $start > $end;
   Catalyst::Exception->throw("Do not know anything about the species $species and core database") unless $adaptor;
   my $coord_system_name = $c->request->param('coord_system') || 'toplevel';
   my $coord_system_version = $c->request->param('coord_system_version');
