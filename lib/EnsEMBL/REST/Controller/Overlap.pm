@@ -63,6 +63,7 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   $c->stash()->{region} = $region;
   my $features;
   try {
+    my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
     my $slice = $c->model('Lookup')->find_slice($region);
     $self->assert_slice_length($c, $slice);
     $features = $c->model('Overlap')->fetch_features();

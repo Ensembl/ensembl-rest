@@ -408,11 +408,6 @@ sub find_slice {
   # or this
   my $db_type = $s->{db_type} || 'core';
   my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, 'slice');
-  my ($chromosome, $start, $end) = $region =~ /^([0-9]+):([0-9]+)\-([0-9]+)/;
-  Catalyst::Exception->throw("Location $region not understood") unless $chromosome;
-  Catalyst::Exception->throw("$start is not a valid start") if $start < 0;
-  Catalyst::Exception->throw("$end is not a valid end") if $end < 0;
-  Catalyst::Exception->throw("$start should be smaller than $end") if $start > $end;
   Catalyst::Exception->throw("Do not know anything about the species $species and core database") unless $adaptor;
   my $coord_system_name = $c->request->param('coord_system') || 'toplevel';
   my $coord_system_version = $c->request->param('coord_system_version');
@@ -427,6 +422,14 @@ sub decode_region {
   my ($self, $region, $no_warnings, $no_errors) = @_;
   my $c = $self->context();
   my $s = $c->stash();
+  ## Add sanity check before API call to avoid stack trace
+  my ($region_check, $start_check, $second_delimiter, $end_check) = $region =~ /^([0-9A-Z\.]+):?([0-9]*)(\.|_|-:)*([0-9]*)/;
+  $c->log->debug("$region parsed into $region_check, $start_check and $end_check");
+  $start_check = 1 if !$start_check;
+  $end_check = $start_check+1 if !$end_check;
+  Catalyst::Exception->throw("Location $region not understood") unless $region_check;
+  Catalyst::Exception->throw("$start_check is not a valid start") if $start_check < 0;
+  Catalyst::Exception->throw("$end_check is not a valid end") if $end_check < 0;
   my $species = $s->{species};
   my $adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'slice');
   Catalyst::Exception->throw("Do not know anything about the species $species and core database")unless $adaptor;

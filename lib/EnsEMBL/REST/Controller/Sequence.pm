@@ -131,6 +131,7 @@ sub _get_region_sequence {
   my ($self, $c, $region) = @_;
   my $seq_stash = $c->stash()->{sequences};
   try {
+    my ($sr_name) = $c->model('Lookup')->decode_region( $region );
     my $slice = $c->model('Lookup')->find_slice($region);
     $slice = $self->_enrich_slice($c, $slice);
     my $seq = $self->_mask_slice_features($slice, $c);
@@ -140,7 +141,7 @@ sub _get_region_sequence {
       seq => $seq,
     };
   } catch {
-    Catalyst::Exception->throw($_);
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $c->stash()->{sequences} = $seq_stash;
 }

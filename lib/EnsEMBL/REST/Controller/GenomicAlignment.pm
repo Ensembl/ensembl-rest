@@ -84,6 +84,7 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
     #getting GenomicAlignBlock or GenomicAlignTree alignments
     my $alignments;
     try {
+      my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
       my $slice = $c->model('Lookup')->find_slice($region);
 
       #Check for maximum slice length
