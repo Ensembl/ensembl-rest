@@ -101,7 +101,7 @@ sub region_GET {
   try {
     $self->_get_region_sequence($c,$region);
   } catch {
-    $c->go('ReturnError','custom','Failure to retrieve sequence for '.$region);
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->_write($c);
 }
@@ -130,18 +130,14 @@ sub region :Chained('get_species') PathPart('') ActionClass('REST') {
 sub _get_region_sequence {
   my ($self, $c, $region) = @_;
   my $seq_stash = $c->stash()->{sequences};
-  try {
-    my ($sr_name) = $c->model('Lookup')->decode_region( $region );
-    my $slice = $c->model('Lookup')->find_slice($region);
-    $slice = $self->_enrich_slice($c, $slice);
-    my $seq = $self->_mask_slice_features($slice, $c);
-    push @$seq_stash, {
-      id => $slice->name(),
-      molecule => 'dna',
-      seq => $seq,
-    };
-  } catch {
-    $c->go('ReturnError', 'custom', [qq{$_}]);
+  my ($sr_name) = $c->model('Lookup')->decode_region( $region );
+  my $slice = $c->model('Lookup')->find_slice($region);
+  $slice = $self->_enrich_slice($c, $slice);
+  my $seq = $self->_mask_slice_features($slice, $c);
+  push @$seq_stash, {
+    id => $slice->name(),
+    molecule => 'dna',
+    seq => $seq,
   };
   $c->stash()->{sequences} = $seq_stash;
 }
