@@ -410,6 +410,7 @@ sub find_slice {
   my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, 'slice');
   Catalyst::Exception->throw("Do not know anything about the species $species and core database") unless $adaptor;
   my $coord_system_name = $c->request->param('coord_system') || 'toplevel';
+  Catalyst::Exception->throw("Coord_system $coord_system_name is not valid") if $coord_system_name !~ /^[A-Za-z]+$/;
   my $coord_system_version = $c->request->param('coord_system_version');
   my ($no_warnings, $no_fuzz, $ucsc_matching) = (undef, undef, 1);
   my $slice = $adaptor->fetch_by_location($region, $coord_system_name, $coord_system_version, $no_warnings, $no_fuzz, $ucsc_matching);
@@ -424,11 +425,9 @@ sub decode_region {
   my $s = $c->stash();
   ## Add sanity check before API call to avoid stack trace
   my ($region_check, $start_check, $second_delimiter, $end_check) = $region =~ /^([0-9A-Z\.]+):?(\w*)(\.|_|-:)*([0-9A-Z\-]*)/;
-  $c->log->debug("$region parsed into $region_check, $start_check and $end_check");
   $start_check = 1 if !$start_check;
   $end_check = $start_check+1 if !$end_check;
   Catalyst::Exception->throw("Location $region not understood") unless $region_check;
-  Catalyst::Exception->throw("$start_check is not a valid start") if $start_check < 0;
   Catalyst::Exception->throw("$start_check is not a valid start") if ($start_check < 0 || $start_check !~ /[0-9]+/);
   Catalyst::Exception->throw("$end_check is not a valid end") if $end_check !~ /[0-9]+/;
   my $species = $s->{species};
