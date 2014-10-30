@@ -424,9 +424,10 @@ sub decode_region {
   my $c = $self->context();
   my $s = $c->stash();
   ## Add sanity check before API call to avoid stack trace
-  my ($region_check, $start_check, $second_delimiter, $end_check, $strand_check) = $region =~ /^([0-9A-Z\.]+):?(\w*)(\.|_|-:?)([0-9A-Z\-]*):?(-?[0-9]?)/;
+  my ($region_check, $start_check, $second_delimiter, $end_check, $strand_check) = $region =~ /^([0-9A-Z\.]+):?(\w*)(\.|_|-:*)([0-9A-Z\-]*):?(-?[0-9]?)/;
   $start_check = 1 if !$start_check;
   $end_check = $start_check+1 if !$end_check;
+  $strand_check = 1 if !$strand_check;
   Catalyst::Exception->throw("Location $region not understood") unless $region_check;
   Catalyst::Exception->throw("$start_check is not a valid start") if ($start_check < 0 || $start_check !~ /[0-9]+/);
   Catalyst::Exception->throw("$end_check is not a valid end") if $end_check !~ /[0-9]+/;
