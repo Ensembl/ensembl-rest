@@ -73,15 +73,8 @@ sub id_POST {
       my $archive = $self->_fetch_archive_by_id($c,$id);
       $c->stash(entries => $archive);
       my $enc = $self->_encode($c,$archive);
-
-      # my $entity = $c->stash->{entity} if (defined($c->stash->{entity}));
-      # push $entity,$enc;
-      # $c->stash(entity => $entity);
       push @{$c->stash->{entity}},$enc;
     }
-  } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $c->stash->{entity});
 }
@@ -122,8 +115,8 @@ sub _fetch_archive_by_id {
   my $archive;
 
   my @results = $c->model('Lookup')->find_object_location($stable_id, undef, 1);
-  if (!@results) {
-    return;
+  if (!defined $results[0]) {
+    Catalyst::Exception->throw("No object found for $stable_id");
   }
   my $species = $results[0];
   my $adaptor = $c->model('Registry')->get_adaptor($species,'Core','ArchiveStableID');
