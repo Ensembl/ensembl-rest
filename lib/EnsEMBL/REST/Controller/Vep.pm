@@ -99,8 +99,13 @@ sub get_region : Chained('get_species') PathPart('region') ActionClass('REST') {
 
 sub get_region_GET {
   my ( $self, $c, $region ) = @_;
-  my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
-  my $slice = $c->model('Lookup')->find_slice( $sr_name );
+  try {
+    my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
+    my $slice = $c->model('Lookup')->find_slice( $sr_name );
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
   $self->status_ok( $c, entity => $region );
   $c->forward('get_allele');
 }
@@ -176,6 +181,8 @@ sub get_allele : PathPart('') Args(2) {
     }
     my $reference_base;
     $s->{end} = $s->{start} if !$s->{end};
+    $c->go('ReturnError', 'custom', ['Start or End cannot be negative']) if ($s->{start} < 0 || $s->{end} < 0);
+    $c->go('ReturnError', 'custom', ['Strand should be 1 or -1, not ' . $s->{strand}]) if $s->{strand} !~ /1/;
     try {
         $reference_base = $s->{slice}->subseq( $s->{start}, $s->{end}, $s->{strand} );
         $s->{reference_base} = $reference_base;
@@ -223,7 +230,13 @@ sub get_id_GET {
     $_->{chr} = $_->seq_region_name;
   }
 
-  my $consequences = $self->get_consequences($c, $config, $vfs);
+  my $consequences;
+  try {
+    $consequences = $self->get_consequences($c, $config, $vfs);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
   $self->status_ok( $c, entity => $consequences );
 }
 
