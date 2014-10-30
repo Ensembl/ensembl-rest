@@ -191,3 +191,6 @@
 1803	\N	patch	patch_75_76_b.sql|allow_null_karyotype
 1804	\N	patch	patch_75_76_c.sql|remove_alternative_splicing
 1805	\N	patch	patch_76_77_a.sql|schema_version
+1806	\N	patch	patch_77_78_a.sql|schema_version
+1807	\N	patch	patch_77_78_b.sql|source_column_increase
+1808	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int

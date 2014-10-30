@@ -24,4 +24,5 @@
 28	\N	patch	patch_75_76_e.sql|genome_db.name
 29	0		
 31	\N	patch	patch_76_77_a.sql|schema_version
-32	\N  patch	patch_77_78_a.sql|schema_version
+32	0	patch_77_78_a.sql|schema_version	
+33	\N	patch	patch_74_75c.sql|species_tree_root_256

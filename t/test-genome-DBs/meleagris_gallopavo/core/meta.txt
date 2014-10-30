@@ -148,3 +148,4 @@
 1024	\N	patch	patch_76_77_a.sql|schema_version
 1025	\N	patch	patch_77_78_a.sql|schema_version
 1026	\N	patch	patch_77_78_b.sql|source_column_increase
+1027	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int

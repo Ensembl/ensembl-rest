@@ -51,3 +51,7 @@
 51	\N	patch	patch_76_77_e.sql|add variation_attrib table
 52	\N	patch	patch_76_77_f.sql|Add new variation_set_id column to individual table
 53	\N	patch	patch_76_77_g.sql|Add new column to Variation_feature table to flag whether variants should be displayed or not
+54	\N	patch	patch_77_78_a.sql|schema version
+55	\N	patch	patch_77_78_b.sql|Add a column copy_number for CNV supporting structural variants
+56	\N	patch	patch_77_78_c.sql|Drop the table study_variation
+57	\N	patch	patch_77_78_d.sql|Extend the index type_val_idx in the table attrib

@@ -7,3 +7,5 @@
 7	\N	patch	patch_75_76_e.sql|add has_evidence, cell_type_count to regulatory_feature
 8	\N	patch	patch_75_76_f.sql|add feature_type.class Transcription Start Site
 9	\N	patch	patch_75_76_g.sql|mirna_target_feature
+579	\N	patch	patch_77_78_a.sql|schema_version
+580	\N	patch	patch_77_78_b.sql|Change unmapped_reason_id from smallint to int
