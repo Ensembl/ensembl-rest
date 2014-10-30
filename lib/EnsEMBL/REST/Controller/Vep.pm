@@ -175,6 +175,7 @@ sub get_allele : PathPart('') Args(2) {
         $c->go( 'ReturnError', 'custom', [$error_msg] );
     }
     my $reference_base;
+    $s->{end} = $s->{start} if !$s->{end};
     try {
         $reference_base = $s->{slice}->subseq( $s->{start}, $s->{end}, $s->{strand} );
         $s->{reference_base} = $reference_base;
