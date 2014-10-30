@@ -65,9 +65,9 @@ sub id :Chained('/') PathPart('xrefs/id') Args(1)  ActionClass('REST') {
     my $entries = $can->(@args);
     $c->stash(entries => $entries);
     $c->forward('_encode');
-  } 
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $c->stash->{entity});
 }
@@ -92,10 +92,9 @@ sub symbol :Chained('/') PathPart('xrefs/symbol') Args(2) ActionClass('REST') {
       }; # type is classname trimmed down, e.g. Bio::EnsEMBL::Gene -> gene
       push(@entries, $encoded);
     }
-    
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok( $c, entity => \@entries);
 }
@@ -112,9 +111,9 @@ sub name :Chained('/') PathPart('xrefs/name') Args(2) ActionClass('REST') {
     my $entries = $dbentry_adaptor->fetch_all_by_name($name, $external_db);
     $c->stash(entries => $entries);
     $c->forward('_encode');
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $c->stash->{entity});
 }

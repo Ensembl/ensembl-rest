@@ -64,9 +64,9 @@ sub get_adaptors :Private {
       genomic_align_tree_adaptor => $gata,
       genomic_align_block_adaptor => $gaba,
     );
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 }
 
@@ -92,7 +92,8 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
 
       $alignments = $c->model('GenomicAlignment')->get_alignment($slice);
     } catch {
-      $c->go('ReturnError', 'custom', [qq/$_/]);
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
     };
 
     #Set aligned option (default 1)

@@ -51,6 +51,7 @@ sub id: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   try {
     $variation = $c->model('Variation')->fetch_variation($id);
   } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $variation);

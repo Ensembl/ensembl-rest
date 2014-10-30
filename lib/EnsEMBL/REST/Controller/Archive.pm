@@ -55,9 +55,9 @@ sub id_GET {
     $c->stash(entries => $archive);
     $encoded = $self->_encode($c,$archive);
     $c->log->debug(Dumper $encoded);
-  }
-  catch {
-      $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $encoded);
 }
@@ -79,10 +79,9 @@ sub id_POST {
       # $c->stash(entity => $entity);
       push @{$c->stash->{entity}},$enc;
     }
-
-  }
-  catch {
-    $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $c->stash->{entity});
 }

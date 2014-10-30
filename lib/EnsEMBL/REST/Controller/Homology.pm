@@ -68,9 +68,9 @@ sub get_adaptors :Private {
       genomic_align_block_adaptor => $gaba,
       method_adaptor => $ma,
     );
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 }
 
@@ -91,10 +91,10 @@ sub fetch_by_gene_symbol : Chained("/") PathPart("homology/symbol") Args(2)  {
     $c->request->param('object', 'gene');
     my $local_genes = $c->model('Lookup')->find_objects_by_symbol($gene_symbol);
     $genes = [grep { $_->slice->is_reference() } @{$local_genes}];
-  }
-  catch {
+  } catch {
     $c->log->fatal(qq{No genes found for external id: $gene_symbol});
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   unless ( defined $genes ) {
       $c->log->fatal(qq{Nothing found in DB for : [$gene_symbol]});
@@ -133,10 +133,10 @@ sub get_orthologs : Args(0) ActionClass('REST') {
     my $member = try { 
       $c->log->debug('Searching for gene member linked to ', $stable_id);
       $s->{gene_member_adaptor}->fetch_by_stable_id( $stable_id );
-    }
-    catch {
+    } catch {
       $c->log->error(qq{Stable Id not found id db: $stable_id});
-      $c->go( 'ReturnError', 'custom', [qq{stable id '$stable_id' not found}] );
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
     };
 
     if(! defined $member) {
@@ -164,9 +164,9 @@ sub get_orthologs : Args(0) ActionClass('REST') {
       else {
         $all_homologies = $ha->fetch_all_by_Member($member);
       }
-    }
-    catch {
-      $c->go('ReturnError', 'from_ensembl', [$_] );
+    } catch {
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
     };
     push(@final_homologies, {
       id => $stable_id,

@@ -30,9 +30,9 @@ sub region : Chained('/') CaptureArgs(1) PathPart('map') {
   $c->stash->{species} = $species;
   try {
     $c->stash->{slice_adaptor} = $c->model('Registry')->get_adaptor( $species, 'Core', 'Slice' );
-  }
-  catch {
-    $c->go( 'ReturnError', 'from_ensembl', [$_] ) 
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 }
 
@@ -85,20 +85,20 @@ sub _map_transcript_coords {
   return $self->map_mappings($c, $mapped, $transcript);
 }
 
+## Create a slice object based on the location string provided
+## do not proceed if anything went wrong on the way
 sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
   my ( $self, $c, $old_assembly, $region ) = @_;
-  my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($region);
   $c->log->info($region);
-  my $old_slice = try {
+  try {
+    my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($region);
     my $coord_system = $c->request()->param('coord_system') || 'chromosome';
-    $c->stash->{slice_adaptor}->fetch_by_region($coord_system, $old_sr_name, $old_start, $old_end, $old_strand, $old_assembly);
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    my $old_slice = $c->stash->{slice_adaptor}->fetch_by_region($coord_system, $old_sr_name, $old_start, $old_end, $old_strand, $old_assembly);
+    $c->stash->{old_slice} = $old_slice;
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
-  $c->go('ReturnError', 'custom', ["No valid region can be decoded from $region"]) unless $old_slice;
-  # Get a slice for the old region (the region in the input file).
-  $c->stash->{old_slice} = $old_slice;
 }
 
 sub mapped_region_data : Chained('get_region_slice') PathPart('') Args(1) ActionClass('REST') {
@@ -148,9 +148,9 @@ sub map_data : Private {
       };
       push(@decoded_segments, $mapped_data);
     }
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   
   $c->stash(mapped_data => \@decoded_segments);

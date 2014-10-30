@@ -52,8 +52,8 @@ sub id_GET {
   try {
     $features = $c->model('Lookup')->find_and_locate_object($id);
     $c->go('ReturnError', 'custom',  [qq{No valid lookup found for ID $id}]) unless $features->{species};
-  }
-  catch {
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok( $c, entity => $features);
@@ -89,8 +89,8 @@ sub symbol_GET {
   try {
     $features = $c->model('Lookup')->find_gene_by_symbol($symbol);
     $c->go('ReturnError', 'custom',  [qq{No valid lookup found for symbol $symbol}]) unless $features->{species};
-  }
-  catch {
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok( $c, entity => $features);

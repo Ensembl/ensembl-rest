@@ -81,7 +81,9 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
         $c->stash($_.'_adaptor' => $c->model('Registry')->get_adaptor($species, 'Funcgen', $_)) for @REG_FEAT_TYPES;
       }
   } catch {
-      $c->go('ReturnError', 'from_ensembl', [$_]);
+      $c->log->fatal(qq{problem making Bio::EnsEMBL::Variation::VariationFeature object});
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   
   $c->log->debug('Working with species '.$species);
@@ -150,12 +152,12 @@ sub _give_POST_to_VEP {
     $c->stash->{consequences} = $consequences;
 
     $self->status_ok( $c, entity => $consequences );
-  }
-  catch {
+  } catch {
     $c->log->fatal(qw{Problem Getting Consequences});
     $c->log->fatal($_);
     $c->log->fatal(Dumper $data);
-    $c->go( 'ReturnError', 'custom', [ qq{Problem entry within this batch: } . Dumper $data] );
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 }
 
@@ -176,10 +178,10 @@ sub get_allele : PathPart('') Args(2) {
     try {
         $reference_base = $s->{slice}->subseq( $s->{start}, $s->{end}, $s->{strand} );
         $s->{reference_base} = $reference_base;
-    }
-    catch {
+    } catch {
         $c->log->fatal(qq{can't get reference base from slice});
-        $c->go( 'ReturnError', 'from_ensembl', [$_] );
+        $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+        $c->go('ReturnError', 'custom', [qq{$_}]);
     };
     $c->go( 'ReturnError', 'custom', ["request for consequence of [$allele] matches reference [$reference_base]"] )
       if $reference_base eq $allele;
@@ -305,10 +307,10 @@ sub _build_vf {
             }
         );
       }
-    }
-    catch {
+    } catch {
         $c->log->fatal(qq{problem making Bio::EnsEMBL::Variation::VariationFeature object});
-        $c->go( 'ReturnError', 'from_ensembl', [$_] );
+        $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+        $c->go('ReturnError', 'custom', [qq{$_}]);
     };
   return $vf;
 }

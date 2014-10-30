@@ -58,6 +58,7 @@ sub id_GET {
     $c->log()->debug('Pushing out the entity');
     $self->_write($c);
   } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 }
@@ -101,6 +102,7 @@ sub region_GET {
   try {
     $self->_get_region_sequence($c,$region);
   } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->_write($c);
