@@ -67,6 +67,7 @@ sub to_hash {
   $variation_hash->{populations} = $self->Alleles($variation) if $c->request->param('pops');
   $variation_hash->{genotypes} = $self->Genotypes($variation) if $c->request->param('genotypes');
   $variation_hash->{phenotypes} = $self->Phenotypes($variation) if $c->request->param('phenotypes');
+  $variation_hash->{population_genotypes} = $self->PopulationGenotypes($variation) if $c->request->param('population_genotypes');
 
   return $variation_hash;
 }
@@ -180,6 +181,32 @@ sub pops_as_hash {
   return $population;
 }
 
+## Genotype frequencies in available populations
+sub PopulationGenotypes {
+  my ($self, $variation) = @_;
+
+  my @formatted_pop_gen;
+  my $pop_gen = $variation->get_all_PopulationGenotypes();
+  foreach my $pg (@$pop_gen) {
+    push (@formatted_pop_gen, $self->popgen_as_hash($pg));
+  }
+
+  return \@formatted_pop_gen;
+}
+ 
+sub popgen_as_hash {
+  my ($self, $pg) = @_;
+ 
+  my $pop_gen;
+
+  $pop_gen->{population} = $pg->population()->name() ;
+  $pop_gen->{genotype}   = $pg->genotype_string() ;
+  $pop_gen->{frequency}  = $pg->frequency() ;
+  $pop_gen->{count}      = $pg->count();
+  $pop_gen->{subsnp_id}  = $pg->subsnp() if defined $pg->subsnp();
+
+  return $pop_gen;
+}
 
 with 'EnsEMBL::REST::Role::Content';
 
