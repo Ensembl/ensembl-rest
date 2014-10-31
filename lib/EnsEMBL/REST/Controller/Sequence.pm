@@ -113,12 +113,14 @@ sub region_POST {
   my $post_data = $c->req->data;
   my $regions = $post_data->{'regions'};
   $self->assert_post_size($c,$regions);
+  $c->request->params->{'multiple_sequences'} = 1; # required by _write to allow multiple hits.
   my @errors;
-  try {
-    foreach my $reg (@$regions) {
+  foreach my $reg (@$regions) {
+    $c->log->debug($reg);
+    try {
       $self->_get_region_sequence($c,$reg);
-    }
-  };
+    };
+  }
   $self->_write($c);
 }
 
