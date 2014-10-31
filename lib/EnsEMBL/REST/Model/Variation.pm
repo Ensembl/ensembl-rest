@@ -63,16 +63,16 @@ sub to_hash {
   $variation_hash->{MAF} = $variation->minor_allele_frequency,
   $variation_hash->{evidence} = $variation->get_all_evidence_values();
   $variation_hash->{clinical_significance} = $variation->get_all_clinical_significance_states() if @{$variation->get_all_clinical_significance_states()};
-  $variation_hash->{mappings} = $self->VariationFeature($variation);
-  $variation_hash->{populations} = $self->Alleles($variation) if $c->request->param('pops');
-  $variation_hash->{genotypes} = $self->Genotypes($variation) if $c->request->param('genotypes');
-  $variation_hash->{phenotypes} = $self->Phenotypes($variation) if $c->request->param('phenotypes');
-  $variation_hash->{population_genotypes} = $self->PopulationGenotypes($variation) if $c->request->param('population_genotypes');
+  $variation_hash->{mappings} = $self->get_variationFeature_info($variation);
+  $variation_hash->{populations} = $self->get_allele_info($variation) if $c->request->param('pops');
+  $variation_hash->{genotypes} = $self->get_individualGenotype_info($variation) if $c->request->param('genotypes');
+  $variation_hash->{phenotypes} = $self->get_phenotype_info($variation) if $c->request->param('phenotypes');
+  $variation_hash->{population_genotypes} = $self->get_populationGenotype_info($variation) if $c->request->param('population_genotypes');
 
   return $variation_hash;
 }
 
-sub VariationFeature {
+sub get_variationFeature_info {
   my ($self, $variation) = @_;
 
   my @mappings;
@@ -99,7 +99,7 @@ sub vf_as_hash {
   return $variation_feature;
 }
 
-sub Genotypes {
+sub get_individualGenotype_info {
   my ($self, $variation) = @_;
 
   my @genotypes;
@@ -122,7 +122,7 @@ sub gen_as_hash {
   return $gen_hash;
 }
 
-sub Phenotypes {
+sub get_phenotype_info {
   my ($self, $variation) = @_;
 
   my @phenotypes;
@@ -154,7 +154,7 @@ sub phen_as_hash {
   return $phen_hash;
 }
 
-sub Alleles {
+sub get_allele_info {
   my ($self, $variation) = @_;
 
   my @populations;
@@ -182,7 +182,7 @@ sub pops_as_hash {
 }
 
 ## Genotype frequencies in available populations
-sub PopulationGenotypes {
+sub get_populationGenotype_info {
   my ($self, $variation) = @_;
 
   my @formatted_pop_gen;
