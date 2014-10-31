@@ -88,7 +88,6 @@ sub no_content_POST { }
 
 sub not_found: Path : Args(0) : ActionClass('REST') {
     my ( $self, $c, $error_msg ) = @_;
-    $c->log->error($error_msg);
     $self->status_not_found($c, message => $error_msg);
 }
 
