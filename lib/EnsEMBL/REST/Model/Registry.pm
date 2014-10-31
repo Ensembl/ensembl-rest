@@ -296,7 +296,7 @@ sub _build_species_info {
         my $schema_version = $mc->get_schema_version() * 1;
         $release_lookup{$species} = $schema_version;
         
-        if(!$dba->is_multispecies()) {
+        if(!$dba->is_multispecies() && $species !~ /Ancestral/) {
           my $csa = $dba->get_CoordSystemAdaptor();
           $division_lookup{$species} = $mc->get_division() || 'Ensembl';
           $common_lookup{$species} = $mc->get_common_name();
