@@ -30,6 +30,9 @@ The EnsEMBL Group - http://www.ensembl.org/Help/Contact
 
 package EnsEMBL::REST;
 use Moose;
+use HTML::Entities;
+use URI::Escape qw{ uri_escape_utf8 };
+use MRO::Compat;
 use namespace::autoclean;
 use Log::Log4perl::Catalyst;
 use EnsEMBL::REST::Types;
@@ -95,6 +98,10 @@ else {
 }
 __PACKAGE__->setup();
 
+__PACKAGE__->config->{'custom-error-message'}->{'view-name'}         = 'TT';
+__PACKAGE__->config->{'custom-error-message'}->{'error-template'}    = 'error.tt';
+
+
 #HACK but it works
 sub turn_on_config_serialisers {
   my ($class, $package) = @_;
@@ -117,5 +124,43 @@ sub turn_on_config_serialisers {
 
   return;
 }
+
+
+## Intercept default error page
+## Page not found is dealt with in Root.pm, this deals with mistyped urls and replaces the default 'Please come back later' page
+sub finalize_error {
+  my $c = shift;
+  my $config = $c->config->{'custom-error-message'};
+  
+  # in debug mode return the original "page" 
+  if ( $c->debug ) {
+    $c->maybe::next::method;
+    return;
+  }
+  
+  # create error string out of error array
+  my $error = join '<br/> ', map { encode_entities($_) } @{ $c->error };
+  $error ||= 'No output';
+
+  # render the template
+  my $action_name = $c->action->reverse;
+  $c->stash->{'finalize_error'} = $action_name.': '.$error;
+  $c->response->content_type(
+    $config->{'content-type'} || 'text/html; charset=utf-8' );
+  my $view_name = $config->{'view-name'} || 'TT';
+  eval {
+    $c->response->body($c->view($view_name)->render($c,
+      $config->{'error-template'} || 'error.tt' ));
+  };
+  if ($@) {
+    $c->log->error($@);
+    $c->maybe::next::method;
+  }
+  
+  my $response_status = $config->{'response-status'};
+  $response_status = 500 if not defined $response_status;
+  $c->response->status($response_status);
+}
+
 
 1;
