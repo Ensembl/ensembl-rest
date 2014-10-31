@@ -236,12 +236,35 @@ sub find_object_location {
         my $lookup = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
         Catalyst::Exception->throw("No lookup database available on server, archive lookup not possible for $id. Please contact the administrator of this server") unless $lookup;
       }
+      Catalyst::Exception->throw("No object found for $id");
     }
   }
 
   $c->stash(species => $captures[0], object_type => $captures[1], group => $captures[2]);
 
   return @captures;
+}
+
+sub fetch_archive_by_id {
+  my ($self, $id) = @_;
+
+  my $c = $self->context();
+  my ($stable_id, $version) = split(/\./, $id);
+  my $archive;
+
+  my @results = $self->find_object_location($stable_id, undef, 1);
+  if (!defined $results[0]) {
+    Catalyst::Exception->throw("No object found for $stable_id");
+  }
+  my $species = $results[0];
+  my $adaptor = $c->model('Registry')->get_adaptor($species,'Core','ArchiveStableID');
+
+  if ($version) {
+    $archive = $adaptor->fetch_by_stable_id_version($stable_id, $version);
+  } else {
+    $archive = $adaptor->fetch_by_stable_id($stable_id);
+  }
+  $c->stash()->{archive} = $archive;
 }
 
 sub find_and_locate_object {

@@ -45,21 +45,14 @@ sub id: Chained('/') PathPart('archive/id') ActionClass('REST') {
 
 sub id_GET {
   my ($self, $c, $id) = @_;
-  my $archive;
-  my $encoded;
   try {
-    $archive = $self->_fetch_archive_by_id($c,$id);
-    if (!$archive) {
-      $c->go('ReturnError', 'custom', ["No archive found for $id"]);
-    }
-    $c->stash(entries => $archive);
-    $encoded = $self->_encode($c,$archive);
-    $c->log->debug(Dumper $encoded);
+    $c->model('Lookup')->fetch_archive_by_id($id);
+    $self->_get_archive($c, $id);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
-  $self->status_ok($c, entity => $encoded);
+  $self->status_ok($c, entity => $c->stash->{archives}->[0]);
 }
 
 sub id_POST {
@@ -68,23 +61,24 @@ sub id_POST {
   my $payload = $c->req->data();
   my $ids = $payload->{id};
   $self->assert_post_size($c,$ids);
-  try {
-    foreach my $id (@$ids){
-      my $archive = $self->_fetch_archive_by_id($c,$id);
-      $c->stash(entries => $archive);
-      my $enc = $self->_encode($c,$archive);
-      push @{$c->stash->{entity}},$enc;
+  foreach my $id (@$ids){
+    try {
+      $self->_get_archive($c, $id);
     }
   };
-  $self->status_ok($c, entity => $c->stash->{entity});
+  $self->status_ok($c, entity => $c->stash->{archives});
 }
 
 
-sub _encode :Private{
-  my ($self, $c, $archive) = @_;
+sub _get_archive :Private{
+  my ($self, $c, $id) = @_;
+  $c->model('Lookup')->fetch_archive_by_id($id);
+  my $s = $c->stash();
+  my $archive = $s->{archive};
   my ($enc, $peptide, @replacements);
-  # my $aia = $c->model('Registry')->get_adaptor($c->stash()->{species},'Core','ArchiveStableID');
   $peptide = $archive->get_peptide if (!$archive->is_current);
+
+  my $archive_stash = $s->{archives};
 
   if (!$archive->is_current) {
     foreach my $successor (@{ $archive->get_all_successors }) {
@@ -105,28 +99,11 @@ sub _encode :Private{
       latest => $archive->get_latest_incarnation->stable_id .".". $archive->get_latest_incarnation->version,
       peptide => $peptide,
   };
-  return $enc;
-}
 
-sub _fetch_archive_by_id {
-  my ($self,$c,$id) = @_;
+  push @$archive_stash, $enc;
+  $s->{archives} = $archive_stash;
 
-  my ($stable_id, $version) = split(/\./, $id);
-  my $archive;
-
-  my @results = $c->model('Lookup')->find_object_location($stable_id, undef, 1);
-  if (!defined $results[0]) {
-    Catalyst::Exception->throw("No object found for $stable_id");
-  }
-  my $species = $results[0];
-  my $adaptor = $c->model('Registry')->get_adaptor($species,'Core','ArchiveStableID');
-  
-  if ($version) {
-    $archive = $adaptor->fetch_by_stable_id_version($stable_id, $version);
-  } else {
-    $archive = $adaptor->fetch_by_stable_id($stable_id);
-  }
-  return $archive;
+  return;
 }
 
 __PACKAGE__->meta->make_immutable;
