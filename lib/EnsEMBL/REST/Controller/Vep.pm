@@ -201,10 +201,15 @@ sub get_allele : PathPart('') Args(2) {
     my $config = $self->_include_user_params($c,$user_config);
     $config->{format} = 'id'; # Set a format value to silence the VEP in single formatless requests.
     my $vf = $self->_build_vf($c);
-    my $consequences = $self->get_consequences($c, $config, [$vf]);
-    # $c->log->debug(Dumper $consequences);
-    $c->stash->{consequences} = $consequences;
-    $self->status_ok( $c, entity => $consequences );
+    try {
+      my $consequences = $self->get_consequences($c, $config, [$vf]);
+      # $c->log->debug(Dumper $consequences);
+      $c->stash->{consequences} = $consequences;
+    } catch {
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
+    };
+    $self->status_ok( $c, entity => $c->stash->{consequences} );
 }
 
 
