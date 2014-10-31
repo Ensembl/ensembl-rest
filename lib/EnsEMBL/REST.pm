@@ -32,7 +32,6 @@ package EnsEMBL::REST;
 use Moose;
 use HTML::Entities;
 use URI::Escape qw{ uri_escape_utf8 };
-use MRO::Compat;
 use namespace::autoclean;
 use Log::Log4perl::Catalyst;
 use EnsEMBL::REST::Types;
