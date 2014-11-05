@@ -20,6 +20,7 @@ package EnsEMBL::REST::Model::Regulatory;
 
 use Moose;
 use Catalyst::Exception qw(throw);
+use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
@@ -37,30 +38,32 @@ sub fetch_regulatory {
    Catalyst::Exception->throw("No regulatory feature stable ID given. Please specify an stable ID to retrieve from this service");
 
   my $c          = $self->context;
-  my $ctype_name = $c->request->parameters->{cell_type};
+  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
   my $species    = $c->stash->{species};
-  my $dba        = $c->model('Registry')->get_DBAdaptor($species, 'funcgen', 'funcgen') ||
-    throw("No funcgen DBAdaptor found for species $species");
+  my @rfs        = ();
 
-  my ($fset);
-
-  if(defined $ctype_name){
-    $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:'.$ctype_name) ||  
-     throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:$ctype_name");
-  }
-
-  my $regf = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature')->fetch_by_stable_id($regf_id, $fset);
-  
-  if (! $regf) {
-    if (defined $ctype_name) {
-      $ctype_name = '('.$ctype_name.')';
+  if(scalar @ctypes > 0){
+    foreach my $ctype_name (@ctypes) {
+      my $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:'.$ctype_name) ||  
+        Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:$ctype_name");
+      my $rf = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature')->fetch_by_stable_id($regf_id, $fset);
+      if (defined $rf) {
+        push @rfs, $rf;
+      }
     }
-    Catalyst::Exception->throw("$regf_id${ctype_name} not found for $species");
+  }else{
+    my $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:MultiCell') ||  
+      throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:MultiCell");
+    my $rf = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature')->fetch_by_stable_id($regf_id, $fset);
+    if (!defined $rf) {
+      Catalyst::Exception->throw("$regf_id not found for $species");
+    }
+    push @rfs, $rf;
   }
 
   #Add support to include_attributes here by embedding hash summaries
-
-  return $regf->summary_as_hash;
+  my @hashes = map {$_->summary_as_hash} @rfs;
+  return \@hashes;
 }
 
 

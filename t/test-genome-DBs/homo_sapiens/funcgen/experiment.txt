@@ -1,0 +1,1 @@
+671	K562_H3K27me3_ENCODE_YALE	2	NULL	NULL	NULL	NULL	11	14	NULL	http://genome.ucsc.edu/cgi-bin/hgFileSearch?db=hg19&tsName=UCD&tsDescr=&tsGroup=regulation&fsFileType=fastq&hgt_mdbVar1=cell&hgt_mdbVal1=K562b&hgt_mdbVar2=antibody&hgt_mdbVal2=H3K27me3B&hgfs_Search=search
