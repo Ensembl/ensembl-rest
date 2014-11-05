@@ -432,9 +432,10 @@ sub find_slice {
   my $db_type = $s->{db_type} || 'core';
   my $adaptor = $c->model('Registry')->get_adaptor($species, $db_type, 'slice');
   Catalyst::Exception->throw("Do not know anything about the species $species and core database") unless $adaptor;
-  my $coord_system_name = $c->request->param('coord_system') || 'toplevel';
-  Catalyst::Exception->throw("Coord_system $coord_system_name is not valid") if $coord_system_name !~ /^[A-Za-z]+$/;
   my $coord_system_version = $c->request->param('coord_system_version');
+  my $coord_system_name = $c->request->param('coord_system') || 'toplevel';
+  if ($coord_system_version && !$c->request->param('coord_system')) { $coord_system_name = 'chromosome'; }
+  Catalyst::Exception->throw("Coord_system $coord_system_name is not valid") if $coord_system_name !~ /^[A-Za-z]+$/;
   my ($no_warnings, $no_fuzz, $ucsc_matching) = (undef, undef, 1);
   my $slice = $adaptor->fetch_by_location($region, $coord_system_name, $coord_system_version, $no_warnings, $no_fuzz, $ucsc_matching);
   Catalyst::Exception->throw("No slice found for location $region") unless $slice;
