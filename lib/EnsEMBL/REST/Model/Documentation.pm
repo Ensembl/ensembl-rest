@@ -31,7 +31,6 @@ use Log::Log4perl;
 use JSON;
 use YAML qw//;
 use EnsEMBL::REST::EnsemblModel::Endpoint;
-use EnsEMBL::REST::Role::PostLimiter;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
