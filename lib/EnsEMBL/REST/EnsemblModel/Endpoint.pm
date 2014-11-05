@@ -28,6 +28,9 @@ has 'output'      => ( isa => 'EnsRESTValueList', is => 'ro', required => 1, coe
 has 'params'      => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'examples'    => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'postmessage' => ( isa => 'HashRef', is => 'ro', required => 0 );
+has 'post_size'   => ( isa => 'Str', is => 'ro', required => 0 );
+has 'slice_length'=> ( isa => 'Str', is => 'ro', required => 0 );
+
 
 sub has_required_params {
   my ($self) = @_;

@@ -211,6 +211,12 @@ limitations under the License.
     <tbody>
       <tr><td>Methods</td><td>[% endpoint.method.join(',') %]</td></tr>
       <tr><td>Response formats</td><td>[% endpoint.output.join('<br>') %]</td></tr>
+      [% IF endpoint.post_size() && endpoint.method.0 == "POST" %]
+        <tr><td>Post size</td><td>[% endpoint.post_size.join('<br>') %]</td></tr>
+      [% END %]
+      [% IF endpoint.slice_length() %]
+        <tr><td>Slice length</td><td>[% endpoint.slice_length.join('<br>') %]</td></tr>
+     [% END %]
     </tbody>
   </table>
 </div>

@@ -31,6 +31,7 @@ use Log::Log4perl;
 use JSON;
 use YAML qw//;
 use EnsEMBL::REST::EnsemblModel::Endpoint;
+use EnsEMBL::REST::Role::PostLimiter;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -70,6 +71,10 @@ sub merged_config {
       while(my ($k, $v) = each %{$conf_hash}) {
         $conf_hash->{$k}->{key} = $k;
         $v->{id} = $k;
+        my $config_name = 'Controller::' . $conf_hash->{$k}->{group};
+        my $controller_config = EnsEMBL::REST->config()->{$config_name};
+        $v->{post_size} = $controller_config->{max_post_size} if defined $controller_config->{max_post_size};
+        $v->{slice_length} = $controller_config->{max_slice_length} if defined $controller_config->{max_slice_length};
       }
       $merged_cfg = merge($conf_hash, $merged_cfg);
     }
