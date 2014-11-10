@@ -40,6 +40,7 @@ sub fetch_variation {
   Catalyst::Exception->throw("No variation given. Please specify a variation to retrieve from this service") if ! $variation_id;
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
+  $vfa->db->include_failed_variations(1) if $c->request->param('include_failed');;
   my $variation = $vfa->fetch_by_name($variation_id);
   if (!$variation) {
     Catalyst::Exception->throw("$variation_id not found for $species");
