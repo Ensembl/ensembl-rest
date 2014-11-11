@@ -111,17 +111,19 @@ sub enrich {
       }
     }
 
+    my $endpoint_obj = EnsEMBL::REST::EnsemblModel::Endpoint->new(%{$endpoint});
+
     #Build each output example
-    foreach my $id ( keys %{ $endpoint->{examples} } ) {
-        my $eg = $endpoint->{examples}->{$id};
+    foreach my $id ( keys %{ $endpoint_obj->{examples} } ) {
+        my $eg = $endpoint_obj->{examples}->{$id};
         next if $eg->{enriched};
         next if $eg->{disable};
         $eg->{id}  = $id;
-        $self->_request_example($endpoint, $eg);
+        $self->_request_example($endpoint_obj, $eg);
         $eg->{enriched} = 1;
     }
 
-    return EnsEMBL::REST::EnsemblModel::Endpoint->new(%{$endpoint});
+    return $endpoint_obj;
 }
 
 sub _request_example {
@@ -135,9 +137,11 @@ sub _request_example {
   $eg->{uri} = $path . ( join '/', @{$capture} );
   my $param_string = $self->_hash_to_params($params);
   $eg->{true_root_uri} = $eg->{uri};
-  $eg->{uri} = $eg->{uri} .'?'. $param_string;
+  if(! $endpoint->is_post()) {
+    $eg->{uri} = $eg->{uri} .'?'. $param_string;
+  }
 
-  my ($example_host, $example_uri) = $self->_url($eg, $c);
+  my ($example_host, $example_uri) = $self->_url($endpoint, $eg, $c);
   $eg->{example}->{host} = $example_host;
   $eg->{example}->{uri} = $example_uri;
 
@@ -184,15 +188,17 @@ sub _find_conf {
 }
 
 sub _url {
-  my ($self, $eg) = @_;
+  my ($self, $endpoint, $eg) = @_;
   my $c = $self->context();
   my $host = $c->req->base;
   $host =~ s/\/$//;
   my $uri = $eg->{true_root_uri};
-  my $req_params = $eg->{params} || {};
-  $req_params->{'content-type'} = $eg->{content};
-  my $params = $self->_hash_to_params($req_params);
-  $uri .= '?'.$params;
+  if(! $endpoint->is_post()) {
+    my $req_params = $eg->{params} || {};
+    $req_params->{'content-type'} = $eg->{content};
+    my $params = $self->_hash_to_params($req_params);
+    $uri .= '?'.$params;
+  }
   return ($host, $uri);
 }
 

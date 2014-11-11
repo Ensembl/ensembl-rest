@@ -102,7 +102,7 @@ limitations under the License.
 	<br/>
 [% END %]
 
-[% IF endpoint.method.0 == "POST" %]
+[% IF endpoint.is_post %]
 
   <h2>Message</h2>
   <table class="table table-condensed table-striped">
@@ -112,7 +112,7 @@ limitations under the License.
     </tbody>
   </table>
 
-[% ELSE %]
+[% END %]
 
 <h2>Example Requests</h2>
 
@@ -127,6 +127,9 @@ limitations under the License.
 	<br>
 	<ul class="nav nav-pills">
 	  <li class="active"><a href="#example[% p.value.id %]" data-toggle="tab">Example output</a></li>
+    [% IF endpoint.is_post -%]
+      <li ><a href="#input[% p.value.id %]" data-toggle="tab">Example input</a></li>
+    [% END %]
 		[% FOREACH e IN example_types %]
 		  <li><a href="#[% e %][% p.value.id %]" data-toggle="tab">[% e.ucfirst %]</a></li>
 		[% END %]
@@ -135,9 +138,10 @@ limitations under the License.
 	<div class='tab-pane active' id='example[% p.value.id %]'></div>
     <!-- START FILLING AJAX TAB -->
     <script>
-    $.ajax( {
+    var method = "[% endpoint.single_method %]";
+    var params = {
       url : "[% filtered_uri %]",
-      type : "GET",
+      type : method,
      beforeSend : function () {
         $("#example[% p.value.id %]").append("<img src='../../static/img/e-loader.gif'>");
         return true;
@@ -176,9 +180,24 @@ limitations under the License.
          $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\">" + resp.responseText + "</pre>");
          $("#example[% p.value.id %]>img").remove();
       }
-      });
+      };
+
+      if(method === "POST") {
+        params.processData = false;
+        params.data = '[% p.value.body %]';
+        params.contentType = '[% p.value.content %]';
+        params.accept = '[% p.value.accept %]';
+      }
+      $.ajax( params);
     </script>
     <!-- END FILLING AJAX TAB -->
+    [% IF endpoint.is_post %]
+      <div class='tab-pane' id='input[% p.value.id %]'>
+        <pre class="pre-scrollable prettyprint">
+[% p.value.body %]
+        </pre>
+      </div>
+    [% END %]
 
 <!-- PERL EXAMPLE -->
 [% INCLUDE documentation/examples/perl.tt %]
@@ -202,8 +221,6 @@ limitations under the License.
 
 [% END %] <!-- End FOREACH on endpoint examplesv -->
 
-[% END %] <!-- End ELSE of POST versus GET -->
-
 </div>
 <div class="span2">
   <h3>Resource Information</h3>
@@ -211,8 +228,8 @@ limitations under the License.
     <tbody>
       <tr><td>Methods</td><td>[% endpoint.method.join(',') %]</td></tr>
       <tr><td>Response formats</td><td>[% endpoint.output.join('<br>') %]</td></tr>
-      [% IF endpoint.post_size() && endpoint.method.0 == "POST" %]
-        <tr><td>Post size</td><td>[% endpoint.post_size.join('<br>') %]</td></tr>
+      [% IF endpoint.post_size() && endpoint.is_post %]
+        <tr><td>Maximum POST size</td><td>[% endpoint.post_size.join('<br>') %]</td></tr>
       [% END %]
       [% IF endpoint.slice_length() %]
         <tr><td>Slice length</td><td>[% endpoint.slice_length.join('<br>') %]</td></tr>

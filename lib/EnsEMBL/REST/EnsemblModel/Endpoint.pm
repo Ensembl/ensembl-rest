@@ -31,6 +31,16 @@ has 'postmessage' => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'post_size'   => ( isa => 'Str', is => 'ro', required => 0 );
 has 'slice_length'=> ( isa => 'Str', is => 'ro', required => 0 );
 
+sub is_post {
+  my ($self) = @_;
+  return scalar(grep {$_ eq 'POST'} @{$self->method()});
+}
+
+sub single_method {
+  my ($self) = @_;
+  return $self->method()->[0] if @{$self->method()};
+  return;
+}
 
 sub has_required_params {
   my ($self) = @_;

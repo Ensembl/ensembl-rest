@@ -24,10 +24,21 @@ use HTTP::Tiny;
 my $http = HTTP::Tiny->new();
 
 my $server = '[% p.value.example.host %]';
+[% IF p.value.body -%]
+my $ext = '[% p.value.uri %]';
+my $response = $http->request('POST', $server.$ext, {
+  headers => { 
+  	'Content-type' => '[% p.value.content %]',
+  	'Accept' => '[% p.value.accept %]'
+  },
+  content => '[% p.value.body %]'
+});
+[% ELSE -%]
 my $ext = '[% p.value.uri %]';
 my $response = $http->get($server.$ext, {
   headers => { 'Content-type' => '[% p.value.content %]' }
 });
+[% END -%]
 
 die "Failed!\n" unless $response->{success};
 
