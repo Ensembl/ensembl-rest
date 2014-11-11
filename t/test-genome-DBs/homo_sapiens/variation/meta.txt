@@ -55,3 +55,5 @@
 55	\N	patch	patch_77_78_b.sql|Add a column copy_number for CNV supporting structural variants
 56	\N	patch	patch_77_78_c.sql|Drop the table study_variation
 57	\N	patch	patch_77_78_d.sql|Extend the index type_val_idx in the table attrib
+58	\N	patch	patch_77_78_e.sql|add indexes on father_ and mother_individual_id and population name
+59	\N	patch	patch_77_78_f.sql|Add new column to the transcript_variation table to flag whether variants should be displayed or not

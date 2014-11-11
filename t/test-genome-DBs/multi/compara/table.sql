@@ -267,6 +267,24 @@ CREATE TABLE `genomic_align_tree` (
   KEY `left_index` (`root_id`,`left_index`)
 ) ENGINE=MyISAM AUTO_INCREMENT=6410000023754 DEFAULT CHARSET=latin1;
 
+CREATE TABLE `hmm_annot` (
+  `seq_member_id` int(10) unsigned NOT NULL,
+  `model_id` varchar(40) DEFAULT NULL,
+  `evalue` float DEFAULT NULL,
+  PRIMARY KEY (`seq_member_id`),
+  KEY `model_id` (`model_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `hmm_curated_annot` (
+  `seq_member_stable_id` varchar(40) NOT NULL,
+  `model_id` varchar(40) DEFAULT NULL,
+  `library_version` varchar(40) NOT NULL,
+  `annot_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `reason` mediumtext,
+  PRIMARY KEY (`seq_member_stable_id`),
+  KEY `model_id` (`model_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 CREATE TABLE `hmm_profile` (
   `model_id` varchar(40) NOT NULL,
   `name` varchar(40) DEFAULT NULL,
@@ -382,7 +400,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=38 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -446,8 +464,8 @@ CREATE TABLE `peptide_align_feature` (
   `peptide_align_feature_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `qmember_id` int(10) unsigned NOT NULL,
   `hmember_id` int(10) unsigned NOT NULL,
-  `qgenome_db_id` int(10) unsigned NOT NULL,
-  `hgenome_db_id` int(10) unsigned NOT NULL,
+  `qgenome_db_id` int(10) unsigned DEFAULT NULL,
+  `hgenome_db_id` int(10) unsigned DEFAULT NULL,
   `qstart` int(10) NOT NULL DEFAULT '0',
   `qend` int(10) NOT NULL DEFAULT '0',
   `hstart` int(11) NOT NULL DEFAULT '0',

@@ -1,4 +1,4 @@
-30	\N	schema_version	78
+34	\N	schema_version	78
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -26,3 +26,6 @@
 31	\N	patch	patch_76_77_a.sql|schema_version
 32	0	patch_77_78_a.sql|schema_version	
 33	\N	patch	patch_74_75c.sql|species_tree_root_256
+35	\N	patch	patch_77_78_a.sql|schema_version
+36	\N	patch	patch_77_78_b.sql|null_paf_genome_db_ids
+37	\N	patch	patch_77_78_c.sql|hmm_tables
