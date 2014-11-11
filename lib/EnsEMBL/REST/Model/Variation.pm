@@ -40,7 +40,7 @@ sub fetch_variation {
   Catalyst::Exception->throw("No variation given. Please specify a variation to retrieve from this service") if ! $variation_id;
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
-  $vfa->db->include_failed_variations(1) if $c->request->param('include_failed');;
+  $vfa->db->include_failed_variations(1);
   my $variation = $vfa->fetch_by_name($variation_id);
   if (!$variation) {
     Catalyst::Exception->throw("$variation_id not found for $species");
@@ -54,15 +54,16 @@ sub to_hash {
   my $c = $self->context();
   my $variation_hash;
 
-  $variation_hash->{name} = $variation->name,
-  $variation_hash->{source} = $variation->source_description,
-  $variation_hash->{ambiguity} = $variation->ambig_code,
-  $variation_hash->{synonyms} = $variation->get_all_synonyms,
-  $variation_hash->{ancestral_allele} = $variation->ancestral_allele,
-  $variation_hash->{var_class} = $variation->var_class,
-  $variation_hash->{most_severe_consequence} = $variation->display_consequence,
-  $variation_hash->{MAF} = $variation->minor_allele_frequency,
-  $variation_hash->{evidence} = $variation->get_all_evidence_values();
+  $variation_hash->{name} = $variation->name;
+  $variation_hash->{source} = $variation->source_description;
+  $variation_hash->{ambiguity} = $variation->ambig_code;
+  $variation_hash->{synonyms} = $variation->get_all_synonyms;
+  $variation_hash->{failed} = $variation->failed_description if $variation->is_failed;
+  $variation_hash->{ancestral_allele} = $variation->ancestral_allele;
+  $variation_hash->{var_class} = $variation->var_class;
+  $variation_hash->{most_severe_consequence} = $variation->display_consequence;
+  $variation_hash->{MAF} = $variation->minor_allele_frequency;
+  $variation_hash->{evidence} = $variation->get_all_evidence_values;
   $variation_hash->{clinical_significance} = $variation->get_all_clinical_significance_states() if @{$variation->get_all_clinical_significance_states()};
   $variation_hash->{mappings} = $self->get_variationFeature_info($variation);
   $variation_hash->{populations} = $self->get_allele_info($variation) if $c->request->param('pops');
