@@ -245,6 +245,39 @@ sub get_id_GET {
   $self->status_ok( $c, entity => $consequences );
 }
 
+
+# /vep/:species/hgvs/:hgvs
+sub get_hgvs : Chained('get_species') PathPart('hgvs') ActionClass('REST') {
+  my ($self, $c, $hgvs) = @_;
+}
+
+sub get_hgvs_GET {
+  my ($self, $c, $hgvs) = @_;
+  unless ($hgvs) {$c->go('ReturnError', 'custom', ["HGVS is a required parameter for this endpoint"])}
+  
+  my $vf;
+  eval { $vf = $c->stash()->{vfa}->fetch_by_hgvs_notation($hgvs); };
+
+  if(!defined($vf) || (defined $@ && length($@) > 1)) {
+    $c->go( 'ReturnError', 'custom', [qq{Unable to parse HGVS notation $hgvs $@}] );
+  }
+  
+  # name it
+  $vf->variation_name($hgvs);
+  
+  $c->stash( variation => $vf->variation, variation_features => [$vf] );
+
+  my $user_config = $c->request->parameters;
+  my $config = $self->_include_user_params($c,$user_config);
+  $config->{format} = 'hgvs';
+  
+  $vf->{chr} = $vf->seq_region_name;
+  $config->{slice_cache}->{$vf->{chr}} = $vf->slice;
+
+  my $consequences = $self->get_consequences($c, $config, [$vf]);
+  $self->status_ok( $c, entity => $consequences );
+}
+
 sub get_consequences {
   my ($self, $c, $config, $vfs) = @_;
   my $user_config = $c->request->parameters;
