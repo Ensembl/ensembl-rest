@@ -30,6 +30,7 @@ has 'examples'    => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'postmessage' => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'post_size'   => ( isa => 'Str', is => 'ro', required => 0 );
 has 'slice_length'=> ( isa => 'Str', is => 'ro', required => 0 );
+has 'postformat'  => ( isa => 'Str', is => 'ro', required => 0 );
 
 sub is_post {
   my ($self) = @_;

@@ -16,24 +16,26 @@ limitations under the License.
 
 <div class='tab-pane' id='python[% p.value.id %]'>
 <pre class="pre-scrollable prettyprint linenums">[% FILTER html %]
-import httplib2, sys
-
-http = httplib2.Http(".cache")
+import requests, sys
 
 server = "[% p.value.example.host %]"
 ext = "[% p.value.uri %]"
-resp, content = http.request(server+ext, method="GET", headers={"Content-Type":"[% p.value.content %]"})
+[% IF p.value.body -%]
+headers={ "Content-Type" : "[% p.value.content %]", "Accept" : "[% p.value.accept %]"}
+r = requests.post(server+ext, headers=headers, data='[% p.value.body %]')
+[% ELSE %]
+r = requests.get(server+ext, headers={ "Content-Type" : "[% p.value.content %]"})
+[% END -%]
 
-if not resp.status == 200:
-  print "Invalid response: ", resp.status
+if not r.ok:
+  r.raise_for_status()
   sys.exit()
-[% IF p.value.content == 'application/json' -%]
-import json
 
-decoded = json.loads(content)
+[% IF (p.value.body && p.value.accept == 'application/json') || p.value.content == 'application/json' -%]
+decoded = r.json()
 print repr(decoded)
 [% ELSE %]
-print content
+print r.text
 [% END -%]
 [% END %]
 </pre>

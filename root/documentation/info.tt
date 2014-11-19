@@ -103,12 +103,12 @@ limitations under the License.
 [% END %]
 
 [% IF endpoint.is_post %]
-
+  [% example_post = endpoint.examples.values.first %]
   <h2>Message</h2>
   <table class="table table-condensed table-striped">
     <tbody>
       <tr><td><b>Content-type</b></td><td><b>Format</b></td><td><b>Example</b></td></tr>
-      <tr><td>[% endpoint.postmessage.type %]</td><td>[% endpoint.postmessage.format %]</td><td>[% endpoint.postmessage.body %]</td></tr>
+      <tr><td>[% example_post.content %]</td><td>[% endpoint.postformat %]</td><td>[% example_post.body %]</td></tr>
     </tbody>
   </table>
 
@@ -143,7 +143,7 @@ limitations under the License.
       url : "[% filtered_uri %]",
       type : method,
      beforeSend : function () {
-        $("#example[% p.value.id %]").append("<img src='../../static/img/e-loader.gif'>");
+        $("#example[% p.value.id %]").append("<img src='/static/img/e-loader.gif'>");
         return true;
      },
       success : function (resp) {

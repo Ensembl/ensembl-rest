@@ -24,6 +24,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
+[% IF p.value.body -%]
+import java.io.DataOutputStream;
+[% END %]
 
 public class EnsemblRest {
 
@@ -34,7 +37,23 @@ public class EnsemblRest {
 
     URLConnection connection = url.openConnection();
     HttpURLConnection httpConnection = (HttpURLConnection)connection;
-    connection.setRequestProperty("Content-Type", "[% p.value.content %]");
+    [% IF p.value.body %]
+    String postBody = "[% p.value.body | replace('"', '\"') %]";
+    httpConnection.setRequestMethod("POST");
+    httpConnection.setRequestProperty("Content-Type", "[% p.value.content %]");
+    httpConnection.setRequestProperty("Accept", "[% p.value.accept %]");
+    httpConnection.setRequestProperty("Content-Length", Integer.toString(postBody.getBytes().length));
+    httpConnection.setUseCaches(false);
+    httpConnection.setDoInput(true);
+    httpConnection.setDoOutput(true);
+
+    DataOutputStream wr = new DataOutputStream(httpConnection.getOutputStream());
+    wr.writeBytes(postBody);
+    wr.flush();
+    wr.close();
+    [% ELSE %]
+    httpConnection.setRequestProperty("Content-Type", "[% p.value.content %]");
+    [% END %]
 
     InputStream response = connection.getInputStream();
     int responseCode = httpConnection.getResponseCode();

@@ -42,7 +42,7 @@ my $response = $http->get($server.$ext, {
 
 die "Failed!\n" unless $response->{success};
 
-[% IF p.value.content == 'application/json' %]
+[% IF (p.value.body && p.value.accept == 'application/json') || p.value.content == 'application/json' %]
 use JSON;
 use Data::Dumper;
 if(length $response->{content}) {
