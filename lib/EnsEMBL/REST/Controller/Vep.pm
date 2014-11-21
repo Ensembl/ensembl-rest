@@ -57,16 +57,23 @@ with 'EnsEMBL::REST::Role::PostLimiter';
 sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
   $c->stash->{species} = $c->model('Registry')->get_alias($species);
-  my $has_variation = $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation');
-  if (!$has_variation) { $c->go('ReturnError', 'custom', ["Species $species does not have any variation features"]); }
+  $c->stash->{has_variation} = $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation');
   try {
       $c->stash->{species} = $c->model('Registry')->get_alias($species);
       
       # get variation adaptors
-      $c->stash( va   => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
-      $c->stash( tva  => $c->model('Registry')->get_adaptor( $species, 'Variation', 'TranscriptVariation' ) );
-      $c->stash( vfa  => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
-      $c->stash( svfa => $c->model('Registry')->get_adaptor( $species, 'Variation', 'StructuralVariationFeature' ) );
+      if($c->stash->{has_variation}) {
+        $c->stash( va   => $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation' ) );
+        $c->stash( tva  => $c->model('Registry')->get_adaptor( $species, 'Variation', 'TranscriptVariation' ) );
+        $c->stash( vfa  => $c->model('Registry')->get_adaptor( $species, 'Variation', 'VariationFeature' ) );
+        $c->stash( svfa => $c->model('Registry')->get_adaptor( $species, 'Variation', 'StructuralVariationFeature' ) );
+      }
+      # get fake ones for species with no variation DB
+      else {
+        $c->stash( vfa  => Bio::EnsEMBL::Variation::DBSQL::VariationFeatureAdaptor->new_fake($species) );
+        $c->stash( svfa => Bio::EnsEMBL::Variation::DBSQL::StructuralVariationFeatureAdaptor->new_fake($species) );
+        $c->stash( tva  => Bio::EnsEMBL::Variation::DBSQL::TranscriptVariationAdaptor->new_fake($species) );
+      }
       
       # get core adaptors
       my $coord_system_adaptor = $c->model('Registry')->get_adaptor( $species, 'Core',      'CoordSystem' );
@@ -221,6 +228,9 @@ sub get_id : Chained('get_species') PathPart('id') ActionClass('REST') {
 
 sub get_id_GET {
   my ( $self, $c, $rs_id ) = @_;
+
+  if (!$c->stash->{has_variation}) { $c->go('ReturnError', 'custom', ["Species ".$c->stash->{species}." does not have a variation database"]); }
+  
   unless ($rs_id) {$c->go('ReturnError', 'custom', ["rs_id is a required parameter for this endpoint"])}
   my $v = $c->stash()->{va}->fetch_by_name($rs_id);
   $c->go( 'ReturnError', 'custom', [qq{No variation found for RS ID $rs_id}] ) unless $v;
@@ -253,6 +263,8 @@ sub get_hgvs : Chained('get_species') PathPart('hgvs') ActionClass('REST') {
 
 sub get_hgvs_GET {
   my ($self, $c, $hgvs) = @_;
+
+  if (!$c->stash->{has_variation}) { $c->go('ReturnError', 'custom', ["Species ".$c->stash->{species}." does not have a variation database"]); }
   unless ($hgvs) {$c->go('ReturnError', 'custom', ["HGVS is a required parameter for this endpoint"])}
   
   my $vf;
@@ -304,6 +316,9 @@ sub get_consequences {
 
 sub get_id_POST {
   my ($self, $c) = @_;
+
+  if (!$c->stash->{has_variation}) { $c->go('ReturnError', 'custom', ["Species ".$c->stash->{species}." does not have a variation database"]); }
+  
   my $post_data = $c->req->data;
   my $config = $self->_include_user_params($c,$post_data);
   unless (exists $post_data->{ids}) {
