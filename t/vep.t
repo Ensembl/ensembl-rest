@@ -354,7 +354,7 @@ $vep_output =
   ]
 }];
 
-$vep_output_2 = 
+$vep_output_2 =
 {
   data => [
     {
@@ -531,7 +531,7 @@ $vep_output =
   strand => 1
   }];
 
-$vep_output_2 = 
+$vep_output_2 =
 {
   data => [
     {
@@ -677,6 +677,54 @@ $json = json_POST($vep_id_post,$vep_id_body,'VEP ID list POST');
 eq_or_diff($json, $vep_output, 'VEP id POST');
 $json_2 = json_POST($vep_id_post, $vep_id_body_2, "VEP ID list POST version 2");
 eq_or_diff($json_2, $vep_output_2, "VEP id POST version 2");
+
+
+# test vep/hgvs with a genomic coord
+my $vep_hgvs_get = '/vep/homo_sapiens/hgvs/6:g.1102327G>T?content-type=application/json';
+$vep_output = [{
+  allele_string => 'G/T',
+  assembly_name => 'GRCh37',
+  end => 1102327,
+  id => '6:g.1102327G>T',
+  most_severe_consequence => 'missense_variant',
+  seq_region_name => '6',
+  start => 1102327,
+  strand => 1,
+  transcript_consequences => [
+    {
+      amino_acids => 'W/L',
+      biotype => 'protein_coding',
+      cdna_end => 581,
+      cdna_start => 581,
+      cds_end => 311,
+      cds_start => 311,
+      codons => 'tGg/tTg',
+      consequence_terms => [
+        'missense_variant'
+      ],
+      gene_id => 'ENSG00000176515',
+      gene_symbol => 'AL033381.1',
+      gene_symbol_source => 'Clone_based_ensembl_gene',
+      polyphen_prediction => 'possibly_damaging',
+      polyphen_score => '0.514',
+      protein_end => 104,
+      protein_start => 104,
+      strand => 1,
+      transcript_id => 'ENST00000314040',
+      variant_allele => 'T'
+    }
+  ]
+}];
+
+$json = json_GET($vep_hgvs_get,'GET consequences for genomic HGVS notation');
+eq_or_diff($json, $vep_output, 'VEP genomic HGVS GET');
+
+# test vep/hgvs with a transcript coord
+$vep_hgvs_get = '/vep/homo_sapiens/hgvs/ENST00000314040:c.311G>T?content-type=application/json';
+$vep_output->[0]->{id} = 'ENST00000314040:c.311G>T';
+
+$json = json_GET($vep_hgvs_get,'GET consequences for transcript HGVS notation');
+eq_or_diff($json, $vep_output, 'VEP transcript HGVS GET');
 
 
 my $body = '{ "blurb" : "stink" }';
