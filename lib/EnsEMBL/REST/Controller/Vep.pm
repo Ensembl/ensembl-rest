@@ -80,6 +80,7 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
       $c->stash->{assembly} = $coord_system_adaptor->get_default_version();
       $c->stash( csa  => $coord_system_adaptor );
       $c->stash( ga   => $c->model('Registry')->get_adaptor( $species, 'Core',      'Gene' ) );
+      $c->stash( ta   => $c->model('Registry')->get_adaptor( $species, 'Core',      'Transcript' ) );
       $c->stash( sa   => $c->model('Registry')->get_adaptor( $species, 'Core',      'Slice' ) );
       
       # get regulatory adaptors
@@ -264,11 +265,10 @@ sub get_hgvs : Chained('get_species') PathPart('hgvs') ActionClass('REST') {
 sub get_hgvs_GET {
   my ($self, $c, $hgvs) = @_;
 
-  if (!$c->stash->{has_variation}) { $c->go('ReturnError', 'custom', ["Species ".$c->stash->{species}." does not have a variation database"]); }
   unless ($hgvs) {$c->go('ReturnError', 'custom', ["HGVS is a required parameter for this endpoint"])}
   
   my $vf;
-  eval { $vf = $c->stash()->{vfa}->fetch_by_hgvs_notation($hgvs); };
+  eval { $vf = $c->stash()->{vfa}->fetch_by_hgvs_notation($hgvs, $c->stash->{sa}, $c->stash->{ta}); };
 
   if(!defined($vf) || (defined $@ && length($@) > 1)) {
     $c->go( 'ReturnError', 'custom', [qq{Unable to parse HGVS notation $hgvs $@}] );
