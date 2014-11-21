@@ -16,7 +16,13 @@ limitations under the License.
 
 <div class='tab-pane' id='wget[% p.value.id %]'>
 <pre class="pre-scrollable prettyprint linenums">[% FILTER html -%]
+[% IF p.value.body -%]
+wget -q --header='Content-type:[% p.value.content %]' --header='Accept:[% p.value.accept %]' \
+--post-data='[% p.value.body %]' \
+'[% p.value.example.host %][% p.value.uri %]'  -O -
+[% ELSE %]
 wget -q --header='Content-type:[% p.value.content %]' '[% p.value.example.host %][% p.value.uri %]'  -O -
+[% END %]
 [% END -%]
 </pre>
 </div>
