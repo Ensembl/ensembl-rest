@@ -271,7 +271,7 @@ sub get_hgvs_GET {
   eval { $vf = $c->stash()->{vfa}->fetch_by_hgvs_notation($hgvs, $c->stash->{sa}, $c->stash->{ta}); };
 
   if(!defined($vf) || (defined $@ && length($@) > 1)) {
-    $c->go( 'ReturnError', 'custom', [qq{Unable to parse HGVS notation $hgvs $@}] );
+    $c->go( 'ReturnError', 'from_ensembl', [qq{Unable to parse HGVS notation $hgvs $@}] );
   }
   
   # name it
