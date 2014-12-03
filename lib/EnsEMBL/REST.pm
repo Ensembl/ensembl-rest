@@ -112,7 +112,8 @@ sub turn_on_config_serialisers {
     );
   }
 
-  if($class->config->{html}) {
+## Only add a default for text/html if it is not already set by the controller
+  if(!$package->config->{map}->{'text/html'}) {
     $package->config(default => 'text/html');
     $package->config(
       map => {
