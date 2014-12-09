@@ -490,18 +490,18 @@ $base = '/overlap/translation';
   
   is(
     @{json_GET("$base/$id?feature=transcript_variation", 'Ensembl transcript variation')}, 
-    3, "3 variation feature for $id");
+    19, "19 variation feature for $id");
   
   is(
     @{json_GET("$base/$id?feature=transcript_variation;feature=protein_feature", 'Ensembl biotype transcripts')}, 
-    7, "7 features for protein $id");
+    23, "23 features for protein $id");
 
   is(
-    @{json_GET("$base/$id?feature=transcript_variation;so_term=intron_variant", 'Ensembl variation with so term')},
-    3, "3 intron variants for $id");
+    @{json_GET("$base/$id?feature=transcript_variation;so_term=missense_variant", 'Ensembl variation with so term')},
+    10, "10 missense variants for $id");
   is(
     @{json_GET("$base/$id?feature=somatic_transcript_variation", 'Ensembl variation with somatic data')},
-    2, "2 somatic variations overlapping $id");
+    16, "16 somatic variations overlapping $id");
 }
 
 #Check can we get the splice sites and exon boundaries of a translation
