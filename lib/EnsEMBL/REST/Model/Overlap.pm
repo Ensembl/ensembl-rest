@@ -272,7 +272,7 @@ sub _filter_transcript_variation {
   
   foreach my $tv (@{$transcript_variants}) {
     # filter out up/downstream TVs
-    next unless $tv->cdna_start || $tv->cdna_end;
+    next unless $tv->cds_start || $tv->cds_end;
     
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
     my ($vf) = grep {$_->dbID eq $tv->{_variation_feature_id}} @{$cached_vfs};
