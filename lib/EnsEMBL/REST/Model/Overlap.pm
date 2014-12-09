@@ -252,10 +252,14 @@ sub somatic_transcript_variation {
   
   my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
-    $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms);
+    # HACK FOR DATA BUG IN VARIATION DB
+    $transcript_variants = [@{$tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms)}, @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms)}];
+    # $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript]);
   } 
   else {
-    $transcript_variants = $tva->fetch_all_somatic_by_Transcripts([$transcript]);
+    # HACK FOR DATA BUG IN VARIATION DB
+    $transcript_variants = [@{$tva->fetch_all_somatic_by_Transcripts([$transcript])}, @{$tva->fetch_all_by_Transcripts([$transcript])}];
+    # $transcript_variants = $tva->fetch_all_somatic_by_Transcripts([$transcript]);
   }
   return $self->_filter_transcript_variation($transcript_variants);
 }
