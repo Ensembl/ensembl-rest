@@ -59,6 +59,7 @@ sub id_POST {
   my ($self, $c) = @_;
   my %variations;
   my $data = $c->request->data;
+  unless (exists $data->{ids}) { $c->go('ReturnError','custom', [qq/You POST data does not contain a list keyed by 'ids'/])}
   my $id_list = $data->{ids} if exists $data->{ids};
   $self->assert_post_size($c,$id_list);
   foreach my $id (@$id_list) {
