@@ -24,7 +24,6 @@ use Try::Tiny;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
-
 =pod
 
 /variation/species/rs1333049
@@ -34,6 +33,7 @@ application/json
 =cut
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
+with 'EnsEMBL::REST::Role::PostLimiter';
 
 
 sub species: Chained('/') PathPart('variation') CaptureArgs(1) {
@@ -41,13 +41,11 @@ sub species: Chained('/') PathPart('variation') CaptureArgs(1) {
   $c->stash(species => $species);
 }
 
-sub id_GET {}
+sub id: Chained('species') PathPart('') ActionClass('REST') {}
 
-
-sub id: Chained('species') PathPart('') Args(1) ActionClass('REST') {
+sub id_GET {
   my ($self, $c, $id) = @_;
   my $variation;
-  my $pops = $c->request->param('pops');
   try {
     $variation = $c->model('Variation')->fetch_variation($id);
   } catch {
@@ -56,6 +54,24 @@ sub id: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   };
   $self->status_ok($c, entity => $variation);
 }
+
+sub id_POST {
+  my ($self, $c) = @_;
+  my %variations;
+  my $data = $c->request->data;
+  my $id_list = $data->{ids} if exists $data->{ids};
+  $self->assert_post_size($c,$id_list);
+  foreach my $id (@$id_list) {
+    try {
+      my $variation_hash = $c->model('Variation')->fetch_variation($id);
+      # $c->log->debug('Variation'.$variation_hash->{name}) if $variation_hash;
+      $variations{$id} = $variation_hash if $variation_hash;
+    } catch {$c->log->debug('Problems:'.$_)};
+  }
+  $self->status_ok($c, entity => \%variations);
+}
+
+
 
 
 __PACKAGE__->meta->make_immutable;
