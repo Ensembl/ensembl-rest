@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	78
+2	\N	schema_version	79
 3	\N	patch	patch_65_66_a.sql|schema_version
 4	\N	patch	patch_65_66_b.sql|fix_external_db_id
 5	\N	patch	patch_65_66_c.sql|reorder_unmapped_obj_index
@@ -125,3 +125,4 @@
 374	\N	patch	patch_77_78_a.sql|schema_version
 375	\N	patch	patch_77_78_b.sql|source_column_increase
 376	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
+377	\N	patch	patch_78_79_a.sql|schema_version

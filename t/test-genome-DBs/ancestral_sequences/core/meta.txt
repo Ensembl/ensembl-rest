@@ -1,6 +1,11 @@
-1	\N	schema_version	77
+1	\N	schema_type	core
+2	\N	schema_version	79
+3	\N	patch	patch_77_78_a.sql|schema_version
+4	\N	patch	patch_77_78_b.sql|source_column_increase
+5	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
 804	\N	schema_type	core
 805	\N	patch	patch_75_76_a.sql|schema_version
 806	\N	patch	patch_75_76_b.sql|allow_null_karyotype
 807	\N	patch	patch_75_76_c.sql|remove_alternative_splicing
 808	\N	patch	patch_76_77_a.sql|schema_version
+809	\N	patch	patch_78_79_a.sql|schema_version

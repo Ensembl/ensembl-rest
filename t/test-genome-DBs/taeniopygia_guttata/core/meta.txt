@@ -1,4 +1,4 @@
-1	\N	schema_version	78
+1	\N	schema_version	79
 2	\N	patch	patch_50_51_a.sql|schema_version
 3	\N	patch	patch_50_51_b.sql|protein_feature_hit_name
 4	\N	patch	patch_50_51_c.sql|meta_coord_index
@@ -193,3 +193,4 @@
 1247	\N	patch	patch_77_78_a.sql|schema_version
 1248	\N	patch	patch_77_78_b.sql|source_column_increase
 1249	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
+1250	\N	patch	patch_78_79_a.sql|schema_version
