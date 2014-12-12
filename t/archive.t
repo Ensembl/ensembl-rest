@@ -73,7 +73,7 @@ my $id_response = [
     latest => 'ENST00000429181.1',
     peptide => undef,
     possible_replacement => [],
-    release => '78',
+    release => "$release",
     type => 'Transcript',
     version => '1'
   },
@@ -84,7 +84,7 @@ my $id_response = [
     latest => 'ENSG00000262424.2',
     peptide => undef,
     possible_replacement => [],
-    release => '78',
+    release => "$release",
     type => 'Gene',
     version => '2'
   }
