@@ -221,6 +221,11 @@ sub transcript_variation {
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+  
+  my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
+  my $vfs = $transcript->feature_Slice->get_all_VariationFeatures();
+  $c->stash->{_cached_vfs} = $vfs;
+  
   my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
     $transcript_variants = $tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms);
@@ -240,12 +245,21 @@ sub somatic_transcript_variation {
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+  
+  my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
+  my $vfs = $transcript->feature_Slice->get_all_somatic_VariationFeatures();
+  $c->stash->{_cached_vfs} = $vfs;
+  
   my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
-    $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms);
+    # HACK FOR DATA BUG IN VARIATION DB
+    $transcript_variants = [@{$tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms)}, @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms)}];
+    # $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript]);
   } 
   else {
-    $transcript_variants = $tva->fetch_all_somatic_by_Transcripts([$transcript]);
+    # HACK FOR DATA BUG IN VARIATION DB
+    $transcript_variants = [@{$tva->fetch_all_somatic_by_Transcripts([$transcript])}, @{$tva->fetch_all_by_Transcripts([$transcript])}];
+    # $transcript_variants = $tva->fetch_all_somatic_by_Transcripts([$transcript]);
   }
   return $self->_filter_transcript_variation($transcript_variants);
 }
@@ -253,10 +267,17 @@ sub somatic_transcript_variation {
 sub _filter_transcript_variation {
   my ($self, $transcript_variants) = @_;
   my $type = $self->context->request->parameters->{type};
+  my $cached_vfs = $self->context->stash->{_cached_vfs};
   my @vfs;
+  
   foreach my $tv (@{$transcript_variants}) {
+    # filter out up/downstream TVs
+    next unless $tv->cds_start || $tv->cds_end;
+    
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
-    my $vf = $tv->variation_feature;
+    my ($vf) = grep {$_->dbID eq $tv->{_variation_feature_id}} @{$cached_vfs};
+    next unless $vf;
+    
     my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
     push(@vfs, $blessed_vf);
   }
