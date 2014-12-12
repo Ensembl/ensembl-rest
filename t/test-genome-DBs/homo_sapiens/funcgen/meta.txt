@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	78
+2	\N	schema_version	79
 3	\N	patch	patch_75_76_a.sql|schema_version
 4	\N	patch	patch_75_76_b.sql|result/feature_set.experiment_id & experiment/input_subset.display_url/archive_id
 5	\N	patch	patch_75_76_c.sql|cell_type.display_label
@@ -9,3 +9,4 @@
 9	\N	patch	patch_75_76_g.sql|mirna_target_feature
 579	\N	patch	patch_77_78_a.sql|schema_version
 580	\N	patch	patch_77_78_b.sql|Change unmapped_reason_id from smallint to int
+581	\N	patch	patch_78_79_a.sql|schema_version
