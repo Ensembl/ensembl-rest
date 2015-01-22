@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	78
+2	\N	schema_version	79
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -57,3 +57,6 @@
 57	\N	patch	patch_77_78_d.sql|Extend the index type_val_idx in the table attrib
 58	\N	patch	patch_77_78_e.sql|add indexes on father_ and mother_individual_id and population name
 59	\N	patch	patch_77_78_f.sql|Add new column to the transcript_variation table to flag whether variants should be displayed or not
+60	\N	patch	patch_78_79_a.sql|schema version
+61	\N	patch	patch_78_79_b.sql|change the column attrib_type_id by attrib_id in the variation_attrib table
+62	\N	patch	patch_78_79_c.sql|Store more detailed Sift information

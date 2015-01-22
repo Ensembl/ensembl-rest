@@ -31,3 +31,4 @@
 37	\N	patch	patch_77_78_c.sql|hmm_tables
 38	\N	patch	patch_74_75c.sql|species_tree_root_256
 39	\N	patch	patch_78_79_a.sql|schema_version
+40	\N	patch	patch_78_79_b.sql|genome_component

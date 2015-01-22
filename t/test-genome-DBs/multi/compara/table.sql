@@ -216,9 +216,10 @@ CREATE TABLE `genome_db` (
   `genebuild` varchar(100) NOT NULL DEFAULT '',
   `has_karyotype` tinyint(1) NOT NULL DEFAULT '0',
   `is_high_coverage` tinyint(1) NOT NULL DEFAULT '0',
+  `genome_component` varchar(5) DEFAULT NULL,
   `locator` varchar(400) DEFAULT NULL,
   PRIMARY KEY (`genome_db_id`),
-  UNIQUE KEY `name` (`name`,`assembly`,`genebuild`),
+  UNIQUE KEY `name` (`name`,`assembly`,`genebuild`,`genome_component`),
   KEY `taxon_id` (`taxon_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=144 DEFAULT CHARSET=latin1;
 
@@ -400,7 +401,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=41 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

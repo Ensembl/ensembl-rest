@@ -189,7 +189,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=63 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -305,6 +305,14 @@ CREATE TABLE `protein_function_predictions` (
   `analysis_attrib_id` int(11) unsigned NOT NULL,
   `prediction_matrix` mediumblob,
   PRIMARY KEY (`translation_md5_id`,`analysis_attrib_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `protein_function_predictions_attrib` (
+  `translation_md5_id` int(11) unsigned NOT NULL,
+  `analysis_attrib_id` int(11) unsigned NOT NULL,
+  `attrib_type_id` int(11) unsigned NOT NULL,
+  `position_values` blob,
+  PRIMARY KEY (`translation_md5_id`,`analysis_attrib_id`,`attrib_type_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `publication` (
@@ -512,14 +520,14 @@ CREATE TABLE `transcript_variation` (
   `hgvs_protein` text,
   `polyphen_prediction` enum('unknown','benign','possibly damaging','probably damaging') DEFAULT NULL,
   `polyphen_score` float DEFAULT NULL,
-  `sift_prediction` enum('tolerated','deleterious') DEFAULT NULL,
+  `sift_prediction` enum('tolerated','deleterious','tolerated - low confidence','deleterious - low confidence') DEFAULT NULL,
   `sift_score` float DEFAULT NULL,
   `display` int(1) DEFAULT '1',
   PRIMARY KEY (`transcript_variation_id`),
   KEY `variation_feature_idx` (`variation_feature_id`),
   KEY `consequence_type_idx` (`consequence_types`),
   KEY `somatic_feature_idx` (`feature_stable_id`,`somatic`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=7328586 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `translation_md5` (
   `translation_md5_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -546,14 +554,14 @@ CREATE TABLE `variation` (
   PRIMARY KEY (`variation_id`),
   UNIQUE KEY `name` (`name`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=63646322 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=64119776 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `variation_attrib` (
   `variation_id` int(11) unsigned NOT NULL,
-  `attrib_type_id` int(11) DEFAULT NULL,
+  `attrib_id` int(11) DEFAULT NULL,
   `value` varchar(255) DEFAULT NULL,
   KEY `variation_idx` (`variation_id`),
-  KEY `type_value_idx` (`attrib_type_id`,`value`)
+  KEY `attrib_value_idx` (`attrib_id`,`value`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `variation_citation` (
@@ -592,7 +600,7 @@ CREATE TABLE `variation_feature` (
   KEY `variation_set_idx` (`variation_set_id`),
   KEY `consequence_type_idx` (`consequence_types`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=69175965 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=69649394 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `variation_feature_bak` (
   `variation_feature_id` int(10) unsigned NOT NULL DEFAULT '0',
