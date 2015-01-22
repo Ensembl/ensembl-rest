@@ -411,7 +411,9 @@ sub _include_user_params {
   my %vep_params = %{ $c->config->{'Controller::VEP'} };
   read_cache_info(\%vep_params);
   # $c->log->debug("Before ".Dumper \%vep_params);
+  # Values in user_config come from POST body while request_params() contains config from url
   map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
+  map { $vep_params{$_} = $c->request()->params() if ($_ ~~ @valid_keys) } keys %{$c->request->params()};
   
   if ($c->stash->{species} ne 'homo_sapiens') {
     delete $vep_params{cache};
