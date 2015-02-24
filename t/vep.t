@@ -68,6 +68,7 @@ my $vep_output =
       consequence_terms => [
         'intron_variant'
       ],
+      impact => 'MODIFIER',
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
@@ -80,6 +81,7 @@ my $vep_output =
       consequence_terms => [
         'intron_variant'
       ],
+      impact => 'MODIFIER',
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
@@ -92,6 +94,7 @@ my $vep_output =
       consequence_terms => [
         'intron_variant'
       ],
+      impact => 'MODIFIER',
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
@@ -104,6 +107,7 @@ my $vep_output =
       consequence_terms => [
         'intron_variant'
       ],
+      impact => 'MODIFIER',
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
@@ -116,6 +120,7 @@ my $vep_output =
       consequence_terms => [
         'intron_variant'
       ],
+      impact => 'MODIFIER',
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
@@ -138,6 +143,7 @@ my $vep_output_2 =
      "Existing_variation" => "rs2299222",
      "Allele" => "G",
      "Gene" => "ENSG00000198822",
+      IMPACT => 'MODIFIER',
      "CDS_position" => "-",
      "cDNA_position" => "-",
      "Protein_position" => "-",
@@ -156,6 +162,7 @@ my $vep_output_2 =
      "Existing_variation" => "rs2299222",
      "Allele" => "G",
      "Gene" => "ENSG00000198822",
+      IMPACT => 'MODIFIER',
      "CDS_position" => "-",
      "cDNA_position" => "-",
      "Protein_position" => "-",
@@ -176,6 +183,7 @@ my $vep_output_2 =
       "Existing_variation" => "rs2299222",
       "Allele" => "G",
       "Gene" => "ENSG00000198822",
+       IMPACT => 'MODIFIER',
       "CDS_position" => "-",
       "cDNA_position" => "-",
       "Protein_position" => "-",
@@ -195,6 +203,7 @@ my $vep_output_2 =
        "Existing_variation" => "rs2299222",
        "Allele" => "G",
        "Gene" => "ENSG00000198822",
+        IMPACT => 'MODIFIER',
        "CDS_position" => "-",
        "cDNA_position" => "-",
        "Protein_position" => "-",
@@ -214,6 +223,7 @@ my $vep_output_2 =
         "Existing_variation" => "rs2299222",
         "Allele" => "G",
         "Gene" => "ENSG00000198822",
+         IMPACT => 'MODIFIER',
         "CDS_position" => "-",
         "cDNA_position" => "-",
         "Protein_position" => "-",
@@ -256,6 +266,7 @@ $vep_output =
         gene_id => 'ENSG00000197085',
         gene_symbol => 'NPSR1-AS1',
         gene_symbol_source => 'HGNC',
+        impact => 'MODIFIER',
         strand => -1,
         transcript_id => 'ENST00000419766',
         variant_allele => 'T'
@@ -299,6 +310,7 @@ $vep_output =
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
+      impact => 'MODIFIER',
       strand => 1,
       transcript_id => 'ENST00000536043',
       variant_allele => 'C'
@@ -311,6 +323,7 @@ $vep_output =
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
+      impact => 'MODIFIER',
       strand => 1,
       transcript_id => 'ENST00000439827',
       variant_allele => 'C'
@@ -323,6 +336,7 @@ $vep_output =
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
+      impact => 'MODIFIER',
       strand => 1,
       transcript_id => 'ENST00000361669',
       variant_allele => 'C'
@@ -335,6 +349,7 @@ $vep_output =
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
+      impact => 'MODIFIER',
       strand => 1,
       transcript_id => 'ENST00000546348',
       variant_allele => 'C'
@@ -347,6 +362,7 @@ $vep_output =
       gene_id => 'ENSG00000198822',
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
+      impact => 'MODIFIER',
       strand => 1,
       transcript_id => 'ENST00000394720',
       variant_allele => 'C'
@@ -372,6 +388,7 @@ $vep_output_2 =
       Feature => 'ENST00000419766',
       Feature_type => 'Transcript',
       Gene => 'ENSG00000197085',
+       IMPACT => 'MODIFIER',
       Location => '7:34381884',
       Protein_position => '-',
       Uploaded_variation => 'var1',
@@ -386,6 +403,7 @@ $vep_output_2 =
       Consequence => 'intron_variant',
       Existing_variation => 'rs2299222',
       GMAF => 'C:0.0399',
+      IMPACT => 'MODIFIER',
       STRAND => 1,
       SYMBOL => 'GRM3',
       SYMBOL_SOURCE => 'HGNC',
@@ -406,6 +424,7 @@ $vep_output_2 =
       Consequence => 'intron_variant',
       Existing_variation => 'rs2299222',
       GMAF => 'C:0.0399',
+      IMPACT => 'MODIFIER',
       STRAND => 1,
       SYMBOL => 'GRM3',
       SYMBOL_SOURCE => 'HGNC',
@@ -426,6 +445,7 @@ $vep_output_2 =
       Consequence => 'intron_variant',
       Existing_variation => 'rs2299222',
       GMAF => 'C:0.0399',
+      IMPACT => 'MODIFIER',
       STRAND => 1,
       SYMBOL => 'GRM3',
       SYMBOL_SOURCE => 'HGNC',
@@ -446,6 +466,7 @@ $vep_output_2 =
       Consequence => 'intron_variant',
       Existing_variation => 'rs2299222',
       GMAF => 'C:0.0399',
+      IMPACT => 'MODIFIER',
       STRAND => 1,
       SYMBOL => 'GRM3',
       SYMBOL_SOURCE => 'HGNC',
@@ -466,6 +487,7 @@ $vep_output_2 =
       Consequence => 'intron_variant',
       Existing_variation => 'rs2299222',
       GMAF => 'C:0.0399',
+      IMPACT => 'MODIFIER',
       STRAND => 1,
       SYMBOL => 'GRM3',
       SYMBOL_SOURCE => 'HGNC',
@@ -515,12 +537,14 @@ $vep_output =
       consequence_terms => [
         'intergenic_variant'
       ],
+      impact => 'MODIFIER',
       variant_allele => 'A'
     },
     {
       consequence_terms => [
         'intergenic_variant'
       ],
+      impact => 'MODIFIER',
       variant_allele => 'T'
     }
   ],
@@ -539,6 +563,7 @@ $vep_output_2 =
       Consequence => 'intergenic_variant',
       Existing_variation => 'rs186950277',
       GMAF => 'A:0.0014',
+      IMPACT => 'MODIFIER',
       Location => '8:60403074',
       Uploaded_variation => 'rs186950277'
     },
@@ -547,6 +572,7 @@ $vep_output_2 =
       Consequence => 'intergenic_variant',
       Existing_variation => 'rs186950277',
       GMAF => 'A:0.0014',
+      IMPACT => 'MODIFIER',
       Location => '8:60403074',
       Uploaded_variation => 'rs186950277'
     }
@@ -590,12 +616,14 @@ $vep_output =
       consequence_terms => [
         'intergenic_variant'
       ],
+      impact => 'MODIFIER',
       variant_allele => 'A'
     },
     {
       consequence_terms => [
         'intergenic_variant'
       ],
+      impact => 'MODIFIER',
       variant_allele => 'T'
     }
   ],
@@ -633,6 +661,7 @@ $vep_output =
         consequence_terms => [
           'intergenic_variant'
         ],
+        impact => 'MODIFIER',
         variant_allele => 'A'
       }
     ],
@@ -651,6 +680,7 @@ $vep_output_2 =
       Consequence => 'intergenic_variant',
       Existing_variation => 'rs17081232',
       GMAF => 'A:0.2443',
+      IMPACT => 'MODIFIER',
       Location => '4:32305409',
       Uploaded_variation => 'rs17081232'
     },
@@ -659,6 +689,7 @@ $vep_output_2 =
       Consequence => 'intergenic_variant',
       Existing_variation => 'rs186950277',
       GMAF => 'A:0.0014',
+      IMPACT => 'MODIFIER',
       Location => '8:60403074',
       Uploaded_variation => 'rs186950277'
     },
@@ -667,6 +698,7 @@ $vep_output_2 =
       Consequence => 'intergenic_variant',
       Existing_variation => 'rs186950277',
       GMAF => 'A:0.0014',
+      IMPACT => 'MODIFIER',
       Location => '8:60403074',
       Uploaded_variation => 'rs186950277'
     }
@@ -705,6 +737,7 @@ $vep_output = [{
       gene_id => 'ENSG00000176515',
       gene_symbol => 'AL033381.1',
       gene_symbol_source => 'Clone_based_ensembl_gene',
+      impact => 'MODERATE',
       polyphen_prediction => 'possibly_damaging',
       polyphen_score => '0.514',
       protein_end => 104,
