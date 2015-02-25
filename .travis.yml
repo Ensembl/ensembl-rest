@@ -23,9 +23,7 @@ before_install:
     - cd perl
     - perl Makefile.PL
     - make && make install
-    - cd ../../
-    - cd C_code/
-    - make
+
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
