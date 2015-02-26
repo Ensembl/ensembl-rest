@@ -32,7 +32,7 @@ use Data::Dumper;
 
 Catalyst::Test->import('EnsEMBL::REST');
 
-my $base = '/variants/search';
+my $base = '/ga4gh/variants/search';
 
 my $post_data1 = '{ "referenceName": 22,"start": 16050150 ,"end": 16060170 ,"pageSize": 1, "callSetIds": ["NA12878"], "variantSetIds":[65] }';
 my $post_data2 = '{ "referenceName": 22,"start": 16132100 ,"end": 16132110 ,"pageSize": 1,  "variantSetIds":[22], "callSetIds": ["NA19060", "NA18990"] ,"variantName": "rs150753069" }';

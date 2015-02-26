@@ -31,7 +31,7 @@ use Bio::EnsEMBL::Test::TestUtils;
 
 Catalyst::Test->import('EnsEMBL::REST');
 
-my $base = '/callsets/search';
+my $base = '/ga4gh/callsets/search';
 
 my $post_data1 = '{ "pageSize": 2,  "datasetIds":[],"pageToken":"" }';
 my $post_data2 = '{ "pageSize": 2,  "variantSetIds":[65],"pageToken":"" }';
