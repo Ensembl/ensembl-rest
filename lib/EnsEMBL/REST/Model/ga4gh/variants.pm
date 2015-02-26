@@ -17,7 +17,7 @@ limitations under the License.
 =cut
 
 package EnsEMBL::REST::Model::ga4gh::variants;
-## version using raw IO mods
+
 use Moose;
 extends 'Catalyst::Model';
 
