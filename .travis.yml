@@ -14,8 +14,16 @@ before_install:
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-compara.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-variation.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-funcgen.git
+    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-io.git
     - wget https://github.com/bioperl/bioperl-live/archive/bioperl-release-1-2-3.zip
     - unzip bioperl-release-1-2-3.zip
+    - git clone --branch master --depth 1 https://github.com/samtools/tabix.git
+    - cd tabix
+    - make
+    - cd perl
+    - perl Makefile.PL
+    - make && make install
+    - cd ../../
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .

@@ -1,6 +1,8 @@
 #!/bin/bash
 
-export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/ensembl-compara/modules:$PWD/ensembl-variation/modules:$PWD/ensembl-funcgen/modules:$PWD/lib
+export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/ensembl-compara/modules:$PWD/ensembl-variation/modules:$PWD/ensembl-funcgen/modules:$PWD/ensembl-io/modules:$PWD/lib
+
+export PATH=$PATH:$PWD/tabix
 
 echo "Running test suite"
 if [ "$COVERALLS" = 'true' ]; then
