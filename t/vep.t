@@ -239,6 +239,32 @@ eq_or_diff($json, $vep_output, 'Example vep region get message');
 my $json_2 = json_GET("$vep_get;version=2", "GET a VEP region version 2");
 eq_or_diff($json_2, $vep_output_2, "Example vep region in version 2 get message");
 
+# test with non-toplevel sequence (should transform to toplevel)
+$vep_get = '/vep/homo_sapiens/region/HSCHR6_CTG1:1000001-1000001:1/G?content-type=application/json';
+$vep_output = [
+  {
+    'assembly_name' => 'GRCh37',
+    'end' => 1060001,
+    'seq_region_name' => '6',
+    'strand' => 1,
+    'id' => 'temp',
+    'most_severe_consequence' => 'intergenic_variant',
+    'allele_string' => 'C/G',
+    'intergenic_consequences' => [
+      {
+        'consequence_terms' => [
+          'intergenic_variant'
+        ],
+        'variant_allele' => 'G',
+        'impact' => 'MODIFIER'
+      }
+    ],
+    'start' => 1060001
+  }
+];
+$json = json_GET($vep_get,'GET a VEP region on a non-toplevel sequence');
+eq_or_diff($json_2, $vep_output_2, "VEP non-toplevel get message");
+
 my $vep_post = '/vep/homo_sapiens/region';
 my $vep_post_body = '{ "variants" : ["7  34381884  var1  C  T  . . .",
                                      "7  86442404  var2  T  C  . . ."]}';

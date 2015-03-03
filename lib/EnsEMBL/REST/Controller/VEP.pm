@@ -22,7 +22,7 @@ use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
 use Data::Dumper;
 use Bio::DB::Fasta;
-use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line read_cache_info @REG_FEAT_TYPES);
+use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line validate_vf read_cache_info @REG_FEAT_TYPES);
 use Bio::EnsEMBL::Slice;
 use Bio::EnsEMBL::Utils::Sequence qw(reverse_comp);
 use Bio::EnsEMBL::Funcgen::MotifFeature;
@@ -299,6 +299,11 @@ sub get_consequences {
     delete $config->{rest};
     $config->{gmaf} = 1;
   }
+  
+  # pass the variant(s) through validate_vf
+  # as well as doing some QC, this will transform the variant to toplevel
+  @$vfs = grep {validate_vf($config, $_ )} @$vfs;
+  
   my $consequences = get_all_consequences( $config, $vfs);
   if ($version == 2) {
     foreach my $consequence (@$consequences) {
