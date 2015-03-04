@@ -13,7 +13,6 @@ all_from 'lib/EnsEMBL/REST.pm';
 requires 'Catalyst::Runtime';
 requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
-requires 'Catalyst::Plugin::Cache::Store::FastMmap';
 requires 'Catalyst::Action::RenderView';
 requires 'Moose';
 requires 'namespace::autoclean';

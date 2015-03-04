@@ -60,7 +60,6 @@ use Catalyst qw/
   ConfigLoader
   Static::Simple
   Cache
-  Cache::Store::FastMmap
 /;
 
 
@@ -86,11 +85,6 @@ __PACKAGE__->config(
       General => {-ForceArray => 1},
     },
   },
-  'Plugin::Cache' => { 
-    backend => {
-      store => "FastMmap"
-    }
-  }
 );
 
 # Start the application
