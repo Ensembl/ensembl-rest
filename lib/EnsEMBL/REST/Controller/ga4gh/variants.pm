@@ -69,6 +69,11 @@ sub get_request: Chained('/') PathPart('ga4gh/variants') ActionClass('REST')  {
   $c->go( 'ReturnError', 'custom', [ ' Cannot find "end" key in your request'])   
     unless exists $post_data->{end};
 
+  $c->go( 'ReturnError','custom', [ '"start" must not equal "end". Check your coordinates are expressed in zero-based half-open format' ])
+    if ($post_data->{start} == $post_data->{end});
+  # This occurence causes big problems in the underlying Tabix use. Bug in the IO layer may be fixed, but the users still shouldn't
+  # be treating this endpoint like other Ensembl endpoints.
+
   $c->go( 'ReturnError', 'custom', [ '  End of interval cannot be greater than start of interval'])
     unless $post_data->{end} >= $post_data->{start};
 
