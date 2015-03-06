@@ -329,7 +329,7 @@ sub get_next_by_token{
 
   ## this should not happen
 #  $self->context()->go('ReturnError', 'custom', ["No data found in the required region"]) if $n ==0;
-  
+  $parser->close();
   return (\@var,$current_ds) ;
 
 }
