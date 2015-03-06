@@ -171,6 +171,12 @@ my $json4 = json_POST($base, $post_data4, 'variants by callset & token');
 eq_or_diff($json4, $expected_data4, "Checking the result from the gavariant endpoint - with token");
 
 
+my $bad_post = q/{ "referenceName": 22,"start": 16050150 ,"end": 16050150 ,"pageSize": 1, "callSetIds": ["NA12878"], "variantSetIds":[65], "pageToken":"16050158_65_2" }/;
+
+action_bad_post($base, $bad_post, qr/must not equal/, 'Throw nasty data at endpoint' );
+
+
+
 done_testing();
 
 
