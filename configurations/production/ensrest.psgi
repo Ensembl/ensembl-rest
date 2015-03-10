@@ -20,7 +20,7 @@ builder {
   #------ Set Content-type headers when we detect a valid extension
   enable "DetectExtension";
   #------ Allow CrossOrigin requests from any host
-  enable 'CrossOrigin', origins => '*', headers => [qw/GET HEAD POST OPTIONS/];
+  enable 'CrossOrigin', origins => '*', headers => '*', methods => ['GET','POST','OPTIONS'];
   
   
   my $dirname = dirname(__FILE__);
