@@ -175,6 +175,10 @@ my $bad_post = q/{ "referenceName": 22,"start": 16050150 ,"end": 16050150 ,"page
 
 action_bad_post($base, $bad_post, qr/must not equal/, 'Throw nasty data at endpoint' );
 
+my $bad_post2 = q/{ "referenceName": 22,"start": 1 ,"end": 10 ,"pageSize": 1, "callSetIds": ["NA12878"], "variantSetIds":[65] }/;
+
+action_bad_post($base, $bad_post2, qr/No variants are available for this region/, 'Throw if no data' );
+
 
 
 done_testing();
