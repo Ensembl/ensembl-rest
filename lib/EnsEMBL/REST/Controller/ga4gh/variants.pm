@@ -50,23 +50,18 @@ BEGIN {extends 'Catalyst::Controller::REST'; }
 sub get_request_POST {
   my ( $self, $c ) = @_;
 
-}
-
-
-sub get_request: Chained('/') PathPart('ga4gh/variants') ActionClass('REST')  {
-  my ( $self, $c ) = @_;
   my $post_data = $c->req->data;
 
 #  $c->log->debug(Dumper $post_data);
 
   ## required by spec, so check early
-  $c->go( 'ReturnError', 'custom', [ ' Cannot find "referenceName" key in your request' ] ) 
+  $c->go( 'ReturnError', 'custom', [ ' Cannot find "referenceName" key in your request' ] )
     unless exists $post_data->{referenceName} ;
 
-  $c->go( 'ReturnError', 'custom', [ ' Cannot find "start" key in your request'])         
+  $c->go( 'ReturnError', 'custom', [ ' Cannot find "start" key in your request'])
     unless exists $post_data->{start};
 
-  $c->go( 'ReturnError', 'custom', [ ' Cannot find "end" key in your request'])   
+  $c->go( 'ReturnError', 'custom', [ ' Cannot find "end" key in your request'])
     unless exists $post_data->{end};
 
   $c->go( 'ReturnError','custom', [ '"start" must not equal "end". Check your coordinates are expressed in zero-based half-open format' ])
@@ -83,12 +78,11 @@ sub get_request: Chained('/') PathPart('ga4gh/variants') ActionClass('REST')  {
 
 
   ## set a default page size if not supplied or not a number
-  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&  
+  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&
                                       $post_data->{pageSize} =~ /\d+/ &&
                                       $post_data->{pageSize} >0  );
 
-
-  ## set a maximum page size 
+## set a maximum page size 
   $post_data->{pageSize} =  1000 if $post_data->{pageSize} > 1000; 
 
   my $gavariant;
@@ -100,6 +94,13 @@ sub get_request: Chained('/') PathPart('ga4gh/variants') ActionClass('REST')  {
   };
 
   $self->status_ok($c, entity => $gavariant);
+
+
+}
+
+
+sub get_request: Chained('/') PathPart('ga4gh/variants') ActionClass('REST')  {
+  my ( $self, $c ) = @_;
 }
 
 

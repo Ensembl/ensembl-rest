@@ -323,6 +323,7 @@ sub get_next_by_token{
 
   if ($n ==0){
     ## may be nothing in the specified dataset - increment dataset id and re-send
+    $current_ds++;
     $data->{pageToken} = $batch_start ."_". $set_start ."_".  $current_ds;
     $self->get_next_by_token($data);
  }
