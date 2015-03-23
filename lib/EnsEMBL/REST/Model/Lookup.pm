@@ -219,7 +219,7 @@ sub find_object_location {
     my $lookup = $c->model($model_name);
     @captures = $lookup->find_object_location($id, $object_type, $db_type, $species, $use_archive);
     #Check if we any conntent or if the 1st element was false (both mean force a long lookup)
-    unless (@captures && $captures[0]) {
+    unless (@captures || $captures[0]) {
       $c->log()->debug('Using long database lookup');
       @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
     }
