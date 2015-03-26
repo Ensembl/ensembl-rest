@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	79
+2	\N	schema_version	80
 3	\N	patch	patch_65_66_a.sql|schema_version
 4	\N	patch	patch_65_66_b.sql|fix_external_db_id
 5	\N	patch	patch_65_66_c.sql|reorder_unmapped_obj_index
@@ -126,3 +126,8 @@
 375	\N	patch	patch_77_78_b.sql|source_column_increase
 376	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
 377	\N	patch	patch_78_79_a.sql|schema_version
+378	\N	patch	patch_78_79_b.sql|bamcov support
+379	\N	patch	patch_79_80_a.sql|schema_version
+380	\N	patch	patch_79_80_b.sql|xref_dbprimary_acc_longer
+381	\N	patch	patch_79_80_c.sql|seq_region_synonym_longer
+382	\N	patch	patch_79_80_d.sql|genome_statistics_value_longer

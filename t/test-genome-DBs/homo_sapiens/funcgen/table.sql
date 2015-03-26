@@ -168,8 +168,8 @@ CREATE TABLE `binding_matrix` (
   `analysis_id` smallint(5) unsigned NOT NULL,
   `threshold` double DEFAULT NULL,
   PRIMARY KEY (`binding_matrix_id`),
-  KEY `feature_type_idx` (`feature_type_id`),
-  KEY `name_analysis_idx` (`name`,`analysis_id`)
+  UNIQUE KEY `name_analysis_idx` (`name`,`analysis_id`),
+  KEY `feature_type_idx` (`feature_type_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=265 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `cell_type` (
@@ -216,7 +216,7 @@ CREATE TABLE `coord_system` (
   KEY `name_version_idx` (`name`,`version`),
   KEY `coord_species_idx` (`species_id`),
   KEY `coord_system_id_idx` (`coord_system_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2482 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2486 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `data_set` (
   `data_set_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -230,7 +230,8 @@ CREATE TABLE `dbfile_registry` (
   `table_id` int(10) unsigned NOT NULL,
   `table_name` varchar(32) NOT NULL,
   `path` varchar(255) NOT NULL,
-  PRIMARY KEY (`table_id`,`table_name`)
+  PRIMARY KEY (`table_id`,`table_name`),
+  UNIQUE KEY `table_id_name_path_idx` (`table_id`,`table_name`,`path`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `experiment` (
@@ -426,7 +427,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=582 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=585 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,

@@ -1,5 +1,5 @@
 1775	1	xref.timestamp	2012-09-03 21:14:58
-1	\N	schema_version	79
+1	\N	schema_version	80
 2	\N	patch	patch_52_53_a.sql|schema_version
 3	\N	patch	patch_52_53_b.sql|external_db_type_enum
 4	\N	patch	patch_52_53_c.sql|identity_xref_rename
@@ -195,3 +195,8 @@
 1807	\N	patch	patch_77_78_b.sql|source_column_increase
 1808	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
 1809	\N	patch	patch_78_79_a.sql|schema_version
+1810	\N	patch	patch_78_79_b.sql|bamcov support
+1811	\N	patch	patch_79_80_a.sql|schema_version
+1812	\N	patch	patch_79_80_b.sql|xref_dbprimary_acc_longer
+1813	\N	patch	patch_79_80_c.sql|seq_region_synonym_longer
+1814	\N	patch	patch_79_80_d.sql|genome_statistics_value_longer

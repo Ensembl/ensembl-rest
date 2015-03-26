@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	79
+2	\N	schema_version	80
 3	\N	patch	patch_59_60_a.sql|schema_version
 4	\N	patch	patch_59_60_b.sql|rename_go_xref_table
 5	\N	patch	patch_59_60_c.sql|QC_fixes
@@ -150,3 +150,8 @@
 1026	\N	patch	patch_77_78_b.sql|source_column_increase
 1027	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
 1028	\N	patch	patch_78_79_a.sql|schema_version
+1029	\N	patch	patch_78_79_b.sql|bamcov support
+1030	\N	patch	patch_79_80_a.sql|schema_version
+1031	\N	patch	patch_79_80_b.sql|xref_dbprimary_acc_longer
+1032	\N	patch	patch_79_80_c.sql|seq_region_synonym_longer
+1033	\N	patch	patch_79_80_d.sql|genome_statistics_value_longer
