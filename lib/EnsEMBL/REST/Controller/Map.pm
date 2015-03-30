@@ -122,9 +122,11 @@ sub map_data : Private {
   my $old_strand  = $old_slice->strand()*1;
   my $old_version = $old_slice->coord_system()->version();
 
+  my $target_coord_system = $c->request()->param('target_coord_system') || 'chromosome';
+
   my @decoded_segments;
   try {
-    my $projection = $old_slice->project('chromosome', $c->stash->{target_assembly});
+    my $projection = $old_slice->project($target_coord_system, $c->stash->{target_assembly});
 
     foreach my $segment ( @{$projection} ) {
       my $mapped_slice = $segment->to_Slice;
