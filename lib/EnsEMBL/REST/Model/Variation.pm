@@ -41,6 +41,14 @@ sub fetch_variation {
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
   $vfa->db->include_failed_variations(1);
+  
+  # use VCF if requested in config
+  my $var_params = $c->config->{'Model::Variation'};
+  if($var_params && $var_params->{use_vcf}) {
+    $vfa->db->use_vcf($var_params->{use_vcf});
+    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $var_params->{vcf_config};
+  }
+  
   my $variation = $vfa->fetch_by_name($variation_id);
   if (!$variation) {
     Catalyst::Exception->throw("$variation_id not found for $species");
