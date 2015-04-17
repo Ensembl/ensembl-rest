@@ -273,7 +273,8 @@ sub get_next_by_token{
 
   while($n < $limit){
     
-    $parser->next();
+    my $got_something = $parser->next();
+    last if $got_something ==0;
     my $name = $parser->get_IDs->[0];
     last unless defined $name ;
     ## add filter for variant name if require
