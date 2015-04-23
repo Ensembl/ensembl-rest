@@ -1,62 +1,3 @@
-CREATE TABLE `MTMP_cs_sr_view` (
-  `seq_region_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `seq_region_name` varchar(40) NOT NULL,
-  `coord_system_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `coord_system_name` varchar(40) NOT NULL,
-  `core_seq_region_id` int(10) unsigned NOT NULL,
-  UNIQUE KEY `sr_idx` (`seq_region_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-CREATE TABLE `MTMP_external_feature_ox_view` (
-  `external_feature_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `linkage_annotation` varchar(255) DEFAULT NULL,
-  `dbprimary_acc` varchar(40) NOT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `xref_display_label` varchar(128) NOT NULL,
-  `info_text` varchar(255) NOT NULL DEFAULT '',
-  `db_display_name` varchar(255) DEFAULT NULL,
-  `db_name` varchar(100) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-CREATE TABLE `MTMP_external_feature_view` (
-  `external_feature_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `display_label` varchar(60) DEFAULT NULL,
-  `core_seq_region_id` int(10) unsigned NOT NULL,
-  `seq_region_start` int(10) unsigned NOT NULL,
-  `seq_region_end` int(10) unsigned NOT NULL,
-  `seq_region_strand` tinyint(1) NOT NULL,
-  `seq_region_name` varchar(40) NOT NULL,
-  `name` varchar(100) DEFAULT NULL,
-  `fs_display_label` varchar(80) DEFAULT NULL,
-  `feature_type_class` enum('Insulator','DNA','Regulatory Feature','Histone','RNA','Polymerase','Transcription Factor','Transcription Factor Complex','Regulatory Motif','Enhancer','Expression','Pseudo','Open Chromatin','Search Region','Association Locus','Segmentation State','DNA Modification','Transcription Start Site') DEFAULT NULL,
-  `feature_type_description` varchar(255) DEFAULT NULL,
-  `feature_type_name` varchar(40) NOT NULL,
-  `feature_set_id` int(10) unsigned NOT NULL,
-  `linkage_annotation` varchar(255) DEFAULT NULL,
-  `dbprimary_acc` varchar(40) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `xref_display_label` varchar(128) DEFAULT NULL,
-  `info_text` varchar(255) DEFAULT '',
-  `db_display_name` varchar(255) DEFAULT NULL,
-  `db_name` varchar(100) DEFAULT NULL,
-  UNIQUE KEY `external_feature_idx` (`external_feature_id`,`dbprimary_acc`),
-  KEY `fs_idx` (`feature_set_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-CREATE TABLE `MTMP_fs_displayable_view` (
-  `feature_set_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `feature_type_id` int(10) unsigned NOT NULL,
-  `name` varchar(100) DEFAULT NULL,
-  `display_label` varchar(80) DEFAULT NULL,
-  `description` varchar(80) DEFAULT NULL,
-  `cell_type_description` varchar(80) DEFAULT NULL,
-  `cell_type_name` varchar(120) DEFAULT NULL,
-  `cell_type_display_label` varchar(30) DEFAULT NULL,
-  `archive_id` varchar(60) DEFAULT NULL,
-  `project_name` varchar(40) DEFAULT NULL,
-  UNIQUE KEY `fs_idx` (`feature_set_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
 CREATE TABLE `analysis` (
   `analysis_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -74,7 +15,7 @@ CREATE TABLE `analysis` (
   `gff_feature` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`analysis_id`),
   UNIQUE KEY `logic_name_idx` (`logic_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=93 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=111 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `analysis_description` (
   `analysis_id` smallint(5) unsigned NOT NULL,
@@ -98,7 +39,7 @@ CREATE TABLE `annotated_feature` (
   PRIMARY KEY (`annotated_feature_id`),
   UNIQUE KEY `seq_region_feature_set_idx` (`seq_region_id`,`seq_region_start`,`feature_set_id`),
   KEY `feature_set_idx` (`feature_set_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=12173934 DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=39;
+) ENGINE=MyISAM AUTO_INCREMENT=12186808 DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=39;
 
 CREATE TABLE `array` (
   `array_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -111,7 +52,7 @@ CREATE TABLE `array` (
   PRIMARY KEY (`array_id`),
   UNIQUE KEY `vendor_name_idx` (`vendor`,`name`),
   UNIQUE KEY `class_name_idx` (`class`,`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=63 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `array_chip` (
   `array_chip_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -120,7 +61,7 @@ CREATE TABLE `array_chip` (
   `name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`array_chip_id`),
   UNIQUE KEY `array_design_idx` (`array_id`,`design_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=103 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=104 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `associated_feature_type` (
   `table_id` int(10) unsigned NOT NULL,
@@ -170,7 +111,7 @@ CREATE TABLE `binding_matrix` (
   PRIMARY KEY (`binding_matrix_id`),
   UNIQUE KEY `name_analysis_idx` (`name`,`analysis_id`),
   KEY `feature_type_idx` (`feature_type_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=265 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=196 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `cell_type` (
   `cell_type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -216,7 +157,7 @@ CREATE TABLE `coord_system` (
   KEY `name_version_idx` (`name`,`version`),
   KEY `coord_species_idx` (`species_id`),
   KEY `coord_system_id_idx` (`coord_system_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2486 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2474 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `data_set` (
   `data_set_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -295,7 +236,7 @@ CREATE TABLE `external_db` (
   `description` text,
   PRIMARY KEY (`external_db_id`),
   UNIQUE KEY `db_name_release_idx` (`db_name`,`db_release`)
-) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=latin1 AVG_ROW_LENGTH=80;
+) ENGINE=MyISAM AUTO_INCREMENT=73 DEFAULT CHARSET=latin1 AVG_ROW_LENGTH=80;
 
 CREATE TABLE `external_feature` (
   `external_feature_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -312,7 +253,7 @@ CREATE TABLE `external_feature` (
   KEY `feature_type_idx` (`feature_type_id`),
   KEY `feature_set_idx` (`feature_set_id`),
   KEY `seq_region_idx` (`seq_region_id`,`seq_region_start`)
-) ENGINE=MyISAM AUTO_INCREMENT=465239 DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=80;
+) ENGINE=MyISAM AUTO_INCREMENT=935450 DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=80;
 
 CREATE TABLE `external_synonym` (
   `xref_id` int(10) unsigned NOT NULL,
@@ -336,7 +277,7 @@ CREATE TABLE `feature_set` (
   KEY `feature_type_idx` (`feature_type_id`),
   KEY `cell_type_idx` (`cell_type_id`),
   KEY `experiment_idx` (`experiment_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=627 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=645 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `feature_type` (
   `feature_type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -349,7 +290,7 @@ CREATE TABLE `feature_type` (
   PRIMARY KEY (`feature_type_id`),
   UNIQUE KEY `name_class_analysis_idx` (`name`,`class`,`analysis_id`),
   KEY `so_accession_idx` (`so_accession`)
-) ENGINE=MyISAM AUTO_INCREMENT=179512 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=179678 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `identity_xref` (
   `object_xref_id` int(10) unsigned NOT NULL,
@@ -427,7 +368,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=585 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=591 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -471,7 +412,7 @@ CREATE TABLE `motif_feature` (
   UNIQUE KEY `interdb_stable_id_idx` (`interdb_stable_id`),
   KEY `seq_region_idx` (`seq_region_id`,`seq_region_start`),
   KEY `binding_matrix_idx` (`binding_matrix_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=154885 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1290348 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `object_xref` (
   `object_xref_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -484,7 +425,7 @@ CREATE TABLE `object_xref` (
   UNIQUE KEY `xref_idx` (`xref_id`,`ensembl_object_type`,`ensembl_id`,`analysis_id`),
   KEY `analysis_idx` (`analysis_id`),
   KEY `ensembl_idx` (`ensembl_object_type`,`ensembl_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=26912558 DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=40;
+) ENGINE=MyISAM AUTO_INCREMENT=146603948 DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=40;
 
 CREATE TABLE `ontology_xref` (
   `object_xref_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -507,7 +448,7 @@ CREATE TABLE `probe` (
   KEY `probe_set_idx` (`probe_set_id`),
   KEY `array_chip_idx` (`array_chip_id`),
   KEY `name_idx` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=10997729 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=20948327 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `probe_feature` (
   `probe_feature_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -522,7 +463,7 @@ CREATE TABLE `probe_feature` (
   PRIMARY KEY (`probe_feature_id`),
   KEY `probe_idx` (`probe_id`),
   KEY `seq_region_probe_probe_feature_idx` (`seq_region_id`,`seq_region_start`,`seq_region_end`,`probe_id`,`probe_feature_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=27712553 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=32690472 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `probe_set` (
   `probe_set_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -531,7 +472,7 @@ CREATE TABLE `probe_set` (
   `family` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`probe_set_id`),
   KEY `name` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=1748264 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2326708 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `regbuild_string` (
   `regbuild_string_id` int(10) NOT NULL AUTO_INCREMENT,
@@ -559,7 +500,7 @@ CREATE TABLE `regulatory_feature` (
   `display_label` varchar(80) DEFAULT NULL,
   `feature_type_id` int(10) unsigned DEFAULT NULL,
   `feature_set_id` int(10) unsigned DEFAULT NULL,
-  `stable_id` mediumint(8) unsigned DEFAULT NULL,
+  `stable_id` varchar(128) DEFAULT NULL,
   `binary_string` varchar(500) DEFAULT NULL,
   `projected` tinyint(1) DEFAULT '0',
   `bound_start_length` mediumint(3) unsigned NOT NULL,
@@ -636,7 +577,7 @@ CREATE TABLE `segmentation_feature` (
   PRIMARY KEY (`segmentation_feature_id`),
   UNIQUE KEY `fset_seq_region_idx` (`feature_set_id`,`seq_region_id`,`seq_region_start`),
   KEY `feature_type_idx` (`feature_type_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=90613579 DEFAULT CHARSET=latin1 MAX_ROWS=100000000;
+) ENGINE=MyISAM AUTO_INCREMENT=27246067 DEFAULT CHARSET=latin1 MAX_ROWS=100000000;
 
 CREATE TABLE `seq_region` (
   `seq_region_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -647,7 +588,7 @@ CREATE TABLE `seq_region` (
   PRIMARY KEY (`name`,`schema_build`,`coord_system_id`),
   KEY `coord_system_id` (`coord_system_id`),
   KEY `seq_region_id_idx` (`seq_region_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2355 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2423 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `status` (
   `table_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -677,7 +618,7 @@ CREATE TABLE `unmapped_object` (
   `analysis_id` smallint(5) unsigned NOT NULL,
   `external_db_id` smallint(5) unsigned DEFAULT NULL,
   `identifier` varchar(255) NOT NULL,
-  `unmapped_reason_id` smallint(5) unsigned NOT NULL,
+  `unmapped_reason_id` int(10) unsigned NOT NULL,
   `query_score` double DEFAULT NULL,
   `target_score` double DEFAULT NULL,
   `ensembl_id` int(10) unsigned DEFAULT '0',
@@ -688,14 +629,14 @@ CREATE TABLE `unmapped_object` (
   KEY `anal_exdb_idx` (`analysis_id`,`external_db_id`),
   KEY `id_idx` (`identifier`(50)),
   KEY `ext_db_identifier_idx` (`external_db_id`,`identifier`)
-) ENGINE=MyISAM AUTO_INCREMENT=142023379 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=191082458 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `unmapped_reason` (
   `unmapped_reason_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `summary_description` varchar(255) DEFAULT NULL,
   `full_description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`unmapped_reason_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=14737 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=195001 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `xref` (
   `xref_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -710,5 +651,5 @@ CREATE TABLE `xref` (
   UNIQUE KEY `id_index` (`dbprimary_acc`,`external_db_id`,`info_type`,`info_text`,`version`),
   KEY `display_index` (`display_label`),
   KEY `info_type_idx` (`info_type`)
-) ENGINE=MyISAM AUTO_INCREMENT=3805360 DEFAULT CHARSET=latin1 AVG_ROW_LENGTH=100;
+) ENGINE=MyISAM AUTO_INCREMENT=4410592 DEFAULT CHARSET=latin1 AVG_ROW_LENGTH=100;
 
