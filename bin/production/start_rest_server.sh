@@ -16,6 +16,9 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 PORT=5000
+if [ -n "$REST_PORT"]; then
+  PORT=$REST_PORT
+fi
 # This should be the directory name/app name
 APP="perl5/ensembl-rest"
 PIDFILE="$HOME/$APP.pid"
