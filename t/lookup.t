@@ -60,6 +60,27 @@ my $expanded_response = {
                 };
 is_json_GET("/lookup/id/$basic_id?expand=1;format=condensed", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
 
+my $utr_response = {
+  %{$condensed_response},
+  Transcript => [
+                 {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040',
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
+         UTR => [
+                {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens'},
+                {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens'},
+                {object_type => 'three_prime_UTR', db_type => 'core', species => 'homo_sapiens'}
+                ],
+        Exon =>
+                [
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861'},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874'},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
+                ]
+                }]
+                };
+
+is_json_GET("/lookup/id/$basic_id?expand=1;utr=1;format=condensed", $utr_response, 'Get of a known ID with utr option will return UTRs as well');
+
 is_json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1;format=condensed", $expanded_response, 'Get of a known symbol returns the same result as with stable id');
 
 action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');

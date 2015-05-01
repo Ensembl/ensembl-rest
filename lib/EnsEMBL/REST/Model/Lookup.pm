@@ -285,6 +285,7 @@ sub find_and_locate_object {
       $type = 'Transcript';
     } elsif ($input_type eq 'transcript') {
       $type = 'Exon';
+      if ($c->request->param('utr')) { $features->{UTR} = $self->UTR($id, $species, $db_type) ; }
     } else {
       Catalyst::Exception->throw("Include option only available for Genes and Transcripts");
     }
@@ -360,8 +361,27 @@ sub Transcript {
       $features->{Translation} = $self->features_as_hash($translation->stable_id, $species, 'Translation', $db_type);
     }
     push @transcripts, $features;
+    if ($self->context->request->param('utr')) { $features->{UTR} = $self->UTR($transcript->stable_id, $species, $db_type) ; }
   }
   return \@transcripts;
+}
+
+sub UTR {
+  my ($self, $id, $species, $db_type) = @_;
+
+  my @utrs;
+  my $features;
+  my $transcript = $self->find_object($id, $species, 'Transcript', $db_type);
+  my $five_utr = $transcript->get_all_five_prime_utrs();
+  foreach my $five (@$five_utr) {
+    push @utrs, $self->utr_as_hash($five, $species, 'five_prime_UTR', $db_type);
+  }
+  my $three_utr = $transcript->get_all_three_prime_utrs();
+  foreach my $three (@$three_utr) {
+    push @utrs, $self->utr_as_hash($three, $species, 'three_prime_UTR', $db_type);
+  }
+
+  return \@utrs;
 }
 
 sub Exon {
@@ -375,6 +395,22 @@ sub Exon {
   }
 
   return \@exons;
+}
+
+sub utr_as_hash {
+  my ($self, $utr, $species, $object_type, $db_type) = @_;
+
+  my $format = $self->context->request->param('format') || 'full';
+  my $features;
+  $features->{species} = $species;
+  $features->{db_type} = $db_type;
+  $features->{object_type} = $object_type;
+  if ($format eq 'full') {
+    $features->{seq_region_start} = $utr->start();
+    $features->{seq_region_end} = $utr->end();
+  }
+
+  return $features;
 }
 
 sub features_as_hash {
