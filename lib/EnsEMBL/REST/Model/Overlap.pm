@@ -21,8 +21,7 @@ package EnsEMBL::REST::Model::Overlap;
 use Moose;
 extends 'Catalyst::Model';
 use Catalyst::Exception;
-use EnsEMBL::REST::EnsemblModel::ExonTranscript;
-use EnsEMBL::REST::EnsemblModel::CDS;
+use Bio::EnsEMBL::Feature;
 use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
 use EnsEMBL::REST::EnsemblModel::TranslationSpliceSiteOverlap;
 use EnsEMBL::REST::EnsemblModel::TranslationExon;
@@ -190,13 +189,21 @@ sub transcript {
 sub cds {
   my ($self, $slice, $load_exons) = @_;
   my $transcripts = $self->transcript($slice, 0);
-  return EnsEMBL::REST::EnsemblModel::CDS->new_from_Transcripts($transcripts);
+  my @cds;
+  foreach my $transcript (@$transcripts) {
+    push (@cds, @{ $transcript->get_all_CDS });
+  }
+  return \@cds;
 }
 
 sub exon {
   my ($self, $slice) = @_;
-  my $exons = $slice->get_all_Exons();
-  return EnsEMBL::REST::EnsemblModel::ExonTranscript->build_all_from_Exons($exons);
+  my $transcripts = $self->transcript($slice, 0);
+  my @exons;
+  foreach my $transcript (@$transcripts) {
+    push (@exons, @{ $transcript->get_all_ExonTranscripts});
+  }
+  return \@exons;
 }
 
 sub repeat {
@@ -650,7 +657,18 @@ sub _has_to_be_trimmed_in_circ_chr {
   return $trim;
 }
 
-
+sub Bio::EnsEMBL::Feature::summary_as_hash {
+  my $self = shift;
+  my %summary;
+  $summary{'id'} = $self->display_id;
+  $summary{'version'} = $self->version() if $self->version();
+  $summary{'start'} = $self->seq_region_start;
+  $summary{'end'} = $self->seq_region_end;
+  $summary{'strand'} = $self->strand;
+  $summary{'seq_region_name'} = $self->seq_region_name;
+  $summary{'assembly_name'} = $self->slice->coord_system->version() if $self->slice();
+  return \%summary;
+}
 
 __PACKAGE__->meta->make_immutable;
 

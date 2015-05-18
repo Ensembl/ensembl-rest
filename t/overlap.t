@@ -78,7 +78,7 @@ my $base = '/overlap/region/homo_sapiens';
     biotype => 'protein_coding',
     description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109  [Source:UniProtKB/TrEMBL;Acc:Q8NAX6]',
     end => 1105181,
-    external_name => 'AL033381.1',
+    Name => 'AL033381.1',
     feature_type => 'gene',
     logic_name => 'ensembl',
     seq_region_name => '6',
@@ -382,7 +382,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 gene in this region');
   
-  my $gff_line = qq{6\tensembl\tgene\t1080164\t1105181\t.\t+\t.\tID=gene:ENSG00000176515;assembly_name=GRCh37;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];external_name=AL033381.1;logic_name=ensembl;version=1};
+  my $gff_line = qq{6\tensembl\tgene\t1080164\t1105181\t.\t+\t.\tID=gene:ENSG00000176515;Name=AL033381.1;assembly_name=GRCh37;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];logic_name=ensembl;version=1};
   eq_or_diff($lines[0], $gff_line, 'Expected output gene line from GFF');
 }
 
