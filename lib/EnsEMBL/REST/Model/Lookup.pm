@@ -431,7 +431,7 @@ sub features_as_hash {
 # Not all features have all labels
 # Seq_region_name, start and end are available for genes, transcripts and exons but not translations
       $features->{seq_region_name} = $summary_hash->{seq_region_name} if defined $summary_hash->{seq_region_name};
-      $features->{assembly_name} = $summary_hash->{assembly_name} if defined $summary_hash->{assembly_name};
+      $features->{assembly_name} = $obj->slice->coord_system->version() if $obj->slice();
       $features->{start} = $summary_hash->{start} * 1 if defined $summary_hash->{start};
       $features->{end} = $summary_hash->{end} * 1 if defined $summary_hash->{end};
       $features->{strand} = $summary_hash->{strand} * 1 if defined $summary_hash->{strand};
@@ -441,7 +441,7 @@ sub features_as_hash {
 # Translation length provided separately
       $features->{length} = $summary_hash->{length} if defined $summary_hash->{length};
 # Display_name and description are available for genes and sometimes for transcripts
-      $features->{display_name} = $summary_hash->{external_name} if defined $summary_hash->{external_name};
+      $features->{display_name} = $summary_hash->{Name} if defined $summary_hash->{Name};
       $features->{description} = $summary_hash->{description} if defined $summary_hash->{description};
 # Biotype, source and logic_name are only available for genes and transcripts
       $features->{biotype} = $summary_hash->{biotype} if defined $summary_hash->{biotype};
