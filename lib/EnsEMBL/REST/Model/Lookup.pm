@@ -372,11 +372,11 @@ sub UTR {
   my @utrs;
   my $features;
   my $transcript = $self->find_object($id, $species, 'Transcript', $db_type);
-  my $five_utr = $transcript->get_all_five_prime_utrs();
+  my $five_utr = $transcript->get_all_five_prime_UTRs();
   foreach my $five (@$five_utr) {
     push @utrs, $self->utr_as_hash($five, $species, 'five_prime_UTR', $db_type);
   }
-  my $three_utr = $transcript->get_all_three_prime_utrs();
+  my $three_utr = $transcript->get_all_three_prime_UTRs();
   foreach my $three (@$three_utr) {
     push @utrs, $self->utr_as_hash($three, $species, 'three_prime_UTR', $db_type);
   }
