@@ -46,7 +46,7 @@ my $base = '/variation/homo_sapiens';
   $id = 'rs67521280';
   my $expected_variation_2 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => undef, failed => 'None of the variant alleles match the reference allele;Mapped position is not compatible with reported alleles', ambiguity => undef, var_class => 'indel', synonyms => [], evidence => [], ancestral_allele => undef, most_severe_consequence => 'Intergenic variant', mappings => [{"assembly_name" => "GRCh37", "location"=> "11:6303493-6303493", "strand" => 1, "start" => 6303493, "end" => 6303493, "seq_region_name" => "11", "coord_system" => "chromosome","allele_string"=>"-/GT"}] };
   my $expected_genotype = { %{$expected_variation_2}, 
-  genotypes => [{genotype => "GT|GT", gender => "Male", individual => "J. CRAIG VENTER", submission_id => 'ss95559393'}] };
+  genotypes => [{genotype => "GT|GT", gender => "Male", sample => "J. CRAIG VENTER", submission_id => 'ss95559393'}] };
   my $genotype_json = json_GET("$base/$id?genotypes=1", "Genotype info");
   eq_or_diff($genotype_json, $expected_genotype, "Returning genotype information");
 
