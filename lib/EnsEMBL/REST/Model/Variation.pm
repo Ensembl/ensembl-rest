@@ -75,7 +75,7 @@ sub to_hash {
   $variation_hash->{clinical_significance} = $variation->get_all_clinical_significance_states() if @{$variation->get_all_clinical_significance_states()};
   $variation_hash->{mappings} = $self->get_variationFeature_info($variation);
   $variation_hash->{populations} = $self->get_allele_info($variation) if $c->request->param('pops');
-  $variation_hash->{genotypes} = $self->get_individualGenotype_info($variation) if $c->request->param('genotypes');
+  $variation_hash->{genotypes} = $self->get_sampleGenotype_info($variation) if $c->request->param('genotypes');
   $variation_hash->{phenotypes} = $self->get_phenotype_info($variation) if $c->request->param('phenotypes');
   $variation_hash->{population_genotypes} = $self->get_populationGenotype_info($variation) if $c->request->param('population_genotypes');
 
@@ -109,11 +109,11 @@ sub vf_as_hash {
   return $variation_feature;
 }
 
-sub get_individualGenotype_info {
+sub get_sampleGenotype_info {
   my ($self, $variation) = @_;
 
   my @genotypes;
-  my $genotypes = $variation->get_all_IndividualGenotypes;
+  my $genotypes = $variation->get_all_SampleGenotypes;
   foreach my $gen (@$genotypes) {
     push (@genotypes, $self->gen_as_hash($gen));
   }
@@ -125,8 +125,8 @@ sub gen_as_hash {
 
   my $gen_hash;
   $gen_hash->{genotype} = $gen->genotype_string();
-  $gen_hash->{individual} = $gen->individual->name();
-  $gen_hash->{gender} = $gen->individual->gender();
+  $gen_hash->{sample} = $gen->sample->name();
+  $gen_hash->{gender} = $gen->sample->individual->gender();
   $gen_hash->{submission_id} = $gen->subsnp() if $gen->subsnp;
 
   return $gen_hash;
