@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	80
+2	\N	schema_version	81
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -63,3 +63,6 @@
 63	\N	patch	patch_79_80_a.sql|schema version
 64	\N	patch	patch_79_80_b.sql|create a unique key for the variation_name column in the table structural_variation
 65	\N	patch	patch_79_80_b.sql|change the column consequence_types in transcript_variation and variation_feature to add protein_altering_variant
+66	\N	patch	patch_80_81_a.sql|schema version
+67	\N	patch	patch_80_81_b.sql|Create new sample table and update individual table. Copy individual data into new sample table.
+68	\N	patch	patch_80_81_c.sql|Update table, column and index names from individual to sample.
