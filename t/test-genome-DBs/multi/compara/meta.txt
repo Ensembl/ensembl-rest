@@ -1,4 +1,4 @@
-41	\N	schema_version	80
+41	\N	schema_version	81
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -33,3 +33,5 @@
 39	\N	patch	patch_78_79_a.sql|schema_version
 40	\N	patch	patch_78_79_b.sql|genome_component
 42	\N	patch	patch_79_80_a.sql|schema_version
+43	\N	patch	patch_79_80_b.sql|genebuild_unique
+44	\N	patch	patch_80_81_a.sql|schema_version

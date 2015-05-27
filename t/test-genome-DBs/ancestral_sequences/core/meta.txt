@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	80
+2	\N	schema_version	81
 3	\N	patch	patch_77_78_a.sql|schema_version
 4	\N	patch	patch_77_78_b.sql|source_column_increase
 5	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
@@ -14,3 +14,4 @@
 812	\N	patch	patch_79_80_b.sql|xref_dbprimary_acc_longer
 813	\N	patch	patch_79_80_c.sql|seq_region_synonym_longer
 814	\N	patch	patch_79_80_d.sql|genome_statistics_value_longer
+815	\N	patch	patch_80_81_a.sql|schema_version
