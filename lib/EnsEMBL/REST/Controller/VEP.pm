@@ -428,9 +428,9 @@ sub _include_user_params {
   
   # add adaptors
   $vep_params{$_} = $c->stash->{$_} for qw(va vfa svfa tva csa sa ga), map {$_.'_adaptor'} @REG_FEAT_TYPES;
-  if (!$c->stash->{'RegulatoryFeature'}) { delete $vep_params{regulatory}; };
+  if (!$c->stash->{'RegulatoryFeature_adaptor'}) { delete $vep_params{regulatory}; };
 
- # $c->log->debug("After ".Dumper \%vep_params);
+  # $c->log->debug("After ".Dumper \%vep_params);
   return \%vep_params;
 }
 
