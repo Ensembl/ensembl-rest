@@ -25,6 +25,7 @@ requires 'Catalyst::Component::InstancePerContext';
 requires 'Catalyst::View::JSON';
 requires 'Catalyst::View::TT';
 requires 'JSON::XS';
+requires 'JSON';
 requires 'Log::Log4perl::Catalyst';
 requires 'Hash::Merge';
 requires 'Catalyst::Plugin::Cache';
