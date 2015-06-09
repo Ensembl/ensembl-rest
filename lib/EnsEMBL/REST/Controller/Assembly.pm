@@ -53,12 +53,14 @@ sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   my $include_bands = $c->request->param('bands') || 0;
   my $slice = $c->model('Lookup')->find_slice($name);
   my $bands = $c->model('Assembly')->get_karyotype_info($slice) if $include_bands;
+  my $topology = $slice->is_circular()==1?'circular':'linear';
   if ($bands && scalar(@$bands) > 0) {
     $self->status_ok( $c, entity => { 
       length => $slice->length(),
       coordinate_system => $slice->coord_system()->name(),
       assembly_exception_type => $slice->assembly_exception_type(),
       is_chromosome => $slice->is_chromosome(),
+      topology => $topology,
       karyotype_band => $bands,
       assembly_name => $slice->coord_system()->version(),
     });
@@ -68,6 +70,7 @@ sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
       coordinate_system => $slice->coord_system()->name(),
       assembly_exception_type => $slice->assembly_exception_type(),
       is_chromosome => $slice->is_chromosome(),
+      topology => $topology,
       assembly_name => $slice->coord_system()->version(),
     });
   }
