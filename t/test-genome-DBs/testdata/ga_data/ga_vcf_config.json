@@ -14,7 +14,7 @@
       "populations": {
                "65" : "Illumina_platinum_genomes"
               },
-      "individual_populations": {
+      "sample_populations": {
         "NA12878": ["65"]
       }
  },
@@ -33,8 +33,8 @@
                       "21" : "1000GENOMES:phase_1:AMR", 
                       "22" : "1000GENOMES:phase_1:ASM", 
                       "23" : "1000GENOMES:phase_1:EUR"},
-      "individual_prefix": "1000GENOMES:phase_1:",
-      "individual_populations": {
+      "sample_prefix": "1000GENOMES:phase_1:",
+      "sample_populations": {
         "NA12347": ["23"],
         "NA12348": ["23"],
         "NA06984": ["23"],
