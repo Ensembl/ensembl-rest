@@ -32,7 +32,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory segmentation motif chipseq array_probe/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory segmentation motif chipseq array_probe band/
   };
 });
 
@@ -80,7 +80,6 @@ sub fetch_features {
     my $allowed = $allowed_features->{$feature_type};
 
     Catalyst::Exception->throw("The feature type $feature_type is not understood") if ! $allowed;
-    # my $objects = $self->$feature_type($slice);
     my $load_exons = ($feature_type eq 'transcript' && $is_bed) ? 1 : 0;
     my $objects = $self->_trim_features($self->$feature_type($slice, $load_exons));
     if($is_gff3 || $is_bed) {
@@ -164,14 +163,18 @@ sub to_hash {
   return \@hashed;
 }
 
+sub band {
+  my ($self, $slice) = @_;
+
+  return $slice->get_all_KaryotypeBands();
+}
+
 sub gene {
   my ($self, $slice) = @_;
   my $c = $self->context();
   my ($dbtype, $load_transcripts, $source, $biotype) = 
     (undef, undef, $c->request->parameters->{source}, $c->request->parameters->{biotype});
   return $slice->get_all_Genes($self->_get_logic_dbtype(), $load_transcripts, $source, $biotype);
-  # my $genes = $slice->get_all_Genes($self->_get_logic_dbtype(), $load_transcripts, $source, $biotype);
-  # return [ grep { $self->_trim_feature($_) } ] @{$genes};
 }
 
 sub transcript {
