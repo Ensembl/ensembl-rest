@@ -66,9 +66,9 @@ my $utr_response = {
                  {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040',
  Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
          UTR => [
-                {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens'},
-                {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens'},
-                {object_type => 'three_prime_UTR', db_type => 'core', species => 'homo_sapiens'}
+                {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'},
+                {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'},
+                {object_type => 'three_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'}
                 ],
         Exon =>
                 [

@@ -321,7 +321,7 @@ sub find_gene_by_symbol {
   my $gene_adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'Gene');
   my $gene = $gene_adaptor->fetch_by_display_label($symbol);
   Catalyst::Exception->throw(qq{No valid lookup found for symbol $symbol}) unless $gene;
-  my $features = $self->features_as_hash($gene->stable_id, $species, 'Gene', 'core');
+  my $features = $self->features_as_hash($gene->stable_id, $species, 'Gene', 'core', $gene);
 
   my $expand = $c->request->param('expand');
   if ($expand) {
@@ -354,11 +354,11 @@ sub Transcript {
   my $object = $self->find_object($id, $species, 'Gene', $db_type);
   my $transcripts = $object->get_all_Transcripts;
   foreach my $transcript (@$transcripts) {
-    $features = $self->features_as_hash($transcript->stable_id, $species, 'Transcript', $db_type);
+    $features = $self->features_as_hash($transcript->stable_id, $species, 'Transcript', $db_type, $transcript);
     $features->{Exon} = $self->Exon($features->{id}, $species, $db_type);
     if ($transcript->translate) {
       my $translation = $transcript->translation;
-      $features->{Translation} = $self->features_as_hash($translation->stable_id, $species, 'Translation', $db_type);
+      $features->{Translation} = $self->features_as_hash($translation->stable_id, $species, 'Translation', $db_type, $translation);
     }
     push @transcripts, $features;
     if ($self->context->request->param('utr')) { $features->{UTR} = $self->UTR($transcript->stable_id, $species, $db_type) ; }
@@ -374,11 +374,11 @@ sub UTR {
   my $transcript = $self->find_object($id, $species, 'Transcript', $db_type);
   my $five_utr = $transcript->get_all_five_prime_UTRs();
   foreach my $five (@$five_utr) {
-    push @utrs, $self->utr_as_hash($five, $species, 'five_prime_UTR', $db_type);
+    push @utrs, $self->features_as_hash($transcript->stable_id, $species, 'five_prime_UTR', $db_type, $five);
   }
   my $three_utr = $transcript->get_all_three_prime_UTRs();
   foreach my $three (@$three_utr) {
-    push @utrs, $self->utr_as_hash($three, $species, 'three_prime_UTR', $db_type);
+    push @utrs, $self->features_as_hash($transcript->stable_id, $species, 'three_prime_UTR', $db_type, $three);
   }
 
   return \@utrs;
@@ -391,30 +391,15 @@ sub Exon {
   my $object = $self->find_object($id, $species, 'Transcript', $db_type);
   my $exons = $object->get_all_Exons;
   foreach my $exon(@$exons) {
-    push @exons, $self->features_as_hash($exon->stable_id, $species, 'Exon', $db_type);
+    push @exons, $self->features_as_hash($exon->stable_id, $species, 'Exon', $db_type, $exon);
   }
 
   return \@exons;
 }
 
-sub utr_as_hash {
-  my ($self, $utr, $species, $object_type, $db_type) = @_;
-
-  my $format = $self->context->request->param('format') || 'full';
-  my $features;
-  $features->{species} = $species;
-  $features->{db_type} = $db_type;
-  $features->{object_type} = $object_type;
-  if ($format eq 'full') {
-    $features->{seq_region_start} = $utr->start();
-    $features->{seq_region_end} = $utr->end();
-  }
-
-  return $features;
-}
 
 sub features_as_hash {
-  my ($self, $id, $species, $object_type, $db_type) = @_;
+  my ($self, $id, $species, $object_type, $db_type, $obj) = @_;
 
   my $c = $self->context();
   my $format = $c->request->param('format') || 'full';
@@ -425,7 +410,7 @@ sub features_as_hash {
   $features->{db_type} = $db_type;
 
   if ($format eq 'full') {
-    my $obj = $self->find_object($id, $species, $object_type, $db_type);
+    $obj = $self->find_object($id, $species, $object_type, $db_type) if !$obj;
     if($obj->can('summary_as_hash')) {
       my $summary_hash = $obj->summary_as_hash();
 # Not all features have all labels
