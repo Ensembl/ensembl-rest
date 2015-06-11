@@ -165,8 +165,11 @@ sub to_hash {
 
 sub band {
   my ($self, $slice) = @_;
-
-  return $slice->get_all_KaryotypeBands();
+  if ($slice->is_chromosome) {
+    return $slice->get_all_KaryotypeBands();
+  } else {
+    return;
+  }
 }
 
 sub gene {
