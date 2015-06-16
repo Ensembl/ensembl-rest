@@ -57,6 +57,7 @@ sub fetch_features {
   my $c = $self->context();
   my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
   my $is_bed = $self->is_content_type($c, 'text/x-bed');
+  my $species = $c->stash->{species};
   
   my $allowed_features = $self->allowed_features();
   my $feature = $c->request->parameters->{feature};
@@ -73,6 +74,8 @@ sub fetch_features {
   my %processed_feature_types;
   
   my $slice = $c->stash()->{slice};
+  my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
+  $vfa->db->include_failed_variations(0);
   my @final_features;
   foreach my $feature_type (@features) {
     next if exists $processed_feature_types{$feature_type};
