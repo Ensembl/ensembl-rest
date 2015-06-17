@@ -59,6 +59,7 @@ sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
       coordinate_system => $slice->coord_system()->name(),
       assembly_exception_type => $slice->assembly_exception_type(),
       is_chromosome => $slice->is_chromosome(),
+      is_circular => ($slice->is_circular()||0),
       karyotype_band => $bands,
       assembly_name => $slice->coord_system()->version(),
     });
@@ -68,6 +69,7 @@ sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
       coordinate_system => $slice->coord_system()->name(),
       assembly_exception_type => $slice->assembly_exception_type(),
       is_chromosome => $slice->is_chromosome(),
+      is_circular => ($slice->is_circular()||0),
       assembly_name => $slice->coord_system()->version(),
     });
   }
