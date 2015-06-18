@@ -116,7 +116,7 @@ limitations under the License.
 
 <h2>Example Requests</h2>
 
-[% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget'] %]
+[% example_types = ['perl', 'python2', 'python3', 'ruby', 'java', 'curl', 'wget'] %]
 
 [% FOREACH p IN endpoint.examples.pairs %]
 	[% NEXT IF p.value.disable %]
@@ -202,8 +202,11 @@ limitations under the License.
 <!-- PERL EXAMPLE -->
 [% INCLUDE documentation/examples/perl.tt %]
 
-<!-- Python EXAMPLE -->
-[% INCLUDE documentation/examples/python.tt %]
+<!-- Python2 EXAMPLE -->
+[% INCLUDE documentation/examples/python2.tt %]
+
+<!-- Python3 EXAMPLE -->
+[% INCLUDE documentation/examples/python3.tt %]
 
 <!-- RUBY EXAMPLE -->
 [% INCLUDE documentation/examples/ruby.tt %]
