@@ -71,6 +71,7 @@ sub to_hash {
   $variation_hash->{var_class} = $variation->var_class;
   $variation_hash->{most_severe_consequence} = $variation->display_consequence;
   $variation_hash->{MAF} = $variation->minor_allele_frequency;
+  $variation_hash->{minor_allele} = $variation->minor_allele;
   $variation_hash->{evidence} = $variation->get_all_evidence_values;
   $variation_hash->{clinical_significance} = $variation->get_all_clinical_significance_states() if @{$variation->get_all_clinical_significance_states()};
   $variation_hash->{mappings} = $self->get_variationFeature_info($variation);
