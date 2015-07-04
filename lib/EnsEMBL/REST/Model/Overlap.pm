@@ -149,7 +149,7 @@ sub fetch_feature {
 }
 
 #Have to do this to force JSON encoding to encode numerics as numerics
-my @KNOWN_NUMERICS = qw( start end strand );
+my @KNOWN_NUMERICS = qw( start end strand version );
 
 sub to_hash {
   my ($self, $features, $feature_type) = @_;

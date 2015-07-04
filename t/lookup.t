@@ -39,7 +39,7 @@ is_json_GET("/lookup/$basic_id?format=condensed", $condensed_response, 'Get of a
 
 my $full_response = {
   %{$condensed_response},
-  start => 1080164, end => 1105181, strand => 1, seq_region_name => '6', assembly_name => 'GRCh37',
+  start => 1080164, end => 1105181, strand => 1, version => 1, seq_region_name => '6', assembly_name => 'GRCh37',
   biotype => 'protein_coding', display_name => 'AL033381.1', logic_name => 'ensembl', source => 'ensembl',
   description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109  [Source:UniProtKB/TrEMBL;Acc:Q8NAX6]'
 };
@@ -108,6 +108,7 @@ my $id_response = {
     seq_region_name => "X",
     db_type => "core",
     strand => -1,
+    version => 12,
     id => "ENSG00000167393",
     assembly_name => 'GRCh37',
     start => 294698
@@ -133,7 +134,8 @@ my $symbol_response = {
     species => 'homo_sapiens',
     start => 1080164,
     assembly_name => 'GRCh37',
-    strand => 1                                                                                                                        
+    strand => 1,
+    version => 1
   },
 
   snoU13 => {
@@ -150,7 +152,8 @@ my $symbol_response = {
     species => 'homo_sapiens',
     start => 1186753,
     assembly_name => 'GRCh37',
-    strand => 1
+    strand => 1,
+    version => 1
   } 
 };
 my $symbol_body = qq{ 

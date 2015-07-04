@@ -430,6 +430,7 @@ sub features_as_hash {
 # Display_name and description are available for genes and sometimes for transcripts
       $features->{display_name} = $summary_hash->{Name} if defined $summary_hash->{Name};
       $features->{description} = $summary_hash->{description} if defined $summary_hash->{description};
+      $features->{version} = $summary_hash->{version} * 1 if defined $summary_hash->{version};
 # Biotype, source and logic_name are only available for genes and transcripts
       $features->{biotype} = $summary_hash->{biotype} if defined $summary_hash->{biotype};
       $features->{source} = $summary_hash->{source} if defined $summary_hash->{source};
