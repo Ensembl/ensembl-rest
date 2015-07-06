@@ -82,6 +82,7 @@ my $utr_response = {
 is_json_GET("/lookup/id/$basic_id?expand=1;utr=1;format=condensed", $utr_response, 'Get of a known ID with utr option will return UTRs as well');
 
 is_json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1;format=condensed", $expanded_response, 'Get of a known symbol returns the same result as with stable id');
+json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1", "Extended response works");
 
 action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');
 # Test POST endpoints
