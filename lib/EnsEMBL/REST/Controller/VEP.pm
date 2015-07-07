@@ -468,11 +468,11 @@ sub _configure_plugins {
   foreach my $plugin_hash(grep {$_->{available}} @{$VEP_PLUGIN_CONFIG->{plugins}}) {
     my $module = $plugin_hash->{key};
 
-    # has user specified it?
-    if(defined($user_config->{$module})) {
+    # has user specified it, or is it enabled by default?
+    if(defined($user_config->{$module}) || $plugin_hash->{enabled}) {
 
       # user passes a list of params as a comma-separated string ModuleName=param1,param2,...,paramN
-      my @given_params = split(',', $user_config->{$module});
+      my @given_params = split(',', $user_config->{$module} || '');
 
       # we now need to add these to a final list, including any that come from the plugin config file
       my $added_given = 0;
