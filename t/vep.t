@@ -771,6 +771,48 @@ $json = json_GET($vep_hgvs_get,'GET consequences for transcript HGVS notation');
 eq_or_diff($json, $vep_output, 'VEP transcript HGVS GET');
 
 
+# test using a plugin
+my $vep_plugin_get = '/vep/homo_sapiens/hgvs/6:g.1102327G>T?content-type=application/json&RestTestPlugin=Hello';
+$vep_output = [{
+  allele_string => 'G/T',
+  assembly_name => 'GRCh37',
+  end => 1102327,
+  id => '6:g.1102327G>T',
+  most_severe_consequence => 'missense_variant',
+  seq_region_name => '6',
+  start => 1102327,
+  strand => 1,
+  transcript_consequences => [
+    {
+      amino_acids => 'W/L',
+      biotype => 'protein_coding',
+      cdna_end => 581,
+      cdna_start => 581,
+      cds_end => 311,
+      cds_start => 311,
+      codons => 'tGg/tTg',
+      consequence_terms => [
+        'missense_variant'
+      ],
+      gene_id => 'ENSG00000176515',
+      gene_symbol => 'AL033381.1',
+      gene_symbol_source => 'Clone_based_ensembl_gene',
+      impact => 'MODERATE',
+      polyphen_prediction => 'possibly_damaging',
+      polyphen_score => '0.514',
+      protein_end => 104,
+      protein_start => 104,
+      strand => 1,
+      transcript_id => 'ENST00000314040',
+      variant_allele => 'T',
+      resttestplugin => 'Hello'
+    }
+  ]
+}];
+
+$json = json_GET($vep_plugin_get,'GET consequences with test plugin');
+eq_or_diff($json, $vep_output, 'VEP plugin test');
+
 my $body = '{ "blurb" : "stink" }';
 # Test malformed messages
 action_bad_post($vep_post,$body, qr/key in your POST/, 'Using a bad message format causes an exception');

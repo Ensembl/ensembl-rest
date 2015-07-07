@@ -438,8 +438,90 @@ sub _include_user_params {
   $vep_params{$_} = $c->stash->{$_} for qw(va vfa svfa tva csa sa ga), map {$_.'_adaptor'} @REG_FEAT_TYPES;
   if (!$c->stash->{'RegulatoryFeature_adaptor'}) { delete $vep_params{regulatory}; };
 
+  my $plugin_config = $self->_configure_plugins($c,$user_config,\%vep_params);
+  $vep_params{plugins} = $plugin_config if $plugin_config;
+
   # $c->log->debug("After ".Dumper \%vep_params);
   return \%vep_params;
+}
+
+sub _configure_plugins {
+  my ($self,$c,$user_config,$vep_config) = @_;
+
+  # add dir_plugins to Perl's list of include dirs
+  # otherwise the plugins have to be somewhere in PERL5LIB on startup
+  unshift @INC, $vep_config->{dir_plugins};
+  my @plugin_config = ();
+
+  # get config from file
+  my $plugin_config_file = $vep_config->{plugin_config};
+  return unless $plugin_config_file && -e $plugin_config_file;
+
+  open IN, $plugin_config_file or return;
+  my @content = <IN>;
+  close IN;
+  
+  my $VEP_PLUGIN_CONFIG = eval join('', @content);
+  $c->log->warn("Could not eval VEP plugin config file: $@\n") if $@;
+
+  # iterate over all defined plugins
+  foreach my $plugin_hash(grep {$_->{available}} @{$VEP_PLUGIN_CONFIG->{plugins}}) {
+    my $module = $plugin_hash->{key};
+
+    # has user specified it?
+    if(defined($user_config->{$module})) {
+
+      # user passes a list of params as a comma-separated string ModuleName=param1,param2,...,paramN
+      my @given_params = split(',', $user_config->{$module});
+
+      # we now need to add these to a final list, including any that come from the plugin config file
+      my $added_given = 0;
+      my @params;
+
+      foreach my $param(@{$plugin_hash->{params} || []}) {
+
+        # This is probably not the best way to do this!
+        # Basically '@field' should mean insert the value of a field from the form here
+        # and '@*' means insert all params here.
+        # But since we are just taking a list of params anyway, if we see either
+        # type we just add them all and make sure we do it once
+        if($param =~ /^\@/ && !$added_given) {
+          push @params, @given_params;
+          $added_given = 1;
+        }
+        # other params, such as file paths, get passed from the config
+        else {
+          push @params, $param;
+        }
+      }
+
+      ## could probably implement some checking on @params here based on whats in the web form
+
+      # attempt to load the module
+      eval qq{
+        use $module;
+      };
+      if($@) {
+        $c->log->warn("Failed to use module for VEP plugin $module:\n$@");
+        next;
+      }
+      
+      # now check we can instantiate it, passing any parameters to the constructor
+      my $instance;
+      
+      eval {
+        $instance = $module->new($vep_config, @params);
+      };
+      if($@) {
+        $c->log->warn("Failed to create instance of VEP plugin $module:\n$@");
+        next;
+      }
+
+      push @plugin_config, $instance;
+    }
+  }
+
+  return \@plugin_config;
 }
 
 __PACKAGE__->meta->make_immutable;
