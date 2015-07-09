@@ -93,16 +93,16 @@ sub get_set_info{
     $file =~ s/\#\#\#CHR\#\#\#/$data->{referenceName}/;
 
     ## loop over callSets
-    $dataSet->{individual_populations} = $dataSet->{_raw_populations};
-    foreach my $callset_id(keys %{$dataSet->{individual_populations}} ){
+    $dataSet->{sample_populations} = $dataSet->{_raw_populations};
+    foreach my $callset_id(keys %{$dataSet->{sample_populations}} ){
 
-      my $variantSet_id = $dataSet->{individual_populations}->{$callset_id}->[0];
+      my $variantSet_id = $dataSet->{sample_populations}->{$callset_id}->[0];
 
        ## limit by variant set if required
        next if defined $data->{variantSetIds}->[0] && ! defined $data->{required_set}->{$variantSet_id} ;
 
        ## save sample to variantSet link
-       $data->{sample2set}->{$callset_id} = $dataSet->{individual_populations}->{$callset_id}->[0];
+       $data->{sample2set}->{$callset_id} = $dataSet->{sample_populations}->{$callset_id}->[0];
 
        ##if data is needed for this sample, save the file name       
        $data->{files}->{$dataSet->{id}} = $file;
@@ -281,7 +281,7 @@ sub get_next_by_token{
 
     next if defined $data->{variantName} && $data->{variantName} =~/\w+/ &&  $data->{variantName} ne $name;
 
-    my $raw_genotypes  = $parser->get_raw_individuals_info();
+    my $raw_genotypes  = $parser->get_raw_samples_info();
     ## extract arrays of genotypes by variantSet
     my $genotype_calls = $self->sort_genotypes($raw_genotypes, $data);
 

@@ -83,13 +83,13 @@ sub fetch_callSets{
     }
 
     ## loop over callSets
-    $dataSet->{individual_populations} = $dataSet->{_raw_populations};
-    foreach my $callset_id( sort( keys %{$dataSet->{individual_populations}} ) ){
+    $dataSet->{sample_populations} = $dataSet->{_raw_populations};
+    foreach my $callset_id( sort( keys %{$dataSet->{sample_populations}} ) ){
      
       last if defined  $newPageToken ;
  
       ## limit by variant set if required
-      next if defined $data->{req_variantsets} && ! defined $data->{req_variantsets}->{ $dataSet->{individual_populations}->{$callset_id}->[0] } ;
+      next if defined $data->{req_variantsets} && ! defined $data->{req_variantsets}->{ $dataSet->{sample_populations}->{$callset_id}->[0] } ;
  
       ## paging
       $count_ind++;
@@ -103,7 +103,7 @@ sub fetch_callSets{
       $callset->{sampleId}       = $callset_id;
       $callset->{id}             = $callset_id;
       $callset->{name}           = $callset_id;
-      $callset->{variantSetIds}  = [$dataSet->{individual_populations}->{$callset_id}->[0]]; 
+      $callset->{variantSetIds}  = [$dataSet->{sample_populations}->{$callset_id}->[0]]; 
       $callset->{info}           = {"assembly_version" => [ $dataSet->assembly]};
       push @callsets, $callset;
       $n++;
