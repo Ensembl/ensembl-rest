@@ -68,13 +68,11 @@ sub get_set_info{
     }
   }
 
-
   $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $self->{ga_config};
   my $vca = Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new();
-
  
   foreach my $dataSet ( @{$vca->fetch_all} ){
-    
+
     ## filter at dataSet level first if selection made
     next if defined $data->{datasetIds}->[0] && ! defined $data->{required_dataset}->{$dataSet->{id} } ;
 
@@ -221,7 +219,10 @@ sub sort_genotypes {
       ## force genotype to be numeric
       push @{$gen_hash->{genotype}}, $g*1;
     } 
-
+    ## place holders
+    $gen_hash->{phaseset}           = '';
+    $gen_hash->{genotypeLikelihood} = [];
+    $gen_hash->{info}               = {};
 
     ## store genotypes by variationSetId
     if (defined $data->{sample2set}->{$sample}){
@@ -260,7 +261,7 @@ sub get_next_by_token{
   
   return unless defined $current_ds;
 
-  my $file = $self->{dir} .'/'. $data->{files}->{$current_ds};
+ my $file = $self->{dir} .'/'. $data->{files}->{$current_ds};
 
   my $parser = Bio::EnsEMBL::IO::Parser::VCF4Tabix->open( $file ) || die "Failed to get parser : $!\n";
   $parser->seek($data->{referenceName},$batch_start,$batch_end);
@@ -304,7 +305,7 @@ sub get_next_by_token{
       $variation_hash->{variantSetId}    = $set_required;
       $variation_hash->{calls}           = $genotype_calls->{$set_required};
 
-      $variation_hash->{name}            = $name;
+      $variation_hash->{names}           = [$name];
       $variation_hash->{id}              = $name;
       $variation_hash->{referenceBases}  = $parser->get_reference;
       $variation_hash->{alternateBases}  = \@{$parser->get_alternatives};
@@ -315,6 +316,9 @@ sub get_next_by_token{
       ## open end of interval
       $variation_hash->{end}             = $parser->get_raw_end;
 
+#      $variation_hash->{created}         = '';
+#      $variation_hash->{updated}         = '';
+      $variation_hash->{info}            = {};
       push @var, $variation_hash;
     }
    
