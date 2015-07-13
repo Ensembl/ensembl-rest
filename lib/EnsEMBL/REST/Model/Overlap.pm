@@ -160,6 +160,10 @@ sub to_hash {
       my $v = $hash->{$key};
       $hash->{$key} = ($v*1) if defined $v;
     }
+    if ($hash->{Name}) {
+      $hash->{external_name} = $hash->{Name};
+      delete $hash->{Name};
+    }
     $hash->{feature_type} = $feature_type;
     push(@hashed, $hash);
   }
