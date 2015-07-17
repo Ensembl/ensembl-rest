@@ -2,13 +2,18 @@ language: "perl"
 
 perl:
   - "5.14"
+  
+sudo: false
+  
+addons:
+  apt:
+    packages:
+    - unzip
 
 env:
   - COVERALLS=false
 
 before_install:
-    - sudo apt-get -y update
-    - sudo apt-get -y install unzip
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-compara.git
