@@ -135,8 +135,8 @@ sub map_data : Private {
           coord_system => $old_cs_name,
           assembly => $old_version,
           seq_region_name => $old_sr_name,
-          start => ($old_start + $segment->from_start() - 1),
-          end => ($old_start + $segment->from_end() - 1),
+          start => ($old_start + $segment->from_start() - 1) * 1,
+          end => ($old_start + $segment->from_end() - 1) * 1,
           strand => $old_strand,
         },
         mapped => {
@@ -174,8 +174,8 @@ sub map_mappings {
       $strand = $m->strand();
     }
     push(@r, {
-      start => $m->start(),
-      end => $m->end(),
+      start => $m->start() * 1,
+      end => $m->end() * 1,
       strand => $strand,
       rank => $m->rank(),
       gap => $gap,
