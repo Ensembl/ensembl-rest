@@ -75,7 +75,9 @@ sub fetch_features {
   
   my $slice = $c->stash()->{slice};
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
-  $vfa->db->include_failed_variations(0);
+  if ($vfa) {
+    $vfa->db->include_failed_variations(0);
+  }
   my @final_features;
   foreach my $feature_type (@features) {
     next if exists $processed_feature_types{$feature_type};
