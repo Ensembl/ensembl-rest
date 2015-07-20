@@ -47,8 +47,13 @@ sub get_genetree_GET { }
 sub get_genetree : Chained('/') PathPart('genetree/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $s = $c->stash();
-  my $gt = $c->model('Lookup')->find_genetree_by_stable_id($id);
-  $self->_set_genetree($c, $gt);
+  try {
+    my $gt = $c->model('Lookup')->find_genetree_by_stable_id($id);
+    $self->_set_genetree($c, $gt);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
 }
 
 sub get_genetree_by_member_id_GET { }
@@ -56,9 +61,13 @@ sub get_genetree_by_member_id_GET { }
 sub get_genetree_by_member_id : Chained('/') PathPart('genetree/member/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
    
-  my $gt = $c->model('Lookup')->find_genetree_by_member_id($id);
-  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree"]) unless $gt;
-  $self->_set_genetree($c, $gt);
+  try {
+    my $gt = $c->model('Lookup')->find_genetree_by_member_id($id);
+    $self->_set_genetree($c, $gt);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
 }
 
 sub get_genetree_by_symbol_GET { }
@@ -77,9 +86,13 @@ sub get_genetree_by_symbol : Chained('/') PathPart('genetree/member/symbol') Arg
   
   my $stable_id = $genes[0]->stable_id;
   
-  my $gt = $c->model('Lookup')->find_genetree_by_member_id($stable_id);
-  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree for $symbol,$stable_id"]) unless $gt;
-  $self->_set_genetree($c, $gt);
+  try {
+    my $gt = $c->model('Lookup')->find_genetree_by_member_id($stable_id);
+    $self->_set_genetree($c, $gt);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
 }
 
 sub _set_genetree {
