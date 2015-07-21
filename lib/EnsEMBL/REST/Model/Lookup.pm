@@ -78,12 +78,12 @@ sub find_genetree_by_member_id {
   my $reg = $c->model('Registry');
 
   my ($species, $object_type, $db_type) = $self->find_object_location($id);
-  Exception::Catalyst->throw("Unable to find given object: $id") unless $species;
+  Catalyst::Exception->throw("Unable to find given object: $id") unless $species;
 
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
   my $ma = $dba->get_GeneMemberAdaptor;
   my $member = $ma->fetch_by_stable_id($id);
-  Exception->Catalyst->throw("Could not fetch GeneTree Member") unless $member;
+  Catalyst::Exception->throw("Could not fetch GeneTree Member") unless $member;
 
   my $gta = $dba->get_GeneTreeAdaptor;
   my $gt = $gta->fetch_default_for_Member($member);
