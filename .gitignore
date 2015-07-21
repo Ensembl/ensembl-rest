@@ -23,3 +23,5 @@ MultiTestDB.conf
 /lookup_cache.json
 /GLOB(0*
 *.index
+ensembl_rest.conf
+ensrest.psgi
