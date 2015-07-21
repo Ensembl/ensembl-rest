@@ -186,7 +186,7 @@ sub _full_encoding {
       species => $genome_db->name(),
       perc_id => ($member->perc_id()*1),
       perc_pos => ($member->perc_pos()*1),
-      protein_id => $gene->get_canonical_SeqMember()->stable_id(),
+      protein_id => $member->stable_id(),
     };
     $result->{cigar_line} = $member->cigar_line() if $cigar_line;
     $result->{taxon_id} = ($taxon_id+0) if defined $taxon_id;
@@ -201,7 +201,7 @@ sub _full_encoding {
   
   Bio::EnsEMBL::Compara::MemberSet->_load_all_missing_sequences($seq_type, @{$homologies});
   while(my $h = shift @{$homologies}) {
-    my ($src, $trg) = $self->_decode_members($h, $stable_id);
+    my ($src, $trg) = @{ $h->get_all_Members() };
     my $e = {
       type => $h->description(),
       taxonomy_level => $h->taxonomy_level(),
@@ -221,13 +221,13 @@ sub _condensed_encoding {
   $c->log()->debug('Starting condensed encoding');
   my @output;
   while(my $h = shift @{$homologies}) {
-    my ($src, $trg) = $self->_decode_members($h, $stable_id);
+    my ($src, $trg) = @{ $h->get_all_Members() };
     my $gene_member = $trg->gene_member();
     my $e = {
       type => $h->description(),
       taxonomy_level => $h->taxonomy_level(),
       id => $gene_member->stable_id(),
-      protein_id => $gene_member->get_canonical_SeqMember()->stable_id(),
+      protein_id => $trg->stable_id(),
       species => $gene_member->genome_db->name(),
       method_link_type => $h->method_link_species_set()->method()->type(),
     };
@@ -235,20 +235,6 @@ sub _condensed_encoding {
   }
   $c->log()->debug('Finished condensed encoding');
   return \@output;
-}
-
-sub _decode_members {
-  my ($self, $h, $stable_id) = @_;
-  my ($src, $trg);
-  foreach my $m (@{$h->get_all_Members()}) {
-    if($m->gene_member()->stable_id() eq $stable_id) {
-      $src = $m;
-    }
-    else {
-      $trg = $m;
-    }
-  }
-  return ($src, $trg);
 }
 
 sub get_orthologs_GET {
