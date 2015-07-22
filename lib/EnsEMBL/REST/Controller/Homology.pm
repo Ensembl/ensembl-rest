@@ -199,6 +199,7 @@ sub _full_encoding {
     return $result;
   };
   
+  Bio::EnsEMBL::Compara::MemberSet->_load_all_missing_sequences($seq_type, @{$homologies});
   while(my $h = shift @{$homologies}) {
     my ($src, $trg) = $self->_decode_members($h, $stable_id);
     my $e = {
