@@ -169,7 +169,8 @@ sub _full_encoding {
   my ($self, $c, $homologies, $stable_id) = @_;
   my @output;
   
-  my $seq_type = $c->request->param('sequence') || 'protein';
+  my $sequence_param = $c->request->param('sequence') || 'protein';
+  my $seq_type = $sequence_param eq 'protein' ? undef : 'cds';
   my $aligned = $c->request->param('aligned');
   $aligned = 1 unless defined $aligned;
   my $cigar_line = $c->request->param('cigar_line');
@@ -190,21 +191,10 @@ sub _full_encoding {
     $result->{cigar_line} = $member->cigar_line() if $cigar_line;
     $result->{taxon_id} = ($taxon_id+0) if defined $taxon_id;
     if($aligned && $member->cigar_line()) {
-      if($seq_type eq 'protein') {
-        $result->{align_seq} = $member->alignment_string();
-      }
-      elsif($seq_type eq 'cdna') {
-       $result->{align_seq} = $member->alignment_string('cds');
-       $result->{align_seq} =~ s/\s//g;
-      }
+      $result->{align_seq} = $member->alignment_string($seq_type);
     }
     else {
-      if($seq_type eq 'protein') {
-        $result->{seq} = $member->sequence();
-      }
-      elsif($seq_type eq 'cdna') {
-        $result->{seq} = $member->other_sequence('cds');
-      }
+      $result->{seq} = $member->other_sequence($seq_type);
     }
     return $result;
   };
