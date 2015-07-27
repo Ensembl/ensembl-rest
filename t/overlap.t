@@ -407,14 +407,14 @@ sub filter_gff {
 {
   my $region = '6:1078245-1108340';
   my $bed = bed_GET("$base/$region?feature=gene", 'Getting single gene'); 
-  my $expected_bed = qq{chr6\t1080163\t1105181\tENSG00000176515\t0\t+\n};
+  my $expected_bed = qq{chr6\t1080163\t1105181\tENSG00000176515\t1000\t+\n};
   eq_or_diff($bed, $expected_bed, 'Expected output gene line from BED');
 }
 
 {
   my $region = '6:1078245-1108340';
   my $bed = bed_GET("$base/$region?feature=transcript", 'Getting a set of transcripts from both strands');
-  my $expected_bed = qq{chr6\t1080163\t1105181\tENST00000314040\t0\t+\t1101507\t1102415\t0\t3\t66,228,3141,\t0,21140,21877,\n};
+  my $expected_bed = qq{chr6\t1080163\t1105181\tENST00000314040\t1000\t+\t1101507\t1102415\t0,0,0\t3\t66,228,3141,\t0,21140,21877,\tAL033381.1-201\tcmpl\tcmpl\t-1,-1,0,\tprotein_coding\tENSG00000176515\tAL033381.1\tprotein_coding\n};
   eq_or_diff($bed, $expected_bed, 'Expected output transcript line from BED with exons and their offsets');
 }
 
