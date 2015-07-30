@@ -60,12 +60,16 @@ my $expected_data1 = {  nextPageToken => "16050158_65_2",
          ],              
          end => 16050159,      
          id => '22_16050159', 
-         info => {}, 
+         info => { AC => ['1'],
+                   AF => ['0.50'], 
+                   AN => ['2']}, 
          names => ['22_16050159'],  
          referenceBases => 'C', 
          referenceName => '22',
          start => '16050158', 
-         variantSetId => '65'
+         variantSetId => '65',
+         created => '1419292800000',
+         updated => '1419292800000', 
        }                    
      ]                     
    };    
@@ -86,8 +90,12 @@ my $expected_data2 = {
             1,                    
             1                     
           ],
-          genotypeLikelihood => [],
-          info => {},
+          genotypeLikelihood => ['-0.48', '-0.48', '-0.48'],
+          info => { 
+            DS => [ 
+              '2.000' 
+            ]         
+          },   
           phaseset => ''                           
         },                          
         {                           
@@ -97,19 +105,39 @@ my $expected_data2 = {
             1,                    
             1                     
           ],
-          genotypeLikelihood => [],
-          info => {},
+          genotypeLikelihood => ['-0.48', '-0.48', '-0.48'],
+          info => {             
+            DS => [
+              '1.950' 
+            ]         
+          },
           phaseset => ''                            
         }                           
       ],                            
       end => 16132101,              
       id => 'rs150753069',
-      info => {},          
+      info => {AA => ['N'],    
+        AC => ['2143'],
+        AF => ['0.98'], 
+        AFR_AF => ['0.99'], 
+        AMR_AF => ['0.99'], 
+        AN => ['2184'],     
+        ASN_AF => ['0.99'], 
+        AVGPOST => ['0.8755'], 
+        ERATE => ['0.0050'],   
+        EUR_AF => ['0.96'],   
+        LDAF => ['0.9238'],  
+        RSQ => ['0.2636'], 
+        SNPSOURCE => ['LOWCOV'],
+        THETA => ['0.0202'],  
+        VT => ['SNP']},          
       names => ['rs150753069'],        
       referenceBases => 'G',        
       referenceName => '22',        
       start => '16132100',          
-      variantSetId => '22'
+      variantSetId => '22',
+      created => '1432745640000',
+      updated => '1432745640000',  
     }                               
   ]                                
 };
@@ -129,19 +157,39 @@ my $expected_data3 = {
             1,
             1
           ],
-          genotypeLikelihood => [],
-          info => {},
+          genotypeLikelihood => ['-0.48', '-0.48', '-0.48'],
+          info => {
+            DS => [
+              '1.950'
+            ]
+          },
           phaseset => ''
         }
       ],
       end => 16132101,
       id => 'rs150753069',
-      info => {},
+      info => {AA => ['N'],
+        AC => ['2143'],
+        AF => ['0.98'],
+        AFR_AF => ['0.99'],
+        AMR_AF => ['0.99'],
+        AN => ['2184'],
+        ASN_AF => ['0.99'],
+        AVGPOST => ['0.8755'],
+        ERATE => ['0.0050'],
+        EUR_AF => ['0.96'],
+        LDAF => ['0.9238'],
+        RSQ => ['0.2636'],
+        SNPSOURCE => ['LOWCOV'],
+        THETA => ['0.0202'],
+        VT => ['SNP']},
       names => ['rs150753069'],
       referenceBases => 'G',
       referenceName => '22',
       start => '16132100',
-      variantSetId => '22'
+      variantSetId => '22',
+      created => '1432745640000',
+      updated => '1432745640000',
     }
   ]
 };
@@ -167,12 +215,16 @@ my $expected_data4 = {  nextPageToken => "16050251_65_2",
          ],
          end => 16050252,
          id => '22_16050252',
-         info => {},
+         info => { AC => ['1'],                  
+                   AF => ['0.50'],
+                   AN => ['2']},
          names => ['22_16050252'],
          referenceBases => 'A',
          referenceName => '22',
          start => '16050251',
-         variantSetId => '65'
+         variantSetId => '65',
+         created => '1419292800000',
+         updated => '1419292800000',
        }
      ]
    };
