@@ -275,6 +275,8 @@ sub _full_encoding {
   my $seq_type = $c->request->param('sequence') || 'protein';
   my $aligned = $c->request->param('aligned');
   $aligned = 1 unless defined $aligned;
+  my $cigar_line = $c->request->param('cigar_line');
+  $cigar_line = 1 unless defined $cigar_line;
   
   my $encode = sub {
     my ($member) = @_;
@@ -286,9 +288,9 @@ sub _full_encoding {
       species => $genome_db->name(),
       perc_id => ($member->perc_id()*1),
       perc_pos => ($member->perc_pos()*1),
-      cigar_line => $member->cigar_line(),
       protein_id => $gene->get_canonical_SeqMember()->stable_id(),
     };
+    $result->{cigar_line} = $member->cigar_line() if $cigar_line;
     $result->{taxon_id} = ($taxon_id+0) if defined $taxon_id;
     if($aligned && $member->cigar_line()) {
       if($seq_type eq 'protein') {

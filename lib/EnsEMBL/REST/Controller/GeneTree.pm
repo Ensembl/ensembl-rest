@@ -104,10 +104,11 @@ sub _set_genetree {
     # code deal with it.
     my $aligned = $c->request()->param('aligned') || $c->request()->param('phyloxml_aligned') ? 1 : 0;
     my $sequence = $c->request()->param('sequence') || $c->request()->param('phyloxml_sequence') || 'protein';
+    my $cigar_line = $c->request()->param('cigar_line') ? 1 : 0;
     my $cdna = $sequence eq 'cdna' ? 1 : 0;
     my $no_sequences = $sequence eq 'none' ? 1 : 0;
     $gt->preload();
-    my $hash = Bio::EnsEMBL::Compara::Utils::GeneTreeHash->convert ($gt, -no_sequences => $no_sequences, -aligned => $aligned, -cdna => $cdna, -species_common_name => 0, -exon_boundaries => 0, -gaps => 0, -full_tax_info => 0);
+    my $hash = Bio::EnsEMBL::Compara::Utils::GeneTreeHash->convert ($gt, -no_sequences => $no_sequences, -aligned => $aligned, -cdna => $cdna, -species_common_name => 0, -exon_boundaries => 0, -gaps => 0, -full_tax_info => 0, -cigar_line => $cigar_line);
     return $self->status_ok($c, entity => $hash);
   }
   return $self->status_ok($c, entity => $gt);
