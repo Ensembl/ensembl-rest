@@ -187,23 +187,30 @@ sub get_allele : PathPart('') Args(2) {
         my $error_msg = qq{Allele must be A,T,G,C or SO term [got: $allele]};
         $c->go( 'ReturnError', 'custom', [$error_msg] );
     }
-    my $reference_base;
-    $s->{end} = $s->{start} if !$s->{end};
-    $c->go('ReturnError', 'custom', ['Start or End cannot be negative']) if ($s->{start} < 0 || $s->{end} < 0);
-    $c->go('ReturnError', 'custom', ['Strand should be 1 or -1, not ' . $s->{strand}]) if $s->{strand} !~ /1/;
-    try {
-        $reference_base = $s->{slice}->subseq( $s->{start}, $s->{end}, $s->{strand} );
-        $s->{reference_base} = $reference_base;
-    } catch {
-        $c->log->fatal(qq{can't get reference base from slice});
-        $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-        $c->go('ReturnError', 'custom', [qq{$_}]);
-    };
-    $c->go( 'ReturnError', 'custom', ["request for consequence of [$allele] matches reference [$reference_base]"] )
-      if $reference_base eq $allele;
-    my $allele_string = $reference_base . '/' . $allele;
-    $s->{allele_string} = $allele_string;
-    $s->{allele}        = $allele;
+
+    if($allele =~ /INS|DUP|DEL|TDUP/) {
+      $s->{allele_string} = $allele;
+      $s->{allele} = $allele;
+    }
+    else {
+      my $reference_base;
+      $s->{end} = $s->{start} if !$s->{end};
+      $c->go('ReturnError', 'custom', ['Start or End cannot be negative']) if ($s->{start} < 0 || $s->{end} < 0);
+      $c->go('ReturnError', 'custom', ['Strand should be 1 or -1, not ' . $s->{strand}]) if $s->{strand} !~ /1/;
+      try {
+          $reference_base = $s->{slice}->subseq( $s->{start}, $s->{end}, $s->{strand} );
+          $s->{reference_base} = $reference_base;
+      } catch {
+          $c->log->fatal(qq{can't get reference base from slice});
+          $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+          $c->go('ReturnError', 'custom', [qq{$_}]);
+      };
+      $c->go( 'ReturnError', 'custom', ["request for consequence of [$allele] matches reference [$reference_base]"] )
+        if $reference_base eq $allele;
+      my $allele_string = $reference_base . '/' . $allele;
+      $s->{allele_string} = $allele_string;
+      $s->{allele}        = $allele;
+    }
 
     my $user_config = $c->request->parameters;
     my $config = $self->_include_user_params($c,$user_config);
@@ -340,6 +347,7 @@ sub _build_vf {
   my ($self, $c) = @_;
   my $s = $c->stash;
   my $vf;
+
   try {
       if($s->{allele_string} !~ /\//) {
           my $so_term;
