@@ -393,7 +393,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 repeat in this region');
   
-  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079387\t.\t+\t.\tassembly_name=GRCh37;description=AluSq};
+  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079680\t.\t+\t.\tassembly_name=GRCh37;description=AluSq};
   eq_or_diff($lines[0], $gff_line, 'Expected output repeat feature line from GFF');
 }
 
