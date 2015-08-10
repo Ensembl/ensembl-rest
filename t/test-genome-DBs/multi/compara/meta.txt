@@ -36,3 +36,5 @@
 43	\N	patch	patch_79_80_b.sql|genebuild_unique
 44	\N	patch	patch_80_81_a.sql|schema_version
 45	\N	patch	patch_81_82_a.sql|schema_version
+46	\N	patch	patch_81_82_b.sql|first_last_release
+47	\N	patch	patch_81_82_c.sql|species_set_size
