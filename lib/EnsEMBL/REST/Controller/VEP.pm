@@ -52,6 +52,9 @@ has 'fasta' => (
 
 with 'EnsEMBL::REST::Role::PostLimiter';
 
+our $UPSTREAM_DISTANCE_BAK;
+our $DOWNSTREAM_DISTANCE_BAK;
+
 
 # /vep/:species
 sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
@@ -322,6 +325,14 @@ sub get_consequences {
     }
     $consequences = { data => $consequences };
   }
+
+  # restore default distances, may have been altered by a plugin
+  # this would otherwise persist into future requests!
+  if($UPSTREAM_DISTANCE_BAK) {
+    $Bio::EnsEMBL::Variation::Utils::VariationEffect::UPSTREAM_DISTANCE   = $UPSTREAM_DISTANCE_BAK;
+    $Bio::EnsEMBL::Variation::Utils::VariationEffect::DOWNSTREAM_DISTANCE = $DOWNSTREAM_DISTANCE_BAK;
+  }
+
   return $consequences;
 }
 
@@ -447,6 +458,10 @@ sub _include_user_params {
 
 sub _configure_plugins {
   my ($self,$c,$user_config,$vep_config) = @_;
+
+  # backup up/down distances
+  $UPSTREAM_DISTANCE_BAK   = $Bio::EnsEMBL::Variation::Utils::VariationEffect::UPSTREAM_DISTANCE;
+  $DOWNSTREAM_DISTANCE_BAK = $Bio::EnsEMBL::Variation::Utils::VariationEffect::DOWNSTREAM_DISTANCE;
 
   # add dir_plugins to Perl's list of include dirs
   # otherwise the plugins have to be somewhere in PERL5LIB on startup
