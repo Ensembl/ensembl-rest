@@ -107,6 +107,8 @@ sub fetch_callSets{
       $callset->{name}           = $callset_id;
       $callset->{variantSetIds}  = [$dataSet->{sample_populations}->{$callset_id}->[0]]; 
       $callset->{info}           = {"assembly_version" => [ $dataSet->assembly]};
+      $callset->{created}        = $dataSet->created();
+      $callset->{updated}        = $dataSet->updated();
 
       push @callsets, $callset;
       $n++;
