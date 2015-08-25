@@ -219,6 +219,55 @@ sub popgen_as_hash {
   return $pop_gen;
 }
 
+sub fetch_variation_source_infos {
+  my ($self,$src_filter) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $srca = $c->model('Registry')->get_adaptor($species, 'Variation', 'Source');
+
+  my $sources;  
+  if (defined $src_filter) {
+    my $src = $srca->fetch_by_name($src_filter);
+    if (!$src) {
+      Catalyst::Exception->throw("Variation source '$src_filter' not found for $species");
+    }
+    else {
+      $sources = [$src];
+    }
+  }
+  else {
+    $sources = $srca->fetch_all();
+    if (!$sources) {
+      Catalyst::Exception->throw("Variation sources not found for $species");
+    }
+  }
+
+  my @sources_list;
+  foreach my $source (@{$sources}) {
+    push @sources_list, $self->source_as_hash($source); 
+  }
+  return \@sources_list;
+}
+
+sub source_as_hash {
+  my ($self, $src) = @_;
+
+  my $source;
+
+  $source->{name}           = $src->name() ;
+  $source->{version}        = $src->formatted_version() if defined $src->version;
+  $source->{description}    = $src->description() ;
+  $source->{url}            = $src->url();
+  $source->{type}           = $src->type() if defined $src->type();
+  $source->{somatic_status} = $src->somatic_status() if defined $src->somatic_status;
+  $source->{data_types}     = $src->get_all_data_types() if @{$src->get_all_data_types()};
+
+  return $source;
+}
+
+
 with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
