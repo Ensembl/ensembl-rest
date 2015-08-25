@@ -672,6 +672,8 @@ sub _has_to_be_trimmed_in_circ_chr {
   return $trim;
 }
 
+no warnings 'redefine';
+
 sub Bio::EnsEMBL::Feature::summary_as_hash {
   my $self = shift;
   my %summary;
