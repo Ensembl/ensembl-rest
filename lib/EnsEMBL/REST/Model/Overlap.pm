@@ -216,7 +216,11 @@ sub exon {
   my $transcripts = $self->transcript($slice, 0);
   my @exons;
   foreach my $transcript (@$transcripts) {
-    push (@exons, @{ $transcript->get_all_ExonTranscripts});
+    foreach my $exon (@{ $transcript->get_all_ExonTranscripts}) {
+      if (($slice->start < $exon->seq_region_start && $exon->seq_region_start < $slice->end) || ($exon->seq_region_end > $slice->start && $exon->end < $slice->end)) {
+        push (@exons, $exon);
+      }
+    }
   }
   return \@exons;
 }
