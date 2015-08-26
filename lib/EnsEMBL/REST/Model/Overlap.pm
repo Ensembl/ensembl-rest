@@ -289,16 +289,30 @@ sub somatic_transcript_variation {
 sub _filter_transcript_variation {
   my ($self, $transcript_variants) = @_;
   my $type = $self->context->request->parameters->{type};
+  my $set_short_name  = $self->context->request->parameters->{variant_set};
   my $cached_vfs = $self->context->stash->{_cached_vfs};
   my @vfs;
-  
+
   foreach my $tv (@{$transcript_variants}) {
     # filter out up/downstream TVs
     next unless $tv->cds_start || $tv->cds_end;
     
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
+
     my ($vf) = grep {$_->dbID eq $tv->{_variation_feature_id}} @{$cached_vfs};
     next unless $vf;
+
+    # filter by set if required
+    my $in_set = 0;
+    if($set_short_name){
+      foreach my $set ( @{$vf->get_all_VariationSets()} ){
+        if ($set->short_name() eq $set_short_name){
+          $in_set = 1;
+          last;
+        }
+      }
+      next if $in_set == 0;
+    }
     
     my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
     push(@vfs, $blessed_vf);
@@ -318,7 +332,18 @@ sub translation_exon {
 
 sub variation {
   my ($self, $slice) = @_;
-  return $slice->get_all_VariationFeatures($self->_get_SO_terms());
+
+  my $c = $self->context();
+  
+  if( $c->request->parameters->{variant_set}){
+
+    my $set = $self->_get_VariationSet();
+    my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
+    return $vfa->fetch_all_by_Slice_VariationSet_SO_terms($slice, $set, $self->_get_SO_terms());
+  }
+  else{
+    return $slice->get_all_VariationFeatures($self->_get_SO_terms());
+  }
 }
 
 sub structural_variation {
@@ -504,6 +529,23 @@ sub _get_SO_terms {
     }
   }
   return \@final_terms;
+}
+
+## look up variation set by short name
+sub _get_VariationSet{
+  my ($self) = @_;
+
+  my $c =  $self->context;
+  my $short_set_name = $c->request->parameters->{variant_set};
+
+  ## check set exists
+  my $vsa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationset');
+  my $set = $vsa->fetch_by_short_name($short_set_name);
+
+  if(!ref($set) || !$set->isa('Bio::EnsEMBL::Variation::VariationSet')) {
+    Catalyst::Exception->throw("No VariationSet found with short name: $short_set_name");
+  }
+  return $set;
 }
 
 sub _get_logic_dbtype {

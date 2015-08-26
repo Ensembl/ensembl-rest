@@ -213,7 +213,16 @@ my $base = '/overlap/region/homo_sapiens';
   #Normal SO querying
   my $intergenic = 'intergenic_variant';
   my $json_so = json_GET("$base/$region?feature=variation;so_term=$intergenic", 'SO term querying with known type');
-  is(scalar(@{$json}), $expected_count, 'Expected '.$intergenic.' variations at '.$region);
+  is(scalar(@{$json_so}), $expected_count, 'Expected '.$intergenic.' variations at '.$region);
+
+  #Query by both SO & set
+  my $set = '1kg_com';
+  my $json_so_set= json_GET("$base/$region?feature=variation;so_term=$intergenic;variant_set=$set", 'SO term & variation set querying');
+  is(scalar(@{$json_so_set}), $expected_count, 'Expected '.$intergenic.' variants in set '. $set .'at '.$region);
+
+  # Error given if set does not exist
+  my $bad_set = 'not_a_set';
+  action_bad_regex( "$base/$region?feature=variation;so_term=$intergenic;variant_set=$bad_set", qr/No VariationSet found/, 'Throw if no set of this name' );
 }
 
 #Query for other objects
@@ -503,6 +512,9 @@ $base = '/overlap/translation';
   is(
     @{json_GET("$base/$id?feature=somatic_transcript_variation", 'Ensembl variation with somatic data')},
     16, "16 somatic variations overlapping $id");
+  is(
+    @{json_GET("$base/$id?feature=transcript_variation;variant_set=1kg_com", 'Ensembl variation with set')},
+    3, "3 set variants for $id");
 }
 
 #Check can we get the splice sites and exon boundaries of a translation
