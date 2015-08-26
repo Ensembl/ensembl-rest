@@ -1,11 +1,20 @@
+=head1 LICENSE
 
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
+     http://www.apache.org/licenses/LICENSE-2.0
 
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
-
-
-
+=cut
 
 package EnsEMBL::REST::Controller::LD;
 use Moose;
@@ -20,14 +29,31 @@ BEGIN {
 	
 }
 
-# /ld/:species
 
-# /ld/:species/population_ids
+sub id_GET {
+  my ($self, $c, $id) = @_;
+  my $LDFeatureContainer;
 
-# /ld/:species/id/:id/:d_prime/:r_square/:population_ids
+  try {
+    $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_variation_name($id);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
+  }
+  $self->status_ok($c, entity => $LDFeatureContainer);
 
-# /ld/:species/region/:region/:d_prime/:r_square/:population_ids
+}
 
+sub region_GET {
+  my ($self, $c, $region) = @_;
+  my $slice = $c->model('Lookup')->find_slice($region);
+  my $LDFeatureContainer;
+  try {
+    $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_slice($slice);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+  }
+  $self->status_ok($c, entity => $LDFeatureContainer); 
+}
 
-
-
+__PACKAGE__->meta->make_immutable;
+1;
