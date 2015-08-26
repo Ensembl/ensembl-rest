@@ -177,6 +177,24 @@ sub species_sets : Chained('/') PathPart("info/compara/species_sets") Args(1) Ac
 
 }
 
+sub variation :Local :ActionClass('REST') :Args(1) { }
+
+sub variation_GET :Local :Args(1) {
+  my ($self, $c, $species) = @_;
+
+  $c->stash(species => $species) if defined $species;
+
+  my $sources ;
+  try {
+    $sources = $c->model('Variation')->fetch_variation_source_infos($c->request->param('filter'));
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $sources);
+  return;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -160,4 +160,26 @@ is_json_GET(
   );
 }
 
+#/info/variation/:species
+{
+  my $variation_json = json_GET('/info/variation/homo_sapiens', 'Get analysis hash');
+  cmp_ok(scalar(@{$variation_json}), '==', 6, 'Ensuring we have the right number of sources available');
+
+  # Check with filter
+  my $expected = 
+    [
+      { 
+        name => 'dbSNP',
+        version => 138,
+        description => 'Variants (including SNPs and indels) imported from dbSNP',
+        url => 'http://www.ncbi.nlm.nih.gov/projects/SNP/',
+        somatic_status => 'mixed',
+        data_types => ['variation']
+      }
+    ];
+  is_json_GET('/info/variation/homo_sapiens?filter=dbSNP', $expected, 'Checking dbSNP source filtering works');
+
+  is_json_GET('/info/variation/wibble', {}, 'Bogus species means empty hash');
+}
+
 done_testing();
