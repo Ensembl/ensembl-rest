@@ -194,6 +194,7 @@ my $base = '/overlap/region/homo_sapiens';
   eq_or_diff_data($json->[0],{
     start => 1001893,
     assembly_name => 'GRCh37',
+    clinical_significance => [], 
     end => 1001893,
     strand => 1,
     id => 'tmp__',

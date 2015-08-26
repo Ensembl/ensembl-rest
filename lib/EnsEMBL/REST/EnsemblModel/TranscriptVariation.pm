@@ -38,6 +38,7 @@ sub new {
   $self->{polyphen} = $tva->polyphen_score;
   $self->{parent} = $transcript_variant->transcript->stable_id();
   $self->minor_allele_frequency($proxy_vf->minor_allele_frequency);
+  $self->{clinical_significance} = \@{$proxy_vf->get_all_clinical_significance_states};
   return $self;
 }
 
@@ -114,6 +115,12 @@ sub ID {
   return $self->{'ID'};
 }
 
+sub clinical_significance{
+  my ($self, $clinical_significance) = @_;
+  $self->{clinical_significance} = $clinical_significance if defined $clinical_significance;
+  return $self->{clinical_significance};
+}
+
 sub summary_as_hash {
   my ($self) = @_;
   my $summary = {};
@@ -129,6 +136,7 @@ sub summary_as_hash {
   $summary->{polyphen} = $self->polyphen;
   $summary->{Parent} = $self->parent;
   $summary->{minor_allele_frequency} = $self->minor_allele_frequency;
+  $summary->{clinical_significance} = $self->{clinical_significance} ;
 
   $summary->{seq_region_name} = $summary->{translation};
   return $summary;
