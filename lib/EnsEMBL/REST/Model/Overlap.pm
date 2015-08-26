@@ -217,7 +217,7 @@ sub exon {
   my @exons;
   foreach my $transcript (@$transcripts) {
     foreach my $exon (@{ $transcript->get_all_ExonTranscripts}) {
-      if (($slice->start < $exon->seq_region_start && $exon->seq_region_start < $slice->end) || ($exon->seq_region_end > $slice->start && $exon->end < $slice->end)) {
+      if (($slice->start < $exon->seq_region_start && $exon->seq_region_start < $slice->end) || ($slice->start < $exon->seq_region_end && $exon->seq_region_end < $slice->end)) {
         push (@exons, $exon);
       }
     }
