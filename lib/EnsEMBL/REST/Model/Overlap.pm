@@ -289,7 +289,6 @@ sub somatic_transcript_variation {
 sub _filter_transcript_variation {
   my ($self, $transcript_variants) = @_;
   my $type = $self->context->request->parameters->{type};
-  my $set_short_name  = $self->context->request->parameters->{variant_set};
   my $cached_vfs = $self->context->stash->{_cached_vfs};
   my @vfs;
 
@@ -301,18 +300,6 @@ sub _filter_transcript_variation {
 
     my ($vf) = grep {$_->dbID eq $tv->{_variation_feature_id}} @{$cached_vfs};
     next unless $vf;
-
-    # filter by set if required
-    my $in_set = 0;
-    if($set_short_name){
-      foreach my $set ( @{$vf->get_all_VariationSets()} ){
-        if ($set->short_name() eq $set_short_name){
-          $in_set = 1;
-          last;
-        }
-      }
-      next if $in_set == 0;
-    }
     
     my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
     push(@vfs, $blessed_vf);
