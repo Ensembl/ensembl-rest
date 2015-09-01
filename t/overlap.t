@@ -79,7 +79,7 @@ my $base = '/overlap/region/homo_sapiens';
     biotype => 'protein_coding',
     description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109  [Source:UniProtKB/TrEMBL;Acc:Q8NAX6]',
     end => 1105181,
-    Name => 'AL033381.1',
+    external_name => 'AL033381.1',
     feature_type => 'gene',
     logic_name => 'ensembl',
     seq_region_name => '6',
@@ -194,6 +194,7 @@ my $base = '/overlap/region/homo_sapiens';
   eq_or_diff_data($json->[0],{
     start => 1001893,
     assembly_name => 'GRCh37',
+    clinical_significance => [], 
     end => 1001893,
     strand => 1,
     id => 'tmp__',
@@ -213,7 +214,16 @@ my $base = '/overlap/region/homo_sapiens';
   #Normal SO querying
   my $intergenic = 'intergenic_variant';
   my $json_so = json_GET("$base/$region?feature=variation;so_term=$intergenic", 'SO term querying with known type');
-  is(scalar(@{$json}), $expected_count, 'Expected '.$intergenic.' variations at '.$region);
+  is(scalar(@{$json_so}), $expected_count, 'Expected '.$intergenic.' variations at '.$region);
+
+  #Query by both SO & set
+  my $set = '1kg_com';
+  my $json_so_set= json_GET("$base/$region?feature=variation;so_term=$intergenic;variant_set=$set", 'SO term & variation set querying');
+  is(scalar(@{$json_so_set}), $expected_count, 'Expected '.$intergenic.' variants in set '. $set .'at '.$region);
+
+  # Error given if set does not exist
+  my $bad_set = 'not_a_set';
+  action_bad_regex( "$base/$region?feature=variation;so_term=$intergenic;variant_set=$bad_set", qr/No VariationSet found/, 'Throw if no set of this name' );
 }
 
 #Query for other objects
@@ -393,7 +403,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 repeat in this region');
   
-  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079387\t.\t+\t.\tassembly_name=GRCh37;description=AluSq};
+  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079680\t.\t+\t.\tassembly_name=GRCh37;description=AluSq};
   eq_or_diff($lines[0], $gff_line, 'Expected output repeat feature line from GFF');
 }
 
@@ -407,14 +417,14 @@ sub filter_gff {
 {
   my $region = '6:1078245-1108340';
   my $bed = bed_GET("$base/$region?feature=gene", 'Getting single gene'); 
-  my $expected_bed = qq{chr6\t1080163\t1105181\tENSG00000176515\t0\t+\n};
+  my $expected_bed = qq{chr6\t1080163\t1105181\tENSG00000176515\t1000\t+\n};
   eq_or_diff($bed, $expected_bed, 'Expected output gene line from BED');
 }
 
 {
   my $region = '6:1078245-1108340';
   my $bed = bed_GET("$base/$region?feature=transcript", 'Getting a set of transcripts from both strands');
-  my $expected_bed = qq{chr6\t1080163\t1105181\tENST00000314040\t0\t+\t1101507\t1102415\t0\t3\t66,228,3141,\t0,21140,21877,\n};
+  my $expected_bed = qq{chr6\t1080163\t1105181\tENST00000314040\t1000\t+\t1101507\t1102415\t0,0,0\t3\t66,228,3141,\t0,21140,21877,\tAL033381.1-201\tcmpl\tcmpl\t-1,-1,0,\tprotein_coding\tENSG00000176515\tAL033381.1\tprotein_coding\n};
   eq_or_diff($bed, $expected_bed, 'Expected output transcript line from BED with exons and their offsets');
 }
 

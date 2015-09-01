@@ -48,6 +48,7 @@ sub id : Chained('') PathPart('lookup/id') ActionClass('REST') {
 
 sub id_GET {
   my ($self, $c, $id) = @_;
+  unless (defined $id) { $c->go('ReturnError', 'custom', [qq{Id must be provided as part of the URL.}])}
   my $features;
   try {
     $features = $c->model('Lookup')->find_and_locate_object($id);
@@ -86,6 +87,7 @@ sub symbol : Chained('/') PathPart('lookup/symbol') ActionClass('REST') {
 sub symbol_GET {
   my ($self, $c, $species, $symbol) = @_;
   my $features;
+  unless (defined $symbol) { $c->go('ReturnError', 'custom', [qq{Symbol must be provided as part of the URL.}])}
   try {
     $features = $c->model('Lookup')->find_gene_by_symbol($symbol);
     $c->go('ReturnError', 'custom',  [qq{No valid lookup found for symbol $symbol}]) unless $features->{species};

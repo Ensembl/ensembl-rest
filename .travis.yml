@@ -2,13 +2,18 @@ language: "perl"
 
 perl:
   - "5.14"
+  
+sudo: false
+  
+addons:
+  apt:
+    packages:
+    - unzip
 
 env:
   - COVERALLS=false
 
 before_install:
-    - sudo apt-get -y update
-    - sudo apt-get -y install unzip
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-compara.git
@@ -27,9 +32,6 @@ before_install:
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
-    - cpanm -n Catalyst::Runtime 
-    - cpanm -n Catalyst::Plugin::ConfigLoader Catalyst::Action::RenderView Mojo Catalyst::Plugin::Static::Simple
-    - cpanm -n Catalyst::Devel
     - cpanm -v --installdeps --with-recommends --notest .
     - cpanm -n Devel::Cover::Report::Coveralls
     - cp travisci/MultiTestDB.conf.travisci t/MultiTestDB.conf

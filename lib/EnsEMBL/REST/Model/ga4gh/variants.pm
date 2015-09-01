@@ -217,6 +217,7 @@ sub sort_genotypes {
     } 
     ## place holders
     $gen_hash->{phaseset}           = '';
+
     if( $is_remapped ){
       ## minimal data relevant if remapped
       $gen_hash->{genotypeLikelihood} = [];
@@ -275,6 +276,7 @@ sub get_next_by_token{
   }
   
   return unless defined $current_ds;
+
 
   ## look up info from vcf collection object
   my $ds_ob = $data->{coll}->{$current_ds};

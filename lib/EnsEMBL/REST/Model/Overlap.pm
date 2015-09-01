@@ -75,7 +75,9 @@ sub fetch_features {
   
   my $slice = $c->stash()->{slice};
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
-  $vfa->db->include_failed_variations(0);
+  if ($vfa) {
+    $vfa->db->include_failed_variations(0);
+  }
   my @final_features;
   foreach my $feature_type (@features) {
     next if exists $processed_feature_types{$feature_type};
@@ -160,6 +162,10 @@ sub to_hash {
       my $v = $hash->{$key};
       $hash->{$key} = ($v*1) if defined $v;
     }
+    if ($hash->{Name}) {
+      $hash->{external_name} = $hash->{Name};
+      delete $hash->{Name};
+    }
     $hash->{feature_type} = $feature_type;
     push(@hashed, $hash);
   }
@@ -210,7 +216,11 @@ sub exon {
   my $transcripts = $self->transcript($slice, 0);
   my @exons;
   foreach my $transcript (@$transcripts) {
-    push (@exons, @{ $transcript->get_all_ExonTranscripts});
+    foreach my $exon (@{ $transcript->get_all_ExonTranscripts}) {
+      if (($slice->start < $exon->seq_region_start && $exon->seq_region_start < $slice->end) || ($slice->start < $exon->seq_region_end && $exon->seq_region_end < $slice->end)) {
+        push (@exons, $exon);
+      }
+    }
   }
   return \@exons;
 }
@@ -285,12 +295,13 @@ sub _filter_transcript_variation {
   my $type = $self->context->request->parameters->{type};
   my $cached_vfs = $self->context->stash->{_cached_vfs};
   my @vfs;
-  
+
   foreach my $tv (@{$transcript_variants}) {
     # filter out up/downstream TVs
     next unless $tv->cds_start || $tv->cds_end;
     
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
+
     my ($vf) = grep {$_->dbID eq $tv->{_variation_feature_id}} @{$cached_vfs};
     next unless $vf;
     
@@ -312,7 +323,18 @@ sub translation_exon {
 
 sub variation {
   my ($self, $slice) = @_;
-  return $slice->get_all_VariationFeatures($self->_get_SO_terms());
+
+  my $c = $self->context();
+  
+  if( $c->request->parameters->{variant_set}){
+
+    my $set = $self->_get_VariationSet();
+    my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
+    return $vfa->fetch_all_by_Slice_VariationSet_SO_terms($slice, $set, $self->_get_SO_terms());
+  }
+  else{
+    return $slice->get_all_VariationFeatures($self->_get_SO_terms());
+  }
 }
 
 sub structural_variation {
@@ -500,6 +522,23 @@ sub _get_SO_terms {
   return \@final_terms;
 }
 
+## look up variation set by short name
+sub _get_VariationSet{
+  my ($self) = @_;
+
+  my $c =  $self->context;
+  my $short_set_name = $c->request->parameters->{variant_set};
+
+  ## check set exists
+  my $vsa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationset');
+  my $set = $vsa->fetch_by_short_name($short_set_name);
+
+  if(!ref($set) || !$set->isa('Bio::EnsEMBL::Variation::VariationSet')) {
+    Catalyst::Exception->throw("No VariationSet found with short name: $short_set_name");
+  }
+  return $set;
+}
+
 sub _get_logic_dbtype {
   my ($self) = @_;
   my $c = $self->context();
@@ -665,6 +704,8 @@ sub _has_to_be_trimmed_in_circ_chr {
   
   return $trim;
 }
+
+no warnings 'redefine';
 
 sub Bio::EnsEMBL::Feature::summary_as_hash {
   my $self = shift;

@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,22 +16,22 @@ limitations under the License.
 
 =cut
 
-package EnsEMBL::REST::View::TT;
+package EnsEMBL::REST::View::OrthoXML;
 use Moose;
 use namespace::autoclean;
-use File::Spec;
-use Template::Stash::XS;
 
-extends 'Catalyst::View::TT';
+extends 'Catalyst::View';
 
-__PACKAGE__->config(
-    WRAPPER => 'wrapper.tt',
-    TEMPLATE_EXTENSION => '.tt',
-    RENDER_DIE => 1,
-    COMPILE_DIR => File::Spec->catdir(File::Spec->tmpdir(), $ENV{USER}, 'ensrest', 'template_cache'),
-    STASH => Template::Stash::XS->new(),
-);
+sub process {
+  my ($self, $c, $stash_key) = @_;
+  $c->res->body(${$self->encode_orthoxml($c, $stash_key)});
+  $self->set_content_disposition($c, 'xml', $stash_key);
+  $c->res->headers->header('Content-Type' => 'text/x-orthoxml+xml');
+  return 1;
+}
 
+with 'EnsEMBL::REST::Role::Tree';
+
+__PACKAGE__->meta->make_immutable;
 
 1;
-

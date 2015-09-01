@@ -273,7 +273,7 @@ sub _build_species_info {
     }
   }
   
-  my @all_dbadaptors = @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
+  my @all_dbadaptors = grep {$_->dbname ne 'ncbi_taxonomy'} @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
   my @core_dbadaptors;
   my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup);
   my %processed_db;
@@ -294,10 +294,10 @@ sub _build_species_info {
       if(! exists $processed_db{$db_key}) {
         my $mc = $dba->get_MetaContainer();
         my $schema_version = $mc->get_schema_version() * 1;
-        $release_lookup{$species} = $schema_version;
         
         if(!$dba->is_multispecies() && $species !~ /Ancestral/) {
           my $csa = $dba->get_CoordSystemAdaptor();
+          $release_lookup{$species} = $schema_version;
           $division_lookup{$species} = $mc->get_division() || 'Ensembl';
           $common_lookup{$species} = $mc->get_common_name();
           $taxon_lookup{$species} = $mc->get_taxonomy_id();
@@ -323,6 +323,7 @@ sub _build_species_info {
               $division_lookup{$row->[0]} = $row->[1];
               $display_lookup{$row->[0]} = $row->[2];
               $taxon_lookup{$row->[0]} = $row->[3];
+              $release_lookup{$row->[0]} = $schema_version;
               return;
             }
           );

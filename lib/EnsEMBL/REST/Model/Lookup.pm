@@ -78,15 +78,35 @@ sub find_genetree_by_member_id {
   my $reg = $c->model('Registry');
 
   my ($species, $object_type, $db_type) = $self->find_object_location($id);
-  Exception::Catalyst->throw("Unable to find given object: $id") unless $species;
+
+  # The rest of the method should treat all the possible $object_type and
+  # $db_type, and output the relevant error messages
+  Catalyst::Exception->throw("Unable to find given object: $id") unless $species;
+  Catalyst::Exception->throw("'$id' is not an Ensembl Core object, and thus does not have a gene-tree.") if $db_type ne 'core';
 
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
-  my $ma = $dba->get_GeneMemberAdaptor;
-  my $member = $ma->fetch_by_stable_id($id);
-  Exception->Catalyst->throw("Could not fetch GeneTree Member") unless $member;
+
+  my $member;
+  if ($object_type eq 'Gene') {
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($id);
+  } elsif ($object_type eq 'Transcript') {
+    my $gene_adaptor = $reg->get_adaptor($species, $db_type, 'Gene');
+    my $gene = $gene_adaptor->fetch_by_transcript_stable_id($id);
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($gene->stable_id);
+  } elsif ($object_type eq 'Translation') {
+    my $translation_adaptor = $reg->get_adaptor($species, $db_type, 'Translation');
+    my $translation = $translation_adaptor->fetch_by_stable_id($id);
+    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id($translation->stable_id);
+  } elsif ($object_type eq 'Exon') {
+    my $gene_adaptor = $reg->get_adaptor($species, $db_type, 'Gene');
+    my $gene = $gene_adaptor->fetch_by_exon_stable_id($id);
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($gene->stable_id);
+  }
+  Catalyst::Exception->throw("Could not fetch a $object_type object for ID $id") unless $member;
 
   my $gta = $dba->get_GeneTreeAdaptor;
   my $gt = $gta->fetch_default_for_Member($member);
+  Catalyst::Exception->throw("No GeneTree found for $object_type ID $id") unless $gt;
   return $gt;
 }
 
@@ -96,7 +116,7 @@ sub find_compara_methods {
   my ($self, $class) = @_;
   my $c = $self->context();
   #default is "multi"
-  my $compara = $c->request->parameters->{compara} || 'multi';
+  my $compara = $c->request->parameters->{compara} || $c->config->{'Controller::Compara'}->{default_compara} || 'multi';
   my $reg = $c->model('Registry');
   my $compara_dba = $reg->get_DBAdaptor($compara, "compara");
   my $methods;
@@ -115,7 +135,7 @@ sub find_compara_species_sets {
 
   my $c = $self->context();
   #default is "multi"
-  my $compara = $c->request->parameters->{compara} || 'multi';
+  my $compara = $c->request->parameters->{compara} || $c->config->{'Controller::Compara'}->{default_compara} || 'multi';
   my $reg = $c->model('Registry');
   my $compara_dba = $reg->get_DBAdaptor($compara, "compara");
 
@@ -435,6 +455,8 @@ sub features_as_hash {
       $features->{biotype} = $summary_hash->{biotype} if defined $summary_hash->{biotype};
       $features->{source} = $summary_hash->{source} if defined $summary_hash->{source};
       $features->{logic_name} = $summary_hash->{logic_name} if defined $summary_hash->{logic_name};
+# Parent field to link back to gene/transcript where available
+      $features->{Parent} = $summary_hash->{Parent} if defined $summary_hash->{Parent};
       if (lc($object_type) eq 'transcript') {
         $features->{is_canonical} = $obj->is_canonical;
       }
