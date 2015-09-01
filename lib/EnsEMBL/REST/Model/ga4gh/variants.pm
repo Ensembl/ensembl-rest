@@ -217,13 +217,11 @@ sub sort_genotypes {
     } 
     ## place holders
     $gen_hash->{phaseset}           = '';
+    $gen_hash->{genotypeLikelihood} = [];
+    $gen_hash->{info}               = {};
 
-    if( $is_remapped ){
-      ## minimal data relevant if remapped
-      $gen_hash->{genotypeLikelihood} = [];
-      $gen_hash->{info}               = {};
-    }
-    else{
+    unless( $is_remapped ){
+      ## meta data may not be relevant if variant remapped rather than recalled
 
       foreach my $inf (keys %{$geno_strings->{$sample}} ){
         next if $inf eq 'GT';
