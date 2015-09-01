@@ -42,175 +42,175 @@ my $expected_data1 = {
       datasetId => '1',                           
       id => '20',                                 
       metadata => [                               
-     { 
+     {   info => {}, 
          description => 'MLE Allele Frequency Accounting for LD',                        
          id => 'LDAF',                                                                   
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Average posterior probability from MaCH/Thunder',               
          id => 'AVGPOST',                                                                
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype imputation quality from MaCH/Thunder',                 
          id => 'RSQ',                                                                    
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Per-marker Mutation rate from MaCH/Thunder',                    
          id => 'ERATE',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Per-marker Transition rate from MaCH/Thunder',                  
          id => 'THETA',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Confidence interval around END for imprecise variants',         
          id => 'CIEND',                                                                  
          key => 'INFO',                                                                  
          number => '2',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Confidence interval around POS for imprecise variants',         
          id => 'CIPOS',                                                                  
          key => 'INFO',                                                                  
          number => '2',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'End position of the variant described in this record',          
          id => 'END',                                                                    
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Length of base pair identical micro-homology at event breakpoints',
          id => 'HOMLEN',                                                                 
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Sequence of base pair identical micro-homology at event breakpoints',
          id => 'HOMSEQ',                                                                 
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Difference in length between REF and ALT alleles',              
          id => 'SVLEN',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Type of structural variant',                                    
          id => 'SVTYPE',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Alternate Allele Count',                                        
          id => 'AC',                                                                     
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Total Allele Count',                                            
          id => 'AN',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
          id => 'AA',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Global Allele Frequency based on AC/AN',                        
          id => 'AF',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from AMR based on AC/AN',          
          id => 'AMR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from ASN based on AC/AN',          
          id => 'ASN_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from AFR based on AC/AN',          
          id => 'AFR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from EUR based on AC/AN',          
          id => 'EUR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                                
          description => 'indicates what type of variant the line represents',            
          id => 'VT',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'indicates if a snp was called when analysing the low coverage or exome alignment data',
          id => 'SNPSOURCE',                                                              
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype',                                                      
          id => 'GT',                                                                     
          key => 'FORMAT',                                                                
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype dosage from MaCH/Thunder',                             
          id => 'DS',                                                                     
          key => 'FORMAT',                                                                
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype Likelihoods',                                          
          id => 'GL',                                                                     
          key => 'FORMAT',                                                                
@@ -239,175 +239,175 @@ my $expected_data1 = {
       datasetId => '1',                           
       id => '21',                                 
       metadata => [                               
-{ 
+       { info => {},
          description => 'MLE Allele Frequency Accounting for LD',                        
          id => 'LDAF',                                                                   
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                                
          description => 'Average posterior probability from MaCH/Thunder',               
          id => 'AVGPOST',                                                                
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype imputation quality from MaCH/Thunder',                 
          id => 'RSQ',                                                                    
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Per-marker Mutation rate from MaCH/Thunder',                    
          id => 'ERATE',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Per-marker Transition rate from MaCH/Thunder',                  
          id => 'THETA',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Confidence interval around END for imprecise variants',         
          id => 'CIEND',                                                                  
          key => 'INFO',                                                                  
          number => '2',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Confidence interval around POS for imprecise variants',         
          id => 'CIPOS',                                                                  
          key => 'INFO',                                                                  
          number => '2',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'End position of the variant described in this record',          
          id => 'END',                                                                    
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Length of base pair identical micro-homology at event breakpoints',
          id => 'HOMLEN',                                                                 
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Sequence of base pair identical micro-homology at event breakpoints',
          id => 'HOMSEQ',                                                                 
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Difference in length between REF and ALT alleles',              
          id => 'SVLEN',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Type of structural variant',                                    
          id => 'SVTYPE',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Alternate Allele Count',                                        
          id => 'AC',                                                                     
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Total Allele Count',                                            
          id => 'AN',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
          id => 'AA',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Global Allele Frequency based on AC/AN',                        
          id => 'AF',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from AMR based on AC/AN',          
          id => 'AMR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from ASN based on AC/AN',          
          id => 'ASN_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from AFR based on AC/AN',          
          id => 'AFR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from EUR based on AC/AN',          
          id => 'EUR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'indicates what type of variant the line represents',            
          id => 'VT',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'indicates if a snp was called when analysing the low coverage or exome alignment data',
          id => 'SNPSOURCE',                                                              
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype',                                                      
          id => 'GT',                                                                     
          key => 'FORMAT',                                                                
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype dosage from MaCH/Thunder',                             
          id => 'DS',                                                                     
          key => 'FORMAT',                                                                
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype Likelihoods',                                          
          id => 'GL',                                                                     
          key => 'FORMAT',                                                                
@@ -443,175 +443,175 @@ my $expected_data2 = {
       datasetId => '1',                           
       id => '20',                                 
       metadata => [                               
-{ 
+       { info => {},
          description => 'MLE Allele Frequency Accounting for LD',                        
          id => 'LDAF',                                                                   
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                                
          description => 'Average posterior probability from MaCH/Thunder',               
          id => 'AVGPOST',                                                                
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                                
          description => 'Genotype imputation quality from MaCH/Thunder',                 
          id => 'RSQ',                                                                    
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Per-marker Mutation rate from MaCH/Thunder',                    
          id => 'ERATE',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Per-marker Transition rate from MaCH/Thunder',                  
          id => 'THETA',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Confidence interval around END for imprecise variants',         
          id => 'CIEND',                                                                  
          key => 'INFO',                                                                  
          number => '2',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Confidence interval around POS for imprecise variants',         
          id => 'CIPOS',                                                                  
          key => 'INFO',                                                                  
          number => '2',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'End position of the variant described in this record',          
          id => 'END',                                                                    
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Length of base pair identical micro-homology at event breakpoints',
          id => 'HOMLEN',                                                                 
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Sequence of base pair identical micro-homology at event breakpoints',
          id => 'HOMSEQ',                                                                 
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Difference in length between REF and ALT alleles',              
          id => 'SVLEN',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Type of structural variant',                                    
          id => 'SVTYPE',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Alternate Allele Count',                                        
          id => 'AC',                                                                     
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Total Allele Count',                                            
          id => 'AN',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
          id => 'AA',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Global Allele Frequency based on AC/AN',                        
          id => 'AF',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from AMR based on AC/AN',          
          id => 'AMR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from ASN based on AC/AN',          
          id => 'ASN_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from AFR based on AC/AN',          
          id => 'AFR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from EUR based on AC/AN',          
          id => 'EUR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'indicates what type of variant the line represents',            
          id => 'VT',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'indicates if a snp was called when analysing the low coverage or exome alignment data',
          id => 'SNPSOURCE',                                                              
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype',                                                      
          id => 'GT',                                                                     
          key => 'FORMAT',                                                                
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype dosage from MaCH/Thunder',                             
          id => 'DS',                                                                     
          key => 'FORMAT',                                                                
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype Likelihoods',                                          
          id => 'GL',                                                                     
          key => 'FORMAT',                                                                
@@ -640,175 +640,175 @@ my $expected_data2 = {
       datasetId => '1',                           
       id => '21',                                 
       metadata => [                               
-{ 
+       { info => {},
          description => 'MLE Allele Frequency Accounting for LD',                        
          id => 'LDAF',                                                                   
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                                
          description => 'Average posterior probability from MaCH/Thunder',               
          id => 'AVGPOST',                                                                
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype imputation quality from MaCH/Thunder',                 
          id => 'RSQ',                                                                    
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Per-marker Mutation rate from MaCH/Thunder',                    
          id => 'ERATE',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Per-marker Transition rate from MaCH/Thunder',                  
          id => 'THETA',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Confidence interval around END for imprecise variants',         
          id => 'CIEND',                                                                  
          key => 'INFO',                                                                  
          number => '2',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Confidence interval around POS for imprecise variants',         
          id => 'CIPOS',                                                                  
          key => 'INFO',                                                                  
          number => '2',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'End position of the variant described in this record',          
          id => 'END',                                                                    
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Length of base pair identical micro-homology at event breakpoints',
          id => 'HOMLEN',                                                                 
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Sequence of base pair identical micro-homology at event breakpoints',
          id => 'HOMSEQ',                                                                 
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Difference in length between REF and ALT alleles',              
          id => 'SVLEN',                                                                  
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Type of structural variant',                                    
          id => 'SVTYPE',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Alternate Allele Count',                                        
          id => 'AC',                                                                     
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Total Allele Count',                                            
          id => 'AN',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Integer'                                                               
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
          id => 'AA',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Global Allele Frequency based on AC/AN',                        
          id => 'AF',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from AMR based on AC/AN',          
          id => 'AMR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from ASN based on AC/AN',          
          id => 'ASN_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from AFR based on AC/AN',          
          id => 'AFR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Allele Frequency for samples from EUR based on AC/AN',          
          id => 'EUR_AF',                                                                 
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'indicates what type of variant the line represents',            
          id => 'VT',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'indicates if a snp was called when analysing the low coverage or exome alignment data',
          id => 'SNPSOURCE',                                                              
          key => 'INFO',                                                                  
          number => '.',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype',                                                      
          id => 'GT',                                                                     
          key => 'FORMAT',                                                                
          number => '1',                                                                  
          type => 'String'                                                                
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype dosage from MaCH/Thunder',                             
          id => 'DS',                                                                     
          key => 'FORMAT',                                                                
          number => '1',                                                                  
          type => 'Float'                                                                 
        },                                                                                
-       {                                                                                 
+       { info => {},                                                                     
          description => 'Genotype Likelihoods',                                          
          id => 'GL',                                                                     
          key => 'FORMAT',                                                                

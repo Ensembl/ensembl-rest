@@ -161,6 +161,9 @@ sub get_info{
       foreach my $k (keys %$d){
         $out->{"\L$k"} = $d->{$k};
       }
+      ##required info hash
+      $out->{info} = {};
+
       push @meta, $out;
     }
   }
