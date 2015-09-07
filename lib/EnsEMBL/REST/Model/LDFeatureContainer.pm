@@ -33,45 +33,31 @@ sub fetch_LDFeatureContainer_variation_name {
   Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @$vfs == 0);
   my $vf = $vfs->[0];
 
-  my $d_prime = $c->request->param('d_prime');
-  my $r2 = $c->request->param('r2');
-  my @population_names = @{$c->request->param('population_id')};
-  my @populations_ids = ();
-  if (@population_names) {
+  my $population_name = $c->request->param('population');
+  if ($population_name) {
     my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
-    foreach my $name (@population_names) {
-      my $population = $pa->fetch_by_name($name);
-      if (!$population) {
-        Catalyst::Exception->throw("Could not fetch population object for population name: $name");
-      } else {
-        push @population_ids, $population->dbID;
-      }
+    my $population = $pa->fetch_by_name($population_name);
+    if (!$population) {
+      Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
     }
+    my $ldfc = $ldfca->fetch_by_VariationFeature($vf, $population);
+    return $self->to_hash($ldfc)
   }
-  my $ldfc = $ldfca->fetch_by_VariationFeature($vf, );
-  return $self->to_hash($ldfc);
-}
-
-sub fetch_LDFeatureContainer_slice {
-  my ($self, $slice) = @_; 
-  Catalyst::Exception->throw("No region given. Please specify a region to retrieve from this service") if ! $slice;
-  $self->_config();
-  my $c = $self->context();
-  my $species = $c->stash->{species};
-  my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
-  my $var_params = $c->config->{'Model::Variation'};
-  if ($var_params && $var_params->{use_vcf}) {
-    $ldfca->db->use_vcf($var_params->{use_vcf});
-    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $var_params->{vcf_config};
-  }
-  my $ldfc = $ldfca->fetch_by_Slice($slice);
+  my $ldfc = $ldfca->fetch_by_VariationFeature($vf);
   return $self->to_hash($ldfc);
 }
 
 sub to_hash {
   my ($self, $LDFC) = @_;
   my $c = $self->context();
+  my $d_prime = $c->request->param('d_prime');
+  my $r2 = $c->request->param('r2');
   my $LDFC_hash;
+  foreach my $hash (@{$LDFC->get_all_ld_values()}) {
+    my $variation1 = $hash->{variation1}->variation_name; 
+    $LDFC_hash->{variation1} = $variation1;
+  }
+  return $LDFC_hash;
 }
 
 with 'EnsEMBL::REST::Role::Content';
