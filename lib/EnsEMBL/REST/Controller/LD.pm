@@ -29,6 +29,12 @@ BEGIN {
 	
 }
 
+sub species: Chained('/') PathPart('ld') CaptureArgs(1) {
+  my ($self, $c, $species) = @_;
+  $c->stash(species => $species);
+}
+
+sub id: Chained('species') PathPart('') ActionClass('REST') {}
 
 sub id_GET {
   my ($self, $c, $id) = @_;
@@ -38,21 +44,9 @@ sub id_GET {
     $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_variation_name($id);
   } catch {
     $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   }
   $self->status_ok($c, entity => $LDFeatureContainer);
-
-}
-
-sub region_GET {
-  my ($self, $c, $region) = @_;
-  my $slice = $c->model('Lookup')->find_slice($region);
-  my $LDFeatureContainer;
-  try {
-    $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_slice($slice);
-  } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-  }
-  $self->status_ok($c, entity => $LDFeatureContainer); 
 }
 
 __PACKAGE__->meta->make_immutable;
