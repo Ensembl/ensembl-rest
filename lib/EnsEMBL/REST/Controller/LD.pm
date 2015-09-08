@@ -19,18 +19,16 @@ limitations under the License.
 package EnsEMBL::REST::Controller::LD;
 use Moose;
 use namespace::autoclean;
-
-
+use Try::Tiny;
+use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
-
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
-BEGIN {
-  extends 'Catalyst::Controller::REST';
-	
-}
+
+BEGIN {extends 'Catalyst::Controller::REST';}
+with 'EnsEMBL::REST::Role::PostLimiter';
 
 sub species: Chained('/') PathPart('ld') CaptureArgs(1) {
-  my ($self, $c, $species) = @_;
+  my ( $self, $c, $species) = @_;
   $c->stash(species => $species);
 }
 
@@ -39,13 +37,12 @@ sub id: Chained('species') PathPart('') ActionClass('REST') {}
 sub id_GET {
   my ($self, $c, $id) = @_;
   my $LDFeatureContainer;
-
   try {
     $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_variation_name($id);
   } catch {
     $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
     $c->go('ReturnError', 'custom', [qq{$_}]);
-  }
+  };
   $self->status_ok($c, entity => $LDFeatureContainer);
 }
 
