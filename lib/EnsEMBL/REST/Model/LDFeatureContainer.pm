@@ -1,23 +1,26 @@
-package EnsEMBL::REST::EnsemlModel::LDFeatureContainer;
+package EnsEMBL::REST::Model::LDFeatureContainer;
 
 use Moose;
 use Catalyst::Exception qw(throw);
 extends 'Catalyst::Model';
 
-#with 'Catalyst::Component::InstancePerContext';
+with 'Catalyst::Component::InstancePerContext';
 
-#has 'context' => (is => 'ro');
+
+has 'context' => (is => 'ro');
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ conext => $c, %$self, @args});
+  return $self->new({ context => $c, %$self, @args });
 }
 
 sub fetch_LDFeatureContainer_variation_name {
   my ($self, $variation_name) = @_;
   Catalyst::Exception->throw("No variation given. Please specify a variation to retrieve from this service") if ! $variation_name;
+
   my $c = $self->context();
   my $species = $c->stash->{species};
+
   my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
   my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
 
@@ -44,20 +47,25 @@ sub fetch_LDFeatureContainer_variation_name {
     return $self->to_hash($ldfc)
   }
   my $ldfc = $ldfca->fetch_by_VariationFeature($vf);
-  return $self->to_hash($ldfc);
+  return $self->to_array($ldfc);
 }
 
-sub to_hash {
+sub to_array {
   my ($self, $LDFC) = @_;
   my $c = $self->context();
   my $d_prime = $c->request->param('d_prime');
   my $r2 = $c->request->param('r2');
-  my $LDFC_hash;
-  foreach my $hash (@{$LDFC->get_all_ld_values()}) {
-    my $variation1 = $hash->{variation1}->variation_name; 
-    $LDFC_hash->{variation1} = $variation1;
+  my @LDFC_array = ();
+  foreach my $ld_hash (@{$LDFC->get_all_ld_values()}) {
+    my $hash = {};
+    $hash->{variation1} = $ld_hash->{variation1}->variation_name; 
+    $hash->{variation2} = $ld_hash->{variation2}->variation_name; 
+    $hash->{d_prime} = $ld_hash->{d_prime};
+    $hash->{r2} = $ld_hash->{r2};
+    $hash->{population_id} = $ld_hash->{population_id};
+    push @LDFC_array, $hash;
   }
-  return $LDFC_hash;
+  return \@LDFC_array;
 }
 
 with 'EnsEMBL::REST::Role::Content';
