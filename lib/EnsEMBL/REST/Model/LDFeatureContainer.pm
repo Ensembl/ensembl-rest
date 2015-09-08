@@ -3,9 +3,7 @@ package EnsEMBL::REST::Model::LDFeatureContainer;
 use Moose;
 use Catalyst::Exception qw(throw);
 extends 'Catalyst::Model';
-
 with 'Catalyst::Component::InstancePerContext';
-
 
 has 'context' => (is => 'ro');
 
@@ -67,8 +65,6 @@ sub to_array {
   }
   return \@LDFC_array;
 }
-
-with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
 
