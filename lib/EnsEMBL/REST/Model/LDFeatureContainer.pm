@@ -37,7 +37,7 @@ sub fetch_LDFeatureContainer_variation_name {
   Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @$vfs == 0);
   my $vf = $vfs->[0];
 
-  my $population_name = $c->request->param('population_id');
+  my $population_name = $c->request->param('population_name');
   if ($population_name) {
     my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
     my $population = $pa->fetch_by_name($population_name);
@@ -59,11 +59,12 @@ sub to_array {
   my @LDFC_array = ();
   foreach my $ld_hash (@{$LDFC->get_all_ld_values()}) {
     my $hash = {};
+    $hash->{d_prime} = $ld_hash->{d_prime};
+    next if ($d_prime && $hash->{d_prime} < $d_prime);
+    $hash->{r2} = $ld_hash->{r2};
+    next if ($r2 && $hash->{r2} < $r2);
     $hash->{variation1} = $ld_hash->{variation1}->variation_name; 
     $hash->{variation2} = $ld_hash->{variation2}->variation_name; 
-    $hash->{d_prime} = $ld_hash->{d_prime};
-    $hash->{r2} = $ld_hash->{r2};
-    $hash->{population_id} = $ld_hash->{population_id};
     push @LDFC_array, $hash;
   }
   return \@LDFC_array;
