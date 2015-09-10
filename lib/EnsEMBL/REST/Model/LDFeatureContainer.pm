@@ -69,11 +69,8 @@ sub to_array {
   return \@LDFC_array;
 }
 
-<<<<<<< HEAD
 with 'EnsEMBL::REST::Role::Content';
 
-=======
->>>>>>> f43b857f9e7239b23116ed6854257e6dc78cc23f
 __PACKAGE__->meta->make_immutable;
 
 1;
