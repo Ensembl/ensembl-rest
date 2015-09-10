@@ -17,12 +17,13 @@ sub build_per_context_instance {
 sub fetch_LDFeatureContainer_variation_name {
   my ($self, $variation_name) = @_;
   Catalyst::Exception->throw("No variation given. Please specify a variation to retrieve from this service") if ! $variation_name;
-
   my $c = $self->context();
   my $species = $c->stash->{species};
 
   my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
   my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
+  my $max_snp_distance = 25_000;
+  $ldfca->max_snp_distance($max_snp_distance);
 
   my $var_params = $c->config->{'Model::Variation'};
   if ($var_params && $var_params->{use_vcf}) {
@@ -36,7 +37,7 @@ sub fetch_LDFeatureContainer_variation_name {
   Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @$vfs == 0);
   my $vf = $vfs->[0];
 
-  my $population_name = $c->request->param('population');
+  my $population_name = $c->request->param('population_id');
   if ($population_name) {
     my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
     my $population = $pa->fetch_by_name($population_name);
@@ -44,7 +45,7 @@ sub fetch_LDFeatureContainer_variation_name {
       Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
     }
     my $ldfc = $ldfca->fetch_by_VariationFeature($vf, $population);
-    return $self->to_hash($ldfc)
+    return $self->to_array($ldfc)
   }
   my $ldfc = $ldfca->fetch_by_VariationFeature($vf);
   return $self->to_array($ldfc);
