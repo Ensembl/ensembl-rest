@@ -24,10 +24,10 @@ sub fetch_LDFeatureContainer_variation_name {
   my $max_snp_distance = 25_000;
   $ldfca->max_snp_distance($max_snp_distance);
 
-  my $var_params = $c->config->{'Model::Variation'};
-  if ($var_params && $var_params->{use_vcf}) {
-    $ldfca->db->use_vcf($var_params->{use_vcf});
-    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $var_params->{vcf_config};
+  my $ld_config = $c->config->{'Model::LDFeatureContainer'};
+  if ($ld_config && $ld_config->{use_vcf}) {
+    $ldfca->db->use_vcf($ld_config->{use_vcf});
+    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $ld_config->{vcf_config};
   }
   my $variation = $va->fetch_by_name($variation_name);
   Catalyst::Exception->throw("Could not fetch variation object for id: $variation_name.") if ! $variation;
