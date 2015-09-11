@@ -25,11 +25,16 @@ BEGIN {
 
 use Test::More;
 use Test::Differences;
+use Bio::EnsEMBL::Test::MultiTestDB;
+
 use Bio::EnsEMBL::Test::TestUtils;
 use Catalyst::Test();
 
+my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
+my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
+Catalyst::Test->import('EnsEMBL::REST');
 
-my $ld_get = '/ld/human/rs1042779?content-type=application/json;population_name=1000GENOMES:phase_1_ASW';
+my $ld_get = '/ld/homo_sapiens/rs10757279?content-type=application/json;population_name=1000GENOMES:phase_1_ASW';
 
 my $expected_data =
 [
@@ -49,3 +54,6 @@ my $expected_data =
 
 my $json = json_GET($ld_get, 'GET LD data for variant and population');
 
+print $json, "\n";
+
+done_testing();
