@@ -29,7 +29,7 @@ use Bio::EnsEMBL::Test::TestUtils;
 use Catalyst::Test();
 
 
-my $ld_get = '/ld/human/rs1042779?content-type=application/json;population_name=1000GENOMES:phase_3:KHV';
+my $ld_get = '/ld/human/rs1042779?content-type=application/json;population_name=1000GENOMES:phase_1_ASW';
 
 my $expected_data =
 [
