@@ -39,3 +39,4 @@
 13022	SSMP:SSM	\N	96 human individuals DNA from the South East Asian (Singapore) Malays	0	\N	UNDISPLAYABLE	\N
 13097	clinvar	\N	\N	0	0	UNDISPLAYABLE	\N
 171946	COSMIC:gene:FAM123A_ENST00000515384:tumour_site:endometrium	13	13 endometrium tumours examined through the FAM123A_ENST00000515384 gene	0	\N	UNDISPLAYABLE	\N
+102179	1000GENOMES:phase_1_ASW	61	Americans of African Ancestry in SW USA	0	1	LD	1
