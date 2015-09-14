@@ -1,6 +1,9 @@
 package EnsEMBL::REST::Model::LDFeatureContainer;
 
 use Moose;
+use namespace::autoclean;
+use Try::Tiny;
+
 use Catalyst::Exception qw(throw);
 extends 'Catalyst::Model';
 
@@ -43,7 +46,12 @@ sub fetch_LDFeatureContainer_variation_name {
     if (!$population) {
       Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
     }
-    my $ldfc = $ldfca->fetch_by_VariationFeature($vf, $population);
+    my $ldfc;
+    try {
+      $ldfc = $ldfca->fetch_by_VariationFeature($vf, $population);
+    } catch {
+      warn "caught error: $_";
+    };
     return $self->to_array($ldfc)
   }
   my $ldfc = $ldfca->fetch_by_VariationFeature($vf);
@@ -53,6 +61,8 @@ sub fetch_LDFeatureContainer_variation_name {
 sub to_array {
   my ($self, $LDFC) = @_;
   my $c = $self->context();
+  my $species = $c->stash->{species};
+  my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
   my $d_prime = $c->request->param('d_prime');
   my $r2 = $c->request->param('r2');
   my @LDFC_array = ();
@@ -64,6 +74,9 @@ sub to_array {
     next if ($r2 && $hash->{r2} < $r2);
     $hash->{variation1} = $ld_hash->{variation1}->variation_name; 
     $hash->{variation2} = $ld_hash->{variation2}->variation_name; 
+    my $population_id = $ld_hash->{population_id};
+    my $population = $pa->fetch_by_dbID($population_id);
+    $hash->{population_name} = $population->name;
     push @LDFC_array, $hash;
   }
   return \@LDFC_array;
