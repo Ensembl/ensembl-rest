@@ -12,6 +12,8 @@ addons:
 
 env:
   - COVERALLS=false
+  global:
+  - PATH=$HOME/ensembl-variation/C_code/:$PATH
 
 before_install:
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-test.git
