@@ -195,6 +195,23 @@ sub variation_GET :Local :Args(1) {
   return;
 }
 
+sub populations_GET {}
+
+sub populations: Chained('/') PathPart('info/variation/populations') Args(1) ActionClass('REST') {
+  my ($self, $c, $species) = @_;
+  $c->stash(species => $species) if defined $species;
+  my $populations;
+  try {
+    $populations = $c->model('Variation')->fetch_population_infos($c->request->param('filter'));
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $populations);
+  return;
+}
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;
