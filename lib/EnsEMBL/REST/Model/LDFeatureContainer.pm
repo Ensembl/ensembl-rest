@@ -31,6 +31,7 @@ sub fetch_LDFeatureContainer_variation_name {
   if ($ld_config && $ld_config->{use_vcf}) {
     $ldfca->db->use_vcf($ld_config->{use_vcf});
     $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $ld_config->{vcf_config};
+    $ENV{ENSEMBL_VARIATION_VCF_ROOT_DIR} = $ld_config->{dir} if (defined $ld_config->{dir});
   }
   my $variation = $va->fetch_by_name($variation_name);
   Catalyst::Exception->throw("Could not fetch variation object for id: $variation_name.") if ! $variation;
