@@ -26,7 +26,7 @@ BEGIN {
 use Test::More;
 use Test::Differences;
 use Bio::EnsEMBL::Test::MultiTestDB;
-
+use Data::Dumper;
 use Bio::EnsEMBL::Test::TestUtils;
 use Catalyst::Test();
 
@@ -34,26 +34,54 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
-my $ld_get = '/ld/homo_sapiens/rs10757279?content-type=application/json;population_name=1000GENOMES:phase_1_ASW';
+my ($ld_get, $json, $expected_output);
 
-my $expected_data =
+$expected_output =
 [
   {
-    variation1 => "rs1042779",
-    variation2 => "rs2240919",
-    r2 => "0.903845",
-    d_prime => "0.974422"
+    'variation1' => 'rs1333047',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '1.000000',
+    'variation2' => 'rs4977575',
+    'd_prime' => '1.000000'
   },
   {
-    variation1 => "rs1042779",
-    variation2 => "rs2286799",
-    r2 => "0.088461",
-    d_prime => "0.999983"
+    'variation1' => 'rs1333047',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.050071',
+    'variation2' => 'rs1333049',
+    'd_prime' => '0.999871'
   },
-]; 
+  {
+    'variation1' => 'rs1333047',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.063754',
+    'variation2' => 'rs72655407',
+    'd_prime' => '0.999996'
+  }
+];
 
-my $json = json_GET($ld_get, 'GET LD data for variant and population');
+$ld_get = '/ld/homo_sapiens/rs1333047';
+$json = json_GET($ld_get, 'GET LD data for variant');
+eq_or_diff($json, $expected_output, "Example variant");
 
-print $json, "\n";
+$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW';
+$json = json_GET($ld_get, 'GET LD data for variant and population');
+eq_or_diff($json, $expected_output, "Example variant and population");
+
+$expected_output =
+[
+  {
+    'variation1' => 'rs1333047',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '1.000000',
+    'variation2' => 'rs4977575',
+    'd_prime' => '1.000000'
+  },
+];
+
+$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0';
+$json = json_GET($ld_get, 'GET LD data for variant, population and d_prime');
+eq_or_diff($json, $expected_output, "Example variant, population and d_prime");
 
 done_testing();
