@@ -31,7 +31,6 @@ before_install:
     - cd ../../
     - cd ensembl-variation/C_code/
     - make
-    - sudo cp calc_genotypes /usr/bin/
     - cd ../../
 
 install:
