@@ -12,7 +12,6 @@ addons:
 
 env:
   - COVERALLS=false
-  global:
   - PATH=$HOME/ensembl-variation/C_code/:$PATH
 
 before_install:
