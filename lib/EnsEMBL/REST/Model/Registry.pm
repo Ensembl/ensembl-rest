@@ -273,7 +273,7 @@ sub _build_species_info {
     }
   }
   
-  my @all_dbadaptors = grep {$_->dbname ne 'ncbi_taxonomy'} @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
+  my @all_dbadaptors = grep {$_->dbc->dbname ne 'ncbi_taxonomy'} @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
   my @core_dbadaptors;
   my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup);
   my %processed_db;
