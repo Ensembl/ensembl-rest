@@ -28,6 +28,7 @@ use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::ApiVersion qw/software_version/;
 use Test::Differences;
+use Data::Dumper;
 
 my $test = Bio::EnsEMBL::Test::MultiTestDB->new();
 my $dba = $test->get_DBAdaptor('core');
@@ -179,5 +180,24 @@ is_json_GET(
     ];
   is_json_GET('/info/variation/homo_sapiens?filter=dbSNP', $expected, 'Checking dbSNP source filtering works');
 }
+
+#/info/variation/populations/:species
+{
+  my $json = json_GET('/info/variation/populations/homo_sapiens', 'GET all populations for given species in variation database');
+  cmp_ok(scalar(@{$json}), '==', 42, 'Test that correct number of populations is returned');
+
+  $json = json_GET('/info/variation/populations/homo_sapiens?filter=LD', 'GET all populations for given species in variation database with LD filter');
+
+  print Dumper($json);             
+
+}
+
+
+
+
+
+
+
+
 
 done_testing();
