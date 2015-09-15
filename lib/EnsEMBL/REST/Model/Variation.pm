@@ -267,6 +267,35 @@ sub source_as_hash {
   return $source;
 }
 
+sub fetch_population_infos {
+  my ($self, $filter) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
+  
+  my $populations;
+  if (defined $filter) {
+    if ($filter eq 'LD') {
+      $populations = $pa->fetch_all_LD_Populations(); 
+    } else {
+      Catalyst::Exception->throw("Unknown filter option '$filter'");
+    }
+  } else {
+    $populations = $pa->fetch_all();
+  }
+  if (!$populations) {
+    Catalyst::Exception->throw("Couldn't fetch populations.");
+  } 
+
+  my @populations_list = ();
+  foreach my $population (@$populations) {
+    push @populations_list, {name => $population->name, description => $population->description, size => $population->size};
+  }
+
+  return \@populations_list;
+}
 
 with 'EnsEMBL::REST::Role::Content';
 
