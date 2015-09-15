@@ -29,6 +29,9 @@ before_install:
     - perl Makefile.PL
     - make && make install
     - cd ../../
+    - cd ensembl-variation/C_code/
+    - make
+    - cd ../../
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
