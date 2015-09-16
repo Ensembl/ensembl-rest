@@ -22,7 +22,7 @@ use Moose;
 extends 'Catalyst::Model';
 use Data::Dumper;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
-
+use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro');
@@ -78,23 +78,22 @@ sub fetch_sets{
     ## limit by data set if required
     next unless !defined  $data->{req_datasets} || defined $data->{req_datasets}->{ $dataSet->id() }; 
 
-    ## create summary of essential info for meta for the data set
-    my @meta;
+    ## get info descriptions from one of the VCF files    
+    my $meta = $self->get_info($dataSet);
+
+    ## add summary of essential info for meta for the data set from the config
     foreach my $key ("assembly", "source_name", "source_url"){
       my %meta;
       $meta{key}   = $key;
       $meta{value} = $dataSet->$key;
-      push @meta, \%meta;
+      push @{$meta}, \%meta;
     }
-
-
-
 
     ## loop through and save all available variantsets
     foreach my $population (@{$dataSet->get_all_Populations}){
       my $varset = $population->dbID();
       $variantSets{$varset}{datasetId}   = $dataSet->id();
-      my @m = @meta;
+      my @m = @{$meta};
       my %m  = ( "key"   => "set_name", 
                  "value" => $population->name()
                );
@@ -118,7 +117,7 @@ sub fetch_sets{
       $newPageToken = $varset_id if defined $data->{pageSize} && $n == $data->{pageSize};
       last;
     }
-    ## store varinatSet info to return
+    ## store variantSet info to return
     my $varset;
     $varset->{id} = $varset_id;
     $varset->{datasetId} = $variantSets{$varset_id}->{datasetId};
@@ -137,6 +136,39 @@ sub fetch_sets{
   
 }
 
+## get info descriptions from one of the VCF files    
+sub get_info{
 
+  my $self = shift;
+  my $dataSet  = shift;
+
+  my $vcf_file  = $dataSet->filename_template();
+  $vcf_file =~ s/\#\#\#CHR\#\#\#/22/;
+  $vcf_file = $self->{dir} .'/'. $vcf_file;
+
+  my $parser = Bio::EnsEMBL::IO::Parser::VCF4Tabix->open( $vcf_file ) || die "Failed to get parser : $!\n";
+
+  my @meta;
+
+  ## metadata for info & format 
+  foreach my $type ("INFO", "FORMAT"){
+
+    my $data = $parser->get_metadata_by_pragma($type);
+
+    foreach my $d(@{$data}){
+      my $out;
+      $out->{key} = $type;
+      foreach my $k (keys %$d){
+        $out->{"\L$k"} = $d->{$k};
+      }
+      ##required info hash
+      $out->{info} = {};
+
+      push @meta, $out;
+    }
+  }
+ 
+  return \@meta;
+}
 
 1;

@@ -86,9 +86,6 @@ sub get_set_info{
     $self->context()->go( 'ReturnError', 'custom', [ " Failed to find the specified reference sequence"])
     unless defined $avail_chr{ $data->{referenceName} };
 
-    ## derive required VCF file name/ location
-    my $file = $dataSet->filename_template(); 
-    $file =~ s/\#\#\#CHR\#\#\#/$data->{referenceName}/;
 
     ## loop over callSets
     $dataSet->{sample_populations} = $dataSet->{_raw_populations};
@@ -102,16 +99,14 @@ sub get_set_info{
        ## save sample to variantSet link
        $data->{sample2set}->{$callset_id} = $dataSet->{sample_populations}->{$callset_id}->[0];
 
-       ##if data is needed for this sample, save the file name       
-       $data->{files}->{$dataSet->{id}} = $file;
-
+       ##if data is needed for this sample, save the collection object by id      
+       $data->{coll}->{$dataSet->{id}} = $dataSet;
      }
   }
 
   return $data;
 }
   
-
 
 ## format sample names if filtering by sample required
 ## variantSet limitation takes presidence 
@@ -198,13 +193,14 @@ sub fetch_by_region{
 ## input: array of strings - format : 'NA10000:0|1:44:23'
 ## output: hash with key: variantSetID and value: array of individual genotype hashes
 sub sort_genotypes {
-  my ($self, $geno_strings, $data) = @_;
+  my ($self, $parser, $data, $is_remapped) = @_;
+
+
+  my $geno_strings  = $parser->get_samples_info();
 
   my %genotypes;
 
-  foreach my $geno_string(@{$geno_strings}){
-
-    my ($sample, $call, $qual) = split(/\:/,$geno_string,3);
+  foreach my $sample(keys %{$geno_strings}){
 
     ## filter by individual if required
     next if defined $data->{callSetIds}->[0] && 
@@ -214,15 +210,32 @@ sub sort_genotypes {
     $gen_hash->{callSetId}    = $sample;
     $gen_hash->{callSetName}  = $sample;
 
-    my @g = split/\||\//, $call;
+    my @g = split/\||\//, $geno_strings->{$sample}->{GT};
     foreach my $g(@g){
       ## force genotype to be numeric
-      push @{$gen_hash->{genotype}}, $g*1;
+      push @{$gen_hash->{genotype}}, numeric($g);
     } 
     ## place holders
     $gen_hash->{phaseset}           = '';
     $gen_hash->{genotypeLikelihood} = [];
     $gen_hash->{info}               = {};
+
+    unless( $is_remapped ){
+      ## meta data may not be relevant if variant remapped rather than recalled
+
+      foreach my $inf (keys %{$geno_strings->{$sample}} ){
+        next if $inf eq 'GT';
+        if( $inf eq 'GL'){
+          my @gl = split/\,/, $geno_strings->{$sample}->{GL};
+          foreach my $gl (@gl){
+            push @{$gen_hash->{genotypeLikelihood}}, numeric($gl);
+          }
+        }
+        else{ 
+          $gen_hash->{info}->{$inf} = [$geno_strings->{$sample}->{$inf}];
+        }
+      }
+    }
 
     ## store genotypes by variationSetId
     if (defined $data->{sample2set}->{$sample}){
@@ -249,7 +262,8 @@ sub get_next_by_token{
   my $batch_end =  $data->{end};
 
   ## which data set are we paging through?
-  my @datasetsreq = sort(keys %{$data->{files}});
+  my @datasetsreq = sort(keys %{$data->{coll}});
+
   my $current_ds;
   foreach my $ds(@datasetsreq){
 
@@ -261,7 +275,12 @@ sub get_next_by_token{
   
   return unless defined $current_ds;
 
- my $file = $self->{dir} .'/'. $data->{files}->{$current_ds};
+
+  ## look up info from vcf collection object
+  my $ds_ob = $data->{coll}->{$current_ds};
+  my $file  = $ds_ob->filename_template(); 
+  $file =~ s/\#\#\#CHR\#\#\#/$data->{referenceName}/;
+  $file = $self->{dir} .'/'. $file;
 
   my $parser = Bio::EnsEMBL::IO::Parser::VCF4Tabix->open( $file ) || die "Failed to get parser : $!\n";
   $parser->seek($data->{referenceName},$batch_start,$batch_end);
@@ -282,9 +301,10 @@ sub get_next_by_token{
 
     next if defined $data->{variantName} && $data->{variantName} =~/\w+/ &&  $data->{variantName} ne $name;
 
-    my $raw_genotypes  = $parser->get_raw_samples_info();
+    next if $name=~ /esv/; ##skip these for now
+
     ## extract arrays of genotypes by variantSet
-    my $genotype_calls = $self->sort_genotypes($raw_genotypes, $data);
+    my $genotype_calls = $self->sort_genotypes($parser, $data, $ds_ob->{is_remapped});
 
     my @sets_to_return; ## sort here for paging
     if(defined $data->{variantSetIds}->[0]){
@@ -312,13 +332,26 @@ sub get_next_by_token{
       $variation_hash->{referenceName}   = $parser->get_seqname ;
 
       ## position is zero-based + closed start of interval 
-      $variation_hash->{start}           = $parser->get_raw_start -1;
+      $variation_hash->{start}           = numeric($parser->get_raw_start -1);
       ## open end of interval
-      $variation_hash->{end}             = $parser->get_raw_end;
+      $variation_hash->{end}             = numeric($parser->get_raw_end);
 
-#      $variation_hash->{created}         = '';
-#      $variation_hash->{updated}         = '';
-      $variation_hash->{info}            = {};
+      $variation_hash->{created}         = $ds_ob->created || undef;
+      $variation_hash->{updated}         = $ds_ob->updated || undef; 
+
+      ## What can be trusted if variants re-mapped but not re-called? Start with: AC, AF, AN
+      my $var_info = $parser->get_info();
+      if( $ds_ob->{is_remapped} ){
+        $variation_hash->{info} = { AC => [$var_info->{AC}],
+                                    AN => [$var_info->{AN}],
+                                    AF => [$var_info->{AF}]
+                                  };
+      }
+      else{
+       foreach my $k (keys %{$var_info}){
+         $variation_hash->{info}->{$k}  =  [$var_info->{$k}];
+       }
+      }
       push @var, $variation_hash;
     }
    
@@ -340,7 +373,10 @@ sub get_next_by_token{
 
 }
 
-
+sub numeric{
+  my $string = shift;
+  return $string * 1;
+}
 
 with 'EnsEMBL::REST::Role::Content';
 
