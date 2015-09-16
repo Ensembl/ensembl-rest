@@ -28,6 +28,7 @@ use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::ApiVersion qw/software_version/;
 use Test::Differences;
+use Data::Dumper;
 
 my $test = Bio::EnsEMBL::Test::MultiTestDB->new();
 my $dba = $test->get_DBAdaptor('core');
@@ -178,6 +179,43 @@ is_json_GET(
       }
     ];
   is_json_GET('/info/variation/homo_sapiens?filter=dbSNP', $expected, 'Checking dbSNP source filtering works');
+}
+
+#/info/variation/populations/:species
+{
+  my $json = json_GET('/info/variation/populations/homo_sapiens', 'GET all populations for given species in variation database');
+  cmp_ok(scalar(@{$json}), '==', 42, 'Test that correct number of populations is returned');
+
+  # check with filter
+  my $expected = 
+    [
+      {
+        'name' => 'CSHL-HAPMAP:HapMap-CEU',
+        'description' => 'Utah residents with Northern and Western European ancestry from the CEPH collection.',
+        'size' => '185'
+      },
+      {
+        'name' => 'CSHL-HAPMAP:HapMap-HCB',
+        'description' => '45 unrelated Han Chinese in Beijing, China, representing one of the populations studied in the International HapMap project.',
+        'size' => '48'
+      },
+      {
+        'name' => 'CSHL-HAPMAP:HapMap-JPT',
+        'description' => 'Japanese in Tokyo, Japan.,JPT is one of the 11 populations in HapMap phase 3.',
+        'size' => '93'
+      },
+      {
+        'name' => 'CSHL-HAPMAP:HapMap-YRI',
+        'description' => 'Yoruba in Ibadan, Nigeria.,YRI is one of the 11 populations in HapMap phase 3.',
+        'size' => '185'
+      },
+      {
+        'name' => '1000GENOMES:phase_1_ASW',
+        'description' => 'Americans of African Ancestry in SW USA',
+        'size' => '61'
+      }
+    ];
+  is_json_GET('/info/variation/populations/homo_sapiens?filter=LD', $expected, 'Checking filtering for LD population works');
 }
 
 done_testing();

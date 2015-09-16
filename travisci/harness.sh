@@ -2,7 +2,7 @@
 
 export PERL5LIB=$PWD/bioperl-live-bioperl-release-1-2-3:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/ensembl-compara/modules:$PWD/ensembl-variation/modules:$PWD/ensembl-funcgen/modules:$PWD/ensembl-io/modules:$PWD/lib
 
-export PATH=$PATH:$PWD/tabix
+export PATH=$PATH:$PWD/tabix:$PWD/ensembl-variation/C_code
 export SKIP_TESTS="--skip $PWD/t/ratelimit.t"
 
 echo "Running test suite"
