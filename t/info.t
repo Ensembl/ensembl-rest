@@ -170,7 +170,7 @@ is_json_GET(
     [
       { 
         name => 'dbSNP',
-        version => 138,
+        version => '138',
         description => 'Variants (including SNPs and indels) imported from dbSNP',
         url => 'http://www.ncbi.nlm.nih.gov/projects/SNP/',
         somatic_status => 'mixed',
