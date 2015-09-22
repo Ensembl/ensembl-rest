@@ -405,7 +405,7 @@ sub get_compara_name_for_species {
     my $mc = $self->get_adaptor($species, 'core', 'metacontainer');
     my $compara_group = 'multi';
     my $division = $mc->single_value_by_key('species.division');
-    if($division) {
+    if($division and $division ne 'Ensembl') {
       $division =~ s/^Ensembl//;
       $compara_group = lc($division);
     }
