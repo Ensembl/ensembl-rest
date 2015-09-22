@@ -32,6 +32,17 @@ before_install:
     - cd ensembl-variation/C_code/
     - make
     - cd ../../
+    - git clone --branch master --depth 1 https://github.com/samtools/htslib.git
+    - cd htslib
+    - make
+    - cd ../
+    - git clone --branch master --depth 1 https://github.com/Ensembl/faidx_xs.git
+    - cd faidx_xs
+    - perl Makefile.PL
+    - make
+    - cp lib/Faidx.pm ..
+    - cp blib/arch/auto/Faidx/Faidx.so ..
+    - cd ../
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
