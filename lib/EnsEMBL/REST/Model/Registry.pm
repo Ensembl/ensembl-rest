@@ -283,7 +283,7 @@ sub _build_species_info {
     my $species_lc = ($species);
     push(@{$groups_lookup{$species_lc}}, $group);
     
-    if($group eq 'core') {
+    if($group eq 'core' && $species !~ /Ancestral/) {
       push(@core_dbadaptors, $dba);
       my $dbc = $dba->dbc();
       my $db_key = sprintf(
