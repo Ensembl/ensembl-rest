@@ -147,23 +147,11 @@ sub get_orthologs : Args(0) ActionClass('REST') {
     my $all_homologies;
     try {
       my $ha = $s->{homology_adaptor};
-      
-      if($c->request->param('target_species') || $c->request->param('target_taxon')) {
-        $c->log->debug('Limiting on species/taxons');
-        $all_homologies = [];
-        my $mlss_array = $self->_method_link_species_sets($c, $member);
-        foreach my $mlss (@{$mlss_array}) {
-          $c->log->debug('Searching for ', $method_link_type, ' with MLSS ID ', $mlss->dbID(), ' (', ($mlss->name() || q{-}), ')');
-	  my $r = $ha->fetch_all_by_Member($member, -METHOD_LINK_SPECIES_SET => $mlss);
-          push(@{$all_homologies}, @{$r});
-        }
-      }
-      elsif($method_link_type) {
-	$all_homologies = $ha->fetch_all_by_Member($member, -METHOD_LINK_TYPE => $method_link_type);
-      }
-      else {
-        $all_homologies = $ha->fetch_all_by_Member($member);
-      }
+      $all_homologies = $ha->fetch_all_by_Member($member,
+          -TARGET_TAXON     => ($c->request->param('target_taxon')   ? [$c->request->param('target_taxon')]   : undef),
+          -TARGET_SPECIES   => ($c->request->param('target_species') ? [$c->request->param('target_species')] : undef),
+          -METHOD_LINK_TYPE => ($method_link_type || undef),
+      );
     } catch {
       $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
       $c->go('ReturnError', 'custom', [qq{$_}]);
@@ -175,97 +163,6 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   }
   
   $c->stash(homology_data => \@final_homologies);
-}
-
-sub _method_link_species_sets {
-  my ($self, $c, $member) = @_;
-  
-  my $mlssa = $c->stash->{method_link_species_set_adaptor};
-  my $gdba = $c->stash->{genome_db_adaptor};
-  
-  my @mlss;
-  
-  #Types
-  my @types;
-  if($c->stash->{method_link_type}) {
-    @types = ($c->stash->{method_link_type});
-  }
-  else {
-    @types = qw/ENSEMBL_ORTHOLOGUES ENSEMBL_PARALOGUES/;
-  }
-
-  my %unique_genome_dbs;
-  my @mlss_queries;
-  my $registry = $c->model('Registry');
-  my $source_gdb = $member->genome_db();
-  my $source_gdb_id = $source_gdb->dbID();
-  
-  #If someone has requested species then limit by MLSS
-  my @target_species = $c->request->param('target_species');
-  foreach my $target (@target_species) {
-    my $species_name = $registry->get_alias($target);
-    if(! $species_name) {
-      $c->go('ReturnError', 'custom', "Nothing is known to this server about the species name '${target}'");
-    }
-    my $gdb;
-    try {
-      $gdb = $gdba->fetch_by_name_assembly($species_name);
-    } catch {
-      my $meta_c = $registry->get_adaptor($species_name, 'core', 'MetaContainer');
-      $gdb = $gdba->fetch_by_name_assembly($meta_c->get_production_name());
-    };
-    if($gdb) {
-      next if exists $unique_genome_dbs{$gdb->dbID()};
-      if($gdb->dbID() == $source_gdb_id) {
-        push(@mlss_queries, [$source_gdb]);
-      }
-      else {
-        push(@mlss_queries, [$source_gdb, $gdb]);
-      }
-      $unique_genome_dbs{$gdb->dbID()} = 1;
-    }
-    else {
-      $c->go('ReturnError', 'custom', "Cannot convert '${target}' into a valid GenomeDB object. Please try again with a different value");
-    }
-  }
-  
-  #Could be taxon identifiers though
-  my @target_taxons = $c->request->param('target_taxon');
-  foreach my $taxon (@target_taxons) {
-    my $gdb = $gdba->fetch_by_taxon_id($taxon);
-    if($gdb) {
-      next if exists $unique_genome_dbs{$gdb->dbID()};
-      if($gdb->dbID() == $source_gdb_id) {
-        push(@mlss_queries, [$source_gdb]);
-      }
-      else {
-        push(@mlss_queries, [$source_gdb, $gdb]);
-      }
-      $unique_genome_dbs{$gdb->dbID()} = 1;
-    }
-    else {
-      $c->go('ReturnError', 'custom', "Cannot convert taxon ID '${taxon}' into a valid GenomeDB object. Please try again with a different value");
-    }
-  }
-
-  # Now get the MLSSs
-  my $log = $c->log();
-  foreach my $ml_type (@types) {
-    foreach my $gdbs (@mlss_queries) {
-      my $genome_names = join(q{, }, map({$_->name()} @{$gdbs}));
-      if($log->is_debug()) {
-        $log->debug("Fetching MLSS for ${ml_type} and [${genome_names}]");
-      }
-      my $r = $mlssa->fetch_by_method_link_type_GenomeDBs($ml_type, $gdbs);
-      if(! $r) {
-        $log->debug("Cannot get a MLSS for ${ml_type} and [${genome_names}]");
-        next;
-      }
-      push(@mlss, $r);
-    }
-  }
-  
-  return \@mlss;
 }
 
 sub _full_encoding {
