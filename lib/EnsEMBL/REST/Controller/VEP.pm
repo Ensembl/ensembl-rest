@@ -91,6 +91,10 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
       if ($is_funcgen) {
         $c->stash($_.'_adaptor' => $c->model('Registry')->get_adaptor($species, 'Funcgen', $_)) for @REG_FEAT_TYPES;
       }
+
+      # get compara adaptors
+      $c->stash( mlssa => $c->model('Registry')->get_adaptor( 'Multi', 'compara', 'MethodLinkSpeciesSet' ) );
+      $c->stash( cosa  => $c->model('Registry')->get_adaptor( 'Multi', 'compara', 'ConservationScore' ) );
   } catch {
       $c->log->fatal(qq{problem making Bio::EnsEMBL::Variation::VariationFeature object});
       $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
@@ -446,7 +450,7 @@ sub _include_user_params {
   }
   
   # add adaptors
-  $vep_params{$_} = $c->stash->{$_} for qw(va vfa svfa tva csa sa ga), map {$_.'_adaptor'} @REG_FEAT_TYPES;
+  $vep_params{$_} = $c->stash->{$_} for qw(va vfa svfa tva csa sa ga mlssa cosa), map {$_.'_adaptor'} @REG_FEAT_TYPES;
   if (!$c->stash->{'RegulatoryFeature_adaptor'}) { delete $vep_params{regulatory}; };
 
   my $plugin_config = $self->_configure_plugins($c,$user_config,\%vep_params);
