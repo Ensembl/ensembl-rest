@@ -196,3 +196,8 @@ jsonp=1
   use_vcf    = 0
   vcf_config =
 </Model::Variation>
+
+<Model::LDFeatureContainer>
+  use_vcf = 1
+  vcf_config =
+</Model::LDFeatureContainer>
