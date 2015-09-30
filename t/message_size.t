@@ -15,6 +15,7 @@ use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
+my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
 my @ids = map {qq/$_/} ( 1..100 );
