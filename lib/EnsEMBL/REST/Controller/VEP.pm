@@ -93,8 +93,9 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
       }
 
       # get compara adaptors
-      $c->stash( mlssa => $c->model('Registry')->get_adaptor( 'Multi', 'compara', 'MethodLinkSpeciesSet' ) );
-      $c->stash( cosa  => $c->model('Registry')->get_adaptor( 'Multi', 'compara', 'ConservationScore' ) );
+      my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'));
+      $c->stash( mlssa => $compara_dba->get_MethodLinkSpeciesSetAdaptor() );
+      $c->stash( cosa  => $compara_dba->get_ConservationScoreAdaptor() );
   } catch {
       $c->log->fatal(qq{problem making Bio::EnsEMBL::Variation::VariationFeature object});
       $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
