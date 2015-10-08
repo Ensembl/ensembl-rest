@@ -201,7 +201,7 @@ my $base = '/overlap/region/homo_sapiens';
     consequence_type => 'intergenic_variant',
     feature_type => 'variation',
     seq_region_name => '6',
-    alt_alleles => [ qw/T -/]
+    alleles => [ qw/T -/]
   }, 'Checking one variation format');
   
   my $somatic_json = json_GET("$base/$region?feature=somatic_variation", 'Fetching somatic variations at '.$region);
