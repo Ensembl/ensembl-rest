@@ -1,5 +1,5 @@
 1775	1	xref.timestamp	2012-09-03 21:14:58
-1	\N	schema_version	82
+1	\N	schema_version	83
 2	\N	patch	patch_52_53_a.sql|schema_version
 3	\N	patch	patch_52_53_b.sql|external_db_type_enum
 4	\N	patch	patch_52_53_c.sql|identity_xref_rename
@@ -202,3 +202,6 @@
 1814	\N	patch	patch_79_80_d.sql|genome_statistics_value_longer
 1815	\N	patch	patch_80_81_a.sql|schema_version
 1816	\N	patch	patch_81_82_a.sql|schema_version
+1817	\N	patch	patch_81_82_b.sql|xref_width
+1818	\N	patch	patch_81_82_c.sql|seq_synonym_key
+1819	\N	patch	patch_82_83_a.sql|schema_version

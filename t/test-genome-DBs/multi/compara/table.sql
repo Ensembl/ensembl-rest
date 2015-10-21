@@ -402,7 +402,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=45 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=50 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1900,7 +1900,7 @@ CREATE TABLE `species_set_header` (
   `first_release` smallint(6) DEFAULT NULL,
   `last_release` smallint(6) DEFAULT NULL,
   PRIMARY KEY (`species_set_id`)
-) ENGINE=MyISAM  ;
+) ENGINE=MyISAM AUTO_INCREMENT=35267 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `species_set_tag` (
   `species_set_id` int(10) unsigned NOT NULL,

@@ -111,7 +111,7 @@ CREATE TABLE `binding_matrix` (
   PRIMARY KEY (`binding_matrix_id`),
   UNIQUE KEY `name_analysis_idx` (`name`,`analysis_id`),
   KEY `feature_type_idx` (`feature_type_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=196 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=215 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `cell_type` (
   `cell_type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -157,7 +157,7 @@ CREATE TABLE `coord_system` (
   KEY `name_version_idx` (`name`,`version`),
   KEY `coord_species_idx` (`species_id`),
   KEY `coord_system_id_idx` (`coord_system_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2474 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2478 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `data_set` (
   `data_set_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -368,7 +368,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=591 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=595 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -577,7 +577,7 @@ CREATE TABLE `segmentation_feature` (
   PRIMARY KEY (`segmentation_feature_id`),
   UNIQUE KEY `fset_seq_region_idx` (`feature_set_id`,`seq_region_id`,`seq_region_start`),
   KEY `feature_type_idx` (`feature_type_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=27246067 DEFAULT CHARSET=latin1 MAX_ROWS=100000000;
+) ENGINE=MyISAM AUTO_INCREMENT=66208336 DEFAULT CHARSET=latin1 MAX_ROWS=100000000;
 
 CREATE TABLE `seq_region` (
   `seq_region_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

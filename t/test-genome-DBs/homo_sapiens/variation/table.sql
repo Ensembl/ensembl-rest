@@ -11,14 +11,14 @@ CREATE TABLE `allele` (
   KEY `variation_idx` (`variation_id`),
   KEY `subsnp_idx` (`subsnp_id`),
   KEY `population_idx` (`population_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=615872647 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `allele_code` (
   `allele_code_id` int(11) NOT NULL AUTO_INCREMENT,
   `allele` varchar(60000) DEFAULT NULL,
   PRIMARY KEY (`allele_code_id`),
   UNIQUE KEY `allele_idx` (`allele`(1000))
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=188 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `associate_study` (
   `study1_id` int(10) unsigned NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE `failed_description` (
   `failed_description_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `description` text NOT NULL,
   PRIMARY KEY (`failed_description_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `failed_structural_variation` (
   `failed_structural_variation_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -119,7 +119,7 @@ CREATE TABLE `failed_variation` (
   `failed_description_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`failed_variation_id`),
   UNIQUE KEY `variation_idx` (`variation_id`,`failed_description_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1231500 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `genotype_code` (
   `genotype_code_id` int(11) unsigned NOT NULL,
@@ -141,7 +141,7 @@ CREATE TABLE `individual` (
   PRIMARY KEY (`individual_id`),
   KEY `father_individual_idx` (`father_individual_id`),
   KEY `mother_individual_idx` (`mother_individual_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=102080 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `individual_synonym` (
   `synonym_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -158,7 +158,7 @@ CREATE TABLE `individual_type` (
   `name` varchar(255) NOT NULL,
   `description` text,
   PRIMARY KEY (`individual_type_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta` (
   `meta_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -168,7 +168,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=73 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -246,7 +246,7 @@ CREATE TABLE `population` (
   `display_group_id` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`population_id`),
   KEY `name_idx` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=171947 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `population_genotype` (
   `population_genotype_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -260,7 +260,7 @@ CREATE TABLE `population_genotype` (
   KEY `population_idx` (`population_id`),
   KEY `variation_idx` (`variation_id`),
   KEY `subsnp_idx` (`subsnp_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=133640072 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `population_structure` (
   `super_population_id` int(10) unsigned NOT NULL,
@@ -306,7 +306,7 @@ CREATE TABLE `publication` (
   PRIMARY KEY (`publication_id`),
   KEY `pmid_idx` (`pmid`),
   KEY `doi_idx` (`doi`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=36250 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `read_coverage` (
   `seq_region_id` int(10) unsigned NOT NULL,
@@ -342,7 +342,7 @@ CREATE TABLE `sample` (
   `variation_set_id` set('1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64') DEFAULT NULL,
   PRIMARY KEY (`sample_id`),
   KEY `individual_idx` (`individual_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=102080 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `sample_genotype_multiple_bp` (
   `variation_id` int(10) unsigned NOT NULL,
@@ -381,7 +381,7 @@ CREATE TABLE `source` (
   `somatic_status` enum('germline','somatic','mixed') DEFAULT 'germline',
   `data_types` set('variation','variation_synonym','structural_variation','phenotype_feature','study') DEFAULT NULL,
   PRIMARY KEY (`source_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `strain_gtype_poly` (
   `variation_id` int(10) unsigned NOT NULL,
@@ -406,7 +406,7 @@ CREATE TABLE `structural_variation` (
   KEY `source_idx` (`source_id`),
   KEY `study_idx` (`study_id`),
   KEY `attrib_idx` (`class_attrib_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=18294457 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `structural_variation_association` (
   `structural_variation_id` int(10) unsigned NOT NULL,
@@ -444,7 +444,7 @@ CREATE TABLE `structural_variation_feature` (
   KEY `study_idx` (`study_id`),
   KEY `attrib_idx` (`class_attrib_id`),
   KEY `variation_set_idx` (`variation_set_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=10281998 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `structural_variation_sample` (
   `structural_variation_sample_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -455,7 +455,7 @@ CREATE TABLE `structural_variation_sample` (
   KEY `structural_variation_idx` (`structural_variation_id`),
   KEY `strain_idx` (`strain_id`),
   KEY `sample_idx` (`sample_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=6107306 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `study` (
   `study_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -467,14 +467,14 @@ CREATE TABLE `study` (
   `study_type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`study_id`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=4480 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `submitter_handle` (
   `handle_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `handle` varchar(25) DEFAULT NULL,
   PRIMARY KEY (`handle_id`),
   UNIQUE KEY `handle` (`handle`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=397 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `subsnp_handle` (
   `subsnp_id` int(11) unsigned NOT NULL,
@@ -537,7 +537,7 @@ CREATE TABLE `transcript_variation` (
   KEY `variation_feature_idx` (`variation_feature_id`),
   KEY `consequence_type_idx` (`consequence_types`),
   KEY `somatic_feature_idx` (`feature_stable_id`,`somatic`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=7328586 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `translation_md5` (
   `translation_md5_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -564,7 +564,7 @@ CREATE TABLE `variation` (
   PRIMARY KEY (`variation_id`),
   UNIQUE KEY `name` (`name`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=64119776 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `variation_attrib` (
   `variation_id` int(11) unsigned NOT NULL,
@@ -610,7 +610,7 @@ CREATE TABLE `variation_feature` (
   KEY `variation_set_idx` (`variation_set_id`),
   KEY `consequence_type_idx` (`consequence_types`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=69649394 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `variation_feature_bak` (
   `variation_feature_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -655,7 +655,7 @@ CREATE TABLE `variation_set` (
   `short_name_attrib_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`variation_set_id`),
   KEY `name_idx` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `variation_set_structural_variation` (
   `structural_variation_id` int(10) unsigned NOT NULL,
@@ -689,5 +689,5 @@ CREATE TABLE `variation_synonym` (
   KEY `variation_idx` (`variation_id`),
   KEY `subsnp_idx` (`subsnp_id`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=236827121 DEFAULT CHARSET=latin1;
 
