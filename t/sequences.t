@@ -353,7 +353,15 @@ FASTA
   my $fasta = fasta_GET($url, 'Getting genomic sub-sequence with start beyond the end of the sequence');
   action_bad_regex($url, qr/not within the sequence/, 'Start of sub-sequence range can not be beyond the sequence length');
 }
+{
+  my $url = "/sequence/id/?start=120&end=150";
+  my $body = q/{ "ids" : [ "ENSP00000370194", "ENSG00000243439" ]}/;
+  my $seq_a = q/LAEYTADVDGVGTLRLLDAVKTCGLINSVK/;
+  my $seq_b = q/TGCACTAAGTTCAGCATGAAGAGCAGCGGGC/;
+  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein"},{"desc" => "chromosome:GRCh37:6:1507676:1507706:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna"}];
+  is_json_POST($url,$body,$response,'POST ID sequence fetch with sequence trimming');
 
+}
 done_testing();
 
 __DATA__
