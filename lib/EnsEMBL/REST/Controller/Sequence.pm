@@ -322,7 +322,7 @@ sub _process_subseq {
   # sanity checking routine so the sanity checking routine can be
   # reused for the Slice() execution path where we need a default
   # start of 1.
-  return substr $seq, $start-1, $end-$start;
+  return substr $seq, $start-1, $end-$start+1;
 }
 
 # Check the trimming start/end we're given by the user to ensure
