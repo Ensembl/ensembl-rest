@@ -155,6 +155,16 @@ sub _process {
   
   Catalyst::Exception->throw(qq{The type '$type' is not understood by this service}) unless $allowed_values{type}{$type};
   
+  if($c->request->param('start') || $c->request->param('end')) {
+      # It doesn't make sense to expand the sequence when doing a sub-sequence
+      if($c->request->param('expand_5prime') || $c->request->param('expand_3prime')) {
+	  Catalyst::Exception->throw(qq{You may not expand the 3prime or 5prime sequence end when requesting a sub-sequence});
+      }
+
+      # Remember this for later when we're processing the object
+      $s->{dosubseq} = 1;
+  }
+
   my $sequences = $self->_process_feature($c, $object, $type);
   my $sequence_count = scalar(@{$sequences});
   if($sequence_count > 1 && ! $multiple_sequences) {
@@ -188,39 +198,60 @@ sub _process_feature {
   my $slice;
   my $desc;
   my $mask_feature = $c->request->param('mask_feature');
-  
+
   #Translations
   if($object->isa('Bio::EnsEMBL::Translation')) {
     $molecule = 'protein';
     $seq = $object->transcript()->translate()->seq();
+    # Grab the subsequence if we've been asked to trim the ends
+    $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
   }
   #Transcripts
   elsif($object->isa('Bio::EnsEMBL::PredictionTranscript')) {
     if($type eq 'cdna') {
       $seq = $object->spliced_seq($mask_feature);
+      # Grab the subsequence if we've been asked to trim the ends
+      $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
     }
     elsif($type eq 'cds') {
       $seq = $object->translateable_seq();
+      # Grab the subsequence if we've been asked to trim the ends
+      $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
     }
     elsif($type eq 'protein') {
       $molecule = 'protein';
       $seq = $object->translate()->seq();
+      if($c->stash()->{dosubseq}) {
+	  # It's a protein that's been requested so we have to translate
+	  # the coordinates first
+	  $self->_translate_coordinates($c, $object);
+	  $seq = $self->_process_subseq($c, $seq);
+      }
     }
   }
   elsif($object->isa('Bio::EnsEMBL::Transcript')) {
     if($type eq 'cdna') {
       $seq = $object->spliced_seq($mask_feature);
+      $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
     }
     elsif($type eq 'cds') {
       $seq = $object->translateable_seq();
+      # We might not have a translatable sequence, be sure
+      # we do before attempting to trim
+      $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq} && $seq);
     }
     #If protein perform recursive calls with the Translation object 
     elsif($type eq 'protein') {
+      # If we're retreiving a subsequence, try to translate the coordinates
+      # to the peptide if needed
+      $self->_translate_coordinates($c, $object) if($c->stash()->{dosubseq});
+
       my @translations = ($object->translation());
       push(@translations, @{$object->get_all_alternative_translations()});
       foreach my $t (@translations) {
+	# Catch case where no translation is available for a transcript
         next unless $t;
-        push(@sequences, @{$self->_process_feature($c, $t, $type)});
+	push(@sequences, @{$self->_process_feature($c, $t, $type)});
       }
     }
     elsif($type eq 'genomic') {
@@ -235,7 +266,12 @@ sub _process_feature {
     if($type ne 'genomic') {
       my $transcripts = $object->get_all_Transcripts();
       foreach my $transcript (@{$transcripts}) {
+	# Because each transcript will have different coordinates if
+	# we're asking for a protein, we have to save the original
+	# coordinates before we translate them each cycle
+	$self->_push_start_end($c) if($c->stash()->{dosubseq});
         push(@sequences, @{$self->_process_feature($c, $transcript, $type)});
+	$self->_pop_start_end($c) if($c->stash()->{dosubseq});
       }
     }
     else {
@@ -248,6 +284,13 @@ sub _process_feature {
   }
   
   if($slice) {
+    # If the user set limits on the range they wanted, process that
+    if($c->stash()->{dosubseq}) {
+	my ($start, $end) = $self->_check_limits($c, $slice->length());
+	$slice = $slice->sub_Slice($start, $end);
+	$c->stash()->{dosubseq} = 0;
+    }
+
     $slice = $self->_enrich_slice($c, $slice);
     $seq = $self->_mask_slice_features($slice, $c, $type, $object);
     $desc = $slice->name();
@@ -263,6 +306,119 @@ sub _process_feature {
   }
   
   return \@sequences;
+}
+
+# For grabbing the sub-sequence if requested
+# The start and end coordinates come from the user request
+sub _process_subseq {
+  my ($self, $c, $seq) = @_;
+
+  my $seq_len = length $seq;
+
+  # Get our start/end points and do some sanity checking
+  my ($start, $end) = $self->_check_limits($c, $seq_len);
+
+  # Deal with zero indexing, we do the minus one here rather than the
+  # sanity checking routine so the sanity checking routine can be
+  # reused for the Slice() execution path where we need a default
+  # start of 1.
+  return substr $seq, $start-1, $end-$start;
+}
+
+# Check the trimming start/end we're given by the user to ensure
+# they make sense, and fill in sensible default if one is left out.
+sub _check_limits {
+  my ($self, $c, $seq_len) = @_;
+
+  # Oh the fun of zero indexing strings in a one-indexed sub-sequence world
+  my $start = $c->request->param('start') ? $c->request->param('start') : 1;
+  my $end = defined($c->request->param('end')) ? $c->request->param('end') : $seq_len;
+
+  # Sanity checking
+  if($start < 0 || $start > $seq_len) {
+      Catalyst::Exception->throw(qq{Your start coordinate is not within the sequence requested})
+  }
+  if($end < 1 || $end > $seq_len + 1) {
+      Catalyst::Exception->throw(qq{Your end coordinate is not within the sequence requested})
+  }
+  if($start > $end) {
+      Catalyst::Exception->throw(qq{Your start coordinate cannot be larger than your end})
+  }
+
+  return ($start, $end);
+}
+
+# For grabbing the sub-sequence for a protein sequence from
+# a translation object. The object type in our stash must
+# be a Bio::EnsEMBL::PredictionTranscript or Bio::EnsEMBL::Transcript
+sub _translate_coordinates {
+  my ($self, $c, $obj) = @_;
+
+  # Return if we've already translated the coordinates
+  return if($c->{stash}->{coordstranslated});
+
+  my $seq_len = length $obj->spliced_seq();
+  my $start; my $end;
+  if($obj->strand() == 1) {
+      $start = $c->request->param('start') ? $c->request->param('start') + $obj->seq_region_start() - 1 : $obj->seq_region_start();
+      $end = $c->request->param('end') ? $obj->seq_region_start() + $c->request->param('end') : $obj->seq_region_end();
+  } else {
+      # Things get a little messy if we're on the reverse strand, we have to count from
+      # opposite ends.
+      $end = $c->request->param('start') ? $obj->seq_region_end() - $c->request->param('start') : $obj->seq_region_end();
+      $start = $c->request->param('end') ? $obj->seq_region_start() + $seq_len - $c->request->param('end') : $obj->seq_region_start();
+  }
+
+  # Do we have a translation?
+  return unless($obj->translate());
+
+  my $transcript_mapper = $obj->get_TranscriptMapper();
+
+  # Grab the coordinates for the peptide sequence that maps from
+  # this subsequence of the transcript
+  my @coords = $transcript_mapper->genomic2pep($start, $end, $obj->strand());
+
+  # Go through and build the coordinates from the pieces returned
+  my $pep_start = length $obj->translate()->seq(); my $pep_end = 0;
+  foreach my $coord (@coords) {
+      if($coord->isa('Bio::EnsEMBL::Mapper::Coordinate')) {
+	  $pep_start = $coord->start if($coord->start < $pep_start);
+	  $pep_end = $coord->end if($coord->end > $pep_end);
+      }
+  }
+
+  # See if we don't find any peptide sequence in this window, so
+  # no coordinates should be returned.
+  if($pep_end < $pep_start) {
+      $c->request->params->{'start'} = 0;
+      $c->request->params->{'end'} = 0;
+  } else {
+      $c->request->params->{'start'} = $pep_start;
+      $c->request->params->{'end'} = $pep_end;
+  }
+
+  # Remember we've translated the coordinates so we don't try again
+  $c->{stash}->{coordstranslated} = 1;
+}
+
+# For the fustrating flow where you're going from a Gene and are outputting
+# protein sequences, we obviously need a different mapping for each transcript
+# so we have to stash away the originally reqested start/end. The alternative
+# would have been a lot more conditions and paramters to the other calls.
+sub _push_start_end {
+  my ($self, $c) = @_;
+
+  $c->{stash}->{orig_start} = $c->request->param('start') if($c->request->param('start'));
+  $c->{stash}->{orig_end} = $c->request->param('end') if($c->request->param('end'));
+}
+
+sub _pop_start_end {
+  my ($self, $c) = @_;
+
+  $c->request->params->{'start'} = $c->{stash}->{orig_start} if($c->{stash}->{orig_start});
+  $c->request->params->{'end'} = $c->{stash}->{orig_end} if($c->{stash}->{orig_end});
+
+  $c->{stash}->{coordstranslated} = 0;
 }
 
 sub _enrich_slice {

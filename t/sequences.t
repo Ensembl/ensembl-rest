@@ -266,6 +266,93 @@ FASTA
 
 }
 
+# Sub-sequence testing
+{
+  my $id = 'ENSG00000243439';
+  my $url = "/sequence/id/$id?start=10&end=30";
+  my $fasta = fasta_GET($url, 'Getting 20 bp sub-sequence');
+  my $expected = <<'FASTA';
+>ENSG00000243439 chromosome:GRCh37:6:1507566:1507586:1
+GGTGGCAGGTGCCTGTAGTCC
+FASTA
+  is($fasta, $expected, 'Genomic 20bp sub-sequence');
+}
+{
+  my $id = 'ENSG00000243439';
+  my $url = "/sequence/id/$id?end=30";
+  my $fasta = fasta_GET($url, 'Getting genomic sub-sequence without start parameter');
+  my $expected = <<'FASTA';
+>ENSG00000243439 chromosome:GRCh37:6:1507557:1507586:1
+GCCAGCCAGGGTGGCAGGTGCCTGTAGTCC
+FASTA
+  is($fasta, $expected, 'Getting genomic sub-sequence without start parameter');
+}
+{
+  my $id = 'ENST00000314040';
+  my $url = "/sequence/id/$id?start=25000";
+  my $fasta = fasta_GET($url, 'Getting transcript sub-sequence without end parameter');
+  my $expected = <<'FASTA';
+>ENST00000314040 chromosome:GRCh37:6:1105163:1105181:1
+CTGTTGCTTCACACTCCCG
+FASTA
+  is($fasta, $expected, 'Getting transcript sub-sequence without end parameter');
+}
+{
+  my $id = 'ENST00000259806';
+  my $url = "/sequence/id/$id?type=protein&start=200";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript without end parameter');
+  my $expected = <<'FASTA';
+>ENSP00000259806
+SPPPAAAAAAAAAPETTSSSSSSSSASCASSSSSSNSASAPSAACKSAGGGGAGAGSGGA
+KKASSGLRRPEKPPYSYIALIVMAIQSSPSKRLTLSEIYQFLQARFPFFRGAYQGWKNSV
+RHNLSLNECFIKLPKGLGRPGKGHYWTIDPASEFMFEEGSFRRRPRGFRRKCQALKPMYH
+RVVSGLGFGASLLPQGFDFQAPPSAPLGCHSQGGYGGLDMMPAGYDAGAGAPSHAHPHHH
+HHHHVPHMSPNPGSTYMASCPVPAGPGGVGAAGGGGGGDYGPDSSSSPVPSSPAMASAIE
+CHSPYTSPAAHWSSPGASPYLKQPPALTPSSNPAASAGLHSSMSSYSLEQSYLHQNARED
+LSVGLPRYQHHSTPVCDRKDFVLNFNGISSFHPSASGSYYHHHHQSVCQDIKPCVM
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from transcript without end parameter');
+}
+{
+  my $id = 'ENST00000400701';
+  my $url = "/sequence/id/$id?type=protein&end=200";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript without start parameter');
+  my $expected = <<'FASTA';
+>ENSP00000383537
+XSNLKRDVAHLYRGVGSRYIMGSGESFMQLQQRLLREKEAKIRKALDRLRKKRHLLRRQR
+TRREFPVISVVGYTNCGKTTLIKALTGDAAIQPRDQLFATLDVTAHAGTLPSRMTVLYVD
+TIGFLSQLPHGLIESFSATLEDVAHSDLILHVRDVSHPEAELQKCSVLSTLRGLQLPAPL
+LDSMVEVHNKVDLVPGYSPTEPNVVPVSALRGHGLQELKAELDAAVLKATGRQILTLRVR
+LAGAQL
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from transcript without start parameter');
+}
+{
+  my $id = 'ENSG00000112699';
+  my $url = "/sequence/id/$id?type=protein&multiple_sequences=1&start=300000";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from gene, using multiple');
+  my $expected = <<'FASTA';
+>ENSP00000436726
+AMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKTIVWEGKNENEVGRCKETGKVHV
+TVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELVREMVHADVELMRTNPNA
+>ENSP00000370194
+GANFVTRKISRSVAKIYLGQLECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIA
+TGEVHSVREFVEKSFLHIGKTIVWEGKNENEVGRCKETGKVHVTVDLKYYRPTE
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from gene, using multiple');
+}
+{
+  my $id = 'ENST00000259806';
+  my $url = "/sequence/id/$id?type=protein&end=100";
+  my $fasta = fasta_GET($url, 'Fetch a protein with an genomic end before translation begins');
+  action_bad_regex($url, qr/not within the sequence/, 'There\'s no protein sequence contained in the genomic boundaries given');
+}
+{
+  my $id = 'ENSG00000243439';
+  my $url = "/sequence/id/$id?start=1000";
+  my $fasta = fasta_GET($url, 'Getting genomic sub-sequence with start beyond the end of the sequence');
+  action_bad_regex($url, qr/not within the sequence/, 'Start of sub-sequence range can not be beyond the sequence length');
+}
 
 done_testing();
 
