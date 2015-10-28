@@ -316,12 +316,22 @@ FASTA
 {
   my $id = 'ENSP00000259806';
   my $url = "/sequence/id/$id?type=protein&start=10&end=30";
-  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript without end parameter');
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from translation feature with start and end');
   my $expected = <<'FASTA';
 >ENSP00000259806
 APLRRACSPVPGALQAALMSP
 FASTA
-  is($fasta, $expected, 'Getting protein sub-sequence from transcript without end parameter');
+  is($fasta, $expected, 'Getting protein sub-sequence from translation feature with start and end');
+}
+{
+  my $id = 'ENSP00000259806';
+  my $url = "/sequence/id/$id?type=protein&start=30&end=30";
+  my $fasta = fasta_GET($url, 'Getting single bp protein sub-sequence from translation feature');
+  my $expected = <<'FASTA';
+>ENSP00000259806
+P
+FASTA
+  is($fasta, $expected, 'Getting single bp sub-sequence from translation feature');
 }
 {
   my $id = 'ENST00000400701';
@@ -329,25 +339,37 @@ FASTA
   my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript without start parameter');
   my $expected = <<'FASTA';
 >ENSP00000383537
-XSNLKRDVAHLYRGVGSRYIMGSGESFMQLQQRLLREKEAKIRKALDRLRKKRHLLRRQR
-TRREFPVISVVGYTNCGKTTLIKALTGDAAIQPRDQLFATLDVTAHAGTLPSRMTVLYVD
-TIGFLSQLPHGLIESFSATLEDVAHSDLILHVRDVSHPEAELQKCSVLSTLRGLQLPAPL
-LDSMVEVHNKVDLVPGYSPTEPNVVPVSALRGHGLQELKAELDAAVLKATGRQILTLRVR
-LAGAQLS
+XSNLKRDVAHLYRGVGSRYIMGSG
 FASTA
   is($fasta, $expected, 'Getting protein sub-sequence from transcript without start parameter');
 }
 {
+  my $id = 'ENST00000400701';
+  my $url = "/sequence/id/$id?type=protein&start=10&end=10";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript with length 1bp');
+  my $expected = <<'FASTA';
+>ENSP00000383537
+K
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from transcript with length 1bp');
+}
+{
   my $id = 'ENSG00000112699';
-  my $url = "/sequence/id/$id?type=protein&multiple_sequences=1&start=300000";
+  my $url = "/sequence/id/$id?type=protein&multiple_sequences=1&start=150000";
   my $fasta = fasta_GET($url, 'Getting protein sub-sequence from gene, using multiple');
   my $expected = <<'FASTA';
 >ENSP00000436726
-AMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKTIVWEGKNENEVGRCKETGKVHV
-TVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELVREMVHADVELMRTNPNA
+ISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYP
+RSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQL
+ECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKT
+IVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELV
+REMVHADVELMRTNPNA
 >ENSP00000370194
-GANFVTRKISRSVAKIYLGQLECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIA
-TGEVHSVREFVEKSFLHIGKTIVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEV
+ISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYP
+RSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQL
+ECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKT
+IVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELV
+REMVHADVELMRTNPNA
 FASTA
   is($fasta, $expected, 'Getting protein sub-sequence from gene, using multiple');
 }

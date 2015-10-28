@@ -156,6 +156,13 @@ sub _process {
   Catalyst::Exception->throw(qq{The type '$type' is not understood by this service}) unless $allowed_values{type}{$type};
   
   if($c->request->param('start') || $c->request->param('end')) {
+      # We don't support circular features at this time, if it's a circular
+      # feature, and not a translation, throw an error.
+      unless($object->isa('Bio::EnsEMBL::Translation')) {
+	  my $feat_slice = $object->feature_Slice();
+	  Catalyst::Exception->throw(qq{Circular slices aren't supported for sequence trimming at this time}) if($feat_slice->is_circular());
+      }
+
       # It doesn't make sense to expand the sequence when doing a sub-sequence
       if($c->request->param('expand_5prime') || $c->request->param('expand_3prime')) {
 	  Catalyst::Exception->throw(qq{You may not expand the 3prime or 5prime sequence end when requesting a sub-sequence});
@@ -203,42 +210,33 @@ sub _process_feature {
   if($object->isa('Bio::EnsEMBL::Translation')) {
     $molecule = 'protein';
     $seq = $object->transcript()->translate()->seq();
-    # Grab the subsequence if we've been asked to trim the ends
-    $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
   }
   #Transcripts
   elsif($object->isa('Bio::EnsEMBL::PredictionTranscript')) {
     if($type eq 'cdna') {
       $seq = $object->spliced_seq($mask_feature);
       # Grab the subsequence if we've been asked to trim the ends
-      $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
     }
     elsif($type eq 'cds') {
       $seq = $object->translateable_seq();
       # Grab the subsequence if we've been asked to trim the ends
-      $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
     }
     elsif($type eq 'protein') {
       $molecule = 'protein';
       $seq = $object->translate()->seq();
-      if($c->stash()->{dosubseq}) {
-	  # It's a protein that's been requested so we have to translate
-	  # the coordinates first
-	  $self->_translate_coordinates($c, $object);
-	  $seq = $self->_process_subseq($c, $seq);
-      }
+      # It's a protein that's been requested so we have to translate
+      # the coordinates first
+      $self->_translate_coordinates($c, $object) if($c->stash()->{dosubseq});
     }
   }
   elsif($object->isa('Bio::EnsEMBL::Transcript')) {
     if($type eq 'cdna') {
       $seq = $object->spliced_seq($mask_feature);
-      $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
     }
     elsif($type eq 'cds') {
       $seq = $object->translateable_seq();
       # We might not have a translatable sequence, be sure
       # we do before attempting to trim
-      $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq} && $seq);
     }
     #If protein perform recursive calls with the Translation object 
     elsif($type eq 'protein') {
@@ -251,6 +249,7 @@ sub _process_feature {
       foreach my $t (@translations) {
 	# Catch case where no translation is available for a transcript
         next unless $t;
+
 	push(@sequences, @{$self->_process_feature($c, $t, $type)});
       }
     }
@@ -297,6 +296,10 @@ sub _process_feature {
   }
   
   if($seq) {
+    # Grab the subsequence if we've been asked to trim the ends
+
+    $seq = $self->_process_subseq($c, $seq) if($c->stash()->{dosubseq});
+
     push(@sequences, {
       id => $object->stable_id(),
       seq => $seq,
@@ -338,9 +341,11 @@ sub _check_limits {
   if($start < 0 || $start > $seq_len) {
       Catalyst::Exception->throw(qq{Your start coordinate is not within the sequence requested})
   }
+
   if($end < 1 || $end > $seq_len + 1) {
       Catalyst::Exception->throw(qq{Your end coordinate is not within the sequence requested})
   }
+
   if($start > $end) {
       Catalyst::Exception->throw(qq{Your start coordinate cannot be larger than your end})
   }
@@ -355,9 +360,11 @@ sub _translate_coordinates {
   my ($self, $c, $obj) = @_;
 
   # Return if we've already translated the coordinates
-  return if($c->{stash}->{coordstranslated});
+  return if($c->stash->{coordstranslated});
 
-  my $seq_len = length $obj->spliced_seq();
+  # Do we have a translation?
+  return unless($obj->translate());
+
   my $start; my $end;
   if($obj->strand() == 1) {
       $start = $c->request->param('start') ? $c->request->param('start') + $obj->seq_region_start() - 1 : $obj->seq_region_start();
@@ -366,11 +373,8 @@ sub _translate_coordinates {
       # Things get a little messy if we're on the reverse strand, we have to count from
       # opposite ends.
       $end = $c->request->param('start') ? $obj->seq_region_end() - $c->request->param('start') : $obj->seq_region_end();
-      $start = $c->request->param('end') ? $obj->seq_region_start() + $seq_len - $c->request->param('end') : $obj->seq_region_start();
+      $start = $c->request->param('end') ? $obj->seq_region_end() - $c->request->param('end') : $obj->seq_region_start();
   }
-
-  # Do we have a translation?
-  return unless($obj->translate());
 
   my $transcript_mapper = $obj->get_TranscriptMapper();
 
@@ -398,7 +402,7 @@ sub _translate_coordinates {
   }
 
   # Remember we've translated the coordinates so we don't try again
-  $c->{stash}->{coordstranslated} = 1;
+  $c->stash->{coordstranslated} = 1;
 }
 
 # For the fustrating flow where you're going from a Gene and are outputting
@@ -408,17 +412,17 @@ sub _translate_coordinates {
 sub _push_start_end {
   my ($self, $c) = @_;
 
-  $c->{stash}->{orig_start} = $c->request->param('start') if($c->request->param('start'));
-  $c->{stash}->{orig_end} = $c->request->param('end') if($c->request->param('end'));
+  $c->stash->{orig_start} = $c->request->param('start') if($c->request->param('start'));
+  $c->stash->{orig_end} = $c->request->param('end') if($c->request->param('end'));
 }
 
 sub _pop_start_end {
   my ($self, $c) = @_;
 
-  $c->request->params->{'start'} = $c->{stash}->{orig_start} if($c->{stash}->{orig_start});
-  $c->request->params->{'end'} = $c->{stash}->{orig_end} if($c->{stash}->{orig_end});
+  $c->request->params->{'start'} = $c->stash->{orig_start} ? $c->stash->{orig_start} : undef;
+  $c->request->params->{'end'} = $c->stash->{orig_end} ? $c->stash->{orig_end} : undef;
 
-  $c->{stash}->{coordstranslated} = 0;
+  $c->stash->{coordstranslated} = 0;
 }
 
 sub _enrich_slice {
