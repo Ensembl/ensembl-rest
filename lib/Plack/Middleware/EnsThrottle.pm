@@ -248,6 +248,9 @@ sub _add_throttle_headers {
   Plack::Util::header_set( $headers, 'X-RateLimit-Remaining', $remaining_requests );
   if($retry_after) {
     my $retry_after_addition = $self->retry_after_addition() || $RETRY_AFTER_ADDITION;
+    # Do a ceiling on the reset time to give second resolution, going so high resolution
+    # in exact reset times causes potential breakage depending on the platform's timer resolution
+    $reset_time = ($reset_time == int $reset_time) ? $reset_time : int($reset_time + 1);
     Plack::Util::header_set( $headers, 'Retry-After', $reset_time+$retry_after_addition );
   }
   return $res;
