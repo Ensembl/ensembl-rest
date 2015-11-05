@@ -284,14 +284,14 @@ sub _whitelisted_hdr {
     my ($self, $headers) = @_;
 
     my $header = $self->whitelist_hdr();
-    my @values = $self->whitelist_hdr_values();
-    return 0 unless $header && @values;
+    my $values = $self->whitelist_hdr_values();
+    return 0 unless $header && @{$values};
     # Since this is a special header just for us we're
     # going to assume there's only one value, to speed
     # the checking code below
     my $hdr_value = $headers->header($header);
     return 0 unless $hdr_value;
-    return grep $hdr_value, @values
+    return grep { $_ eq $hdr_value } @{$values};
 }
 
 sub _client_id {
