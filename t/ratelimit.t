@@ -85,6 +85,8 @@ assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too m
       max_requests => 1,
       whitelist => '192.168.2.1',
       blacklist => ['192.167.0.0-192.167.255.255'],
+#      whitelist_hdr => 'Token',
+#      whitelist_hdr_values => ['loveme', 'imacool'],
       client_id_prefix => 'second', backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
 
     sub {
