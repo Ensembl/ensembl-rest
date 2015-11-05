@@ -110,7 +110,7 @@ assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too m
       cmp_ok($res->header('X-RateLimit-Remaining'), '==', 0, 'Remaining header is 0');
       $res = $cb->(GET '/');
       is($res->code(), 429, 'Checking for a 429 (more than 1 request per second I hope)');
-      cmp_ok($res->header('Retry-After'), '<', 1.0, 'Retry-After header must be less than a second');
+      cmp_ok($res->header('Retry-After'), '<=', 1.0, 'Retry-After header must be less than or equal to a second');
       cmp_ok($res->header('Retry-After'), '>', 0, 'Retry-After header must be greater than zero seconds');
       cmp_ok($res->header('X-RateLimit-Limit'), '==', 1, 'Limit header must be set to 1');
       cmp_ok($res->header('X-RateLimit-Reset'), '<', 1.0, 'Reset header must be less than a second');
