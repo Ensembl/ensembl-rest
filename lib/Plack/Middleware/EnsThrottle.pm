@@ -45,7 +45,7 @@ enable 'EnsThrottle::Second',
   },
   blacklist => '192.168.2.1', #blacklist a single IP
   whitelist => ['192.168.0.0-192.169.255.255'], #whitelist a range
-  whitelist_hdr => 'Token',
+  whitelist_hdr => 'X-My-Secret-Token',
   whitelist_hdr_values => ['loveme'],
   client_id_prefix => 'second', #make the generated key more unique
   message => 'custom rate exceeded message',
