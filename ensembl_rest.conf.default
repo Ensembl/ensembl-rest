@@ -20,15 +20,15 @@ jsonp=1
   # user = anonymous
 
   host = ensembldb.ensembl.org
-  port = 5306
+  port = 3306
   user = anonymous
   
   # host = mysql.ebi.ac.uk
   # port = 4157
   # user = anonymous
  
-  version = 77
-  # verbose = 0
+  version = 82
+  verbose = 0
   
   ###### Registry file settings
   
@@ -67,6 +67,11 @@ jsonp=1
   # Set to control internal Ensembl API caching. Turn this off if your application is persistent (internal
   # caches are not shared, will rarely hit and increase your PSGI processes memory footprint)
   no_caching = 1
+
+  # Trigger a preload of the registry the moment the Model::Registry object is contrstructed. Otherwise we
+  # wait until the 1st request for an adaptor comes in. Use in conjunction with pre-fork PSGI deployments
+  # to stop registry reload issues
+  preload = 0
   
 </Model::Registry>
 
