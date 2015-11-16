@@ -1,0 +1,261 @@
+{
+  "referenceSets": [
+{ "id":  "GRCh37.p13",
+      "name": "GRCh37",
+      "md5":  "3812377a7767211e8f30e096f1615583",
+      "sourceAccessions":["GCA_000001405.14"],
+      "sourceUri": "ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/",
+      "ncbiTaxonId": "9606",
+      "isDerived":   "true",
+      "sequences":[
+   {
+      "length" : 135006516,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "11",
+      "md5" : "98c59049a2df285c76ffb1c6db8f8b96",
+      "sourceAccessions" : [
+         "NC_000011.9"
+      ]
+   },
+   {
+      "length" : 48129895,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "21",
+      "md5" : "2979a6085bfe28e3ad6f552f361ed74d",
+      "sourceAccessions" : [
+         "NC_000021.8"
+      ]
+   },
+   {
+      "length" : 159138663,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "7",
+      "md5" : "618366e953d6aaad97dbe4777c29375e",
+      "sourceAccessions" : [
+         "NC_000007.13"
+      ]
+   },
+   {
+      "length" : 59373566,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "Y",
+      "md5" : "1fa3474750af0948bdf97d5a0ee52e51",
+      "sourceAccessions" : [
+         "NC_000024.9"
+      ]
+   },
+   {
+      "length" : 81195210,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "17",
+      "md5" : "351f64d4f4f9ddd45b35336ad97aa6de",
+      "sourceAccessions" : [
+         "NC_000017.10"
+      ]
+   },
+   {
+      "length" : 243199373,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "2",
+      "md5" : "a0d9851da00400dec1098a9255ac712e",
+      "sourceAccessions" : [
+         "NC_000002.11"
+      ]
+   },
+   {
+      "length" : 51304566,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "22",
+      "md5" : "a718acaa6135fdca8357d5bfe94211dd",
+      "sourceAccessions" : [
+         "NC_000022.10"
+      ]
+   },
+   {
+      "length" : 249250621,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "1",
+      "md5" : "1b22b98cdeb4a9304cb5d48026a85128",
+      "sourceAccessions" : [
+         "NC_000001.10"
+      ]
+   },
+   {
+      "length" : 78077248,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "18",
+      "md5" : "b15d4b2d29dde9d3e4f93d1d0f2cbc9c",
+      "sourceAccessions" : [
+         "NC_000018.9"
+      ]
+   },
+   {
+      "length" : 90354753,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "16",
+      "md5" : "fc9b1a7b42b97a864f56b348b06095e6",
+      "sourceAccessions" : [
+         "NC_000016.9"
+      ]
+   },
+   {
+      "length" : 115169878,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "13",
+      "md5" : "283f8d7892baa81b510a015719ca7b0b",
+      "sourceAccessions" : [
+         "NC_000013.10"
+      ]
+   },
+   {
+      "length" : 171115067,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "6",
+      "md5" : "1d3a93a248d92a729ee764823acbbc6b",
+      "sourceAccessions" : [
+         "NC_000006.11"
+      ]
+   },
+   {
+      "length" : 155270560,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "X",
+      "md5" : "7e0e2e580297b7764e31dbc80c2540dd",
+      "sourceAccessions" : [
+         "NC_000023.10"
+      ]
+   },
+   {
+      "length" : 198022430,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "3",
+      "md5" : "641e4338fa8d52a5b781bd2a2c08d3c3",
+      "sourceAccessions" : [
+         "NC_000003.11"
+      ]
+   },
+   {
+      "length" : 16569,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "MT",
+      "md5" : "c68f52674c9fb33aef52dcf399755519"
+   },
+   {
+      "length" : 141213431,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "9",
+      "md5" : "3e273117f15e0a400f01055d9f393768",
+      "sourceAccessions" : [
+         "NC_000009.11"
+      ]
+   },
+   {
+      "length" : 133851895,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "12",
+      "md5" : "51851ac0e1a115847ad36449b0015864",
+      "sourceAccessions" : [
+         "NC_000012.11"
+      ]
+   },
+   {
+      "length" : 63025520,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "20",
+      "md5" : "0dec9660ec1efaaf33281c0d5ea2560f",
+      "sourceAccessions" : [
+         "NC_000020.10"
+      ]
+   },
+   {
+      "length" : 107349540,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "14",
+      "md5" : "98f3cae32b2a2e9524bc19813927542e",
+      "sourceAccessions" : [
+         "NC_000014.8"
+      ]
+   },
+   {
+      "length" : 102531392,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "15",
+      "md5" : "e5645a794a8238215b2cd77acb95a078",
+      "sourceAccessions" : [
+         "NC_000015.9"
+      ]
+   },
+   {
+      "length" : 146364022,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "8",
+      "md5" : "96f514a9929e410c6651697bded59aec",
+      "sourceAccessions" : [
+         "NC_000008.10"
+      ]
+   },
+   {
+      "length" : 191154276,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "4",
+      "md5" : "23dccd106897542ad87d2765d28a19a1",
+      "sourceAccessions" : [
+         "NC_000004.11"
+      ]
+   },
+   {
+      "length" : 59128983,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "19",
+      "md5" : "1aacd71f30db8e561810913e0b72636d",
+      "sourceAccessions" : [
+         "NC_000019.9"
+      ]
+   },
+   {
+      "length" : 135534747,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "10",
+      "md5" : "988c28e000e84c26d552359af1ea2e1d",
+      "sourceAccessions" : [
+         "NC_000010.10"
+      ]
+   },
+   {
+      "length" : 180915260,
+      "isPrimary" : "true",
+      "refset_name" : "GRCh37.p13",
+      "name" : "5",
+      "md5" : "0740173db9ffd264d728f32784845cd7",
+      "sourceAccessions" : [
+         "NC_000005.9"
+      ]
+   }
+]
+}
+]
+}
