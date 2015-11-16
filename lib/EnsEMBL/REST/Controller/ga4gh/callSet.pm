@@ -28,16 +28,15 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 =pod
 
-POST requests : /callsets/
+POST requests : ga4gh/callsets/search
 
 { "variantSetIds": [1],
  "name": '' ,
- "callSetIds": [],
  "pageToken":  null,
  "pageSize": 10
 }
 
-application/json
+GET: ga4gh/callsets/:id
 
 =cut
 
@@ -49,14 +48,17 @@ sub get_request_POST {
 
 }
 
+sub get_request: Chained('/') PathPart('ga4gh/callsets/search') ActionClass('REST')  {
 
-sub get_request: Chained('/') PathPart('ga4gh/callsets') ActionClass('REST')  {
   my ( $self, $c ) = @_;
   my $post_data = $c->req->data;
 
 #  $c->log->debug(Dumper $post_data);
 
-  my $gacallSet;
+  $c->go( 'ReturnError', 'custom', [ ' Cannot find "variantSetId" key in your request'])
+    unless exists $post_data->{variantSetId};
+
+  my $callSet;
 
   ## set a default page size if not supplied or not a number
   $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&  
@@ -66,14 +68,31 @@ sub get_request: Chained('/') PathPart('ga4gh/callsets') ActionClass('REST')  {
 
 
   try {
-    $gacallSet = $c->model('ga4gh::callSet')->fetch_ga_callSet($post_data);
+    $callSet = $c->model('ga4gh::callSet')->fetch_callSets($post_data);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
 
-  $self->status_ok($c, entity => $gacallSet);
+  $self->status_ok($c, entity => $callSet);
 }
 
+
+sub id: Chained('/') PathPart('ga4gh/callsets') ActionClass('REST') {}
+
+sub id_GET {
+
+  my ($self, $c, $id) = @_;
+  my $callSet;
+
+  try {
+    $callSet = $c->model('ga4gh::callSet')->get_callSet($id);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+
+  $self->status_ok($c, entity => $callSet);
+}
 
 __PACKAGE__->meta->make_immutable;
 
