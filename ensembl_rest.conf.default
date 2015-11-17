@@ -130,6 +130,8 @@ jsonp=1
     cdna_coordinates=100..300
     cds_coordinates=1..1000
     translation_coordinates=100..300
+
+    regulation_id=ENSR00001340277
     
     variation_region=9:22125503-22125502:1
     variation_allele=C
