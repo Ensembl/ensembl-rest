@@ -85,6 +85,8 @@ assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too m
       max_requests => 1,
       whitelist => '192.168.2.1',
       blacklist => ['192.167.0.0-192.167.255.255'],
+      whitelist_hdr => 'Token',
+      whitelist_hdr_values => ['loveme', 'imacool'],
       client_id_prefix => 'second', backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
 
     sub {
@@ -121,6 +123,27 @@ assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too m
       $res = $cb->(GET '/');
       is($res->code(), 200, 'Checking for a 200');
       cmp_ok($res->header('X-RateLimit-Remaining'), '==', 0, 'Remaining header is 0');
+
+      note 'Checking if rate limit is disabled using magic password headers';
+      $res = $cb->(GET '/', 'Token' => 'imacool');
+      is($res->code(), 200, 'Checking for a 200');
+      note 'Sending request again with the rate limit disabling header';
+      $res = $cb->(GET '/', 'Token' => 'imacool');
+      is($res->code(), 200, 'Checking for a 200');
+
+      note 'And pause then try with the wrong token value';
+      sleep(1);
+      $res = $cb->(GET '/');
+      is($res->code(), 200, 'Checking for a 200');
+      $res = $cb->(GET '/', 'Token' => 'imnocool');
+      is($res->code(), 429, 'Checking for a 429');
+
+      note 'And pause then try with the wrong token header';
+      sleep(1);
+      $res = $cb->(GET '/');
+      is($res->code(), 200, 'Checking for a 200');
+      $res = $cb->(GET '/', 'Ttoken' => 'imacool');
+      is($res->code(), 429, 'Checking for a 429');
 
       note 'Checking an ignored non-rate limited path';
       $res = $cb->(GET '/ignore');
