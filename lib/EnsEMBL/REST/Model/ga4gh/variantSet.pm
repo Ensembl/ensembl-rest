@@ -68,10 +68,6 @@ sub fetch_sets{
   my $self = shift;
   my $data = shift;
 
-  ## varset id to start from is the page token - start from 0 if none supplied
-#  my $next_set_id = 0;
-#  $next_set_id    = $data->{pageToken} if ( defined $data->{pageToken} && $data->{pageToken} ne "");
-
 
   ## get hash of VariationSetId => VCF collection
   my $vc_ob = $self->context->model('ga4gh::ga4gh_utils')->fetch_all_VariationSets();
@@ -112,21 +108,12 @@ sub fetch_sets{
     ## get info descriptions from one of the VCF files    
     my $meta = $self->get_info($vc_ob->{$varset_id});
 
-    ### Most of this has been promoted to named fields now
-    ## add summary of essential info for meta for the data set from the config
-#    foreach my $key ( "source_url"){
-#      my %meta;
-#      $meta{key}   = $key;
-#      $meta{value} = $vc_ob{$varset_id}->$key;
-#      push @{$meta}, \%meta;
-#    }
-
     ## store
     $variantSet->{id}             = $varset_id;
     $variantSet->{datasetId}      = $datasetId; 
     $variantSet->{metadata}       = \@{$meta};
     $variantSet->{referenceSetId} = $vc_ob->{$varset_id}->assembly();
-    $variantSet->{name}           = $vc_ob->{$varset_id}->source_name();
+    $variantSet->{name}           = $vc_ob->{$varset_id}->source_name() . ":" . $vc_ob->{$varset_id}->assembly();
     push @varsets, $variantSet;
     $n++;
    
