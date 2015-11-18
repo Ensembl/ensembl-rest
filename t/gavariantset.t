@@ -41,7 +41,7 @@ my $expected_data2 = {
     {                                             
       datasetId => 'e06d8b736a50aaf1460f7640dce12012',                
       id => '1',                                 
-      name => '1000 Genomes phase1',
+      name => '1000 Genomes phase1:GRCh37',
       metadata => [                               
        { info => {},
          description => 'MLE Allele Frequency Accounting for LD',                        
@@ -237,7 +237,7 @@ my $json_get = json_GET("$base/$id", 'get variantset');
 my $expected_get_data =  {                                             
       datasetId => 'e06d8b736a50aaf1460f7640dce12012',                           
       id => '1',                                 
-      name => '1000 Genomes phase1',
+      name => '1000 Genomes phase1:GRCh37',
       metadata => [                               
        { info => {},
          description => 'MLE Allele Frequency Accounting for LD',                        
