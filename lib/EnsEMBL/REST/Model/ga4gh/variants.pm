@@ -175,9 +175,6 @@ sub get_next_by_token{
   ## look up filename from vcf collection object
   my $file  =  $data->{vcf_collection}->filename_template();
 
-  ## hack for compliance suite - sort out when references finalised & added
-  $data->{referenceName} =~ s/ref_brca1/17/;
-
   $file =~ s/\#\#\#CHR\#\#\#/$data->{referenceName}/;
 
   # return these ordered by position for simple pagination
