@@ -165,7 +165,6 @@ sub sort_genotypes {
 }
 
 
-
 ## extract a batch of results for request and hold new start pos in token string
 sub get_next_by_token{
 
@@ -288,6 +287,7 @@ sub getVariant{
  
   my ($variantSetId, $variantId) = split/\:/, $id;
 
+  ## look up position in ensembl db 
   my $var = $va->fetch_by_name($variantId);
   my $vf  = $vfa->fetch_all_by_Variation($var) if defined $var;  
 
@@ -327,7 +327,7 @@ sub getVariant{
   $variation_hash->{created}         = '';
   $variation_hash->{updated}         = '';
 
-   return $variation_hash;
+  return $variation_hash;
 }
 
 =head2 getSingleCallSets
@@ -351,6 +351,7 @@ sub getSingleCallSets{
   if($variantSetId ==10){
     $data->{start} = $data->{start} - 41196312;
     $data->{end }  = $data->{end} - 41196312;
+    $data->{referenceName} = "ref_brca1";
   }
 
   ## load VCFcollections object for variantSet 
