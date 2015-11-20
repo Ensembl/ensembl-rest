@@ -30,8 +30,6 @@ use Bio::EnsEMBL::Test::TestUtils;
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Data::Dumper;
 
-use_ok('EnsEMBL::REST::Model::ga4gh');
-
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 
