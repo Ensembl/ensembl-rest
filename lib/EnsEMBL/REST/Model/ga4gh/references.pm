@@ -1,4 +1,4 @@
-=head1 LICENSE
+=head
 Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ sub format_sequence{
 
   $ref{ncbiTaxonId}      = 9609; 
   $ref{isDerived}        = 'true'; ##ambiguity codes have been changed to Ns
-  $ref{sourceDivergence} = '';
+  $ref{sourceDivergence} = undef;
 
 
   ## define url - ensembl version not in config
