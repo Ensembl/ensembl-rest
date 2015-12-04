@@ -123,6 +123,7 @@ jsonp=1
     compara_method_type=GenomicAlign
     
     genetree_stable_id=ENSGT00390000003602
+    compara_gene_stable_id=ENSG00000167664
     
     from_coord_system=GRCh37
     to_coord_system=GRCh38
@@ -142,6 +143,12 @@ jsonp=1
     
     variation_id=rs56116432
     variation_id_two=COSM476
+
+    variation_id_three=rs1042779
+
+    ld_population_name=1000GENOMES:phase_3:KHV
+    r2=0.85
+    d_prime=1.0
     
     vep_hgvs=AGT:c.803T>C
     vep_hgvs_two=9:g.22125504G>C
@@ -229,6 +236,8 @@ jsonp=1
   fork              = 3
   max_post_size     = 1000
   warning_file      = STDERR # controls VEP logging, not Catalyst
+  plugin_config     = # path to plugin config
+  dir_plugins       = # path to VEP_plugins checkout
 </Controller::VEP>
 
 
