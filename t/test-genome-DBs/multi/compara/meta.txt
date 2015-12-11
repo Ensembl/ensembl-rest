@@ -1,4 +1,4 @@
-48	\N	schema_version	83
+50	\N	schema_version	84
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -39,3 +39,4 @@
 46	\N	patch	patch_81_82_b.sql|first_last_release
 47	\N	patch	patch_81_82_c.sql|species_set_size
 49	\N	patch	patch_82_83_a.sql|schema_version
+51	\N	patch	patch_83_84_a.sql|schema_version
