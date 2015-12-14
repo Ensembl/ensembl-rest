@@ -68,6 +68,9 @@ has 'no_caching' => ( is => 'ro', isa => 'Bool' );
 has 'connection_sharing' => ( is => 'ro', isa => 'Bool' );
 has 'no_version_check' => ( is => 'ro', isa => 'Bool' );
 
+# Preload settings
+has 'preload' => ( is => 'ro', isa => 'Bool', default => 1 );
+
 has 'compara_cache' => ( is => 'ro', isa => 'HashRef[Str]', lazy => 1, default => sub { {} });
 
 has '_registry' => ( is => 'ro', lazy => 1, default => sub {
@@ -475,7 +478,19 @@ sub get_alias {
   return;
 }
 
-__PACKAGE__->meta->make_immutable;
+after 'BUILD' => sub {
+  my ($self) = @_;
+  if($self->preload()) {
+    my $log = $self->log();
+    $log->info('Triggering preload of the registry');
+    $self->_registry();
+    $self->_build_species_info();
+    $log->info('Done');
+  }
+  return;
+};
+
+__PACKAGE__->meta->make_immutable();
 
 1;
 
