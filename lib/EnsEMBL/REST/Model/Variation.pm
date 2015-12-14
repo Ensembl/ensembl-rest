@@ -149,7 +149,7 @@ sub phen_as_hash {
 
   my $phen_hash;
   $phen_hash->{trait} = $phen->phenotype->description;
-  $phen_hash->{source} = $phen->source;
+  $phen_hash->{source} = $phen->source->name;
   $phen_hash->{study} = $phen->study->external_reference if $phen->study;
   $phen_hash->{genes} = $phen->associated_gene;
   $phen_hash->{variants} = $phen->variation_names;
