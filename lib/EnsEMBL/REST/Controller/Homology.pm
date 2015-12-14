@@ -147,23 +147,11 @@ sub get_orthologs : Args(0) ActionClass('REST') {
     my $all_homologies;
     try {
       my $ha = $s->{homology_adaptor};
-      
-      if($c->request->param('target_species') || $c->request->param('target_taxon')) {
-        $c->log->debug('Limiting on species/taxons');
-        $all_homologies = [];
-        my $mlss_array = $self->_method_link_species_sets($c, $member);
-        foreach my $mlss (@{$mlss_array}) {
-          $c->log->debug('Searching for ', $method_link_type, ' with MLSS ID ', $mlss->dbID(), ' (', ($mlss->name() || q{-}), ')');
-	  my $r = $ha->fetch_all_by_Member($member, -METHOD_LINK_SPECIES_SET => $mlss);
-          push(@{$all_homologies}, @{$r});
-        }
-      }
-      elsif($method_link_type) {
-	$all_homologies = $ha->fetch_all_by_Member($member, -METHOD_LINK_TYPE => $method_link_type);
-      }
-      else {
-        $all_homologies = $ha->fetch_all_by_Member($member);
-      }
+      $all_homologies = $ha->fetch_all_by_Member($member,
+          -TARGET_TAXON     => ($c->request->param('target_taxon')   ? [$c->request->param('target_taxon')]   : undef),
+          -TARGET_SPECIES   => ($c->request->param('target_species') ? [$c->request->param('target_species')] : undef),
+          -METHOD_LINK_TYPE => ($method_link_type || undef),
+      );
     } catch {
       $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
       $c->go('ReturnError', 'custom', [qq{$_}]);
@@ -177,102 +165,12 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   $c->stash(homology_data => \@final_homologies);
 }
 
-sub _method_link_species_sets {
-  my ($self, $c, $member) = @_;
-  
-  my $mlssa = $c->stash->{method_link_species_set_adaptor};
-  my $gdba = $c->stash->{genome_db_adaptor};
-  
-  my @mlss;
-  
-  #Types
-  my @types;
-  if($c->stash->{method_link_type}) {
-    @types = ($c->stash->{method_link_type});
-  }
-  else {
-    @types = qw/ENSEMBL_ORTHOLOGUES ENSEMBL_PARALOGUES/;
-  }
-
-  my %unique_genome_dbs;
-  my @mlss_queries;
-  my $registry = $c->model('Registry');
-  my $source_gdb = $member->genome_db();
-  my $source_gdb_id = $source_gdb->dbID();
-  
-  #If someone has requested species then limit by MLSS
-  my @target_species = $c->request->param('target_species');
-  foreach my $target (@target_species) {
-    my $species_name = $registry->get_alias($target);
-    if(! $species_name) {
-      $c->go('ReturnError', 'custom', "Nothing is known to this server about the species name '${target}'");
-    }
-    my $gdb;
-    try {
-      $gdb = $gdba->fetch_by_name_assembly($species_name);
-    } catch {
-      my $meta_c = $registry->get_adaptor($species_name, 'core', 'MetaContainer');
-      $gdb = $gdba->fetch_by_name_assembly($meta_c->get_production_name());
-    };
-    if($gdb) {
-      next if exists $unique_genome_dbs{$gdb->dbID()};
-      if($gdb->dbID() == $source_gdb_id) {
-        push(@mlss_queries, [$source_gdb]);
-      }
-      else {
-        push(@mlss_queries, [$source_gdb, $gdb]);
-      }
-      $unique_genome_dbs{$gdb->dbID()} = 1;
-    }
-    else {
-      $c->go('ReturnError', 'custom', "Cannot convert '${target}' into a valid GenomeDB object. Please try again with a different value");
-    }
-  }
-  
-  #Could be taxon identifiers though
-  my @target_taxons = $c->request->param('target_taxon');
-  foreach my $taxon (@target_taxons) {
-    my $gdb = $gdba->fetch_by_taxon_id($taxon);
-    if($gdb) {
-      next if exists $unique_genome_dbs{$gdb->dbID()};
-      if($gdb->dbID() == $source_gdb_id) {
-        push(@mlss_queries, [$source_gdb]);
-      }
-      else {
-        push(@mlss_queries, [$source_gdb, $gdb]);
-      }
-      $unique_genome_dbs{$gdb->dbID()} = 1;
-    }
-    else {
-      $c->go('ReturnError', 'custom', "Cannot convert taxon ID '${taxon}' into a valid GenomeDB object. Please try again with a different value");
-    }
-  }
-
-  # Now get the MLSSs
-  my $log = $c->log();
-  foreach my $ml_type (@types) {
-    foreach my $gdbs (@mlss_queries) {
-      my $genome_names = join(q{, }, map({$_->name()} @{$gdbs}));
-      if($log->is_debug()) {
-        $log->debug("Fetching MLSS for ${ml_type} and [${genome_names}]");
-      }
-      my $r = $mlssa->fetch_by_method_link_type_GenomeDBs($ml_type, $gdbs);
-      if(! $r) {
-        $log->debug("Cannot get a MLSS for ${ml_type} and [${genome_names}]");
-        next;
-      }
-      push(@mlss, $r);
-    }
-  }
-  
-  return \@mlss;
-}
-
 sub _full_encoding {
   my ($self, $c, $homologies, $stable_id) = @_;
   my @output;
   
-  my $seq_type = $c->request->param('sequence') || 'protein';
+  my $sequence_param = $c->request->param('sequence') || 'protein';
+  my $seq_type = $sequence_param eq 'protein' ? undef : 'cds';
   my $aligned = $c->request->param('aligned');
   $aligned = 1 unless defined $aligned;
   my $cigar_line = $c->request->param('cigar_line');
@@ -288,32 +186,22 @@ sub _full_encoding {
       species => $genome_db->name(),
       perc_id => ($member->perc_id()*1),
       perc_pos => ($member->perc_pos()*1),
-      protein_id => $gene->get_canonical_SeqMember()->stable_id(),
+      protein_id => $member->stable_id(),
     };
     $result->{cigar_line} = $member->cigar_line() if $cigar_line;
     $result->{taxon_id} = ($taxon_id+0) if defined $taxon_id;
     if($aligned && $member->cigar_line()) {
-      if($seq_type eq 'protein') {
-        $result->{align_seq} = $member->alignment_string();
-      }
-      elsif($seq_type eq 'cdna') {
-       $result->{align_seq} = $member->alignment_string('cds');
-       $result->{align_seq} =~ s/\s//g;
-      }
+      $result->{align_seq} = $member->alignment_string($seq_type);
     }
     else {
-      if($seq_type eq 'protein') {
-        $result->{seq} = $member->sequence();
-      }
-      elsif($seq_type eq 'cdna') {
-        $result->{seq} = $member->other_sequence('cds');
-      }
+      $result->{seq} = $member->other_sequence($seq_type);
     }
     return $result;
   };
   
+  Bio::EnsEMBL::Compara::MemberSet->_load_all_missing_sequences($seq_type, @{$homologies});
   while(my $h = shift @{$homologies}) {
-    my ($src, $trg) = $self->_decode_members($h, $stable_id);
+    my ($src, $trg) = @{ $h->get_all_Members() };
     my $e = {
       type => $h->description(),
       taxonomy_level => $h->taxonomy_level(),
@@ -333,13 +221,13 @@ sub _condensed_encoding {
   $c->log()->debug('Starting condensed encoding');
   my @output;
   while(my $h = shift @{$homologies}) {
-    my ($src, $trg) = $self->_decode_members($h, $stable_id);
+    my ($src, $trg) = @{ $h->get_all_Members() };
     my $gene_member = $trg->gene_member();
     my $e = {
       type => $h->description(),
       taxonomy_level => $h->taxonomy_level(),
       id => $gene_member->stable_id(),
-      protein_id => $gene_member->get_canonical_SeqMember()->stable_id(),
+      protein_id => $trg->stable_id(),
       species => $gene_member->genome_db->name(),
       method_link_type => $h->method_link_species_set()->method()->type(),
     };
@@ -347,20 +235,6 @@ sub _condensed_encoding {
   }
   $c->log()->debug('Finished condensed encoding');
   return \@output;
-}
-
-sub _decode_members {
-  my ($self, $h, $stable_id) = @_;
-  my ($src, $trg);
-  foreach my $m (@{$h->get_all_Members()}) {
-    if($m->gene_member()->stable_id() eq $stable_id) {
-      $src = $m;
-    }
-    else {
-      $trg = $m;
-    }
-  }
-  return ($src, $trg);
 }
 
 sub get_orthologs_GET {

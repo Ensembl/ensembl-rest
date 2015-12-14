@@ -15,10 +15,6 @@ jsonp=1
 <Model::Registry>
   ###### Database settings. Use if you want to connect to a single database instance. Common options are given below
   
-  # host = useastdb.ensembl.org
-  # port = 5306
-  # user = anonymous
-
   host = ensembldb.ensembl.org
   port = 3306
   user = anonymous
@@ -121,6 +117,7 @@ jsonp=1
     taxon_name=Homo sapiens
     taxon_nameish=Homo%25
     target_taxon=10090
+    target_ancestral_taxon=9526
     target_species=cow
     
     ontology=GO
@@ -132,6 +129,7 @@ jsonp=1
     compara_method_type=GenomicAlign
     
     genetree_stable_id=ENSGT00390000003602
+    compara_gene_stable_id=ENSG00000167664
     
     from_coord_system=GRCh37
     to_coord_system=GRCh38
@@ -139,6 +137,8 @@ jsonp=1
     cdna_coordinates=100..300
     cds_coordinates=1..1000
     translation_coordinates=100..300
+
+    regulation_id=ENSR00001340277
     
     variation_region=9:22125503-22125502:1
     variation_allele=C
@@ -147,15 +147,21 @@ jsonp=1
     variation_region_three=7:100318423-100321323:1
     variation_allele_three=DUP
     
-    variation_id=rs116035550
+    variation_id=rs56116432
     variation_id_two=COSM476
+
+    variation_id_three=rs1042779
+
+    ld_population_name=1000GENOMES:phase_3:KHV
+    r2=0.85
+    d_prime=1.0
     
     vep_hgvs=AGT:c.803T>C
     vep_hgvs_two=9:g.22125504G>C
     vep_hgvs_three=ENST00000003084:c.1431_1433delTTC
 
     genomic_alignment_species=taeniopygia_guttata
-    genomic_alignment_region=2:106040050-106040100:1
+    genomic_alignment_region=2:106040000-106040050:1
     genomic_alignment_group=sauropsids
 
     info_division=ensembl
@@ -233,15 +239,13 @@ jsonp=1
   biotype           = 1
   rest              = 1
   check_existing    = 1 # adds some performance penalty, mitigated by tabix-converting the cache (http://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#convert)
+  fork              = 3
   max_post_size     = 1000
   warning_file      = STDERR # controls VEP logging, not Catalyst
+  plugin_config     = # path to plugin config
+  dir_plugins       = # path to VEP_plugins checkout
 </Controller::VEP>
 
-
-<View::GFF3>
-  # Set the default source of a GFF3 record
-  # default_source=.
-</View::GFF3>
 
 <Plugin::Cache>
   <backend>
@@ -249,6 +253,16 @@ jsonp=1
     class = CHI
     driver = Memory
     global = 1
+    # Memcache
+    # driver = Memcached
+    # namespace = endpoint_examples
+    # servers = [127.0.0.1:11211]
+    # debug = 0
+    # <l1_cache>
+    #   driver = Memory
+    #   global = 1
+    #   max_size = 126976
+    # </l1_cache>
   </backend>
 </Plugin::Cache>
 
@@ -265,6 +279,11 @@ jsonp=1
 </Model::ga4gh::variantSet>
 
 <Model::Variation>
-  use_vcf    = 0
-  vcf_config = __path_to(vcf_config.json)__
+   use_vcf    = 1
+   vcf_config = __path_to(vcf_config.json)__
 </Model::Variation>
+
+<Model::LDFeatureContainer>
+   use_vcf = 1
+   vcf_config = __path_to(vcf_config.json)__
+</Model::LDFeatureContainer>

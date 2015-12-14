@@ -48,6 +48,7 @@ recommends 'CHI::Driver::Memcached';
 recommends 'Template::Stash::XS';
 recommends 'DateTime';
 recommends 'Server::Starter';
+recommends 'Log::Dispatch::FileRotate';
 
 #Test requirements
 test_requires 'Test::More';

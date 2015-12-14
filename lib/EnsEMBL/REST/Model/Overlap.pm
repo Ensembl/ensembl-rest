@@ -293,7 +293,7 @@ sub somatic_transcript_variation {
 sub _filter_transcript_variation {
   my ($self, $transcript_variants) = @_;
   my $type = $self->context->request->parameters->{type};
-  my $cached_vfs = $self->context->stash->{_cached_vfs};
+  my %cached_vfs = map {$_->dbID => $_} @{$self->context->stash->{_cached_vfs} || []};
   my @vfs;
 
   foreach my $tv (@{$transcript_variants}) {
@@ -302,8 +302,9 @@ sub _filter_transcript_variation {
     
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
 
-    my ($vf) = grep {$_->dbID eq $tv->{_variation_feature_id}} @{$cached_vfs};
+    my $vf = $cached_vfs{$tv->{_variation_feature_id}};
     next unless $vf;
+    $tv->variation_feature($vf);
     
     my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
     push(@vfs, $blessed_vf);
