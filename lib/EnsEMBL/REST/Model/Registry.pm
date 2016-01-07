@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -70,6 +70,34 @@ has 'no_version_check' => ( is => 'ro', isa => 'Bool' );
 
 # Preload settings
 has 'preload' => ( is => 'ro', isa => 'Bool', default => 1 );
+has 'eqtl_db_path' => (is => 'ro', isa => 'Str' );
+has 'eqtl_species' => (is => 'ro', isa => 'ArrayRef[Str]');
+
+has '_eqtl_adaptors' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub {
+
+  my ($self) = @_;
+  my $eqtl_adaptors = {};
+  # path set in ensembl_rest_conf
+  return {} if(! $self->eqtl_db_path);
+  # load if not loaded
+  Catalyst::Utils::ensure_class_loaded('Bio::EnsEMBL::HDF5::EQTLAdaptor');
+# ToDo: Normalise species to production name
+# ToDo: Check if arrayref
+  foreach my $species (@{$self->eqtl_species}) {
+    my $core_a = $self->get_DBAdaptor($species, 'core');
+    my $var_a  = $self->get_DBAdaptor($species, 'variation');
+# ToDo: remove hardcoded file name (species specific)
+    my $file   = $self->eqtl_db_path . '/eqtl.hdf5';
+
+    my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(
+      -filename        => $file,
+      -core_db_adaptor => $core_a,
+      -var_db_adaptor  => $var_a,
+      );
+    $eqtl_adaptors->{$species} = $eqtl_a;
+  }
+  return $eqtl_adaptors;
+});
 
 has 'compara_cache' => ( is => 'ro', isa => 'HashRef[Str]', lazy => 1, default => sub { {} });
 
@@ -81,9 +109,9 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
   Catalyst::Utils::ensure_class_loaded($class);
   $class->no_version_check(1);
   return $class if $self->skip_initation();
-  
+
   my $load = 0;
-    
+
   if($self->file()) {
     no warnings 'once';
     local $Bio::EnsEMBL::Registry::NEW_EVAL = 1;
@@ -97,7 +125,7 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
       -HOST => $self->host(),
       -PORT => $self->port(),
       -USER => $self->user(),
-      -PASS => $self->pass(),  
+      -PASS => $self->pass(),
       -DB_VERSION => $self->version(),
       -VERBOSE => $self->verbose()
     );
@@ -113,7 +141,7 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
       $log->error('You tried to use Bio::EnsEMBL::LookUp but this was not on your PERL5LIB');
     }
   }
-  
+
   if(!$load) {
     confess "Cannot instantiate a registry; we have looked for configuration regarding a registry file, host information and ensembl genomes lookup. None were given. Please consult your configuration file and try again"
   }
@@ -127,20 +155,20 @@ has '_species_info' => ( isa => 'ArrayRef', is => 'ro', lazy => 1, builder => '_
 
 sub _set_connection_policies {
   my ($self, $registry) = @_;
-  
+
   my $log = $self->log();
   $log->info('Setting up connection policies');
-  
+
   if($self->disconnect_if_idle()) {
     $log->info('Setting all DBAdaptors to disconnect when inactive');
     $registry->set_disconnect_when_inactive();
   }
-  
+
   if($self->reconnect_when_lost()) {
     $log->info('Setting all DBAdaptors to reconnect when connections are lost');
     $registry->set_reconnect_when_lost();
   }
-  
+
   if($self->no_caching()) {
     $log->info('Stopping caching in all adaptors and clearing out existing caches');
     $registry->no_cache_warnings(1);
@@ -148,12 +176,12 @@ sub _set_connection_policies {
       $dba->no_cache(1);
     }
   }
-  
+
   if($self->connection_sharing()) {
     $log->info('Connection sharing turned on');
     $self->_intern_db_connections($registry);
   }
-  
+
   return;
 }
 
@@ -238,7 +266,7 @@ sub get_best_compara_DBAdaptor {
   }
 
   return $dba;
-} 
+}
 
 sub get_DBAdaptor {
   my ($self, $species, $group, $no_alias_check) = @_;
@@ -267,7 +295,7 @@ sub _build_species_info {
   my ($self) = @_;
   my @species;
   my $reg = $self->_registry();
-  
+
   #Aliases is backwards i.e. alias -> species
   my %alias_lookup;
   while (my ($alias, $species) = each %{ $Bio::EnsEMBL::Registry::registry_register{_ALIAS} }) {
@@ -275,7 +303,7 @@ sub _build_species_info {
       push(@{$alias_lookup{$species}}, $alias); # iterate through the alias,species pairs & reverse
     }
   }
-  
+
   my @all_dbadaptors = grep {$_->dbc->dbname ne 'ncbi_taxonomy'} @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
   my @core_dbadaptors;
   my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup);
@@ -285,7 +313,7 @@ sub _build_species_info {
     my $group = $dba->group();
     my $species_lc = ($species);
     push(@{$groups_lookup{$species_lc}}, $group);
-    
+
     if($group eq 'core' && $species !~ /Ancestral/) {
       push(@core_dbadaptors, $dba);
       my $dbc = $dba->dbc();
@@ -297,7 +325,7 @@ sub _build_species_info {
       if(! exists $processed_db{$db_key}) {
         my $mc = $dba->get_MetaContainer();
         my $schema_version = $mc->get_schema_version() * 1;
-        
+
         if(!$dba->is_multispecies() && $species !~ /Ancestral/) {
           my $csa = $dba->get_CoordSystemAdaptor();
           $release_lookup{$species} = $schema_version;
@@ -310,15 +338,15 @@ sub _build_species_info {
         }
         else {
           $dbc->sql_helper->execute_no_return(
-            -SQL => q/select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value 
-		from meta m1, meta m2, meta m3, meta m4 
+            -SQL => q/select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value
+		from meta m1, meta m2, meta m3, meta m4
 		where
-		m1.species_id = m2.species_id 
-		and m1.species_id = m3.species_id 
-		and m1.species_id = m4.species_id 
-		and m1.meta_key = ? 
-		and m2.meta_key = ? 
-		and m3.meta_key = ? 
+		m1.species_id = m2.species_id
+		and m1.species_id = m3.species_id
+		and m1.species_id = m4.species_id
+		and m1.meta_key = ?
+		and m2.meta_key = ?
+		and m3.meta_key = ?
 		and m4.meta_key = ?/,
             -PARAMS => ['species.production_name', 'species.division', 'species.display_name', 'species.taxonomy_id'],
             -CALLBACK => sub {
@@ -357,12 +385,12 @@ sub _build_species_info {
               return;
             }
           );
-        }        
+        }
         $processed_db{$db_key} = 1;
       }
     }
   }
-  
+
   foreach my $dba (@core_dbadaptors) {
     my $species = $dba->species();
     my $species_lc = ($species);
@@ -380,7 +408,7 @@ sub _build_species_info {
     };
     push(@species, $info);
   }
-  
+
   return \@species;
 }
 
@@ -414,7 +442,7 @@ sub get_compara_name_for_species {
     }
     $self->compara_cache()->{$species} = $compara_group;
   }
-  
+
   return $self->compara_cache()->{$species};
 }
 
@@ -485,12 +513,20 @@ after 'BUILD' => sub {
     $log->info('Triggering preload of the registry');
     $self->_registry();
     $self->_build_species_info();
+    $self->_eqtl_adaptors();
     $log->info('Done');
   }
   return;
 };
 
-__PACKAGE__->meta->make_immutable();
+sub get_eqtl_adaptor {
+  my ($self, $species) = @_;
+
+# Normalise species to production name
+  return $self->_eqtl_adaptors->{$species};
+}
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
