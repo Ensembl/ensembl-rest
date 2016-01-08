@@ -266,10 +266,9 @@ sub find_object_location {
 }
 
 sub fetch_archive_by_id {
-  my ($self, $id) = @_;
+  my ($self, $stable_id) = @_;
 
   my $c = $self->context();
-  my ($stable_id, $version) = split(/\./, $id);
   my $archive;
 
   my @results = $self->find_object_location($stable_id, undef, 1);
@@ -277,13 +276,14 @@ sub fetch_archive_by_id {
     Catalyst::Exception->throw("No object found for $stable_id");
   }
   my $species = $results[0];
+  # We need to accept the type from find_object_location because some
+  # species like C. elegans don't have a pattern the type lookup can
+  # identify, and things go very badly
+  my $type = $results[1] ? $results[1] : undef;
   my $adaptor = $c->model('Registry')->get_adaptor($species,'Core','ArchiveStableID');
 
-  if ($version) {
-    $archive = $adaptor->fetch_by_stable_id_version($stable_id, $version);
-  } else {
-    $archive = $adaptor->fetch_by_stable_id($stable_id);
-  }
+  # Lookup the stable_id, passing along the identifier type if we have it
+  $archive = $adaptor->fetch_by_stable_id($stable_id, $type);
   $c->stash()->{archive} = $archive;
 }
 
