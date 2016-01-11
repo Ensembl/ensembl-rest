@@ -17,6 +17,7 @@ package EnsEMBL::REST::Model::LDFeatureContainer;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
+use Scalar::Util qw/weaken/;
 
 use Catalyst::Exception qw(throw);
 extends 'Catalyst::Model';
@@ -27,7 +28,7 @@ has 'context' => (is => 'ro');
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ context => weaken($c), %$self, @args });
 }
 
 sub fetch_LDFeatureContainer_variation_name {
