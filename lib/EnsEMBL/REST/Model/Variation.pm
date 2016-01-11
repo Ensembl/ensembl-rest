@@ -20,6 +20,7 @@ package EnsEMBL::REST::Model::Variation;
 
 use Moose;
 use Catalyst::Exception qw(throw);
+use Scalar::Util qw/weaken/;
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
@@ -28,7 +29,7 @@ has 'context' => (is => 'ro');
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ context => weaken($c), %$self, @args });
 }
 
 sub fetch_variation {

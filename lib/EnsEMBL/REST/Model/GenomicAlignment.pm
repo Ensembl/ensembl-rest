@@ -21,6 +21,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 
 use Moose;
 use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -37,7 +38,7 @@ my %allowed_values = (
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ context => weaken($c), %$self, @args });
 }
 
 sub get_alignment {

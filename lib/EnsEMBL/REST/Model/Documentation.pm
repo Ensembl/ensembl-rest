@@ -30,6 +30,7 @@ use Hash::Merge qw/merge/;
 use Log::Log4perl;
 use JSON;
 use YAML qw//;
+use Scalar::Util qw/weaken/;
 use EnsEMBL::REST::EnsemblModel::Endpoint;
 
 extends 'Catalyst::Model';
@@ -40,7 +41,7 @@ has '_parent' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, _parent => $self, %$self, @args });
+  return $self->new({ context => weaken($c), _parent => $self, %$self, @args });
 }
 
 has '_merged_config' => ( is => 'rw', isa => 'HashRef');

@@ -21,6 +21,7 @@ package EnsEMBL::REST::Model::ga4gh::callSet;
 use Moose;
 extends 'Catalyst::Model';
 use Data::Dumper;
+use Scalar::Util qw/weaken/;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
 
 with 'Catalyst::Component::InstancePerContext';
@@ -31,7 +32,7 @@ has 'context' => (is => 'ro');
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
 
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ context => weaken($c), %$self, @args });
 }
 
 sub fetch_ga_callSet {

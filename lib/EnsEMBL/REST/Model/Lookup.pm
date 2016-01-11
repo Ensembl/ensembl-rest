@@ -22,6 +22,7 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -34,7 +35,7 @@ has 'context' => (is => 'ro');
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ context => weaken($c), %$self, @args });
 }
 
 sub find_genetree_by_stable_id {

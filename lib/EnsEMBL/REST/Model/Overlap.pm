@@ -21,6 +21,7 @@ package EnsEMBL::REST::Model::Overlap;
 use Moose;
 extends 'Catalyst::Model';
 use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
 use Bio::EnsEMBL::Feature;
 use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
 use EnsEMBL::REST::EnsemblModel::TranslationSpliceSiteOverlap;
@@ -48,7 +49,7 @@ with 'Catalyst::Component::InstancePerContext', 'EnsEMBL::REST::Role::Content';
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ context => weaken($c), %$self, @args });
 }
 
 sub fetch_features {

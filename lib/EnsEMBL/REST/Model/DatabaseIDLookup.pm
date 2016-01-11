@@ -19,6 +19,7 @@ limitations under the License.
 package EnsEMBL::REST::Model::DatabaseIDLookup;
 
 use Moose;
+use Scalar::Util qw/weaken/;
 use namespace::autoclean;
 
 extends 'Catalyst::Model';
@@ -29,7 +30,7 @@ has 'context' => (is => 'ro');
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ context => weaken($c), %$self, @args });
 }
 
 sub build_long_lookup {
