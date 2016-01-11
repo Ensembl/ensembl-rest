@@ -41,7 +41,8 @@ has '_parent' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => weaken($c), _parent => $self, %$self, @args });
+  weaken($c);
+  return $self->new({ context => $c, _parent => $self, %$self, @args });
 }
 
 has '_merged_config' => ( is => 'rw', isa => 'HashRef');

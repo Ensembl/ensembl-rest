@@ -49,7 +49,8 @@ with 'Catalyst::Component::InstancePerContext', 'EnsEMBL::REST::Role::Content';
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => weaken($c), %$self, @args });
+  weaken($c);
+  return $self->new({ context => $c, %$self, @args });
 }
 
 sub fetch_features {
