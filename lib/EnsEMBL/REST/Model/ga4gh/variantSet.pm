@@ -19,7 +19,7 @@ limitations under the License.
 package EnsEMBL::REST::Model::ga4gh::variantSet;
 
 use Moose;
-use extends 'Catalyst::Model';
+extends 'Catalyst::Model';
 use Data::Dumper;
 use Scalar::Util qw/weaken/;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
