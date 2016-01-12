@@ -43,7 +43,7 @@ has 'allowed_translation_features' => ( isa => 'HashRef', is => 'ro', lazy => 1,
   };
 });
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 with 'Catalyst::Component::InstancePerContext', 'EnsEMBL::REST::Role::Content';
 

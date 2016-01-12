@@ -27,7 +27,7 @@ extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
 
 # Per instance variables
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 my %allowed_values = (
   mask     => { map { $_, 1} qw(soft hard) },

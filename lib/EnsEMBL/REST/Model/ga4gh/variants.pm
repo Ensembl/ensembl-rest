@@ -27,7 +27,7 @@ use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 
 sub build_per_context_instance {

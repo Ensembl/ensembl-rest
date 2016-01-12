@@ -26,7 +26,7 @@ extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
 
 has 'long_lookup' => (isa => 'Bool', is => 'ro', builder => 'build_long_lookup');
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
