@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -30,10 +31,11 @@ with 'Catalyst::Component::InstancePerContext';
 has 'lookup_model' => ( is => 'ro', isa => 'Str', required => 1, default => 'DatabaseIDLookup' );
 
 # Per instance variables
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -266,10 +268,9 @@ sub find_object_location {
 }
 
 sub fetch_archive_by_id {
-  my ($self, $id) = @_;
+  my ($self, $stable_id) = @_;
 
   my $c = $self->context();
-  my ($stable_id, $version) = split(/\./, $id);
   my $archive;
 
   my @results = $self->find_object_location($stable_id, undef, 1);
@@ -277,13 +278,14 @@ sub fetch_archive_by_id {
     Catalyst::Exception->throw("No object found for $stable_id");
   }
   my $species = $results[0];
+  # We need to accept the type from find_object_location because some
+  # species like C. elegans don't have a pattern the type lookup can
+  # identify, and things go very badly
+  my $type = $results[1] ? $results[1] : undef;
   my $adaptor = $c->model('Registry')->get_adaptor($species,'Core','ArchiveStableID');
 
-  if ($version) {
-    $archive = $adaptor->fetch_by_stable_id_version($stable_id, $version);
-  } else {
-    $archive = $adaptor->fetch_by_stable_id($stable_id);
-  }
+  # Lookup the stable_id, passing along the identifier type if we have it
+  $archive = $adaptor->fetch_by_stable_id($stable_id, $type);
   $c->stash()->{archive} = $archive;
 }
 

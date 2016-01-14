@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,14 +20,16 @@ package EnsEMBL::REST::Model::Variation;
 
 use Moose;
 use Catalyst::Exception qw(throw);
+use Scalar::Util qw/weaken/;
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -149,7 +151,7 @@ sub phen_as_hash {
 
   my $phen_hash;
   $phen_hash->{trait} = $phen->phenotype->description;
-  $phen_hash->{source} = $phen->source;
+  $phen_hash->{source} = $phen->source->name;
   $phen_hash->{study} = $phen->study->external_reference if $phen->study;
   $phen_hash->{genes} = $phen->associated_gene;
   $phen_hash->{variants} = $phen->variation_names;

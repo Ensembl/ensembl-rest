@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ use Hash::Merge qw/merge/;
 use Log::Log4perl;
 use JSON;
 use YAML qw//;
+use Scalar::Util qw/weaken/;
 use EnsEMBL::REST::EnsemblModel::Endpoint;
 
 extends 'Catalyst::Model';
@@ -40,6 +41,7 @@ has '_parent' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, _parent => $self, %$self, @args });
 }
 

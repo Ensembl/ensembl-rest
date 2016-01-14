@@ -10,8 +10,10 @@ use Plack::Util;
 
 use Plack::Middleware::EnsThrottle::MemcachedBackend;
 use Cache::Memcached;
+use Sys::Hostname;
 
 my $app = EnsEMBL::REST->psgi_app;
+my $hostname = hostname;
 
 builder {
 
@@ -26,6 +28,7 @@ builder {
   my $dirname = dirname(__FILE__);
   my $rootdir = File::Spec->rel2abs(File::Spec->catdir($dirname, File::Spec->updir(), File::Spec->updir()));
   my $staticdir = File::Spec->catdir($rootdir, 'root');
+  my $logdir = File::Spec->rel2abs(File::Spec->catdir($rootdir, File::Spec->updir(), File::Spec->updir(), 'logs',$hostname.'.access.log'));
 
   enable 'EnsThrottle::Hour',
     backend => Plack::Middleware::EnsThrottle::MemcachedBackend->new({
@@ -121,6 +124,13 @@ builder {
       root => $staticdir;
 
     #------ END OF PLUGINS -------#
-
+    # Allow rotating access logs
+    enable "Log4Access", 
+      name => 'accesslog',
+      min_level => 'info',
+      filename => $logdir,
+      mode => 'append',
+      max => 7,
+      DatePattern => '0:0:0:1:0:0:0';
     $app;
 }

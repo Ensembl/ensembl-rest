@@ -1,5 +1,5 @@
 #!/bin/bash -ex
-# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,11 +54,8 @@ RESTART_INTERVAL=1
 TDP_HOME="$HOME/$APP"
 export TDP_HOME
 
-ERROR_LOG="$HOME/$APP.error.log"
-ACCESS_LOG="$HOME/$APP.access.log"
-
 export ENSEMBL_REST_CONFIG=$APP_HOME/configurations/production/ensembl_rest.conf
-STARMAN="starman --backlog $BACKLOG --max-requests $MAXREQUESTS --workers $WORKERS --access-log $ACCESS_LOG --error-log $ERROR_LOG $APP_HOME/configurations/production/ensrest.psgi"
+STARMAN="starman --backlog $BACKLOG --max-requests $MAXREQUESTS --workers $WORKERS $APP_HOME/configurations/production/ensrest.psgi"
 DAEMON="$HOME/perl5/perlbrew/perls/perl-5.14.2/bin/start_server"
 DAEMON_OPTS="--pid-file=$PIDFILE --interval=$RESTART_INTERVAL --status-file=$STATUS --port 0.0.0.0:$PORT -- $STARMAN"
 

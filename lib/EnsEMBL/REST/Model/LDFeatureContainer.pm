@@ -17,16 +17,18 @@ package EnsEMBL::REST::Model::LDFeatureContainer;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
+use Scalar::Util qw/weaken/;
 
 use Catalyst::Exception qw(throw);
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 

@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package EnsEMBL::REST::Model::Overlap;
 use Moose;
 extends 'Catalyst::Model';
 use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
 use Bio::EnsEMBL::Feature;
 use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
 use EnsEMBL::REST::EnsemblModel::TranslationSpliceSiteOverlap;
@@ -42,12 +43,13 @@ has 'allowed_translation_features' => ( isa => 'HashRef', is => 'ro', lazy => 1,
   };
 });
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 with 'Catalyst::Component::InstancePerContext', 'EnsEMBL::REST::Role::Content';
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -293,7 +295,7 @@ sub somatic_transcript_variation {
 sub _filter_transcript_variation {
   my ($self, $transcript_variants) = @_;
   my $type = $self->context->request->parameters->{type};
-  my $cached_vfs = $self->context->stash->{_cached_vfs};
+  my %cached_vfs = map {$_->dbID => $_} @{$self->context->stash->{_cached_vfs} || []};
   my @vfs;
 
   foreach my $tv (@{$transcript_variants}) {
@@ -302,8 +304,9 @@ sub _filter_transcript_variation {
     
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
 
-    my ($vf) = grep {$_->dbID eq $tv->{_variation_feature_id}} @{$cached_vfs};
+    my $vf = $cached_vfs{$tv->{_variation_feature_id}};
     next unless $vf;
+    $tv->variation_feature($vf);
     
     my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
     push(@vfs, $blessed_vf);
