@@ -70,34 +70,45 @@ has 'no_version_check' => ( is => 'ro', isa => 'Bool' );
 
 # Preload settings
 has 'preload' => ( is => 'ro', isa => 'Bool', default => 1 );
-has 'eqtl_db_path' => (is => 'ro', isa => 'Str' );
-has 'eqtl_species' => (is => 'ro', isa => 'ArrayRef[Str]');
+has 'eqtl_dbs' => (is => 'ro', isa => 'HashRef[Str]');
 
 has '_eqtl_adaptors' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub {
 
   my ($self) = @_;
   my $eqtl_adaptors = {};
-  # path set in ensembl_rest_conf
-  return {} if(! $self->eqtl_db_path);
+
+  return {} if(! $self->eqtl_dbs);
   # load if not loaded
   Catalyst::Utils::ensure_class_loaded('Bio::EnsEMBL::HDF5::EQTLAdaptor');
-# ToDo: Normalise species to production name
-# ToDo: Check if arrayref
-  foreach my $species (@{$self->eqtl_species}) {
-    my $core_a = $self->get_DBAdaptor($species, 'core');
-    my $var_a  = $self->get_DBAdaptor($species, 'variation');
-# ToDo: remove hardcoded file name (species specific)
-    my $file   = $self->eqtl_db_path . '/eqtl.hdf5';
 
+  for my $user_species (sort keys %{$self->eqtl_dbs}) {
+
+    my $ensembl_species   = $self->get_alias($user_species);
+    if(!$ensembl_species){
+      my $msg = "Species $user_species is not available in Ensembl. Please consult your config file.";
+      $self->log->fatal($msg);
+      confess $msg;
+    }
+
+    my $core_a = $self->get_DBAdaptor($ensembl_species, 'core');
+    my $var_a  = $self->get_DBAdaptor($ensembl_species, 'variation');
+
+    my $file   = $self->eqtl_dbs->{$user_species};
     my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(
       -filename        => $file,
       -core_db_adaptor => $core_a,
       -var_db_adaptor  => $var_a,
       );
-    $eqtl_adaptors->{$species} = $eqtl_a;
+
+    if(ref($eqtl_a) ne 'Bio::EnsEMBL::HDF5::EQTLAdaptor'){
+      confess 'xxxxxxxxxxxxxxxxxxxxx';
+    }
+
+    $eqtl_adaptors->{$ensembl_species} = $eqtl_a;
   }
   return $eqtl_adaptors;
 });
+
 
 has 'compara_cache' => ( is => 'ro', isa => 'HashRef[Str]', lazy => 1, default => sub { {} });
 

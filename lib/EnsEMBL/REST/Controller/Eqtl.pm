@@ -24,6 +24,9 @@ use Try::Tiny;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
+#
+#use feature qw(say);
+#use Data::Dumper;
 
 =pod
 
@@ -35,28 +38,7 @@ application/json
 
 BEGIN {
   extends 'Catalyst::Controller::REST';
-#  with 'CatalystX::LeakChecker';
 }
-
-# Potentially register as cell_type
-
-has 'tissues' => (
-    is      => 'ro',
-    builder => '_available_tissues',
-    );
-
-has 'species' => (
-    is      => 'ro',
-    builder => '_available_species',
-    );
-
-has 'allowed_values' => (
-    is      => 'ro',
-    builder => '_allowed_values',
-    lazy =>1
-    );
-
-use Data::Dumper;
 
 sub species_id_GET {}
 sub species_variant_GET {}
@@ -64,118 +46,42 @@ sub species_variant_GET {}
 # /eqtl/gtxstable_idd/:species/:id?tissue=*;statistic=*;variant_name=*
 sub species_id: Chained('/') : PathPart('eqtl/id') : Args(2) ActionClass('REST') {
   my ($self, $c, $species, $stable_id) = @_;
+  my $u_param = {};
+  $u_param->{species}      = $species;
+  $u_param->{stable_id}    = $stable_id;
+  $u_param->{tissue}       = $c->req->param('tissue');
+  $u_param->{variant_name} = $c->req->param('variant_name');
+  $u_param->{statistic}    = $c->req->param('statistic');
 
-
-  $c->stash(species => $species);
-  $c->stash(stable_id => $stable_id);
-
-  $c->stash->{tissue}    = $c->req->param('tissue');
-  $c->stash->{variant_name}   = $c->req->param('variant_name');
-  $c->stash->{statistic} = $c->req->param('statistic');
-
-  my $validate = {};
-  $validate->{species} = $species;
-  if(defined $c->stash->{tissue}){
-    $validate->{tissue}  = $c->stash->{tissue};
+  try {
+    $self->status_ok($c, entity => $c->model('Eqtl')->fetch_eqtl($u_param));
   }
-
-  _validate($self, $c, $validate);
-
-
-  my $eqtl = $c->model('Eqtl')->fetch_eqtl();
-  $self->status_ok($c, entity=>$eqtl);
+  catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
 }
 
 # /eqtl/variant_name/:species/:variant?tissue=*;statistic=*;id=*
 sub species_variant: Chained('/') : PathPart('eqtl/variant_name') : Args(2) ActionClass('REST') {
   my ($self, $c, $species, $variant_name) = @_;
 
-  $c->stash(species => $species);
-  $c->stash(variant_name => $variant_name);
+  my $u_param = {};
+  $u_param->{species}      = $species;
+  $u_param->{variant_name} = $variant_name;
+  $u_param->{tissue}       = $c->req->param('tissue');
+  $u_param->{stable_id}    = $c->req->param('stable_id');
+  $u_param->{statistic}    = $c->req->param('statistic');
 
-  $c->stash->{tissue}    = $c->req->param('tissue');
-  $c->stash->{stable_id}   = $c->req->param('stable_id');
-  $c->stash->{statistic} = $c->req->param('statistic');
-
-  my $validate = {};
-  $validate->{species} = $species;
-  $validate->{tissue}  = $c->stash->{tissue};
-#  if(defined $c->stash->{tissue}){
-#    $validate->{tissue}  = $c->stash->{tissue};
-#  }
-  _validate($self, $c, $validate);
-
-  my $eqtl = $c->model('Eqtl')->fetch_eqtl();
-  $self->status_ok($c, entity=>$eqtl);
-}
-
-sub _validate {
-  my ($self, $c, $validate) = @_;
-
-  if(!exists $self->allowed_values->{species}->{$validate->{species}}){
-    my $species = join("\n", @{$self->species});
-    $c->go('ReturnError', 'custom', ["Species unrecognized. Available species: $species"]);
+  try {
+    $self->status_ok($c, entity => $c->model('Eqtl')->fetch_eqtl($u_param));
   }
-
-  if(defined $validate->{tissue}) {
-    if(!exists $self->allowed_values->{tissue}->{$validate->{tissue}}){
-      my $tissues = join("\n", @{$self->tissues});
-      $c->go('ReturnError', 'custom', ["Tissue unrecognized. Available tissues: $tissues"]);
-    }
+  catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   }
 }
 
-sub _available_tissues {
-  my ($self) = @_;
-  my $a = [qw(
-    Adipose_Subcutaneous
-    Artery_Aorta
-    Artery_Tibial
-    Cells_Transformed_fibroblasts
-    Esophagus_Mucosa
-    Esophagus_Muscularis
-    Heart_Left_Ventricle
-    Lung
-    Muscle_Skeletal
-    Nerve_Tibial
-    Skin_Sun_Exposed_Lower_leg
-    Stomach
-    Thyroid
-    Whole_Blood
-      )];
-  return $a;
-}
-
-sub _available_species {
-  my ($self) = @_;
-  my $a = [qw(
-      homo_sapiens
-      human
-      )];
-}
-
-sub _allowed_values {
-  my ($self) = @_;
-  my $allowed_values = {
-    tissue    => { map { $_, 1} @{$self->tissues}  },
-    species   => { map { $_, 1} @{$self->species}  },
-  };
-  return $allowed_values;
-}
-
-##  if( defined $c->stash->{stable_id}){
-##    if(!defined $c->stash->{tissue}) {
-##      $c->go('ReturnError', 'custom', ["You also have to define a tissue"]);
-##    }
-##  }
-#
-##  if(!defined $c->stash->{stable_id}){
-##    if(!defined $c->stash->{snp}){
-##      $c->go('ReturnError', 'custom', ["You have to either define a stable_id or a snp"]);
-##    }
-##  }
-##
-#
 
 __PACKAGE__->meta->make_immutable;
 

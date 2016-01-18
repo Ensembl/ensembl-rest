@@ -25,68 +25,72 @@ use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::HDF5::EQTLAdaptor;
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
 
-use feature qw(say);
+#use feature qw(say);
+#use Data::Dumper;
+
 extends 'Catalyst::Model';
-
 with 'Catalyst::Component::InstancePerContext';
-#with 'CatalystX::LeakChecker';
-
-# set to read only at initiaion time
-has 'context' => (is => 'ro');
-
 
 # Overwrite potentially, check Catalyst doc
 # Assign all these to $self->context
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  return $self->new({ context => $c, %$self, @args });
+  return $self->new({ registry => $c->model('Registry'), %$self, @args });
+
 }
 
-# Field / Member of the class (Getter/Setter), shortcut to add something new to the class
-# It is statefull, retains states between calls
-# Is run the first time it is accessed
-#has 'eqtl_adaptor' => (
-#    is      => 'ro',
-#    isa     => 'Bio::EnsEMBL::HDF5::EQTLAdaptor',
-#    builder => '_get_eqtl_adaptor',
-#    lazy    => 1
-#    );
+=head2 fetch_qetl
+
+  Arg [1]    : HASHREF $constraints
+  Example    : $eqtls = $eqtl_adaptor->fetch_eqtl($constraints);
+  Description: Validates tissue constraint.
+               Fetches all statistics for from the DB using the constraints supplied.
+  Returntype : HASHREF
+  Exceptions : Throws if constraint is not present in Database
+  Caller     : general
+  Status     : Stable
+
+=cut
 
 sub fetch_eqtl {
-  my ($self) = @_;
+  my ($self, $constraints ) = @_;
 
-  my $c            = $self->context;
-  my $tissue       = $c->stash->{tissue};
-  my $stable_id    = $c->stash->{stable_id};
-  my $variant_name = $c->stash->{variant_name};
-  my $stat         = $c->stash->{statistic};
-  my $species      = $c->stash->{species};
+  # fails in registry if species is wrong/not available in Ensembl
+  my $eqtl_a = $self->{'registry'}->get_eqtl_adaptor($constraints->{species});
 
-  my $eqtl_a = $c->model('Registry')->get_eqtl_adaptor($species);
+  $self->_validate_tissue($eqtl_a, $constraints->{tissue});
 
   my $results = $eqtl_a->fetch( {
-        gene          => $stable_id,
-        tissue        => $tissue,
-        snp           => $variant_name,
-        statistic     => $stat,
+        gene          => $constraints->{stable_id},
+        tissue        => $constraints->{tissue},
+        snp           => $constraints->{variant_name},
+        statistic     => $constraints->{statistic},
       });
 
   return $results;
 }
 
-# replace with grep
-sub validate_species {
-  my ($self, $species) = @_;
+=head2 _validate_tissue
 
-  my $found = 0;
-  my $tmp_species = $self->context->model('Registry')->eqtl_species();
-  my $eqtl_species = {map { $_ => 1 } @{$tmp_species}};
+  Arg [1]    : Bio::EnsEMBL::HDF5::EQTLAdaptor
+  Arg [2]    : $tissue name
+  Example    : $self->_validate_tissue($eqtl_a, $constraints->{tissue});
+  Description: Validates if tissue exists in Database.
+  Returntype : None
+  Exceptions : Throws if tissue is not present in Database
+  Caller     : general
+  Status     : Stable
 
-  if(exists $eqtl_species->{$species}){
-    $found = 1;
+=cut
+
+sub _validate_tissue {
+  my ($self, $eqtl_a, $tissue) = @_;
+
+  if(! exists $eqtl_a->{tissues}->{$tissue}) {
+    my $tissues = join(", ", map { $_ } sort keys %{$eqtl_a->{tissues}});
+    Catalyst::Exception->throw("Tissue '$tissue' not recognised. Available tissues: $tissues ");
   }
-
-  return $found;
 }
+
 
 1;
