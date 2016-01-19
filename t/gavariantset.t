@@ -33,415 +33,15 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 my $base = '/ga4gh/variantsets/search';
 
-my $post_data1 = '{ "pageSize": 2,  "datasetIds":[],"pageToken":"" }';
-my $post_data2 = '{ "pageSize": 2,  "datasetIds":[1],"pageToken":"" }';
 
-my $expected_data1 = {                                                
-  variantSets => [                                
-    {                                             
-      datasetId => '1',                           
-      id => '20',                                 
-      metadata => [                               
-     {   info => {}, 
-         description => 'MLE Allele Frequency Accounting for LD',                        
-         id => 'LDAF',                                                                   
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Average posterior probability from MaCH/Thunder',               
-         id => 'AVGPOST',                                                                
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype imputation quality from MaCH/Thunder',                 
-         id => 'RSQ',                                                                    
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Per-marker Mutation rate from MaCH/Thunder',                    
-         id => 'ERATE',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Per-marker Transition rate from MaCH/Thunder',                  
-         id => 'THETA',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Confidence interval around END for imprecise variants',         
-         id => 'CIEND',                                                                  
-         key => 'INFO',                                                                  
-         number => '2',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Confidence interval around POS for imprecise variants',         
-         id => 'CIPOS',                                                                  
-         key => 'INFO',                                                                  
-         number => '2',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'End position of the variant described in this record',          
-         id => 'END',                                                                    
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Length of base pair identical micro-homology at event breakpoints',
-         id => 'HOMLEN',                                                                 
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Sequence of base pair identical micro-homology at event breakpoints',
-         id => 'HOMSEQ',                                                                 
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Difference in length between REF and ALT alleles',              
-         id => 'SVLEN',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Type of structural variant',                                    
-         id => 'SVTYPE',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Alternate Allele Count',                                        
-         id => 'AC',                                                                     
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Total Allele Count',                                            
-         id => 'AN',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
-         id => 'AA',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Global Allele Frequency based on AC/AN',                        
-         id => 'AF',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from AMR based on AC/AN',          
-         id => 'AMR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from ASN based on AC/AN',          
-         id => 'ASN_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from AFR based on AC/AN',          
-         id => 'AFR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from EUR based on AC/AN',          
-         id => 'EUR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                                
-         description => 'indicates what type of variant the line represents',            
-         id => 'VT',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'indicates if a snp was called when analysing the low coverage or exome alignment data',
-         id => 'SNPSOURCE',                                                              
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype',                                                      
-         id => 'GT',                                                                     
-         key => 'FORMAT',                                                                
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype dosage from MaCH/Thunder',                             
-         id => 'DS',                                                                     
-         key => 'FORMAT',                                                                
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype Likelihoods',                                          
-         id => 'GL',                                                                     
-         key => 'FORMAT',                                                                
-         number => '.',                                                                  
-         type => 'Float'                                                                 
-       },
-       {                                         
-          key => 'assembly',                      
-          value => 'GRCh37'                       
-        },                                        
-        {                                         
-          key => 'source_name',                   
-          value => '1000 Genomes phase1'          
-        },                                        
-        {                                         
-          key => 'source_url',                    
-          value => 'http://www.1000genomes.org/'  
-        },                                         
-        { 
-          key => 'set_name',      
-          value => '1000GENOMES:phase_1:AFR'
-        } 
-       ]
-    },                                            
-    {                                             
-      datasetId => '1',                           
-      id => '21',                                 
-      metadata => [                               
-       { info => {},
-         description => 'MLE Allele Frequency Accounting for LD',                        
-         id => 'LDAF',                                                                   
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                                
-         description => 'Average posterior probability from MaCH/Thunder',               
-         id => 'AVGPOST',                                                                
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype imputation quality from MaCH/Thunder',                 
-         id => 'RSQ',                                                                    
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Per-marker Mutation rate from MaCH/Thunder',                    
-         id => 'ERATE',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Per-marker Transition rate from MaCH/Thunder',                  
-         id => 'THETA',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Confidence interval around END for imprecise variants',         
-         id => 'CIEND',                                                                  
-         key => 'INFO',                                                                  
-         number => '2',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Confidence interval around POS for imprecise variants',         
-         id => 'CIPOS',                                                                  
-         key => 'INFO',                                                                  
-         number => '2',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'End position of the variant described in this record',          
-         id => 'END',                                                                    
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Length of base pair identical micro-homology at event breakpoints',
-         id => 'HOMLEN',                                                                 
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Sequence of base pair identical micro-homology at event breakpoints',
-         id => 'HOMSEQ',                                                                 
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Difference in length between REF and ALT alleles',              
-         id => 'SVLEN',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Type of structural variant',                                    
-         id => 'SVTYPE',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Alternate Allele Count',                                        
-         id => 'AC',                                                                     
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Total Allele Count',                                            
-         id => 'AN',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
-         id => 'AA',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Global Allele Frequency based on AC/AN',                        
-         id => 'AF',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from AMR based on AC/AN',          
-         id => 'AMR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from ASN based on AC/AN',          
-         id => 'ASN_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from AFR based on AC/AN',          
-         id => 'AFR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from EUR based on AC/AN',          
-         id => 'EUR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'indicates what type of variant the line represents',            
-         id => 'VT',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'indicates if a snp was called when analysing the low coverage or exome alignment data',
-         id => 'SNPSOURCE',                                                              
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype',                                                      
-         id => 'GT',                                                                     
-         key => 'FORMAT',                                                                
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype dosage from MaCH/Thunder',                             
-         id => 'DS',                                                                     
-         key => 'FORMAT',                                                                
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype Likelihoods',                                          
-         id => 'GL',                                                                     
-         key => 'FORMAT',                                                                
-         number => '.',                                                                  
-         type => 'Float'                                                                 
-       },
-        {                                         
-          key => 'assembly',                      
-          value => 'GRCh37'                       
-        },                                        
-        {                                         
-          key => 'source_name',                   
-          value => '1000 Genomes phase1'          
-        },                                        
-        {                                         
-          key => 'source_url',                    
-          value => 'http://www.1000genomes.org/'  
-        },
-        {
-          key => 'set_name',
-          value => '1000GENOMES:phase_1:AMR'
-        } 
-      ]                                           
-    },                                            
-    {                                             
-      pageToken => '22'                           
-    }                                             
-  ]                                               
-};      
+my $post_data2  = '{ "pageSize": 2,  "datasetId":"e06d8b736a50aaf1460f7640dce12012","pageToken":"" }';                                            
+
 my $expected_data2 = { 
   variantSets => [                                
     {                                             
-      datasetId => '1',                           
-      id => '20',                                 
+      datasetId => 'e06d8b736a50aaf1460f7640dce12012',                
+      id => '1',                                 
+      name => '1000 Genomes phase1:GRCh37',
       metadata => [                               
        { info => {},
          description => 'MLE Allele Frequency Accounting for LD',                        
@@ -618,232 +218,207 @@ my $expected_data2 = {
          number => '.',                                                                  
          type => 'Float'                                                                 
        },
-        {                                         
-          key => 'assembly',                      
-          value => 'GRCh37'                       
-        },                                        
-        {                                         
-          key => 'source_name',                   
-          value => '1000 Genomes phase1'          
-        },                                        
-        {                                         
-          key => 'source_url',                    
-          value => 'http://www.1000genomes.org/'  
-        },
-        {
-          key => 'set_name',  
-          value => '1000GENOMES:phase_1:AFR'
-        }                                         
-      ]                                           
-    },                                            
-    {                                             
-      datasetId => '1',                           
-      id => '21',                                 
-      metadata => [                               
-       { info => {},
-         description => 'MLE Allele Frequency Accounting for LD',                        
-         id => 'LDAF',                                                                   
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                                
-         description => 'Average posterior probability from MaCH/Thunder',               
-         id => 'AVGPOST',                                                                
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype imputation quality from MaCH/Thunder',                 
-         id => 'RSQ',                                                                    
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Per-marker Mutation rate from MaCH/Thunder',                    
-         id => 'ERATE',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Per-marker Transition rate from MaCH/Thunder',                  
-         id => 'THETA',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Confidence interval around END for imprecise variants',         
-         id => 'CIEND',                                                                  
-         key => 'INFO',                                                                  
-         number => '2',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Confidence interval around POS for imprecise variants',         
-         id => 'CIPOS',                                                                  
-         key => 'INFO',                                                                  
-         number => '2',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'End position of the variant described in this record',          
-         id => 'END',                                                                    
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Length of base pair identical micro-homology at event breakpoints',
-         id => 'HOMLEN',                                                                 
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Sequence of base pair identical micro-homology at event breakpoints',
-         id => 'HOMSEQ',                                                                 
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Difference in length between REF and ALT alleles',              
-         id => 'SVLEN',                                                                  
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Type of structural variant',                                    
-         id => 'SVTYPE',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Alternate Allele Count',                                        
-         id => 'AC',                                                                     
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Total Allele Count',                                            
-         id => 'AN',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Integer'                                                               
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
-         id => 'AA',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Global Allele Frequency based on AC/AN',                        
-         id => 'AF',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from AMR based on AC/AN',          
-         id => 'AMR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from ASN based on AC/AN',          
-         id => 'ASN_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from AFR based on AC/AN',          
-         id => 'AFR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Allele Frequency for samples from EUR based on AC/AN',          
-         id => 'EUR_AF',                                                                 
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'indicates what type of variant the line represents',            
-         id => 'VT',                                                                     
-         key => 'INFO',                                                                  
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'indicates if a snp was called when analysing the low coverage or exome alignment data',
-         id => 'SNPSOURCE',                                                              
-         key => 'INFO',                                                                  
-         number => '.',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype',                                                      
-         id => 'GT',                                                                     
-         key => 'FORMAT',                                                                
-         number => '1',                                                                  
-         type => 'String'                                                                
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype dosage from MaCH/Thunder',                             
-         id => 'DS',                                                                     
-         key => 'FORMAT',                                                                
-         number => '1',                                                                  
-         type => 'Float'                                                                 
-       },                                                                                
-       { info => {},                                                                     
-         description => 'Genotype Likelihoods',                                          
-         id => 'GL',                                                                     
-         key => 'FORMAT',                                                                
-         number => '.',                                                                  
-         type => 'Float'                                                                 
-       },
-        {                                         
-          key => 'assembly',                      
-          value => 'GRCh37'                       
-        },                                        
-        {                                         
-          key => 'source_name',                   
-          value => '1000 Genomes phase1'          
-        },                                        
-        {                                         
-          key => 'source_url',                    
-          value => 'http://www.1000genomes.org/'  
-        },
-        {  
-          key => 'set_name',   
-          value => '1000GENOMES:phase_1:AMR' 
-        }                                         
-      ]                                           
-    },                                            
-    {                                             
-      pageToken => '22'                           
-    }                                             
-  ]                                               
+      ],
+      referenceSetId => 'GRCh37'                                           
+    },
+  ]
 };                
 
-my $json1 = json_POST( $base, $post_data1, 'variantset - 2 entries' );
-eq_or_diff($json1, $expected_data1, "Checking the result from the gavariantset endpoint");
-
 my $json2 = json_POST($base, $post_data2, 'variantset by datasetid');
-eq_or_diff($json2, $expected_data2, "Checking the result from the gavariantset endpoint by dataset");
+eq_or_diff($json2, $expected_data2, "Checking the result from the GA4GH variantset endpoint by dataset");
   
+
+## GET
+ 
+$base =~ s/\/search//;
+my $id = 1;
+my $json_get = json_GET("$base/$id", 'get variantset');
+
+my $expected_get_data =  {                                             
+      datasetId => 'e06d8b736a50aaf1460f7640dce12012',                           
+      id => '1',                                 
+      name => '1000 Genomes phase1:GRCh37',
+      metadata => [                               
+       { info => {},
+         description => 'MLE Allele Frequency Accounting for LD',                        
+         id => 'LDAF',                                                                   
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                                
+         description => 'Average posterior probability from MaCH/Thunder',               
+         id => 'AVGPOST',                                                                
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Genotype imputation quality from MaCH/Thunder',                 
+         id => 'RSQ',                                                                    
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Per-marker Mutation rate from MaCH/Thunder',                    
+         id => 'ERATE',                                                                  
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Per-marker Transition rate from MaCH/Thunder',                  
+         id => 'THETA',                                                                  
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Confidence interval around END for imprecise variants',         
+         id => 'CIEND',                                                                  
+         key => 'INFO',                                                                  
+         number => '2',                                                                  
+         type => 'Integer'                                                               
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Confidence interval around POS for imprecise variants',         
+         id => 'CIPOS',                                                                  
+         key => 'INFO',                                                                  
+         number => '2',                                                                  
+         type => 'Integer'                                                               
+       },                                                                                
+       { info => {},                                                                     
+         description => 'End position of the variant described in this record',          
+         id => 'END',                                                                    
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Integer'                                                               
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Length of base pair identical micro-homology at event breakpoints',
+         id => 'HOMLEN',                                                                 
+         key => 'INFO',                                                                  
+         number => '.',                                                                  
+         type => 'Integer'                                                               
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Sequence of base pair identical micro-homology at event breakpoints',
+         id => 'HOMSEQ',                                                                 
+         key => 'INFO',                                                                  
+         number => '.',                                                                  
+         type => 'String'                                                                
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Difference in length between REF and ALT alleles',              
+         id => 'SVLEN',                                                                  
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Integer'                                                               
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Type of structural variant',                                    
+         id => 'SVTYPE',                                                                 
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'String'                                                                
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Alternate Allele Count',                                        
+         id => 'AC',                                                                     
+         key => 'INFO',                                                                  
+         number => '.',                                                                  
+         type => 'Integer'                                                               
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Total Allele Count',                                            
+         id => 'AN',                                                                     
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Integer'                                                               
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
+         id => 'AA',                                                                     
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'String'                                                                
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Global Allele Frequency based on AC/AN',                        
+         id => 'AF',                                                                     
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Allele Frequency for samples from AMR based on AC/AN',          
+         id => 'AMR_AF',                                                                 
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Allele Frequency for samples from ASN based on AC/AN',          
+         id => 'ASN_AF',                                                                 
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Allele Frequency for samples from AFR based on AC/AN',          
+         id => 'AFR_AF',                                                                 
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Allele Frequency for samples from EUR based on AC/AN',          
+         id => 'EUR_AF',                                                                 
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'indicates what type of variant the line represents',            
+         id => 'VT',                                                                     
+         key => 'INFO',                                                                  
+         number => '1',                                                                  
+         type => 'String'                                                                
+       },                                                                                
+       { info => {},                                                                     
+         description => 'indicates if a snp was called when analysing the low coverage or exome alignment data',
+         id => 'SNPSOURCE',                                                              
+         key => 'INFO',                                                                  
+         number => '.',                                                                  
+         type => 'String'                                                                
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Genotype',                                                      
+         id => 'GT',                                                                     
+         key => 'FORMAT',                                                                
+         number => '1',                                                                  
+         type => 'String'                                                                
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Genotype dosage from MaCH/Thunder',                             
+         id => 'DS',                                                                     
+         key => 'FORMAT',                                                                
+         number => '1',                                                                  
+         type => 'Float'                                                                 
+       },                                                                                
+       { info => {},                                                                     
+         description => 'Genotype Likelihoods',                                          
+         id => 'GL',                                                                     
+         key => 'FORMAT',                                                                
+         number => '.',                                                                  
+         type => 'Float'                                                                 
+       },
+  ],
+   referenceSetId => 'GRCh37'       
+};
+
+eq_or_diff($json_get, $expected_get_data, "Checking the get result from the variantset endpoint");
+
 
 done_testing();

@@ -16,7 +16,7 @@ limitations under the License.
 
 =cut
 
-package EnsEMBL::REST::Controller::ga4gh::callSet;
+package EnsEMBL::REST::Controller::ga4gh::datasets;
 
 use Moose;
 use namespace::autoclean;
@@ -28,15 +28,11 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 =pod
 
-POST requests : ga4gh/callsets/search
+POST /datasets/search -d { "pageSize": 2, "pageToken":3}
 
-{ "variantSetIds": [1],
- "name": '' ,
- "pageToken":  null,
- "pageSize": 10
-}
+GET requests : /dataset/id
 
-GET: ga4gh/callsets/:id
+returns id & description
 
 =cut
 
@@ -48,50 +44,43 @@ sub get_request_POST {
 
 }
 
-sub get_request: Chained('/') PathPart('ga4gh/callsets/search') ActionClass('REST')  {
-
+sub get_request: Chained('/') PathPart('ga4gh/datasets/search') ActionClass('REST')  {
   my ( $self, $c ) = @_;
+
   my $post_data = $c->req->data;
 
-#  $c->log->debug(Dumper $post_data);
+  ## set a maximum page size - not likely to be neccessary
+  $post_data->{pageSize} =  100 if !defined $post_data->{pageSize} || $post_data->{pageSize} > 100; 
 
-  $c->go( 'ReturnError', 'custom', [ ' Cannot find "variantSetId" key in your request'])
-    unless exists $post_data->{variantSetId};
-
-  my $callSet;
-
-  ## set a default page size if not supplied or not a number
-  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&  
-                                      $post_data->{pageSize} =~ /\d+/ &&
-                                      $post_data->{pageSize} >0  );
-
-
+  my $dataset;
 
   try {
-    $callSet = $c->model('ga4gh::callSet')->fetch_callSets($post_data);
+    $dataset = $c->model('ga4gh::datasets')->fetch_datasets($post_data);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
 
-  $self->status_ok($c, entity => $callSet);
+  $self->status_ok($c, entity => $dataset);
+
 }
 
 
-sub id: Chained('/') PathPart('ga4gh/callsets') ActionClass('REST') {}
+
+
+sub id: Chained('/') PathPart('ga4gh/datasets') ActionClass('REST') {}
 
 sub id_GET {
-
   my ($self, $c, $id) = @_;
-  my $callSet;
+
+  my $dataset;
 
   try {
-    $callSet = $c->model('ga4gh::callSet')->get_callSet($id);
+    $dataset = $c->model('ga4gh::datasets')->getDataset($id);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
-
-  $self->status_ok($c, entity => $callSet);
+  $self->status_ok($c, entity => $dataset);
 }
 
 __PACKAGE__->meta->make_immutable;
