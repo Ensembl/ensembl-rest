@@ -91,6 +91,9 @@ sub read_sequence_config{
   $self->context()->go( 'ReturnError', 'custom', [ " No data available " ] )
     unless $config->{referenceSets} && scalar @{$config->{referenceSets}};
 
+  ## add fasta file location for compliance suite
+  $config->{fasta_dir} = $self->{fasta_dir};
+
   return $config;
 }
 

@@ -66,7 +66,7 @@ my $expected_data_single =  {
       ],
       ncbiTaxonId => 9609,
       length => 51304566,
-      sourceDivergence => "",
+      sourceDivergence => undef,
       isDerived => "true",
       sourceURI => "ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.22.fa.gz",
       id => "a718acaa6135fdca8357d5bfe94211dd",
@@ -88,7 +88,7 @@ my $expected_data2 =  {
       sourceAccessions => [                              
         'NC_000011.9'                                    
       ],                                                 
-      sourceDivergence => '',                            
+      sourceDivergence => undef,                            
       sourceURI => 'ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.11.fa.gz'
     },                                                    
     {                                                     
@@ -102,7 +102,7 @@ my $expected_data2 =  {
       sourceAccessions => [                               
         'NC_000021.8'                                     
       ],                                                  
-      sourceDivergence => '',                             
+      sourceDivergence => undef,                             
       sourceURI => 'ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.21.fa.gz'
     } 
   ]
@@ -122,7 +122,7 @@ my $expected_data3 =  {
       sourceAccessions => [                                                                                            
         'NC_000007.13'                                                                                                 
       ],                                                                                                               
-      sourceDivergence => '',                                                                                          
+      sourceDivergence => undef,                                          
       sourceURI => 'ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.7.fa.gz'
     },                                                                                                                 
     {                                                                                                                  
@@ -136,7 +136,7 @@ my $expected_data3 =  {
       sourceAccessions => [                                                                                            
         'NC_000024.9'                                                                                                  
       ],                                                                                                               
-      sourceDivergence => '',                                                                                          
+      sourceDivergence => undef,                                                                                          
       sourceURI => 'ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.Y.fa.gz'  
     }                                                                                                                  
   ] 
@@ -162,10 +162,10 @@ eq_or_diff($json4, $expected_data3, "Checking the result from the GA4GH referenc
 my $json5 = json_POST($base, $post_data5, 'references; non-existent set ');
 eq_or_diff($json5, $expected_data5, "Checking the result from the GA4GH references endpoint with non existent set ");
 
-
 ## GET
 
 $base =~ s/\/search//;
+
 my $id = 'a718acaa6135fdca8357d5bfe94211dd';
 my $json_get = json_GET("$base/$id", 'get references');
 
@@ -178,7 +178,7 @@ my $expected_get_data =  {
       ],
       ncbiTaxonId => 9609,
       length => 51304566,
-      sourceDivergence => "",
+      sourceDivergence => undef,
       isDerived => "true",
       sourceURI => "ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.22.fa.gz",
       id => "a718acaa6135fdca8357d5bfe94211dd",
@@ -187,4 +187,19 @@ my $expected_get_data =  {
 eq_or_diff($json_get, $expected_get_data, "Checking the get result from the references endpoint");
 
 
+## GET sequence string
+
+my $seq_id = '1d3a93a248d92a729ee764823acbbc6b';
+my $query = "$base/$seq_id/bases?start=1080164&end=1080194";
+my $json_seq_get = json_GET( $query, 'get references');
+
+my $expected_get_seq_data =  { sequence => 'CTCAAATAAGAGCCACAAACGTGGAAGATA',
+                               offset   => 1080164,
+                               nextPageToken  => undef
+                              };
+
+eq_or_diff($json_seq_get, $expected_get_seq_data, "Checking the get bases result from the references endpoint");
+
+
 done_testing();
+

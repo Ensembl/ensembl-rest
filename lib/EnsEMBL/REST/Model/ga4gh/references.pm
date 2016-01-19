@@ -21,10 +21,12 @@ with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro');
 
+use Bio::DB::Fasta;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 
 our $species = 'homo_sapiens';
+
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
@@ -49,12 +51,19 @@ sub getReference{
 
   my ($self, $get_id ) = @_;
 
-  my ($reference, $assemblId) = $self->get_sequence($get_id);
+  my $reference = $self->get_sequence($get_id);
 
   $self->context()->go( 'ReturnError', 'custom', ["ERROR: no data for $get_id"])
     unless defined $reference &&  ref($reference) eq 'HASH' ; 
 
-  return $self->format_sequence($reference, $assemblId);
+  ## request for substring ** potentially fragile
+  if ($self->context()->{request}->{arguments}->[1] eq 'bases'){
+    return $self->format_base_sequence($reference);
+  }
+  else{
+    ## request for sequence info
+    return $self->format_sequence($reference);
+  }
 }
 
 
@@ -98,8 +107,8 @@ sub extract_data{
       $nextPageToken = $n;
       last;
     }
-
-    my $ref = $self->format_sequence($refseq, $refSeqSet->{id}, $ens_version); 
+    $refseq->{assembly} = $refSeqSet->{id};
+    my $ref = $self->format_sequence($refseq, $ens_version); 
     push @references,  $ref;
   }
 
@@ -111,8 +120,9 @@ sub format_sequence{
 
   my $self     = shift;
   my $seq      = shift;
-  my $assembly = shift;
   my $ens_ver  = shift;
+
+  $ens_ver ||= $self->get_ensembl_version();
 
   my %ref;
 
@@ -129,14 +139,15 @@ sub format_sequence{
 
 
   ## define url - ensembl version not in config
-  if( $assembly =~ /compliance/){
+  if( $ref{sourceAccessions}->[0] =~ /GA4GH/){
      $ref{sourceURI} = "https://github.com/ga4gh/compliance/blob/master/test-data/";
   }
   else{
-    $ens_ver  = 75         if $assembly =~/GRCh37/; 
-    $assembly =~ s/\.p13// if $assembly =~/GRCh37/;
-
-    $ref{sourceURI} =  'ftp://ftp.ensembl.org/pub/release-'. $ens_ver .'/fasta/homo_sapiens/dna/Homo_sapiens.'. $assembly.'.dna.chromosome.' . $ref{name} . '.fa.gz'; 
+     $ens_ver  = 75         if $seq->{assembly} =~/GRCh37/; 
+     $seq->{assembly} =~ s/\.p13// if $seq->{assembly} =~/GRCh37/;
+     ## over-write stored ftp location with current for GRCh38 site
+     $ref{sourceURI} =  'ftp://ftp.ensembl.org/pub/release-'. $ens_ver .'/fasta/homo_sapiens/dna/Homo_sapiens.'. $seq->{assembly} .'.dna.chromosome.' . $ref{name} . '.fa.gz'; 
+     
   }
 
   return \%ref;
@@ -161,10 +172,13 @@ sub get_sequence{
 
   my $config = $self->context->model('ga4gh::ga4gh_utils')->read_sequence_config();
 
-
   foreach my $referenceSet (@{$config->{referenceSets}}){
+
     foreach my $seq (@{$referenceSet->{sequences}}){
-      return ($seq, $referenceSet->{id}) if $seq->{md5} eq $id;
+      $seq->{fastafile} = $config->{fasta_dir} ."/". $seq->{localFile} if defined $seq->{localFile};
+      $seq->{assembly}  = $referenceSet->{id};
+      $seq->{sourceURI} = $referenceSet->{sourceUri};
+      return $seq if $seq->{md5} eq $id;
     } 
   }
   return undef;
@@ -183,5 +197,93 @@ sub get_sequenceset{
   }
   return undef;
 }
+
+sub format_base_sequence{
+
+  my $self      = shift;
+  my $reference = shift;  
+
+  my $c = $self->context();
+
+  ## do paging..  ** PICK A SENSIBLE LIMIT
+  ## start and end are optional
+  my $nextPageToken;
+  my $current_end   = $c->request->param('end') 
+    if defined $c->request->param('end') && $c->request->param('end') =~/\d+/;
+
+
+  ## Choose a start from the input info
+  my $current_start;  
+  
+  if (defined $c->request->param('nextPageToken') && $c->request->param('nextPageToken') =~/\d+/){
+    $current_start = $c->request->param('nextPageToken');
+  }
+  elsif (defined $c->request->param('start') && $c->request->param('start') =~/\d+/){
+    $current_start = $c->request->param('start') +1; ## convert to zero based coordinates
+  }
+  else{
+    $current_start = 1;
+  }
+
+  if( !defined $c->request->param('end') || 
+      $c->request->param('end') !~/\d+/  ||
+      $c->request->param('end') - $current_start > 1000){
+     $nextPageToken             = $current_start + 1001;
+     $current_end               = $current_start + 1000;
+
+  }
+
+  my $region = $reference->{name} . ":" . $current_start . "-" . $current_end ;
+
+  my $sequence;
+  if( $reference->{sourceAccessions}->[0] =~ /GA4GH/){
+    ## compliance - read fasta file
+    $sequence = $self->fetch_ga4gh_sequence($reference, $region);
+  }
+  else{
+    ## take from slice
+    $sequence  = $self->fetch_ensembl_sequence($reference, $region);
+  }
+
+  return { offset        => $current_start -1,
+           sequence      => $sequence,
+           nextPageToken => $nextPageToken
+         };
+}
+
+sub fetch_ensembl_sequence{
+
+  my $self      = shift;
+  my $reference = shift;
+  my $region    = shift;
+
+  my $sla = $self->context()->model('Registry')->get_adaptor( $species, 'Core', 'Slice');
+
+  my $slice = $sla->fetch_by_toplevel_location($region);
+
+  $self->context()->go( 'ReturnError', 'custom', ["ERROR: no sequence available for region $region"])
+    unless defined $slice ;
+
+  return $slice->seq();
+}
+
+sub fetch_ga4gh_sequence{
+
+  my $self      = shift;
+  my $reference = shift;
+  my $region    = shift;
+
+  my ($seq, $current_start, $current_end)   = split/\:|\-/, $region;
+
+  my $db;
+  eval{ 
+    $db = Bio::DB::Fasta->new( $reference->{fastafile} );
+  };
+  $self->context()->go( 'ReturnError', 'custom', ["ERROR: finding sequence for region $region"])
+    if defined $@;
+
+  return $db->seq( $reference->{name} , $current_start, $current_end );
+
+} 
 
 1;

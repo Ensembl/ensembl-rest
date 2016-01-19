@@ -36,7 +36,8 @@ POST requests : /ga4gh/references/search -d { "referenceSetId": = "",
                                               "pageToken": "",
                                              }
 
-GET requests: /ga4gh/references/id
+GET /ga4gh/references/id
+GET /ga4gh/references/{id}/bases?start=100&end=200
 
 =cut
 
