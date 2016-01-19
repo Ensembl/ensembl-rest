@@ -25,8 +25,8 @@ use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::HDF5::EQTLAdaptor;
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
 
-#use feature qw(say);
-#use Data::Dumper;
+use feature qw(say);
+use Data::Dumper;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -58,7 +58,10 @@ sub fetch_eqtl {
   # fails in registry if species is wrong/not available in Ensembl
   my $eqtl_a = $self->{'registry'}->get_eqtl_adaptor($constraints->{species});
 
+  #say Dumper($eqtl_a);
+
   $self->_validate_tissue($eqtl_a, $constraints->{tissue});
+  $self->_validate_statistic($eqtl_a, $constraints->{statistic});
 
   my $results = $eqtl_a->fetch( {
         gene          => $constraints->{stable_id},
@@ -86,11 +89,32 @@ sub fetch_eqtl {
 sub _validate_tissue {
   my ($self, $eqtl_a, $tissue) = @_;
 
-  if(! exists $eqtl_a->{tissues}->{$tissue}) {
-    my $tissues = join(", ", map { $_ } sort keys %{$eqtl_a->{tissues}});
-    Catalyst::Exception->throw("Tissue '$tissue' not recognised. Available tissues: $tissues ");
+  if(! exists $eqtl_a->{tissue_ids}->{$tissue}) {
+    my $tissues = join(", ", map { $_ } sort keys %{$eqtl_a->{tissue_ids}});
+    Catalyst::Exception->throw("Tissue '$tissue' not recognised. Available tissues: $tissues");
   }
 }
 
+=head2 _validate_statistic
+
+  Arg [1]    : Bio::EnsEMBL::HDF5::EQTLAdaptor
+  Arg [2]    : $statistic name
+  Example    : $self->_validate_statistic($eqtl_a, $constraints->{statistic});
+  Description: Validates if statistic exists in Database.
+  Returntype : None
+  Exceptions : Throws if statistic is not present in Database
+  Caller     : general
+  Status     : Stable
+
+=cut
+
+sub _validate_statistic {
+  my ($self, $eqtl_a, $statistic) = @_;
+
+  if(! exists $eqtl_a->{statistic_ids}->{$statistic}) {
+    my $statistics = join(", ", map { $_ } sort keys %{$eqtl_a->{statistic_ids}});
+    Catalyst::Exception->throw("Tissue '$statistic' not recognised. Available statistics: $statistics");
+  }
+}
 
 1;
