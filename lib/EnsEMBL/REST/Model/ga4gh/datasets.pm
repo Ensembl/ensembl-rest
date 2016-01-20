@@ -68,12 +68,11 @@ sub fetch_datasets{
      push @datasets, $dataset;
      $count++;
   }
-
-  $self->context()->go( 'ReturnError', 'custom', [ " No datasets is available"])
+  
+  $self->context()->go( 'ReturnError', 'custom', [ " No datasets are available"])
      unless scalar(@datasets) >0 ;
 
   return { datasets => \@datasets, nextPageToken => $nextPageToken};
-
 
 }
 
@@ -85,8 +84,7 @@ sub getDataset{
 
   my $collections = $self->context->model('ga4gh::ga4gh_utils')->fetch_all_Datasets();
 
-  $self->context()->go( 'ReturnError', 'custom', [ " No dataset is available with this id"])
-     unless defined $collections->{$id};
+  return undef unless defined $collections->{$id};
 
   return {id => $id, description => $collections->{$id} }; 
 

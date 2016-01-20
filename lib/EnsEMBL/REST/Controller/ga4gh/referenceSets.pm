@@ -40,8 +40,9 @@ BEGIN {extends 'Catalyst::Controller::REST'; }
 
 
 sub searchReferenceSets_POST {
+
   my ( $self, $c ) = @_;
- 
+
   my $referenceSets;
 
   try {
@@ -62,6 +63,7 @@ sub searchReferenceSets: Chained('/') PathPart('ga4gh/referencesets/search') Act
 sub id: Chained('/') PathPart('ga4gh/referencesets') ActionClass('REST') {}
 
 sub id_GET {
+
   my ($self, $c, $id) = @_;
   my $referenceSet;
 
@@ -74,6 +76,10 @@ sub id_GET {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
+
+  ## Return 404 for get requests on unknown ids
+  $c->go( 'ReturnError', 'not_found', [qq{ referenceSet $id not found}]) unless defined $referenceSet;
+
   $self->status_ok($c, entity => $referenceSet);
 }
 

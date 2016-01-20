@@ -120,13 +120,7 @@ sub fetch_sets{
     $n++;
    
   }
-
-  ## check there is something to return
-  $self->context()->go( 'ReturnError', 'custom', [ " Failed to find any variantSets for this query"]) if $n ==0;
- 
-  my $ret = { variantSets => \@varsets};
-  $ret->{pageToken} = $newPageToken  if defined $newPageToken ;
- 
+  
   return (\@varsets, $newPageToken );
   
 }
@@ -188,14 +182,11 @@ sub getVariantSet{
 
   my ($self, $id ) = @_; 
 
-  my $c = $self->context();
-
-  my $data = {req_variantset => $id};
-
   ## extract required variant set 
-  my ($variantSets, $newPageToken ) = $self->fetch_sets($data);
+  my ($variantSets, $newPageToken ) = $self->fetch_sets( {req_variantset => $id} );
 
-  ## would exit earlier if no data
+  return undef unless scalar(@$variantSets) > 0;
+
   return $variantSets->[0];
 }
 

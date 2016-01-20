@@ -60,10 +60,11 @@ sub fetch_callSets {
 
   my ($callsets, $nextPageToken ) = $self->fetch_batch($data);
 
-  my $return_data = { callSets  => $callsets, 
-                      nextPageToken => $nextPageToken }; 
+  return undef unless defined $callsets;
 
-  return $return_data;
+  return ( { callSets  => $callsets, 
+             nextPageToken => $nextPageToken }); 
+
 }
 
 =head2 fetch_batch
@@ -88,8 +89,11 @@ sub fetch_batch{
   my $count_ind = 0; ## for batch size & paging
 
   my $vcf_collection = $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});
-  $self->context()->go( 'ReturnError', 'custom', [ " Failed to find the specified variantSetId ", $data->{variantSetId}])
-    unless defined $vcf_collection; 
+
+  ## non -documented behaviour in compliance suite
+  ## return 404 if searching within non-existant set.
+  ## also triggers GET 404
+  return undef unless defined $vcf_collection; 
 
   $vcf_collection->use_db(0);
 
@@ -157,10 +161,10 @@ sub get_callSet{
   ## extract required call set 
   my ($callSets, $newPageToken ) = $self->fetch_batch($data);
 
-  $self->context()->go( 'ReturnError', 'custom', [ " Failed to find a callSet with id: $id"])
-    unless defined $callSets && defined $callSets->[0];
-
+  return undef unless defined $callSets && scalar (@{$callSets}) > 0;
+ 
   return $callSets->[0];
+
 }
 
 sub sort_num{

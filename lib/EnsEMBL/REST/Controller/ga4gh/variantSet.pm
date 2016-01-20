@@ -44,13 +44,13 @@ application/json
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
 
-sub get_request_POST {
+sub searchVariantSets_POST {
   my ( $self, $c ) = @_;
-
 }
 
 
-sub get_request: Chained('/') PathPart('ga4gh/variantsets/search') ActionClass('REST')  {
+sub searchVariantSets: Chained('/') PathPart('ga4gh/variantsets/search') ActionClass('REST')  {
+
   my ( $self, $c ) = @_;
   my $post_data = $c->req->data;
 
@@ -80,7 +80,12 @@ sub get_request: Chained('/') PathPart('ga4gh/variantsets/search') ActionClass('
 sub id: Chained('/') PathPart('ga4gh/variantsets') ActionClass('REST') {}
 
 sub id_GET {
+
   my ($self, $c, $id) = @_;
+
+  $c->go( 'ReturnError', 'custom', [ ' Error - id required for GET request' ])
+    unless defined $id;
+
   my $variantSet;
   try {
     $variantSet = $c->model('ga4gh::variantSet')->getVariantSet($id);
@@ -88,6 +93,10 @@ sub id_GET {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
+
+  ## Return 404 for get requests on unknown ids
+  $c->go( 'ReturnError', 'not_found', [qq{ variantSet $id not found}]) unless defined $variantSet;
+ 
   $self->status_ok($c, entity => $variantSet);
 }
 

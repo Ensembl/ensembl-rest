@@ -39,12 +39,13 @@ returns id & description
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
 
-sub get_request_POST {
+sub searchDatasets_POST {
   my ( $self, $c ) = @_;
 
 }
 
-sub get_request: Chained('/') PathPart('ga4gh/datasets/search') ActionClass('REST')  {
+sub searchDatasets: Chained('/') PathPart('ga4gh/datasets/search') ActionClass('REST')  {
+
   my ( $self, $c ) = @_;
 
   my $post_data = $c->req->data;
@@ -70,7 +71,11 @@ sub get_request: Chained('/') PathPart('ga4gh/datasets/search') ActionClass('RES
 sub id: Chained('/') PathPart('ga4gh/datasets') ActionClass('REST') {}
 
 sub id_GET {
+
   my ($self, $c, $id) = @_;
+
+  $c->go( 'ReturnError', 'custom', [ ' Error - id required for GET request' ])
+    unless defined $id;
 
   my $dataset;
 
@@ -80,6 +85,10 @@ sub id_GET {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
+
+  ## Return 404 for get requests on unknown ids
+  $c->go( 'ReturnError', 'not_found', [qq{ dataset $id not found}]) unless defined $dataset;
+  
   $self->status_ok($c, entity => $dataset);
 }
 

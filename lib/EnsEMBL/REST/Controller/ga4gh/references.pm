@@ -47,11 +47,11 @@ BEGIN {extends 'Catalyst::Controller::REST'; }
 
 sub searchReferences_POST {
   my ( $self, $c ) = @_;
- 
-  my $references;
+
+   my $references;
 
   $c->go( 'ReturnError', 'custom', [ ' Cannot find "referenceSetId" key in your request' ] )
-    unless exists $c->req->data->{referenceSetId} ;
+    unless defined $c->req->data && exists $c->req->data->{referenceSetId} ;
 
   try {
     $references = $c->model('ga4gh::references')->fetch_references( $c->req->data );
@@ -82,6 +82,10 @@ sub id_GET {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
+
+  ## Return 404 for get requests on unknown ids
+  $c->go( 'ReturnError', 'not_found', [qq{ reference $id not found}]) unless defined $references;
+
   $self->status_ok($c, entity => $references);
 }
 

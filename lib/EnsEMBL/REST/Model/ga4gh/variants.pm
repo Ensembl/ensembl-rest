@@ -306,8 +306,8 @@ sub getVariant{
     eval { $varfeat = $vfa->fetch_by_hgvs_notation( $id ) };
   }
   
-  $c->go( 'ReturnError', 'custom', [ " No variants are available with this id"])
-     unless defined $varfeat;  
+  ## Send 404 for non-existant ids
+  return undef unless defined $varfeat;  
 
   ## return basic location info if available
 

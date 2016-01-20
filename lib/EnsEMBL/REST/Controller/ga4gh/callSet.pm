@@ -43,12 +43,12 @@ GET: ga4gh/callsets/:id
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
 
-sub get_request_POST {
+sub searchCallSets_POST {
   my ( $self, $c ) = @_;
 
 }
 
-sub get_request: Chained('/') PathPart('ga4gh/callsets/search') ActionClass('REST')  {
+sub searchCallSets: Chained('/') PathPart('ga4gh/callsets/search') ActionClass('REST')  {
 
   my ( $self, $c ) = @_;
   my $post_data = $c->req->data;
@@ -73,6 +73,9 @@ sub get_request: Chained('/') PathPart('ga4gh/callsets/search') ActionClass('RES
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
 
+  ## Return 404 for post requests on unknown VariantSet ids
+  $c->go( 'ReturnError', 'not_found', [qq( VariantSet $post_data->{variantSetId} not found )]) unless defined $callSet;
+
   $self->status_ok($c, entity => $callSet);
 }
 
@@ -82,6 +85,10 @@ sub id: Chained('/') PathPart('ga4gh/callsets') ActionClass('REST') {}
 sub id_GET {
 
   my ($self, $c, $id) = @_;
+
+  $c->go( 'ReturnError', 'custom', [ ' Error - id required for GET request' ])
+    unless defined $id;
+
   my $callSet;
 
   try {
@@ -90,6 +97,9 @@ sub id_GET {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
+
+  ## Return 404 for get requests on unknown ids
+  $c->go( 'ReturnError', 'not_found', [qq{ callSet $id not found}]) unless defined $callSet;
 
   $self->status_ok($c, entity => $callSet);
 }

@@ -53,8 +53,7 @@ sub getReference{
 
   my $reference = $self->get_sequence($get_id);
 
-  $self->context()->go( 'ReturnError', 'custom', ["ERROR: no data for $get_id"])
-    unless defined $reference &&  ref($reference) eq 'HASH' ; 
+  return undef unless defined $reference && ref($reference) eq 'HASH' ; 
 
   ## request for substring ** potentially fragile
   if ($self->context()->{request}->{arguments}->[1] eq 'bases'){
@@ -280,7 +279,7 @@ sub fetch_ga4gh_sequence{
     $db = Bio::DB::Fasta->new( $reference->{fastafile} );
   };
   $self->context()->go( 'ReturnError', 'custom', ["ERROR: finding sequence for region $region"])
-    if defined $@;
+    if $@ ne '';
 
   return $db->seq( $reference->{name} , $current_start, $current_end );
 

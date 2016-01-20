@@ -48,16 +48,13 @@ sub searchReferenceSet {
 sub getReferenceSet {
 
   my $self = shift;
-  my $id = shift;
+  my $id   = shift;
 
-  my $data = { id => $id};
-
-  my ($referenceSets, $nextPageToken) =  $self->fetchData( $data );
-
-  $self->context()->go( 'ReturnError', 'custom', ["ERROR: no data for ReferenceSet $id"])
-    unless defined $referenceSets &&  ref($referenceSets) eq 'ARRAY' ;
+  my ($referenceSets, $nextPageToken) =  $self->fetchData( { id => $id} );
  
-  return ($referenceSets->[0]);
+  return undef unless defined $referenceSets &&  scalar($referenceSets) >0 ;
+
+  return $referenceSets->[0];
 
 }
 
@@ -68,7 +65,6 @@ sub fetchData{
   my $self  = shift;
   my $data  = shift;
 
-  my $c = $self->context();
 
   ## read config
   my $config = $self->context->model('ga4gh::ga4gh_utils')->read_sequence_config();
