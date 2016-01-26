@@ -140,9 +140,19 @@ sub get_phenotype_info {
 
   my @phenotypes;
   my $phenotypes = $variation->get_all_PhenotypeFeatures;
+
+  my %seen = ();
+
   foreach my $phen (@$phenotypes) {
-    push (@phenotypes, $self->phen_as_hash($phen));
+    my $hash = $self->phen_as_hash($phen);
+    
+    # generate a key from the values to uniquify
+    my $key = join("", sort values %$hash);
+
+    push (@phenotypes, $hash) unless $seen{$key};
+    $seen{$key} = 1;
   }
+
   return \@phenotypes;
 }
 
