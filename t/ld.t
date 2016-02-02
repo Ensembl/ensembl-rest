@@ -41,13 +41,6 @@ $expected_output =
   {
     'variation1' => 'rs1333047',
     'population_name' => '1000GENOMES:phase_1_ASW',
-    'r2' => '1.000000',
-    'variation2' => 'rs4977575',
-    'd_prime' => '1.000000'
-  },
-  {
-    'variation1' => 'rs1333047',
-    'population_name' => '1000GENOMES:phase_1_ASW',
     'r2' => '0.050071',
     'variation2' => 'rs1333049',
     'd_prime' => '0.999871'
@@ -58,7 +51,14 @@ $expected_output =
     'r2' => '0.063754',
     'variation2' => 'rs72655407',
     'd_prime' => '0.999996'
-  }
+  },
+  {
+    'variation1' => 'rs1333047',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '1.000000',
+    'variation2' => 'rs4977575',
+    'd_prime' => '1.000000'
+  },
 ];
 
 $ld_get = '/ld/homo_sapiens/rs1333047';
