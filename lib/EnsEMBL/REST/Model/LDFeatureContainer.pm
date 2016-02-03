@@ -83,14 +83,19 @@ sub to_array {
   my $d_prime = $c->request->param('d_prime');
   my $r2 = $c->request->param('r2');
   my @LDFC_array = ();
-  foreach my $ld_hash (@{$LDFC->get_all_ld_values()}) {
+
+  # we pass 1 to get_all_ld_values() so that it doesn't lazy load
+  # VariationFeature objects - we only need the name here anyway
+  foreach my $ld_hash (@{$LDFC->get_all_ld_values(1)}) {
     my $hash = {};
     $hash->{d_prime} = $ld_hash->{d_prime};
     next if ($d_prime && $hash->{d_prime} < $d_prime);
     $hash->{r2} = $ld_hash->{r2};
     next if ($r2 && $hash->{r2} < $r2);
-    $hash->{variation1} = $ld_hash->{variation1}->variation_name; 
-    $hash->{variation2} = $ld_hash->{variation2}->variation_name; 
+
+    # fallback for tests as travis uses the release branch
+    $hash->{variation1} = $ld_hash->{variation_name1} || $ld_hash->{variation1}->variation_name; 
+    $hash->{variation2} = $ld_hash->{variation_name2} || $ld_hash->{variation2}->variation_name; 
     my $population_id = $ld_hash->{population_id};
     my $population = $pa->fetch_by_dbID($population_id);
     $hash->{population_name} = $population->name;
