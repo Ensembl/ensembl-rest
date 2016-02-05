@@ -14,8 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 %]
 
+[% INCLUDE documentation/banner.tt %]
 
 <h1 id="title">[% template_title %]</h1>
+
 <table class="table table-striped">
 [% FOREACH pair IN groups.pairs %]
 <thead>
