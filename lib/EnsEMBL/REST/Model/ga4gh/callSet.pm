@@ -97,9 +97,13 @@ sub fetch_batch{
 
   $vcf_collection->use_db(0);
 
-  ## loop over callSets
+  ## extract callSets
   my $samples = $vcf_collection->get_all_Samples(); ## returned sorted
 
+  ## return empty array if non available
+  return (\@callsets, $nextPageToken) unless defined $samples;
+  
+  ## loop over callSets
   for (my $n = $data->{pageToken}; $n < scalar(@{$samples}); $n++) {  
 
     ## stop if there are enough saved for the required batch size
