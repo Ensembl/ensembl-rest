@@ -17,6 +17,7 @@ package EnsEMBL::REST::Model::LDFeatureContainer;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
+use POSIX qw/floor/;
 use Scalar::Util qw/weaken looks_like_number/;
 use Catalyst::Exception qw(throw);
 extends 'Catalyst::Model';
@@ -43,7 +44,9 @@ sub fetch_LDFeatureContainer_variation_name {
   my $window_size = $c->request->param('window_size') || 1000; # default is 1MB
   Catalyst::Exception->throw("window_size needs to be a value bewteen 0 and 1000.") if (!looks_like_number($window_size));
   Catalyst::Exception->throw("window_size needs to be a value bewteen 0 and 1000.") if ($window_size > 1000);
-  my $max_snp_distance = ($window_size / 2) * 100;
+  Catalyst::Exception->throw("window_size needs to be a value bewteen 0 and 1000.") if ($window_size < 0);
+  $window_size = floor($window_size);
+  my $max_snp_distance = ($window_size / 2) * 1000;
   $ldfca->max_snp_distance($max_snp_distance);
 
   my $ld_config = $c->config->{'Model::LDFeatureContainer'};
