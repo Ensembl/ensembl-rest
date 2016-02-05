@@ -84,4 +84,16 @@ $ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_
 $json = json_GET($ld_get, 'GET LD data for variant, population and d_prime');
 eq_or_diff($json, $expected_output, "Example variant, population and d_prime");
 
+$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=500';
+$json = json_GET($ld_get, 'GET LD data for variant, population, d_prime and window_size');
+eq_or_diff($json, $expected_output, "Example variant, population, d_prime and window_size");
+
+$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=500kb';
+action_bad($ld_get, 'window_size needs to be a value bewteen 0 and 1000');
+
+$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=2000';
+action_bad($ld_get, 'window_size needs to be a value bewteen 0 and 1000');
+
+
+
 done_testing();
