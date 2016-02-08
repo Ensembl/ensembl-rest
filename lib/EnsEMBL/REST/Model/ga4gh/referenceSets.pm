@@ -91,8 +91,11 @@ sub fetchData{
     next if defined $data->{md5checksum} &&  $data->{md5checksum} ne ''
                                          &&  $data->{md5checksum} ne $refset_hash->{md5};
 
-    next if defined $data->{accession}   &&  $data->{accession}   ne ''
-                                         &&  $data->{accession}   ne $refset_hash->{sourceAccessions}->[0]; ##FIX for other accessions
+    my $filter_accession = 1 if defined $data->{accession}->[0]   &&  $data->{accession}   ne '';
+    foreach my $ac(@{$data->{accession}}){
+      undef $filter_accession if $ac eq $refset_hash->{sourceAccessions}->[0];
+    } 
+    next if defined $filter_accession ;
 
     next if defined $data->{assemblyId}  &&  $data->{assemblyId}  ne ''
                                          &&  $data->{assemblyId}  ne $refset_hash->{id};
