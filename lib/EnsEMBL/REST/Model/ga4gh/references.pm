@@ -56,7 +56,8 @@ sub getReference{
   return undef unless defined $reference && ref($reference) eq 'HASH' ; 
 
   ## request for substring ** potentially fragile
-  if ($self->context()->{request}->{arguments}->[1] eq 'bases'){
+  if ( defined $self->context()->{request}->{arguments}->[1] && 
+       $self->context()->{request}->{arguments}->[1] eq 'bases'){
     return $self->format_base_sequence($reference);
   }
   else{
