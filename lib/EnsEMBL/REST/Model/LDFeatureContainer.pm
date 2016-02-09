@@ -42,9 +42,9 @@ sub fetch_LDFeatureContainer_variation_name {
   my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
 
   my $window_size = $c->request->param('window_size') || 1000; # default is 1MB
-  Catalyst::Exception->throw("window_size needs to be a value bewteen 0 and 1000.") if (!looks_like_number($window_size));
-  Catalyst::Exception->throw("window_size needs to be a value bewteen 0 and 1000.") if ($window_size > 1000);
-  Catalyst::Exception->throw("window_size needs to be a value bewteen 0 and 1000.") if ($window_size < 0);
+  Catalyst::Exception->throw("window_size needs to be a value between 0 and 1000.") if (!looks_like_number($window_size));
+  Catalyst::Exception->throw("window_size needs to be a value between 0 and 1000.") if ($window_size > 1000);
+  Catalyst::Exception->throw("window_size needs to be a value between 0 and 1000.") if ($window_size < 0);
   $window_size = floor($window_size);
   my $max_snp_distance = ($window_size / 2) * 1000;
   $ldfca->max_snp_distance($max_snp_distance);
@@ -78,6 +78,40 @@ sub fetch_LDFeatureContainer_variation_name {
     return $self->to_array($ldfc)
   }
   my $ldfc = $ldfca->fetch_by_VariationFeature($vf);
+  return $self->to_array($ldfc);
+}
+
+sub fetch_LDFeatureContainer_slice {
+  my ($self, $slice) = @_;
+  Catalyst::Exception->throw("No region given. Please specify a region to retrieve from this service.") if ! $slice;
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
+
+  my $ld_config = $c->config->{'Model::LDFeatureContainer'};
+  if ($ld_config && $ld_config->{use_vcf}) {
+    $ldfca->db->use_vcf($ld_config->{use_vcf});
+    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $ld_config->{vcf_config};
+    $ENV{ENSEMBL_VARIATION_VCF_ROOT_DIR} = $ld_config->{dir} if (defined $ld_config->{dir});
+  }
+
+  my $population_name = $c->request->param('population_name');
+  if ($population_name) {
+    my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
+    my $population = $pa->fetch_by_name($population_name);
+    if (!$population) {
+      Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
+    }
+    my $ldfc;
+    try {
+      $ldfc = $ldfca->fetch_by_Slice($slice, $population);
+    } catch {
+      warn "caught error: $_";
+    };
+    return $self->to_array($ldfc)
+  }
+  my $ldfc = $ldfca->fetch_by_Slice($slice);
   return $self->to_array($ldfc);
 }
 
