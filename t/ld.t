@@ -29,7 +29,7 @@ use Bio::EnsEMBL::Test::MultiTestDB;
 use Data::Dumper;
 use Bio::EnsEMBL::Test::TestUtils;
 use Catalyst::Test();
-
+use JSON;
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
@@ -104,5 +104,55 @@ action_bad($ld_get, 'window_size needs to be a value bewteen 0 and 1000');
 
 $ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=-2000';
 action_bad($ld_get, 'window_size needs to be a value bewteen 0 and 1000');
+
+# tests for ld/:species/region endpoint
+
+$expected_output =
+[  
+  {  
+    'variation1' => 'rs79944118',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.087731',
+    'variation2' => 'rs1333049',
+    'd_prime' => '0.999965'
+  },
+  {  
+    'variation1' => 'rs1333048',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.684916',
+    'variation2' => 'rs1333049',
+    'd_prime' => '0.999999'
+  },
+  {  
+    'variation1' => 'rs79944118',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.060082',
+    'variation2' => 'rs1333048',
+    'd_prime' => '0.999914'
+  }
+];
+
+my $ld_region_get = '/ld/homo_sapiens/region/9:22125265..22125505?population_name=1000GENOMES:phase_1_ASW';
+$json = json_GET($ld_region_get, 'GET LD data for region and population');
+eq_or_diff($json, $expected_output, "Example region, population");
+
+$expected_output =
+[  
+  {  
+    'variation1' => 'rs1333048',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.684916',
+    'variation2' => 'rs1333049',
+    'd_prime' => '0.999999'
+  },
+];
+
+$ld_region_get = '/ld/homo_sapiens/region/9:22125265..22125505?population_name=1000GENOMES:phase_1_ASW;r2=0.5';
+$json = json_GET($ld_region_get, 'GET LD data for region and population, r2');
+eq_or_diff($json, $expected_output, "Example region, population, r2");
+
+$ld_region_get = '/ld/homo_sapiens/region/9:22125265..23125505?population_name=1000GENOMES:phase_1_ASW;r2=0.5';
+action_bad($ld_region_get, 'Specified region is too large');
+
 
 done_testing();
