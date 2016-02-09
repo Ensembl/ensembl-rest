@@ -73,7 +73,7 @@ sub fetch_LDFeatureContainer_variation_name {
     try {
       $ldfc = $ldfca->fetch_by_VariationFeature($vf, $population);
     } catch {
-      warn "caught error: $_";
+      Catalyst::Exception->throw("Something went wrong while fetching from LDFeatureContainerAdaptor");
     };
     return $self->to_array($ldfc)
   }
@@ -108,7 +108,7 @@ sub fetch_LDFeatureContainer_slice {
     try {
       $ldfc = $ldfca->fetch_by_Slice($slice, $population);
     } catch {
-      warn "caught error: $_";
+      Catalyst::Exception->throw("Something went wrong while fetching from LDFeatureContainerAdaptor");
     };
     return $self->to_array($ldfc)
   }
