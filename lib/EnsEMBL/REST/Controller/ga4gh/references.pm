@@ -70,14 +70,14 @@ sub searchReferences: Chained('/') PathPart('ga4gh/references/search') ActionCla
 sub id: Chained('/') PathPart('ga4gh/references') ActionClass('REST') {}
 
 sub id_GET {
-  my ($self, $c, $id) = @_;
+  my ($self, $c, $id, $bases) = @_;
   my $references;
 
   $c->go( 'ReturnError', 'custom', [ ' Error - id required for GET request' ])
     unless defined $id;
 
   try {
-    $references = $c->model('ga4gh::references')->getReference($id);
+    $references = $c->model('ga4gh::references')->getReference($id, $bases);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);

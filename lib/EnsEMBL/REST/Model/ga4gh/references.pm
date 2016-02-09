@@ -16,7 +16,10 @@ package EnsEMBL::REST::Model::ga4gh::references;
 use Moose;
 
 extends 'Catalyst::Model';
+use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
 use Data::Dumper;
+use Try::Tiny;
 with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro');
@@ -25,11 +28,10 @@ use Bio::DB::Fasta;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 
-our $species = 'homo_sapiens';
-
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -49,15 +51,14 @@ sub fetch_references {
 ### GET single reference by 'id'
 sub getReference{
 
-  my ($self, $get_id ) = @_;
+  my ($self, $get_id, $bases ) = @_;
 
   my $reference = $self->get_sequence($get_id);
 
   return undef unless defined $reference && ref($reference) eq 'HASH' ; 
 
-  ## request for substring ** potentially fragile
-  if ( defined $self->context()->{request}->{arguments}->[1] && 
-       $self->context()->{request}->{arguments}->[1] eq 'bases'){
+  ## request for substring 
+  if ( defined $bases){
     return $self->format_base_sequence($reference);
   }
   else{
@@ -98,7 +99,7 @@ sub extract_data{
     next if defined $post_data->{md5checksum} && $post_data->{md5checksum} ne '' 
                                               && $post_data->{md5checksum} ne $refseq->{md5};
 
-    next if defined $post_data->{accession}   && $post_data->{accession}   ne ''
+    next if defined $post_data->{accession}   && $post_data->{accession}   ne '' 
                                               && $post_data->{accession}   ne $refseq->{sourceAccessions}->[0]; 
 
     ## rough paging
@@ -157,7 +158,7 @@ sub get_ensembl_version{
 
   my $self  = shift;
 
-  my $core_ad     = $self->context->model('Registry')->get_DBAdaptor($species, 'core');
+  my $core_ad     = $self->context->model('Registry')->get_DBAdaptor($self->species(), 'core');
   my $core_meta   = $core_ad->get_MetaContainer();
 
   return $core_meta->schema_version();
@@ -171,6 +172,7 @@ sub get_sequence{
   my $id   = shift;
 
   my $config = $self->context->model('ga4gh::ga4gh_utils')->read_sequence_config();
+  return undef unless exists $config->{referenceSets};
 
   foreach my $referenceSet (@{$config->{referenceSets}}){
 
@@ -191,6 +193,7 @@ sub get_sequenceset{
   my $set  = shift;
 
   my $config = $self->context->model('ga4gh::ga4gh_utils')->read_sequence_config();
+  return undef unless exists $config->{referenceSets};
 
   foreach my $referenceSet (@{$config->{referenceSets}}){
     return $referenceSet if $referenceSet->{id} eq $set;
@@ -257,11 +260,10 @@ sub fetch_ensembl_sequence{
   my $reference = shift;
   my $region    = shift;
 
-  my $sla = $self->context()->model('Registry')->get_adaptor( $species, 'Core', 'Slice');
-
+  my $sla   = $self->context()->model('Registry')->get_adaptor( $self->species(), 'Core', 'Slice');
   my $slice = $sla->fetch_by_toplevel_location($region);
 
-  $self->context()->go( 'ReturnError', 'custom', ["ERROR: no sequence available for region $region"])
+  Catalyst::Exception->throw("ERROR: no sequence available for region $region")
     unless defined $slice ;
 
   return $slice->seq();
@@ -276,14 +278,19 @@ sub fetch_ga4gh_sequence{
   my ($seq, $current_start, $current_end)   = split/\:|\-/, $region;
 
   my $db;
-  eval{ 
+  try{ 
     $db = Bio::DB::Fasta->new( $reference->{fastafile} );
+  }
+  catch{
+    Catalyst::Exception->throw("ERROR: finding sequence for region $region in compliance data")
   };
-  $self->context()->go( 'ReturnError', 'custom', ["ERROR: finding sequence for region $region"])
-    if $@ ne '';
 
   return $db->seq( $reference->{name} , $current_start, $current_end );
 
 } 
+
+sub species{
+  return 'homo_sapiens';
+}
 
 1;

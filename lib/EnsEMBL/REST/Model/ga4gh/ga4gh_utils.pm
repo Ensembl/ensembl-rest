@@ -25,7 +25,10 @@ extends 'Catalyst::Model';
 
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
+use Bio::EnsEMBL::Utils::IO qw/work_with_file/;
+
 use Digest::MD5 qw(md5_hex);
+use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
 use Data::Dumper;
 has 'context' => (is => 'ro');
@@ -33,6 +36,7 @@ has 'context' => (is => 'ro');
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -41,11 +45,11 @@ sub fetch_VCFcollection_by_id{
 
   my $self         = shift;
   my $variantSetId = shift; ## may be null
+
   $ENV{ENSEMBL_VARIATION_VCF_ROOT_DIR} = $self->{geno_dir};
 
   ## read config
-  $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $self->{ga_config};
-  my $vca =  Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new();
+  my $vca =  Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new( -config => $self->{ga_config});
 
   my $vcf_coll = $vca->fetch_by_id($variantSetId);
 
@@ -59,8 +63,7 @@ sub fetch_all_VariationSets{
 
   $ENV{ENSEMBL_VARIATION_VCF_ROOT_DIR} = $self->{geno_dir};
 
-  $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $self->{ga_config};
-  my $vca =  Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new();
+  my $vca =  Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new( -config => $self->{ga_config});
 
   my $vcf_coll = $vca->fetch_all();
 
@@ -78,21 +81,18 @@ sub fetch_all_VariationSets{
 sub read_sequence_config{
 
   my $self = shift;
-
   open IN, $self->{ga_reference_config} ||
-    $self->context()->go( 'ReturnError', 'custom', ["ERROR: Could not read from config file $self->{ga_reference_config}"]);
+    Catalyst::Exception->throw(" ERROR: Could not read from config file $self->{ga_reference_config}");
+
   local $/ = undef;
   my $json_string = <IN>;
   close IN;
 
   my $config = JSON->new->decode($json_string) ||
-    $self->context()->go( 'ReturnError', 'custom', ["ERROR: Failed to parse config file $self->{ga_reference_config}"]);
+    Catalyst::Exception->throw(" ERROR: Failed to parse config file $self->{ga_reference_config}");
 
-  $self->context()->go( 'ReturnError', 'custom', [ " No data available " ] )
-    unless $config->{referenceSets} && scalar @{$config->{referenceSets}};
-
-  ## add fasta file location for compliance suite
-  $config->{fasta_dir} = $self->{fasta_dir};
+  ## add fasta file location for compliance test data
+  $config->{fasta_dir} = $self->{fasta_dir} if exists $config->{referenceSets};
 
   return $config;
 }
@@ -101,9 +101,8 @@ sub read_sequence_config{
 sub fetch_all_Datasets{
 
   my $self = shift;
-
-  $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $self->{ga_config};
-  my $vca = Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new();
+ 
+  my $vca = Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new( -config => $self->{ga_config} );
 
   my %collections;
   foreach my $collection(@{$vca->fetch_all} ) { 

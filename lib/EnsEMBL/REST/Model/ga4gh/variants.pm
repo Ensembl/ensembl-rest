@@ -21,6 +21,7 @@ package EnsEMBL::REST::Model::ga4gh::variants;
 use Moose;
 extends 'Catalyst::Model';
 use Scalar::Util qw/weaken/;
+use Catalyst::Exception;
 
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
@@ -56,7 +57,7 @@ sub fetch_gavariant {
 
   ## get the VCF collection object for the required set
   $data->{vcf_collection} =  $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});
-  $self->context()->go( 'ReturnError', 'custom', [ " Failed to find the specified variantSetId"])
+  Catalyst::Exception->throw( " Failed to find the specified variantSetId")
     unless defined $data->{vcf_collection}; 
 
   ## format sample names if filtering by sample required
@@ -358,7 +359,7 @@ sub getSingleCallSets{
 
   ## load VCFcollections object for variantSet 
   $data->{vcf_collection} = $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});
-  $self->context()->go( 'ReturnError', 'custom', [ " Failed to find the specified variantSetId"])
+  Catalyst::Exception->throw( " Failed to find the specified variantSetId")
     unless defined $data->{vcf_collection}; 
 
   ## create fake token -what should really be returned for get??
@@ -368,7 +369,7 @@ sub getSingleCallSets{
   my ($var_info, $next_ds) = $self->get_next_by_token($data);
 
   ## exit if none found
-  $self->context()->go( 'ReturnError', 'custom', [ " No variants are available for this region" ] )
+  Catalyst::Exception->throw(" No variants are available for this region"  )
      unless defined $var_info ;
 
   return $var_info;

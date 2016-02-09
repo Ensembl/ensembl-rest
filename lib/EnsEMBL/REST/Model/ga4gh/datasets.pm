@@ -26,6 +26,9 @@ use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 use Digest::MD5 qw(md5_hex);
+use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
+
 with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro');
@@ -33,6 +36,7 @@ use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -68,8 +72,7 @@ sub fetch_datasets{
      push @datasets, $dataset;
      $count++;
   }
-  
-  $self->context()->go( 'ReturnError', 'custom', [ " No datasets are available"])
+  Catalyst::Exception->throw(" No datasets are available")
      unless scalar(@datasets) >0 ;
 
   return { datasets => \@datasets, nextPageToken => $nextPageToken};
