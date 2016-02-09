@@ -12,10 +12,13 @@ limitations under the License.
 =cut
 
 package EnsEMBL::REST::Model::ga4gh::referenceSets;
-our @ISA =('EnsEMBL::REST::Model::ga4gh');
+
 
 use Moose;
 extends 'Catalyst::Model';
+use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
+use Try::Tiny;
 use Data::Dumper;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
@@ -27,6 +30,7 @@ use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -67,13 +71,20 @@ sub fetchData{
 
 
   ## read config
-  my $config = $self->context->model('ga4gh::ga4gh_utils')->read_sequence_config();
-  my $referenceSets =  $config->{referenceSets};
+  my $config;
+  try {
+    $config = $self->context->model('ga4gh::ga4gh_utils')->read_sequence_config();
+  }
+  catch{
+    Catalyst::Exception->throw(" Problem reading ga_references config " );
+  };
+
   my $nextPageToken;
 
   ## return empty array if no sets available by this id (behaviour not fully specified)
-  return ( [], $nextPageToken) unless defined $referenceSets &&  ref($referenceSets) eq 'ARRAY' ;
+  return ( [], $nextPageToken) unless defined $config ;
 
+  my $referenceSets =  $config->{referenceSets};
 
   my @referenceSets;
 
