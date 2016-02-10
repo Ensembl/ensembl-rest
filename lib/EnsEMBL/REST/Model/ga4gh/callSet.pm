@@ -165,7 +165,7 @@ sub get_callSet{
   ## extract required call set 
   my ($callSets, $newPageToken ) = $self->fetch_batch($data);
 
-  return undef unless defined $callSets && scalar (@{$callSets}) > 0;
+  return undef unless defined $callSets;
  
   return $callSets->[0];
 

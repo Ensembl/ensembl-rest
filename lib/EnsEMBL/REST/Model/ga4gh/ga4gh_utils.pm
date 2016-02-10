@@ -25,7 +25,7 @@ extends 'Catalyst::Model';
 
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
-use Bio::EnsEMBL::Utils::IO qw/work_with_file/;
+use Bio::EnsEMBL::Utils::IO qw/gz_slurp/;
 
 use Digest::MD5 qw(md5_hex);
 use Scalar::Util qw/weaken/;
@@ -81,12 +81,8 @@ sub fetch_all_VariationSets{
 sub read_sequence_config{
 
   my $self = shift;
-  open IN, $self->{ga_reference_config} ||
-    Catalyst::Exception->throw(" ERROR: Could not read from config file $self->{ga_reference_config}");
 
-  local $/ = undef;
-  my $json_string = <IN>;
-  close IN;
+  my $json_string = gz_slurp($self->{ga_reference_config});
 
   my $config = JSON->new->decode($json_string) ||
     Catalyst::Exception->throw(" ERROR: Failed to parse config file $self->{ga_reference_config}");
