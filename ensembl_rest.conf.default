@@ -89,6 +89,7 @@ jsonp=1
     gene_stable_id=ENSG00000157764
     gene_stable_id_2=ENSG00000248378
     transcript_stable_id=ENST00000288602
+    transcript_stable_id_2=ENST00000513398
     exon_stable_id=ENSE00001154485
     translation_stable_id=ENSP00000288602
 
