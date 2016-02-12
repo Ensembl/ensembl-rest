@@ -46,5 +46,20 @@ sub id_GET {
   $self->status_ok($c, entity => $LDFeatureContainer);
 }
 
+sub region: Chained('species') PathPart('region') ActionClass('REST') {}
+
+sub region_GET {
+  my ($self, $c, $region) = @_;
+  my $LDFeatureContainer;
+  my $slice = $c->model('Lookup')->find_slice($region);
+  try {
+    $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_slice($slice);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $LDFeatureContainer);
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
