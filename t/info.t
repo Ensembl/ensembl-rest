@@ -113,13 +113,15 @@ is_json_GET(
   cmp_ok(scalar(@{$external_dbs_json}), '==', 510, 'Ensuring we have the right number of external_dbs available');
   my $expected = [{ name => 'GO', description => undef, release => undef, display_name => 'GO' }];
   is_json_GET('/info/external_dbs/homo_sapiens?filter=GO', $expected, 'Checking GO filtering works');
+  my $xref_external_dbs_json = json_GET('info/external_dbs/homo_sapiens?feature=xref', 'Get the xref external dbs hash');
+  is(scalar(@{$xref_external_dbs_json}), 38, 'Ensuring we have the right number of xref external_dbs available');
 
   action_bad_regex('/info/external_dbs/wibble', qr/Could not fetch adaptor for species .+/, 'Bogus species means error message');
 }
 
 # /info/biotypes/:species
 {
-  my $biotypes_json = json_GET('/info/biotypes/homo_sapiens', 'Get the external dbs hash');
+  my $biotypes_json = json_GET('/info/biotypes/homo_sapiens', 'Get the biotypes hash');
   is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
   cmp_ok(scalar(@{$biotypes_json}), '==', 11, 'Ensuring we have the right number of biotypes');
   my ($protein_coding) = grep { $_->{biotype} eq 'protein_coding' } @{$biotypes_json};
