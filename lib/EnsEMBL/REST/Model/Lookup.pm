@@ -309,7 +309,7 @@ sub find_and_locate_object {
       $type = 'Exon';
       if ($c->request->param('utr')) { $features->{UTR} = $self->UTR($id, $species, $db_type) ; }
     } else {
-      Catalyst::Exception->throw("Include option only available for Genes and Transcripts");
+      Catalyst::Exception->throw("Expand option only available for Genes and Transcripts");
     }
     $features->{$type} = $self->$type($features->{id}, $species, $db_type);
   }
