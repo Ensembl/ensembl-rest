@@ -116,11 +116,67 @@ sub fetch_LDFeatureContainer_slice {
   return $self->to_array($ldfc);
 }
 
+sub fetch_LDFeatureContainer_pairwise {
+  my ($self, $variation_name1, $variation_name2) = @_;
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
+  my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
+  my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
+
+  my $ld_config = $c->config->{'Model::LDFeatureContainer'};
+  if ($ld_config && $ld_config->{use_vcf}) {
+    $ldfca->db->use_vcf($ld_config->{use_vcf});
+    $ldfca->db->vcf_config_file($ld_config->{vcf_config});
+    $ldfca->db->vcf_root_dir($ld_config->{dir}) if (defined $ld_config->{dir});
+  }
+
+  my @vfs = ();
+  foreach my $variation_name ($variation_name1, $variation_name2) {
+    my $variation = $va->fetch_by_name($variation_name);
+    Catalyst::Exception->throw("Could not fetch variation object for id: $variation_name.") if ! $variation;
+    my $vfs = $variation->get_all_VariationFeatures();
+    Catalyst::Exception->throw("Variant maps more than once to the genome.") if (scalar @$vfs > 1);
+    Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @$vfs == 0);
+    push @vfs, $vfs->[0];
+  }
+
+  my $population_name = $c->request->param('population_name');
+  if ($population_name) {
+    my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
+    my $population = $pa->fetch_by_name($population_name);
+    if (!$population) {
+      Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
+    }
+    my $ldfc;
+    try {
+      $ldfc = $ldfca->fetch_by_VariationFeatures(\@vfs, $population);
+    } catch {
+      Catalyst::Exception->throw("Something went wrong while fetching from LDFeatureContainerAdaptor");
+    };
+    return $self->to_array($ldfc)
+  }
+  # compute LD for all LD populations
+  my $ld_populations = $pa->fetch_all_LD_Populations;
+  my @ldfcs = ();
+  foreach my $population (@$ld_populations) {
+    my $ldfc = $ldfca->fetch_by_VariationFeatures(\@vfs, $population);
+    my $array = $self->to_array($ldfc);
+    push @ldfcs, @$array;
+  }
+  return \@ldfcs;
+}
+
 sub to_array {
-  my ($self, $LDFC) = @_;
+  my ($self, $LDFC, $population) = @_;
   my $c = $self->context();
   my $species = $c->stash->{species};
   my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
+  my $population_id2name = {};
+  if ($population) {
+    $population_id2name->{$population->dbID} = $population->name;
+  }
   my $d_prime = $c->request->param('d_prime');
   my $r2 = $c->request->param('r2');
   my @LDFC_array = ();
@@ -138,8 +194,12 @@ sub to_array {
     $hash->{variation1} = $ld_hash->{variation_name1} || $ld_hash->{variation1}->variation_name; 
     $hash->{variation2} = $ld_hash->{variation_name2} || $ld_hash->{variation2}->variation_name; 
     my $population_id = $ld_hash->{population_id};
-    my $population = $pa->fetch_by_dbID($population_id);
-    $hash->{population_name} = $population->name;
+    my $population_name = $population_id2name->{$population_id};
+    if (!$population_name) {
+      my $population = $pa->fetch_by_dbID($population_id);
+      $population_name = $population->name;
+    }
+    $hash->{population_name} = $population_name;
     push @LDFC_array, $hash;
   }
   return \@LDFC_array;
