@@ -154,5 +154,30 @@ eq_or_diff($json, $expected_output, "Example region, population, r2");
 $ld_region_get = '/ld/homo_sapiens/region/9:22125265..23125505?population_name=1000GENOMES:phase_1_ASW;r2=0.5';
 action_bad($ld_region_get, 'Specified region is too large');
 
+# tests for ld/:species/pairwise
+
+$expected_output = 
+[
+  {
+    'variation1' => 'rs1333047',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '1.000000',
+    'variation2' => 'rs4977575',
+    'd_prime' => '1.000000'
+  }
+];
+my $ld_pairwise_get = '/ld/homo_sapiens/pairwise/rs1333047/rs4977575?population_name=1000GENOMES:phase_1_ASW';
+$json = json_GET($ld_pairwise_get, 'GET pairwise LD data for a population');
+eq_or_diff($json, $expected_output, "Example pairwise LD id1, id2, population");
+
+$ld_pairwise_get = '/ld/homo_sapiens/pairwise/rs1333047?population_name=1000GENOMES:phase_1_ASW';
+action_bad($ld_pairwise_get, 'Two variant names are required for this endpoint.');
+
+$ld_pairwise_get = '/ld/homo_sapiens/pairwise/rs1333047/rs4977575';
+$json = json_GET($ld_pairwise_get, 'GET pairwise LD data for all LD populations');
+eq_or_diff($json, $expected_output, "Example pairwise LD id1, id2");
+
+$ld_pairwise_get = '/ld/homo_sapiens/pairwise/rs1333047/rs1234567?population_name=1000GENOMES:phase_1_ASW';
+action_bad($ld_pairwise_get, 'Could not fetch variation object for id');
 
 done_testing();
