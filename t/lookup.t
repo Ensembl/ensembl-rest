@@ -85,6 +85,54 @@ is_json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1;format=condensed", $ex
 json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1", "Extended response works");
 
 action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');
+
+# Test with a transcript
+
+$basic_id = 'ENST00000314040';
+$condensed_response = {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => $basic_id};
+
+is_json_GET("/lookup/id/$basic_id?format=condensed", $condensed_response, 'Get of a known ID will return a value');
+is_json_GET("/lookup/$basic_id?format=condensed", $condensed_response, 'Get of a known ID to the old URL will return a value');
+
+$full_response = {
+  %{$condensed_response},
+  Parent => 'ENSG00000176515', start => 1080164, end => 1105181, strand => 1, version => 1, seq_region_name => '6', assembly_name => 'GRCh37',
+  biotype => 'protein_coding', display_name => 'AL033381.1-201', logic_name => 'ensembl', source => 'ensembl',
+  is_canonical => 1,
+};
+is_json_GET("/lookup/$basic_id", $full_response, 'Full response contains all Transcript information');
+
+$expanded_response = {
+  %{$condensed_response},
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
+        Exon =>
+                [
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861'},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874'},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
+                ]
+                };
+is_json_GET("/lookup/id/$basic_id?expand=1;format=condensed", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
+
+$utr_response = {
+  %{$condensed_response},
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
+         UTR => [
+                {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'},
+                {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'},
+                {object_type => 'three_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'}
+                ],
+        Exon =>
+                [
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861'},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874'},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
+                ]
+                };
+
+is_json_GET("/lookup/id/$basic_id?expand=1;utr=1;format=condensed", $utr_response, 'Get of a known ID with utr option will return UTRs as well');
+
+
 # Test POST endpoints
 
 
