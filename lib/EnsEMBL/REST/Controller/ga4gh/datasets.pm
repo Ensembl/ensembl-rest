@@ -16,7 +16,7 @@ limitations under the License.
 
 =cut
 
-package EnsEMBL::REST::Controller::ga4gh::variantSet;
+package EnsEMBL::REST::Controller::ga4gh::datasets;
 
 use Moose;
 use namespace::autoclean;
@@ -28,56 +28,47 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
 =pod
 
-POST requests : /variantsets/search -d
+POST /datasets/search -d { "pageSize": 2, "pageToken":3}
 
-{ "dataSetIds": [1],
-  "pageToken":  null,
-  "pageSize": 10
-}
+GET requests : /dataset/id
 
-GET requests : /variantsets/:id
-
-application/json
+returns id & description
 
 =cut
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
 
-sub searchVariantSets_POST {
+sub searchDatasets_POST {
   my ( $self, $c ) = @_;
+
 }
 
-
-sub searchVariantSets: Chained('/') PathPart('ga4gh/variantsets/search') ActionClass('REST')  {
+sub searchDatasets: Chained('/') PathPart('ga4gh/datasets/search') ActionClass('REST')  {
 
   my ( $self, $c ) = @_;
+
   my $post_data = $c->req->data;
 
-  #$c->log->debug(Dumper $post_data);
+  ## set a maximum page size - not likely to be neccessary
+  $post_data->{pageSize} =  100 if !defined $post_data->{pageSize} || $post_data->{pageSize} > 100; 
 
-  $c->go( 'ReturnError', 'custom', [ ' Cannot find "datasetId" key in your request'])
-    unless exists $post_data->{datasetId};
-
-  ## set a default page size if not supplied or not a number
-  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&  
-                                      $post_data->{pageSize} =~ /\d+/ &&
-                                      $post_data->{pageSize} >0  );
-
-  my $variantSets;
+  my $dataset;
 
   try {
-    $variantSets = $c->model('ga4gh::variantSet')->fetch_variantSets($post_data);
+    $dataset = $c->model('ga4gh::datasets')->fetch_datasets($post_data);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
 
-  $self->status_ok($c, entity => $variantSets);
+  $self->status_ok($c, entity => $dataset);
+
 }
 
 
 
-sub id: Chained('/') PathPart('ga4gh/variantsets') ActionClass('REST') {}
+
+sub id: Chained('/') PathPart('ga4gh/datasets') ActionClass('REST') {}
 
 sub id_GET {
 
@@ -86,21 +77,20 @@ sub id_GET {
   $c->go( 'ReturnError', 'custom', [ ' Error - id required for GET request' ])
     unless defined $id;
 
-  my $variantSet;
+  my $dataset;
+
   try {
-    $variantSet = $c->model('ga4gh::variantSet')->getVariantSet($id);
+    $dataset = $c->model('ga4gh::datasets')->getDataset($id);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 
   ## Return 404 for get requests on unknown ids
-  $c->go( 'ReturnError', 'not_found', [qq{ variantSet $id not found}]) unless defined $variantSet;
- 
-  $self->status_ok($c, entity => $variantSet);
+  $c->go( 'ReturnError', 'not_found', [qq{ dataset $id not found}]) unless defined $dataset;
+  
+  $self->status_ok($c, entity => $dataset);
 }
-
-
 
 __PACKAGE__->meta->make_immutable;
 

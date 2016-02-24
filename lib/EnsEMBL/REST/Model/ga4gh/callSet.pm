@@ -21,8 +21,11 @@ package EnsEMBL::REST::Model::ga4gh::callSet;
 use Moose;
 extends 'Catalyst::Model';
 use Data::Dumper;
+
 use Scalar::Util qw/weaken/;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
+use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
+
 
 with 'Catalyst::Component::InstancePerContext';
 
@@ -36,96 +39,139 @@ sub build_per_context_instance {
   return $self->new({ context => $c, %$self, @args });
 }
 
-sub fetch_ga_callSet {
+
+=head2 fetch_callSets
+
+  POST request entry point
+
+  ga4gh/callsets/search -d 
+
+{ "variantSetId": 1,
+ "name": '' ,
+ "pageToken":  null,
+ "pageSize": 10
+}
+
+=cut
+
+sub fetch_callSets {
 
   my ($self, $data ) = @_;
 
-#  print Dumper $data;
+  my ($callsets, $nextPageToken ) = $self->fetch_batch($data);
 
-  ## format set ids if filtering by set required
-  if(defined $data->{variantSetIds}->[0]){
+  return undef unless defined $callsets;
 
-    my %req_variantset;
-    foreach my $set ( @{$data->{variantSetIds}} ){
-      $req_variantset{$set} = 1; 
-    }
-    $data->{req_variantsets} = \%req_variantset;
-  } 
-
-  ## extract required sets
-  return $self->fetch_callSets($data);
+  return ( { callSets  => $callsets, 
+             nextPageToken => $nextPageToken }); 
 
 }
 
+=head2 fetch_batch
 
-sub fetch_callSets{
+Read config, apply filtering and format records
+Handle paging and return nextPageToken if required
+
+=cut
+
+## switched sample list look-up to VCF file rather than config - will be slower
+
+sub fetch_batch{
 
   my $self = shift;
   my $data = shift;
 
-  ## ind_id to start taken from page token - start from 0 if none supplied [!!put ids back]
+  ## the position in the callset array to start from is either the pageToken or 0 if none supplied 
   $data->{pageToken} = 0  if (! defined $data->{pageToken} || $data->{pageToken} eq "");
-  my $next_ind_id   =  $data->{pageToken} ;
 
   my @callsets;
-  my $n = 1;
-  my $newPageToken; ## save id of next individual to start with
+  my $nextPageToken; ## save position of next callset to start with
+  my $count_ind = 0; ## for batch size & paging
 
+  my $vcf_collection = $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});
 
-  $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $self->{ga_config};
-  my $vca = Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new();
+  ## non -documented behaviour in compliance suite
+  ## return 404 if searching within non-existant set.
+  ## also triggers GET 404
+  return undef unless defined $vcf_collection; 
 
-  my $count_ind = 0;## for paging [!!put ids back]
-  foreach my $dataSet ( @{$vca->fetch_all} ){
+  $vcf_collection->use_db(0);
 
-    ## loop over variantSets
-    foreach my $varSetId( sort(keys %{$dataSet->{sets}}) ){
-      ## limit by data set if required
-      next if defined  $data->{req_variantsets} &&  ! defined $data->{req_variantsets}->{$varSetId}; 
-    }
+  ## extract callSets
+  my $samples = $vcf_collection->get_all_Samples(); ## returned sorted
 
-    ## loop over callSets
-    $dataSet->{sample_populations} = $dataSet->{_raw_populations};
-    foreach my $callset_id( sort( keys %{$dataSet->{sample_populations}} ) ){
+  ## return empty array if non available
+  return (\@callsets, $nextPageToken) unless defined $samples;
+  
+  ## loop over callSets
+  for (my $n = $data->{pageToken}; $n < scalar(@{$samples}); $n++) {  
 
-      next if defined $data->{name} && $callset_id !~ /$data->{name}/; 
-     
-      last if defined  $newPageToken ;
+    ## stop if there are enough saved for the required batch size
+    last if defined  $nextPageToken ;
+
+    my $sample_name = $samples->[$n]->name();
+    my $sample_id   = $data->{variantSetId} . ":" . $sample_name;
+
+    ## filter by name if required
+    next if defined $data->{name} && $sample_name !~ /$data->{name}/; 
+
+    ## filter by id from GET request
+    next if defined $data->{req_callset} && $sample_id !~ /$data->{req_callset}/;
  
-      ## limit by variant set if required
-      next if defined $data->{req_variantsets} && ! defined $data->{req_variantsets}->{ $dataSet->{sample_populations}->{$callset_id}->[0] } ;
- 
-      ## paging
-      $count_ind++;
-      ## skip ind already reported
-      next if $count_ind <$next_ind_id;
-      $newPageToken = $count_ind + 1  if (defined  $data->{pageSize}  &&  $data->{pageSize} =~/\w+/ && $n == $data->{pageSize});
 
-      
-      ## save info
-      my $callset;
-      $callset->{sampleId}       = $callset_id;
-      $callset->{id}             = $callset_id;
-      $callset->{name}           = $callset_id;
-      $callset->{variantSetIds}  = [$dataSet->{sample_populations}->{$callset_id}->[0]]; 
-      $callset->{info}           = {"assembly_version" => [ $dataSet->assembly]};
-      $callset->{created}        = $dataSet->created();
-      $callset->{updated}        = $dataSet->updated();
+    ## if requested batch size reached set new page token
+    $count_ind++;
+    $nextPageToken = $n + 1  if (defined  $data->{pageSize} &&  
+                                 $data->{pageSize} =~/\w+/ && 
+                                 $count_ind == $data->{pageSize} &&
+                                 $n +1 < scalar(@{$samples}) ); ## is there anything left?
 
-      push @callsets, $callset;
-      $n++;
+    ## save info
+    my $callset;
+    $callset->{sampleId}       = $sample_name;
+    $callset->{id}             = $sample_id;
+    $callset->{name}           = $sample_name;
+    $callset->{variantSetIds}  = [$vcf_collection->id()]; 
+    $callset->{info}           = {"assembly_version" => [ $vcf_collection->assembly() ],
+                                  "variantSetName"   => [ $vcf_collection->source_name()] };
+    $callset->{created}        = $vcf_collection->created();
+    $callset->{updated}        = $vcf_collection->updated();
+    push @callsets, $callset;
 
-    }
   }
 
- 
-  my $return_data = { "callSets"  => \@callsets};
-  $return_data->{"pageToken"} = $newPageToken if defined $newPageToken ;
-
-  return $return_data; 
-  
+  return (\@callsets, $nextPageToken);
 }
 
 
+=head2 getCallSet
 
+  GET entry point - get a CallSet by ID.
+  ga4gh/callset/{id}
+
+=cut
+
+sub get_callSet{
+
+  my ($self, $id ) = @_; 
+
+  my $c = $self->context();
+
+  my ( $variantSetId, $callSetName) = split /\:/, $id;
+  my $data = { req_callset => $callSetName,
+               variantSetId => $variantSetId
+             };
+
+  ## extract required call set 
+  my ($callSets, $newPageToken ) = $self->fetch_batch($data);
+
+  return undef unless defined $callSets;
+ 
+  return $callSets->[0];
+
+}
+
+sub sort_num{
+  $a<=>$b;
+}
 1;
