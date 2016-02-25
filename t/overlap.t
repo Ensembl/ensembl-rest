@@ -273,7 +273,7 @@ my $base = '/overlap/region/homo_sapiens';
     strand => 0,
     feature_type => 'regulatory',
     ID => 'ENSR00001208657',
-    activity_evidence => 1,
+    activity => 1,
     description => "Predicted promoter flanking region",
     cell_type => "MultiCell",
   }], 'Getting regulatory_feature as JSON');
