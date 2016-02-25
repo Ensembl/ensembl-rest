@@ -40,3 +40,7 @@
 47	\N	patch	patch_81_82_c.sql|species_set_size
 49	\N	patch	patch_82_83_a.sql|schema_version
 51	\N	patch	patch_83_84_a.sql|schema_version
+52	\N	patch	patch_83_84_b.sql|gene_tree_attributes_table
+53	\N	patch	patch_83_84_c.sql|change_description_size
+54	\N	patch	patch_83_84_d.sql|insert_orth_quality_homology_table
+55	\N	patch	patch_83_84_e.sql|gene_tree_object_store

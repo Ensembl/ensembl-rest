@@ -236,7 +236,7 @@ CREATE TABLE `exon` (
   `is_current` tinyint(1) NOT NULL DEFAULT '1',
   `is_constitutive` tinyint(1) NOT NULL DEFAULT '0',
   `stable_id` varchar(128) DEFAULT NULL,
-  `version` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `version` smallint(5) unsigned DEFAULT NULL,
   `created_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`exon_id`),
@@ -290,7 +290,7 @@ CREATE TABLE `gene` (
   `is_current` tinyint(1) NOT NULL DEFAULT '1',
   `canonical_transcript_id` int(10) unsigned NOT NULL,
   `stable_id` varchar(128) DEFAULT NULL,
-  `version` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `version` smallint(5) unsigned DEFAULT NULL,
   `created_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`gene_id`),
@@ -468,7 +468,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=823 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=825 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -545,7 +545,7 @@ CREATE TABLE `operon` (
   `display_label` varchar(255) DEFAULT NULL,
   `analysis_id` smallint(5) unsigned NOT NULL,
   `stable_id` varchar(128) DEFAULT NULL,
-  `version` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `version` smallint(5) unsigned DEFAULT NULL,
   `created_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`operon_id`),
@@ -564,7 +564,7 @@ CREATE TABLE `operon_transcript` (
   `display_label` varchar(255) DEFAULT NULL,
   `analysis_id` smallint(5) unsigned NOT NULL,
   `stable_id` varchar(128) DEFAULT NULL,
-  `version` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `version` smallint(5) unsigned DEFAULT NULL,
   `created_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`operon_transcript_id`),
@@ -721,7 +721,7 @@ CREATE TABLE `seq_region_mapping` (
 CREATE TABLE `seq_region_synonym` (
   `seq_region_synonym_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `seq_region_id` int(10) unsigned NOT NULL,
-  `synonym` varchar(50) NOT NULL,
+  `synonym` varchar(250) NOT NULL,
   `external_db_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`seq_region_synonym_id`),
   UNIQUE KEY `syn_idx` (`synonym`,`seq_region_id`),
@@ -780,7 +780,7 @@ CREATE TABLE `transcript` (
   `is_current` tinyint(1) NOT NULL DEFAULT '1',
   `canonical_translation_id` int(10) unsigned DEFAULT NULL,
   `stable_id` varchar(128) DEFAULT NULL,
-  `version` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `version` smallint(5) unsigned DEFAULT NULL,
   `created_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`transcript_id`),
@@ -827,7 +827,7 @@ CREATE TABLE `translation` (
   `seq_end` int(10) NOT NULL,
   `end_exon_id` int(10) unsigned NOT NULL,
   `stable_id` varchar(128) DEFAULT NULL,
-  `version` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `version` smallint(5) unsigned DEFAULT NULL,
   `created_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `modified_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`translation_id`),
