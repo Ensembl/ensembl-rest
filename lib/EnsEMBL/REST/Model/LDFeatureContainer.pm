@@ -144,7 +144,6 @@ sub fetch_LDFeatureContainer_pairwise {
 
   my $population_name = $c->request->param('population_name');
   if ($population_name) {
-    my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
     my $population = $pa->fetch_by_name($population_name);
     if (!$population) {
       Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
