@@ -21,7 +21,7 @@ use Moose;
 use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
 use Data::Dumper;
-use Faidx;
+use Bio::DB::HTS::Faidx;
 use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line validate_vf read_cache_info @REG_FEAT_TYPES);
 use Bio::EnsEMBL::Slice;
 use Bio::EnsEMBL::Utils::Sequence qw(reverse_comp);
@@ -39,7 +39,7 @@ BEGIN {
 }
 
 has 'fasta_db' => (
-  isa => 'Faidx',
+  isa => 'Bio::DB::HTS::Faidx',
   is => 'ro',
   lazy => 1,
   builder => '_find_fasta_cache',
@@ -161,7 +161,7 @@ sub _give_POST_to_VEP {
     # Overwrite Slice->seq method to use a local disk cache when using Human
     my $consequences;
     if ($c->stash->{species} eq 'homo_sapiens' && defined($config->{fasta})) {
-      $c->log->debug('Farming human out to Faidx');
+      $c->log->debug('Farming human out to Bio::DB::HTS::Faidx');
       no warnings 'redefine';
       local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
       $consequences = $self->get_consequences($c, $config, \@vfs);
@@ -414,7 +414,7 @@ sub _build_vf {
 sub _find_fasta_cache {
   my $self = shift;
   
-  my $fasta_db = Faidx->new($self->fasta);
+  my $fasta_db = Bio::DB::HTS::Faidx->new($self->fasta);
   
   return $fasta_db;
 }
