@@ -34,6 +34,7 @@ sub begin : Private {
     service_name => $cfg->{service_name},
     service_logo => $cfg->{service_logo},
     service_parent_url => $cfg->{service_parent_url},
+    user_guide => $cfg->{user_guide},
     service_version => $EnsEMBL::REST::VERSION,
     ensembl_version => software_version(),
     copyright_footer => $cfg->{copyright_footer},
