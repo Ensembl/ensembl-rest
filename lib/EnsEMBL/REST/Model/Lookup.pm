@@ -148,7 +148,7 @@ sub find_compara_species_sets {
   foreach my $mlss (@$mlsss) {
     my $species_set = {};
     my $species_set_obj = $mlss->species_set_obj();
-    my @species_set_genomes = map { $_->name } @{$mlss->species_set_obj->genome_dbs};
+    my @species_set_genomes = map { $_->name } @{$species_set_obj->genome_dbs};
     my $tag = $species_set_obj->get_value_for_tag('name');
     $species_set->{species_set_group} = ($tag) ? $tag : '';
     $species_set->{name} = $mlss->name;
