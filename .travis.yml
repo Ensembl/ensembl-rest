@@ -28,18 +28,12 @@ before_install:
     - git clone --branch master --depth 1 https://github.com/samtools/htslib.git
     - cd htslib
     - make install
-    - export HTSLIB_DIR=$(pwd -P)
-    - cd ../
-    - git clone --branch master --depth 1 https://github.com/Ensembl/Bio-HTS
-    - cd Bio-HTS
-    - perl Build.PL --htslib $HTSLIB_DIR
-    - ./Build
-    - cd ../
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --with-recommends --notest .
     - cpanm -n Devel::Cover::Report::Coveralls
+    - cpanm Bio::DB::HTS
     - cp travisci/MultiTestDB.conf.travisci t/MultiTestDB.conf
 
 script: "./travisci/harness.sh"
