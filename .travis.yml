@@ -24,6 +24,7 @@ before_install:
     - cd bioperl-live
     - git checkout bioperl-release-1-6-1
     - cd ../
+    - git clone --branch master --depth 1 https://github.com/samtools/tabix.git
     - cd tabix
     - make
     - cd perl
