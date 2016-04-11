@@ -57,3 +57,5 @@ notifications:
   email:
     on_success: always
     on_failure: always
+  slack:
+    secure: gTcWzQsVHKPxRJ1u0U2l2+QVujmG1uFW44kAO3l46V5Im5uLTOLeM20ykk6ox4kaPHLs5ky7NGzcJmTDLaHBKjI4Sa34l4tJd0lhkv+hKj9TSv5pDDCdUX8v869Nm8LqJKh26HqvVcN7eHFRatLD/tfYvvkaP1rLLhwLLdr7czQ=
