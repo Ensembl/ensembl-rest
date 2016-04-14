@@ -41,10 +41,10 @@ sub fetch_LDFeatureContainer_variation_name {
   my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
   my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
 
-  my $window_size = $c->request->param('window_size') || 1000; # default is 1MB
-  Catalyst::Exception->throw("window_size needs to be a value between 0 and 1000.") if (!looks_like_number($window_size));
-  Catalyst::Exception->throw("window_size needs to be a value between 0 and 1000.") if ($window_size > 1000);
-  Catalyst::Exception->throw("window_size needs to be a value between 0 and 1000.") if ($window_size < 0);
+  my $window_size = $c->request->param('window_size') || 500; # default is 500KB
+  Catalyst::Exception->throw("window_size needs to be a value between 0 and 500.") if (!looks_like_number($window_size));
+  Catalyst::Exception->throw("window_size needs to be a value between 0 and 500.") if ($window_size > 500);
+  Catalyst::Exception->throw("window_size needs to be a value between 0 and 500.") if ($window_size < 0);
   $window_size = floor($window_size);
   my $max_snp_distance = ($window_size / 2) * 1000;
   $ldfca->max_snp_distance($max_snp_distance);
@@ -84,7 +84,7 @@ sub fetch_LDFeatureContainer_variation_name {
 sub fetch_LDFeatureContainer_slice {
   my ($self, $slice) = @_;
   Catalyst::Exception->throw("No region given. Please specify a region to retrieve from this service.") if ! $slice;
-  Catalyst::Exception->throw("Specified region is too large. Maximum allowed size for region is 1Mb.") if ($slice->length > 1_000_000);
+  Catalyst::Exception->throw("Specified region is too large. Maximum allowed size for region is 500KB.") if ($slice->length > 1_000_000);
   my $c = $self->context();
   my $species = $c->stash->{species};
 
