@@ -84,7 +84,7 @@ sub fetch_LDFeatureContainer_variation_name {
 sub fetch_LDFeatureContainer_slice {
   my ($self, $slice) = @_;
   Catalyst::Exception->throw("No region given. Please specify a region to retrieve from this service.") if ! $slice;
-  Catalyst::Exception->throw("Specified region is too large. Maximum allowed size for region is 500KB.") if ($slice->length > 1_000_000);
+  Catalyst::Exception->throw("Specified region is too large. Maximum allowed size for region is 500KB.") if ($slice->length > 500_000);
   my $c = $self->context();
   my $species = $c->stash->{species};
 
