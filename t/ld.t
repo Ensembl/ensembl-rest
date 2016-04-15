@@ -88,7 +88,7 @@ $ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_
 $json = json_GET($ld_get, 'GET LD data for variant, population, d_prime and window_size');
 eq_or_diff($json, $expected_output, "Example variant, population, d_prime and window_size");
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=500.123';
+$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=499.123';
 $json = json_GET($ld_get, 'GET LD data for variant, population, d_prime and window_size');
 eq_or_diff($json, $expected_output, "Example variant, population, d_prime and window_size");
 
