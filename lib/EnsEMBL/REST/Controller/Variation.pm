@@ -63,13 +63,9 @@ sub id_POST {
   my $id_list;
   if (exists $data->{ids}) { $id_list = $data->{ids} };
   $self->assert_post_size($c,$id_list);
-  foreach my $id (@$id_list) {
-    try {
-      my $variation_hash = $c->model('Variation')->fetch_variation($id);
-      # $c->log->debug('Variation'.$variation_hash->{name}) if $variation_hash;
-      $variations{$id} = $variation_hash if $variation_hash;
-    } catch {$c->log->debug('Problems:'.$_)};
-  }
+  try {
+    %variations = %{$c->model('Variation')->fetch_variation_multiple($id_list)};
+  } catch {$c->log->debug('Problems:'.$_)};
   $self->status_ok($c, entity => \%variations);
 }
 
