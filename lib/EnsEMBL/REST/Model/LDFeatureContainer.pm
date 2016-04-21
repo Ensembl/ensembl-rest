@@ -203,7 +203,7 @@ sub to_array {
     $hash->{population_name} = $population_name;
     
     if (!$names_only) {
-      foreach my $attrib (qw/clinical_significance seq_region_name start end strand consequence_type alleles/) {
+      foreach my $attrib (qw/clinical_significance seq_region_name start end strand consequence_type alleles evidence_values var_class minor_allele minor_allele_frequency minor_allele_count/) {
         foreach my $i (1, 2) {
           $hash->{$attrib . $i} = $ld_hash->{$attrib . $i};
         }
