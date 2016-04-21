@@ -178,11 +178,13 @@ sub to_array {
   }
   my $d_prime = $c->request->param('d_prime');
   my $r2 = $c->request->param('r2');
+  my $variation_attribs = $c->request->param('variation_attribs');
+  my $names_only =  ($variation_attribs) ? 0 : 1; 
   my @LDFC_array = ();
 
   # we pass 1 to get_all_ld_values() so that it doesn't lazy load
   # VariationFeature objects - we only need the name here anyway
-  foreach my $ld_hash (@{$LDFC->get_all_ld_values(1)}) {
+  foreach my $ld_hash (@{$LDFC->get_all_ld_values($names_only)}) {
     my $hash = {};
     $hash->{d_prime} = $ld_hash->{d_prime};
     next if ($d_prime && $hash->{d_prime} < $d_prime);
@@ -199,6 +201,15 @@ sub to_array {
       $population_name = $population->name;
     }
     $hash->{population_name} = $population_name;
+    
+    if (!$names_only) {
+      foreach my $attrib (qw/clinical_significance seq_region_name start end strand consequence_type alleles/) {
+        foreach my $i (1, 2) {
+          $hash->{$attrib . $i} = $ld_hash->{$attrib . $i};
+        }
+      }
+    }
+
     push @LDFC_array, $hash;
   }
   return \@LDFC_array;
