@@ -58,6 +58,27 @@ sub fetch_variation {
   return $self->to_hash($variation);
 }
 
+sub fetch_variation_multiple {
+  my ($self, $variation_ids) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
+  $va->db->include_failed_variations(1);
+  
+  # use VCF if requested in config
+  my $var_params = $c->config->{'Model::Variation'};
+  if($var_params && $var_params->{use_vcf}) {
+    $va->db->use_vcf($var_params->{use_vcf});
+    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $var_params->{vcf_config};
+  }
+
+  my %return = map {$_->name => $self->to_hash($_)} @{$va->fetch_all_by_name_list($variation_ids || [])};
+
+  return \%return;  
+}
+
 
 sub to_hash {
   my ($self, $variation) = @_;
