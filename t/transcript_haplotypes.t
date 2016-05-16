@@ -38,7 +38,7 @@ my ($th_get, $json, $expected_output);
 
 $th_get = '/transcript_haplotypes/homo_sapiens/ENST00000314040';
 $json = json_GET($th_get, 'GET transcript haplotypes for ENST00000314040');
-my $expected_output = {
+$expected_output = {
   'total_population_counts' => { _all => 4 },
   'protein_haplotypes' => [
     {
