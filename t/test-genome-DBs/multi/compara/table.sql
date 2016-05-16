@@ -34,7 +34,7 @@ CREATE TABLE `constrained_element` (
   `dnafrag_id` bigint(20) unsigned NOT NULL,
   `dnafrag_start` int(12) unsigned NOT NULL,
   `dnafrag_end` int(12) unsigned NOT NULL,
-  `dnafrag_strand` int(2) DEFAULT NULL,
+  `dnafrag_strand` int(2) NOT NULL,
   `method_link_species_set_id` int(10) unsigned NOT NULL,
   `p_value` double DEFAULT NULL,
   `score` double NOT NULL DEFAULT '0',
@@ -50,8 +50,8 @@ CREATE TABLE `dnafrag` (
   `length` int(11) NOT NULL DEFAULT '0',
   `name` varchar(40) NOT NULL DEFAULT '',
   `genome_db_id` int(10) unsigned NOT NULL,
-  `coord_system_name` varchar(40) DEFAULT NULL,
-  `is_reference` tinyint(1) DEFAULT '1',
+  `coord_system_name` varchar(40) NOT NULL DEFAULT '',
+  `is_reference` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`dnafrag_id`),
   UNIQUE KEY `name` (`genome_db_id`,`name`)
 ) ENGINE=MyISAM AUTO_INCREMENT=200000000000001 DEFAULT CHARSET=latin1;
@@ -227,6 +227,11 @@ CREATE TABLE `gene_tree_root_attr` (
   `tree_num_dup_nodes` int(10) unsigned DEFAULT NULL,
   `tree_num_leaves` int(10) unsigned DEFAULT NULL,
   `tree_num_spec_nodes` int(10) unsigned DEFAULT NULL,
+  `lca` int(10) unsigned DEFAULT NULL,
+  `taxonomic_coverage` float DEFAULT NULL,
+  `ratio_species_genes` float DEFAULT NULL,
+  `model_name` varchar(40) DEFAULT NULL,
+  `division` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`root_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -264,7 +269,7 @@ CREATE TABLE `genomic_align` (
   `dnafrag_start` int(10) NOT NULL DEFAULT '0',
   `dnafrag_end` int(10) NOT NULL DEFAULT '0',
   `dnafrag_strand` tinyint(4) NOT NULL DEFAULT '0',
-  `cigar_line` mediumtext,
+  `cigar_line` mediumtext NOT NULL,
   `visible` tinyint(2) unsigned NOT NULL DEFAULT '1',
   `node_id` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`genomic_align_id`),
@@ -279,7 +284,7 @@ CREATE TABLE `genomic_align_block` (
   `method_link_species_set_id` int(10) unsigned NOT NULL DEFAULT '0',
   `score` double DEFAULT NULL,
   `perc_id` tinyint(3) unsigned DEFAULT NULL,
-  `length` int(10) DEFAULT NULL,
+  `length` int(10) NOT NULL,
   `group_id` bigint(20) unsigned DEFAULT NULL,
   `level_id` tinyint(2) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`genomic_align_block_id`),
@@ -436,7 +441,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=56 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -462,14 +467,14 @@ CREATE TABLE `method_link_species_set` (
 CREATE TABLE `method_link_species_set_tag` (
   `method_link_species_set_id` int(10) unsigned NOT NULL,
   `tag` varchar(50) NOT NULL,
-  `value` mediumtext,
+  `value` mediumtext NOT NULL,
   PRIMARY KEY (`method_link_species_set_id`,`tag`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `ncbi_taxa_name` (
   `taxon_id` int(10) unsigned NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `name_class` varchar(50) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `name_class` varchar(50) NOT NULL,
   KEY `taxon_id` (`taxon_id`),
   KEY `name` (`name`),
   KEY `name_class` (`name_class`)
@@ -509,13 +514,13 @@ CREATE TABLE `peptide_align_feature` (
   `hstart` int(11) NOT NULL DEFAULT '0',
   `hend` int(11) NOT NULL DEFAULT '0',
   `score` double(16,4) NOT NULL DEFAULT '0.0000',
-  `evalue` double DEFAULT NULL,
-  `align_length` int(10) DEFAULT NULL,
-  `identical_matches` int(10) DEFAULT NULL,
-  `perc_ident` int(10) DEFAULT NULL,
-  `positive_matches` int(10) DEFAULT NULL,
-  `perc_pos` int(10) DEFAULT NULL,
-  `hit_rank` int(10) DEFAULT NULL,
+  `evalue` double NOT NULL,
+  `align_length` int(10) NOT NULL,
+  `identical_matches` int(10) NOT NULL,
+  `perc_ident` int(10) NOT NULL,
+  `positive_matches` int(10) NOT NULL,
+  `perc_pos` int(10) NOT NULL,
+  `hit_rank` int(10) NOT NULL,
   `cigar_line` mediumtext,
   PRIMARY KEY (`peptide_align_feature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=133;
@@ -574,7 +579,7 @@ CREATE TABLE `species_set_header` (
 CREATE TABLE `species_set_tag` (
   `species_set_id` int(10) unsigned NOT NULL,
   `tag` varchar(50) NOT NULL,
-  `value` mediumtext,
+  `value` mediumtext NOT NULL,
   UNIQUE KEY `tag_species_set_id` (`species_set_id`,`tag`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 

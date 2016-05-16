@@ -3141,3 +3141,15 @@
 630	genome_length_43	2073148626
 630	coding_exon_coverage_43	16330125
 630	coding_exon_length_43	24997756
+635	num_chains_blocks_100	1
+635	num_chains_blocks_1000	1
+635	totlength_chains_blocks_100	917
+635	totlength_chains_blocks_1000	1613
+635	num_nets_blocks_100	1
+635	num_nets_blocks_1000	1
+635	totlength_nets_blocks_100	917
+635	totlength_nets_blocks_1000	1613
+641	num_blocks_1000	2
+641	num_blocks_10000	2
+641	totlength_blocks_1000	12768
+641	totlength_blocks_10000	61102

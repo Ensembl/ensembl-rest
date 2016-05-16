@@ -27,12 +27,12 @@ CREATE TABLE `associate_study` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `attrib` (
-  `attrib_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `attrib_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   PRIMARY KEY (`attrib_id`),
   UNIQUE KEY `type_val_idx` (`attrib_type_id`,`value`(80))
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=373 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `attrib_set` (
   `attrib_set_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -168,7 +168,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=76 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=95 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -233,6 +233,13 @@ CREATE TABLE `phenotype_feature_attrib` (
   `value` varchar(255) DEFAULT NULL,
   KEY `phenotype_feature_idx` (`phenotype_feature_id`),
   KEY `type_value_idx` (`attrib_type_id`,`value`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+CREATE TABLE `phenotype_ontology_accession` (
+  `phenotype_id` int(11) unsigned NOT NULL,
+  `accession` varchar(255) NOT NULL,
+  `linked_by_attrib` set('437','438','439','440','441','442') DEFAULT NULL,
+  PRIMARY KEY (`phenotype_id`,`accession`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `population` (
@@ -362,6 +369,16 @@ CREATE TABLE `sample_population` (
   KEY `sample_idx` (`sample_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+CREATE TABLE `sample_synonym` (
+  `synonym_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `sample_id` int(10) unsigned NOT NULL,
+  `source_id` int(10) unsigned NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`synonym_id`),
+  KEY `sample_idx` (`sample_id`),
+  KEY `name` (`name`,`source_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 CREATE TABLE `seq_region` (
   `seq_region_id` int(10) unsigned NOT NULL,
   `name` varchar(40) NOT NULL,
@@ -375,7 +392,7 @@ CREATE TABLE `source` (
   `source_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(24) NOT NULL,
   `version` int(11) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `description` varchar(400) DEFAULT NULL,
   `url` varchar(255) DEFAULT NULL,
   `type` enum('chip','lsdb') DEFAULT NULL,
   `somatic_status` enum('germline','somatic','mixed') DEFAULT 'germline',
@@ -489,15 +506,6 @@ CREATE TABLE `subsnp_map` (
   KEY `variation_idx` (`variation_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-CREATE TABLE `tagged_variation_feature` (
-  `variation_feature_id` int(10) unsigned NOT NULL,
-  `tagged_variation_feature_id` int(10) unsigned DEFAULT NULL,
-  `population_id` int(10) unsigned NOT NULL,
-  KEY `tag_idx` (`variation_feature_id`),
-  KEY `tagged_idx` (`tagged_variation_feature_id`),
-  KEY `population_idx` (`population_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
 CREATE TABLE `tmp_individual_genotype_single_bp` (
   `variation_id` int(10) NOT NULL,
   `subsnp_id` int(15) unsigned DEFAULT NULL,
@@ -563,7 +571,7 @@ CREATE TABLE `variation` (
   PRIMARY KEY (`variation_id`),
   UNIQUE KEY `name` (`name`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=64119776 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=136372538 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `variation_attrib` (
   `variation_id` int(11) unsigned NOT NULL,
@@ -608,7 +616,7 @@ CREATE TABLE `variation_feature` (
   KEY `variation_set_idx` (`variation_set_id`),
   KEY `consequence_type_idx` (`consequence_types`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=69649394 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=135041171 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `variation_feature_bak` (
   `variation_feature_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -681,7 +689,6 @@ CREATE TABLE `variation_synonym` (
   `subsnp_id` int(15) unsigned DEFAULT NULL,
   `source_id` int(10) unsigned NOT NULL,
   `name` varchar(255) DEFAULT NULL,
-  `moltype` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`variation_synonym_id`),
   UNIQUE KEY `name` (`name`,`source_id`),
   KEY `variation_idx` (`variation_id`),
