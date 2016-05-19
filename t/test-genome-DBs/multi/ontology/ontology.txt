@@ -1,2 +1,2 @@
-1	SO	sequence
-2	UNKNOWN	unknown ontology
+1	SO	sequence	\N
+2	UNKNOWN	unknown ontology	\N
