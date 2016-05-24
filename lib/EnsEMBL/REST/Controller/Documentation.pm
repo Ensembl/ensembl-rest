@@ -31,6 +31,7 @@ sub begin : Private {
   $c->stash()->{endpoints} = $endpoints;
   my $cfg = EnsEMBL::REST->config();
   $c->stash(
+    site_name => $cfg->{site_name},
     service_name => $cfg->{service_name},
     service_logo => $cfg->{service_logo},
     service_parent_url => $cfg->{service_parent_url},
@@ -38,6 +39,8 @@ sub begin : Private {
     service_version => $EnsEMBL::REST::VERSION,
     ensembl_version => software_version(),
     copyright_footer => $cfg->{copyright_footer},
+    wiki_url => $cfg->{wiki_url},
+    bootstrap_css => $cfg->{bootstrap_css},
   );
   return;
 }

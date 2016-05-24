@@ -26,11 +26,11 @@ limitations under the License.
 
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<title>Ensembl Rest API - [% template_title %]</title>
+	<title>[% site_name %] - [% template_title %]</title>
 	[% IF c.request.env.$psg %]
 	<link href='[% c.request.env.$psg.0 %]' rel='stylesheet'/>
 	[% ELSE %]
-	<link href="/static/css/10-bootstrap.css" rel="stylesheet"/>
+	<link href="[% bootstrap_css or '/static/css/10-bootstrap.css' %]" rel="stylesheet"/>
 	<link href="/static/css/20-prettify.css" rel="stylesheet"/>
        	<link href="/static/css/25-default.css" rel="stylesheet"/>
 	<link href="/static/css/50-additional.css" rel="stylesheet"/>
@@ -55,10 +55,10 @@ limitations under the License.
                 <a class="brand" href="[% service_parent_url %]"><img class="brand" src="[% service_logo %]" alt="Service logo"/></a>
                     <ul class="nav">
                         <li class="active"><a href="/">Endpoints</a></li>
-                        <li><a href="http://github.com/Ensembl/ensembl-rest/wiki">User Guide</a></li>
+                        <li><a href="[% wiki_url %]">User Guide</a></li>
                         <li><a href="http://github.com/Ensembl/ensembl-rest/wiki/Change-log">Change Log</a></li>
-                        <li><a href="http://www.ensembl.org/info/about/index.html">About the Ensembl Project</a></li>
-                        <li><a href="http://www.ensembl.org/info/about/contact/">Contact Ensembl</a></li>
+                        <li><a href="[% service_parent_url %]/info/about/index.html">About the Ensembl Project</a></li>
+                        <li><a href="[% service_parent_url %]/info/about/contact/">Contact Ensembl</a></li>
                     </ul>
             </div><!-- container-->
         </div><!-- navbar-inner-->
