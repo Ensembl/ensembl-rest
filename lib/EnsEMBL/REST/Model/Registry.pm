@@ -485,6 +485,7 @@ after 'BUILD' => sub {
     $log->info('Triggering preload of the registry');
     $self->_registry();
     $self->_build_species_info();
+    $_->get_MethodLinkSpeciesSetAdaptor()->fetch_all() for @{ $self->get_all_DBAdaptors('compara') };
     $log->info('Done');
   }
   return;
