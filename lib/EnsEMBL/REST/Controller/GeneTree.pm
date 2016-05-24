@@ -101,6 +101,7 @@ sub _set_genetree {
 
   my $prune_species     = $c->request->param('prune_species') ? [$c->request->param('prune_species')] : undef;
   my $prune_taxons      = $c->request->param('prune_taxon') ? [$c->request->param('prune_taxon')] : undef;
+  my ($subtree_filter)  = $c->request->param('subtree_node_id');
   my $aligned           = $c->request()->param('aligned') || $c->request()->param('phyloxml_aligned') ? 1 : 0;
   my $sequence          = $c->request()->param('sequence') || $c->request()->param('phyloxml_sequence') || 'protein';
   my $cigar_line        = $c->request()->param('cigar_line') ? 1 : 0;
@@ -110,6 +111,7 @@ sub _set_genetree {
   $gt->preload(
       -PRUNE_SPECIES => $prune_species,
       -PRUNE_TAXA => $prune_taxons,
+      -PRUNE_SUBTREE => $subtree_filter,
   );
 
   if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
