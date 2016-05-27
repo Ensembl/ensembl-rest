@@ -107,6 +107,7 @@ sub _encode {
     my $values = $taxon->get_all_values_for_tag($tag);
     $entity->{tags}->{$tag} = $values;
   }
+  $entity->{tags}->{'name'} = [ $taxon->name() ];
   if(! $ignore_relations) {
     my $parent = $taxon->parent();
     my $children = $taxon->children();

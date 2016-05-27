@@ -16,8 +16,8 @@ CREATE TABLE `CAFE_species_gene` (
   `node_id` int(10) unsigned NOT NULL,
   `n_members` int(4) unsigned NOT NULL,
   `pvalue` double(5,4) DEFAULT NULL,
-  KEY `node_id` (`node_id`),
-  KEY `cafe_gene_family_id` (`cafe_gene_family_id`)
+  PRIMARY KEY (`cafe_gene_family_id`,`node_id`),
+  KEY `node_id` (`node_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `conservation_score` (
@@ -178,7 +178,7 @@ CREATE TABLE `gene_tree_node_tag` (
   `tag` varchar(50) NOT NULL,
   `value` mediumtext NOT NULL,
   KEY `node_id_tag` (`node_id`,`tag`),
-  KEY `node_id` (`node_id`)
+  KEY `tag` (`tag`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `gene_tree_object_store` (
@@ -222,7 +222,7 @@ CREATE TABLE `gene_tree_root_attr` (
   `aln_num_of_patterns` int(10) unsigned DEFAULT NULL,
   `aln_shrinking_factor` float DEFAULT NULL,
   `spec_count` int(10) unsigned DEFAULT NULL,
-  `tree_max_branch` decimal(8,2) DEFAULT NULL,
+  `tree_max_branch` float DEFAULT NULL,
   `tree_max_length` float DEFAULT NULL,
   `tree_num_dup_nodes` int(10) unsigned DEFAULT NULL,
   `tree_num_leaves` int(10) unsigned DEFAULT NULL,
@@ -346,7 +346,7 @@ CREATE TABLE `homology` (
   `species_tree_node_id` int(10) unsigned DEFAULT NULL,
   `gene_tree_node_id` int(10) unsigned DEFAULT NULL,
   `gene_tree_root_id` int(10) unsigned DEFAULT NULL,
-  `goc_score` int(10) unsigned DEFAULT NULL,
+  `goc_score` tinyint(3) unsigned DEFAULT NULL,
   `wga_coverage` decimal(5,2) DEFAULT NULL,
   PRIMARY KEY (`homology_id`),
   KEY `method_link_species_set_id` (`method_link_species_set_id`)
@@ -357,9 +357,9 @@ CREATE TABLE `homology_member` (
   `gene_member_id` int(10) unsigned NOT NULL,
   `seq_member_id` int(10) unsigned DEFAULT NULL,
   `cigar_line` mediumtext,
-  `perc_cov` tinyint(3) unsigned DEFAULT '0',
-  `perc_id` tinyint(3) unsigned DEFAULT '0',
-  `perc_pos` tinyint(3) unsigned DEFAULT '0',
+  `perc_cov` float unsigned DEFAULT '0',
+  `perc_id` float unsigned DEFAULT '0',
+  `perc_pos` float unsigned DEFAULT '0',
   PRIMARY KEY (`homology_id`,`gene_member_id`),
   KEY `homology_id` (`homology_id`),
   KEY `member_id` (`gene_member_id`),
@@ -404,27 +404,6 @@ CREATE TABLE `member` (
   KEY `canonical_member_id` (`canonical_member_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 MAX_ROWS=100000000;
 
-CREATE TABLE `member_production_counts` (
-  `stable_id` varchar(128) NOT NULL,
-  `families` tinyint(1) unsigned DEFAULT '0',
-  `gene_trees` tinyint(1) unsigned DEFAULT '0',
-  `gene_gain_loss_trees` tinyint(1) unsigned DEFAULT '0',
-  `orthologues` int(10) unsigned DEFAULT '0',
-  `paralogues` int(10) unsigned DEFAULT '0',
-  `homoeologues` int(10) unsigned DEFAULT '0',
-  KEY `stable_id` (`stable_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-CREATE TABLE `member_production_counts2` (
-  `stable_id` varchar(128) NOT NULL,
-  `families` tinyint(1) unsigned DEFAULT '0',
-  `gene_trees` tinyint(1) unsigned DEFAULT '0',
-  `gene_gain_loss_trees` tinyint(1) unsigned DEFAULT '0',
-  `orthologues` int(10) unsigned DEFAULT '0',
-  `paralogues` int(10) unsigned DEFAULT '0',
-  KEY `stable_id` (`stable_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
 CREATE TABLE `member_xref` (
   `gene_member_id` int(10) unsigned NOT NULL,
   `dbprimary_acc` varchar(10) NOT NULL,
@@ -441,7 +420,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -464,11 +443,28 @@ CREATE TABLE `method_link_species_set` (
   UNIQUE KEY `method_link_id` (`method_link_id`,`species_set_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=50047 DEFAULT CHARSET=latin1;
 
+CREATE TABLE `method_link_species_set_attr` (
+  `method_link_species_set_id` int(10) unsigned NOT NULL,
+  `n_goc_null` int(11) DEFAULT NULL,
+  `n_goc_0` int(11) DEFAULT NULL,
+  `n_goc_25` int(11) DEFAULT NULL,
+  `n_goc_50` int(11) DEFAULT NULL,
+  `n_goc_75` int(11) DEFAULT NULL,
+  `n_goc_100` int(11) DEFAULT NULL,
+  `perc_orth_above_goc_thresh` int(11) DEFAULT NULL,
+  `goc_quality_threshold` int(11) DEFAULT NULL,
+  `wga_quality_threshold` int(11) DEFAULT NULL,
+  `perc_orth_above_wga_thresh` int(11) DEFAULT NULL,
+  `threshold_on_ds` int(11) DEFAULT NULL,
+  PRIMARY KEY (`method_link_species_set_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 CREATE TABLE `method_link_species_set_tag` (
   `method_link_species_set_id` int(10) unsigned NOT NULL,
   `tag` varchar(50) NOT NULL,
   `value` mediumtext NOT NULL,
-  PRIMARY KEY (`method_link_species_set_id`,`tag`)
+  PRIMARY KEY (`method_link_species_set_id`,`tag`),
+  KEY `tag` (`tag`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `ncbi_taxa_name` (
@@ -555,9 +551,10 @@ CREATE TABLE `seq_member` (
 CREATE TABLE `sequence` (
   `sequence_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `length` int(10) NOT NULL,
+  `md5sum` char(32) NOT NULL,
   `sequence` longtext NOT NULL,
   PRIMARY KEY (`sequence_id`),
-  KEY `sequence` (`sequence`(18))
+  KEY `md5sum` (`md5sum`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 MAX_ROWS=10000000 AVG_ROW_LENGTH=19000;
 
 CREATE TABLE `species_set` (
@@ -580,7 +577,8 @@ CREATE TABLE `species_set_tag` (
   `species_set_id` int(10) unsigned NOT NULL,
   `tag` varchar(50) NOT NULL,
   `value` mediumtext NOT NULL,
-  UNIQUE KEY `tag_species_set_id` (`species_set_id`,`tag`)
+  PRIMARY KEY (`species_set_id`,`tag`),
+  KEY `tag` (`tag`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `species_tree_node` (
@@ -600,13 +598,41 @@ CREATE TABLE `species_tree_node` (
   KEY `genome_db_id` (`genome_db_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=501315726 DEFAULT CHARSET=latin1;
 
+CREATE TABLE `species_tree_node_attr` (
+  `node_id` int(10) unsigned NOT NULL,
+  `nb_long_genes` int(11) DEFAULT NULL,
+  `nb_short_genes` int(11) DEFAULT NULL,
+  `avg_dupscore` float DEFAULT NULL,
+  `avg_dupscore_nondub` float DEFAULT NULL,
+  `nb_dubious_nodes` int(11) DEFAULT NULL,
+  `nb_dup_nodes` int(11) DEFAULT NULL,
+  `nb_genes` int(11) DEFAULT NULL,
+  `nb_genes_in_tree` int(11) DEFAULT NULL,
+  `nb_genes_in_tree_multi_species` int(11) DEFAULT NULL,
+  `nb_genes_in_tree_single_species` int(11) DEFAULT NULL,
+  `nb_nodes` int(11) DEFAULT NULL,
+  `nb_orphan_genes` int(11) DEFAULT NULL,
+  `nb_seq` int(11) DEFAULT NULL,
+  `nb_spec_nodes` int(11) DEFAULT NULL,
+  `nb_gene_splits` int(11) DEFAULT NULL,
+  `nb_split_genes` int(11) DEFAULT NULL,
+  `root_avg_gene` float DEFAULT NULL,
+  `root_avg_gene_per_spec` float DEFAULT NULL,
+  `root_avg_spec` float DEFAULT NULL,
+  `root_max_gene` int(11) DEFAULT NULL,
+  `root_max_spec` int(11) DEFAULT NULL,
+  `root_min_gene` int(11) DEFAULT NULL,
+  `root_min_spec` int(11) DEFAULT NULL,
+  `root_nb_genes` int(11) DEFAULT NULL,
+  `root_nb_trees` int(11) DEFAULT NULL,
+  PRIMARY KEY (`node_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 CREATE TABLE `species_tree_node_tag` (
   `node_id` int(10) unsigned NOT NULL,
   `tag` varchar(50) NOT NULL,
   `value` mediumtext NOT NULL,
   KEY `node_id_tag` (`node_id`,`tag`),
-  KEY `tag_node_id` (`tag`,`node_id`),
-  KEY `node_id` (`node_id`),
   KEY `tag` (`tag`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
