@@ -111,7 +111,11 @@ sub encode_nh {
   my $nh_format = $c->request->param('nh_format') || 'simple';
   my $root = $gt->root();
   my $str = $root->newick_format($nh_format);
-  $root->release_tree() if ($root->can('release_tree'));
+  if ($gt->can('release_tree')) {
+    $gt->release_tree();
+  } elsif ($root->can('release_tree')) {
+    $root->release_tree();
+  }
   return \$str;
 }
 
