@@ -25,7 +25,7 @@ use Try::Tiny;
 require EnsEMBL::REST;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
-with 'EnsEMBL::REST::Role::PostLimiter';
+with 'EnsEMBL::REST::Role::PostLimiter','EnsEMBL::REST::Role::SliceLength','EnsEMBL::REST::Role::Content';
 __PACKAGE__->config(
   map => {
     'text/html'           => [qw/View FASTAHTML/],
@@ -240,17 +240,17 @@ sub _process_feature {
     }
     #If protein perform recursive calls with the Translation object 
     elsif($type eq 'protein') {
-      # If we're retreiving a subsequence, try to translate the coordinates
+      # If we're retrieving a subsequence, try to translate the coordinates
       # to the peptide if needed
       $self->_translate_coordinates($c, $object) if($c->stash()->{dosubseq});
 
       my @translations = ($object->translation());
       push(@translations, @{$object->get_all_alternative_translations()});
       foreach my $t (@translations) {
-	# Catch case where no translation is available for a transcript
+        # Catch case where no translation is available for a transcript
         next unless $t;
 
-	push(@sequences, @{$self->_process_feature($c, $t, $type)});
+        push(@sequences, @{$self->_process_feature($c, $t, $type)});
       }
     }
     elsif($type eq 'genomic') {
@@ -265,12 +265,12 @@ sub _process_feature {
     if($type ne 'genomic') {
       my $transcripts = $object->get_all_Transcripts();
       foreach my $transcript (@{$transcripts}) {
-	# Because each transcript will have different coordinates if
-	# we're asking for a protein, we have to save the original
-	# coordinates before we translate them each cycle
-	$self->_push_start_end($c) if($c->stash()->{dosubseq});
+        # Because each transcript will have different coordinates if
+        # we're asking for a protein, we have to save the original
+        # coordinates before we translate them each cycle
+        $self->_push_start_end($c) if($c->stash()->{dosubseq});
         push(@sequences, @{$self->_process_feature($c, $transcript, $type)});
-	$self->_pop_start_end($c) if($c->stash()->{dosubseq});
+        $self->_pop_start_end($c) if($c->stash()->{dosubseq});
       }
     }
     else {
@@ -285,9 +285,9 @@ sub _process_feature {
   if($slice) {
     # If the user set limits on the range they wanted, process that
     if($c->stash()->{dosubseq}) {
-	my ($start, $end) = $self->_check_limits($c, $slice->length());
-	$slice = $slice->sub_Slice($start, $end);
-	$c->stash()->{dosubseq} = 0;
+      my ($start, $end) = $self->_check_limits($c, $slice->length());
+      $slice = $slice->sub_Slice($start, $end);
+      $c->stash()->{dosubseq} = 0;
     }
 
     $slice = $self->_enrich_slice($c, $slice);
@@ -386,8 +386,8 @@ sub _translate_coordinates {
   my $pep_start = length $obj->translate()->seq(); my $pep_end = 0;
   foreach my $coord (@coords) {
       if($coord->isa('Bio::EnsEMBL::Mapper::Coordinate')) {
-	  $pep_start = $coord->start if($coord->start < $pep_start);
-	  $pep_end = $coord->end if($coord->end > $pep_end);
+        $pep_start = $coord->start if($coord->start < $pep_start);
+        $pep_end = $coord->end if($coord->end > $pep_end);
       }
   }
 
@@ -488,9 +488,6 @@ sub _write {
     $self->status_ok($c, entity => $data->[0]);
   }
 }
-
-with 'EnsEMBL::REST::Role::SliceLength';
-with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
 
