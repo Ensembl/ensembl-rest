@@ -66,7 +66,7 @@ sub fetch_eqtl {
   my $eqtl_a = $self->{'registry'}->get_eqtl_adaptor($ensembl_species);
 
   $self->_validate_stable_id ($eqtl_a, $constraints->{stable_id});
-  $self->_validate_tissuei   ($eqtl_a, $constraints->{tissue});
+  $self->_validate_tissue    ($eqtl_a, $constraints->{tissue});
   $self->_validate_statistic ($eqtl_a, $constraints->{statistic});
 
   my $results = $eqtl_a->fetch( {
