@@ -9,6 +9,7 @@
       'core' => 'Bio::EnsEMBL::DBSQL::DBAdaptor',
       'variation' => 'Bio::EnsEMBL::Variation::DBSQL::DBAdaptor',
       'funcgen' => 'Bio::EnsEMBL::Funcgen::DBSQL::DBAdaptor',
+      'eqtl' => 'Bio::EnsEMBL::HDF5::EQTLAdaptor',
     },   
     'taeniopygia_guttata' => { 
       'core' => 'Bio::EnsEMBL::DBSQL::DBAdaptor',
