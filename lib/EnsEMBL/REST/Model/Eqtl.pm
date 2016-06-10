@@ -39,7 +39,7 @@ sub build_per_context_instance {
 
 }
 
-=head2 fetch_qetl
+=head2 fetch_eqtl
 
   Arg [1]    : HASHREF $constraints
   Example    : $eqtls = $eqtl_adaptor->fetch_eqtl($constraints);

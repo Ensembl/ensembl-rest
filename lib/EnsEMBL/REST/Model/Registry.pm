@@ -40,10 +40,10 @@ has 'log' => ( is => 'ro', isa => 'Log::Log4perl::Logger', lazy => 1, default =>
 });
 
 # Manual host configuration
-has 'host' => ( is => 'ro', isa => 'Str' );
-has 'port' => ( is => 'ro', isa => 'Int' );
-has 'user' => ( is => 'ro', isa => 'Str' );
-has 'pass' => ( is => 'ro', isa => 'Str' );
+has 'host'    => ( is => 'ro', isa => 'Str' );
+has 'port'    => ( is => 'ro', isa => 'Int' );
+has 'user'    => ( is => 'ro', isa => 'Str' );
+has 'pass'    => ( is => 'ro', isa => 'Str' );
 has 'version' => ( is => 'ro', isa => 'Int' );
 has 'verbose' => ( is => 'ro', isa => 'Bool' );
 
@@ -51,68 +51,34 @@ has 'verbose' => ( is => 'ro', isa => 'Bool' );
 has 'file' => ( is => 'ro', isa => 'Str' );
 
 # Ensembl Genomes LookUp Support
-has 'lookup_host' => ( is => 'ro', isa => 'Str' );
-has 'lookup_port' => ( is => 'ro', isa => 'Int' );
-has 'lookup_user' => ( is => 'ro', isa => 'Str' );
-has 'lookup_pass' => ( is => 'ro', isa => 'Str' );
+has 'lookup_host'   => ( is => 'ro', isa => 'Str' );
+has 'lookup_port'   => ( is => 'ro', isa => 'Int' );
+has 'lookup_user'   => ( is => 'ro', isa => 'Str' );
+has 'lookup_pass'   => ( is => 'ro', isa => 'Str' );
 has 'lookup_dbname' => ( is => 'ro', isa => 'Str' );
 
 # Avoid initiation of the registry
 has 'skip_initation' => ( is => 'ro', isa => 'Bool' );
 
 # Connection settings
-has 'reconnect_interval' => ( is => 'ro', isa => 'Num' );
-has 'disconnect_if_idle' => ( is => 'ro', isa => 'Bool' );
+has 'reconnect_interval'  => ( is => 'ro', isa => 'Num' );
+has 'disconnect_if_idle'  => ( is => 'ro', isa => 'Bool' );
 has 'reconnect_when_lost' => ( is => 'ro', isa => 'Bool' );
-has 'no_caching' => ( is => 'ro', isa => 'Bool' );
-has 'connection_sharing' => ( is => 'ro', isa => 'Bool' );
-has 'no_version_check' => ( is => 'ro', isa => 'Bool' );
+has 'no_caching'          => ( is => 'ro', isa => 'Bool' );
+has 'connection_sharing'  => ( is => 'ro', isa => 'Bool' );
+has 'no_version_check'    => ( is => 'ro', isa => 'Bool' );
 
 # Preload settings
-has 'preload' => ( is => 'ro', isa => 'Bool', default => 1 );
-has 'eqtl_dbs' => (is => 'ro', isa => 'HashRef[Str]');
+has 'preload'   => ( is => 'ro', isa => 'Bool', default => 1 );
+has 'eqtl_dbs'  => (is => 'ro', isa => 'HashRef[Str]');
 
-has '_eqtl_adaptors' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub {
-
-  my ($self) = @_;
-  my $eqtl_adaptors = {};
-
-  return {} if(! $self->eqtl_dbs);
-  # load if not loaded
-  Catalyst::Utils::ensure_class_loaded('Bio::EnsEMBL::HDF5::EQTLAdaptor');
-
-  for my $user_species (sort keys %{$self->eqtl_dbs}) {
-
-    my $ensembl_species   = $self->get_alias($user_species);
-    if(!$ensembl_species){
-      my $msg = "Species $user_species is not available in Ensembl. Please consult your config file.";
-      $self->log->fatal($msg);
-      confess $msg;
-    }
-
-    my $core_a = $self->get_DBAdaptor($ensembl_species, 'core');
-    my $var_a  = $self->get_DBAdaptor($ensembl_species, 'variation');
-
-    my $file   = $self->eqtl_dbs->{$user_species};
-    my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(
-      -filename        => $file,
-      -core_db_adaptor => $core_a,
-      -var_db_adaptor  => $var_a,
-      );
-
-    if(ref($eqtl_a) ne 'Bio::EnsEMBL::HDF5::EQTLAdaptor'){
-      confess 'Could not get Bio::EnsEMBL::HDF5::EQTLAdaptor';
-    }
-
-    $eqtl_adaptors->{$ensembl_species} = $eqtl_a;
-  }
-  return $eqtl_adaptors;
-});
-
+has '_eqtl_adaptors' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_get_eqtl_adaptor');
 
 has 'compara_cache' => ( is => 'ro', isa => 'HashRef[Str]', lazy => 1, default => sub { {} });
 
-has '_registry' => ( is => 'ro', lazy => 1, default => sub {
+has '_registry' => ( is => 'ro', lazy => 1, builder => '_load_registry');
+
+sub _load_registry {
   my ($self) = @_;
   my $log = $self->log();
   $log->info('Loading the registry model object');
@@ -158,11 +124,48 @@ has '_registry' => ( is => 'ro', lazy => 1, default => sub {
   }
   $self->_set_connection_policies($class);
   return $class;
-});
 
+}
 has '_lookup' => ( is => 'rw', lazy => 1, builder => '_build_lookup');
 
 has '_species_info' => ( isa => 'ArrayRef', is => 'ro', lazy => 1, builder => '_build_species_info' );
+
+sub _get_eqtl_adaptor {
+
+  my ($self) = @_;
+  my $eqtl_adaptors = {};
+
+  return {} if(! $self->eqtl_dbs);
+  # load if not loaded
+  Catalyst::Utils::ensure_class_loaded('Bio::EnsEMBL::HDF5::EQTLAdaptor');
+
+  for my $user_species (sort keys %{$self->eqtl_dbs}) {
+
+    my $ensembl_species   = $self->get_alias($user_species);
+    if(!$ensembl_species){
+      my $msg = "Species $user_species is not available in Ensembl. Please consult your config file.";
+      $self->log->fatal($msg);
+      confess $msg;
+    }
+
+    my $core_a = $self->get_DBAdaptor($ensembl_species, 'core');
+    my $var_a  = $self->get_DBAdaptor($ensembl_species, 'variation');
+
+    my $file   = $self->eqtl_dbs->{$user_species};
+    my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(
+      -filename        => $file,
+      -core_db_adaptor => $core_a,
+      -var_db_adaptor  => $var_a,
+      );
+
+    if(ref($eqtl_a) ne 'Bio::EnsEMBL::HDF5::EQTLAdaptor'){
+      confess 'Could not get Bio::EnsEMBL::HDF5::EQTLAdaptor';
+    }
+
+    $eqtl_adaptors->{$ensembl_species} = $eqtl_a;
+  }
+  return $eqtl_adaptors;
+}
 
 sub _set_connection_policies {
   my ($self, $registry) = @_;
