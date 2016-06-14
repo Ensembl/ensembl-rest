@@ -30,16 +30,22 @@ use Bio::EnsEMBL::ApiVersion qw/software_version/;
 use Test::Differences;
 use Data::Dumper;
 use Bio::EnsEMBL::HDF5::EQTLAdaptor;
+use Bio::EnsEMBL::Test::MultiTestDB;
+
 use feature qw(say);
 
 
 Catalyst::Test->import('EnsEMBL::REST');
+my $multi = Bio::EnsEMBL::Test::MultiTestDB->new();
+my $var_dba = $multi->get_DBAdaptor('variation');
+my $core_dba = $multi->get_DBAdaptor('core');
 require EnsEMBL::REST;
-my $sql  = $Bin . '/test-eqtl-DBs/eqtl.hdf5.sqlite3';
+my $sql  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5.sqlite3';
 
-my $hdf5 = $Bin . '/test-eqtl-DBs/eqtl.hdf5';
-my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5);
-warn Dumper($eqtl_a->fetch_all_tissues());
+my $hdf5 = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5';
+my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sql);
+print "Attempt to create $eqtl_a using $hdf5 and $sql\n";
+
 
 
 # warn ref($eqtl_a);
