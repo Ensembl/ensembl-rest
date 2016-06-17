@@ -5,9 +5,11 @@
 name = EnsEMBL::REST
 default_view = HTML
 
+site_name = Ensembl Rest API
 service_name = Ensembl REST API
 service_logo = /static/img/e-ensembl.png
 service_parent_url = http://www.ensembl.org
+wiki_url = http://github.com/Ensembl/ensembl-rest/wiki
 copyright_footer = <a href='http://www.sanger.ac.uk'>WTSI</a> &amp; <a href='http://www.ebi.ac.uk'>EBI</a>
 
 jsonp=1
@@ -93,6 +95,7 @@ jsonp=1
     gene_stable_id=ENSG00000157764
     gene_stable_id_2=ENSG00000248378
     transcript_stable_id=ENST00000288602
+    transcript_stable_id_2=ENST00000513398
     exon_stable_id=ENSE00001154485
     translation_stable_id=ENSP00000288602
 
@@ -142,7 +145,7 @@ jsonp=1
     cds_coordinates=1..1000
     translation_coordinates=100..300
 
-    regulation_id=ENSR00001340277
+    regulation_id=ENSR00001885035
     
     variation_region=9:22125503-22125502:1
     variation_allele=C
@@ -250,6 +253,20 @@ jsonp=1
   dir_plugins       = # path to VEP_plugins checkout
 </Controller::VEP>
 
+
+<View::GFF3>
+  # Set the default source of a GFF3 record
+  # default_source=.
+</View::GFF3>
+
+<View::HTML>
+  # To configure any templates to your own needs provide new includes 
+  # here and replace the template toolkit file. Pay attention to order 
+  # (1st defined is 1st consulted)
+
+  # INCLUDE_PATH __path_to(alternative/root)__
+  INCLUDE_PATH __path_to(root)__
+</View::HTML>
 
 <Plugin::Cache>
   <backend>

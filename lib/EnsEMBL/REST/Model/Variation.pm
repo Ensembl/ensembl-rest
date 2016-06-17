@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -56,6 +57,27 @@ sub fetch_variation {
     Catalyst::Exception->throw("$variation_id not found for $species");
   }
   return $self->to_hash($variation);
+}
+
+sub fetch_variation_multiple {
+  my ($self, $variation_ids) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
+  $va->db->include_failed_variations(1);
+  
+  # use VCF if requested in config
+  my $var_params = $c->config->{'Model::Variation'};
+  if($var_params && $var_params->{use_vcf}) {
+    $va->db->use_vcf($var_params->{use_vcf});
+    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $var_params->{vcf_config};
+  }
+
+  my %return = map {$_->name => $self->to_hash($_)} @{$va->fetch_all_by_name_list($variation_ids || [])};
+
+  return \%return;  
 }
 
 
@@ -140,9 +162,19 @@ sub get_phenotype_info {
 
   my @phenotypes;
   my $phenotypes = $variation->get_all_PhenotypeFeatures;
+
+  my %seen = ();
+
   foreach my $phen (@$phenotypes) {
-    push (@phenotypes, $self->phen_as_hash($phen));
+    my $hash = $self->phen_as_hash($phen);
+    
+    # generate a key from the values to uniquify
+    my $key = join("", sort values %$hash);
+
+    push (@phenotypes, $hash) unless $seen{$key};
+    $seen{$key} = 1;
   }
+
   return \@phenotypes;
 }
 

@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,6 +34,10 @@ __PACKAGE__->config(
   map => {
     'text/plain' => ['YAML'],
   }
+);
+
+my %allowed_values = (
+  feature => { map { $_, 1} qw(dna_align_feature protein_align_feature unmapped_object xref seq_region_synonym)},
 );
 
 sub ping : Local : ActionClass('REST') :Args(0) { }
@@ -124,7 +129,12 @@ sub external_dbs_GET :Local :Args(1) {
   my ($self, $c, $species) = @_;
   my $dba = $c->model('Registry')->get_DBAdaptor($species, 'core', 1);
   $c->go('ReturnError', 'custom', ["Could not fetch adaptor for species $species"]) unless $dba;
-  my $dbs = EnsEMBL::REST::EnsemblModel::ExternalDB->get_ExternalDBs($dba, $c->request->param('filter'));
+  my $filter = undef || $c->request->param('filter');
+  my $feature = undef || $c->request->param('feature');
+  if (defined $feature) {
+    $c->go('ReturnError', 'custom', ["No external db entries for feature '$feature'"]) unless $allowed_values{feature}{$feature};
+  }
+  my $dbs = EnsEMBL::REST::EnsemblModel::ExternalDB->get_ExternalDBs($dba, $filter, $feature);
   my @decoded = map { $_->summary_as_hash() } @{$dbs};
   $self->status_ok($c, entity => \@decoded);
   return

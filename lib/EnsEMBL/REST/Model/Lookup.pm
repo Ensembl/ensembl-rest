@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -148,9 +149,8 @@ sub find_compara_species_sets {
   foreach my $mlss (@$mlsss) {
     my $species_set = {};
     my $species_set_obj = $mlss->species_set_obj();
-    my @species_set_genomes = map { $_->name } @{$mlss->species_set_obj->genome_dbs};
-    my $tag = $species_set_obj->get_value_for_tag('name');
-    $species_set->{species_set_group} = ($tag) ? $tag : '';
+    my @species_set_genomes = map { $_->name } @{$species_set_obj->genome_dbs};
+    $species_set->{species_set_group} = $species_set_obj->name;
     $species_set->{name} = $mlss->name;
     $species_set->{species_set} = \@species_set_genomes;
     $species_set->{method} = $mlss->method()->type();
@@ -304,14 +304,12 @@ sub find_and_locate_object {
     my $type;
     my $input_type = lc($features->{object_type});
     if ($input_type eq 'gene') {
-      $type = 'Transcript';
+      $features->{'Transcript'} = $self->Transcript($features->{id}, $species, $db_type);
     } elsif ($input_type eq 'transcript') {
-      $type = 'Exon';
-      if ($c->request->param('utr')) { $features->{UTR} = $self->UTR($id, $species, $db_type) ; }
+      $features = $self->transcript_feature($features->{id}, $species, $db_type);
     } else {
-      Catalyst::Exception->throw("Include option only available for Genes and Transcripts");
+      Catalyst::Exception->throw("Expand option only available for Genes and Transcripts");
     }
-    $features->{$type} = $self->$type($features->{id}, $species, $db_type);
   }
 
   return $features;
@@ -376,24 +374,32 @@ sub Transcript {
   my $object = $self->find_object($id, $species, 'Gene', $db_type);
   my $transcripts = $object->get_all_Transcripts;
   foreach my $transcript (@$transcripts) {
-    $features = $self->features_as_hash($transcript->stable_id, $species, 'Transcript', $db_type, $transcript);
-    $features->{Exon} = $self->Exon($features->{id}, $species, $db_type);
-    if ($transcript->translate) {
-      my $translation = $transcript->translation;
-      $features->{Translation} = $self->features_as_hash($translation->stable_id, $species, 'Translation', $db_type, $translation);
-    }
-    push @transcripts, $features;
-    if ($self->context->request->param('utr')) { $features->{UTR} = $self->UTR($transcript->stable_id, $species, $db_type) ; }
+    push @transcripts, $self->transcript_feature($transcript->stable_id, $species, $db_type);
   }
   return \@transcripts;
 }
 
-sub UTR {
+sub transcript_feature {
   my ($self, $id, $species, $db_type) = @_;
+  my $features;
+  my $transcript = $self->find_object($id, $species, 'Transcript', $db_type);
+  $features = $self->features_as_hash($id, $species, 'Transcript', $db_type, $transcript);
+  $features->{Exon} = $self->Exon($transcript, $species, $db_type);
+  if ($transcript->translate) {
+    my $translation = $transcript->translation;
+    $features->{Translation} = $self->features_as_hash($translation->stable_id, $species, 'Translation', $db_type, $translation);
+  }
+  if ($self->context->request->param('utr')) {
+    $features->{UTR} = $self->UTR($transcript, $species, $db_type) ;
+  }
+  return $features;
+}
+
+sub UTR {
+  my ($self, $transcript, $species, $db_type) = @_;
 
   my @utrs;
   my $features;
-  my $transcript = $self->find_object($id, $species, 'Transcript', $db_type);
   my $five_utr = $transcript->get_all_five_prime_UTRs();
   foreach my $five (@$five_utr) {
     push @utrs, $self->features_as_hash($transcript->stable_id, $species, 'five_prime_UTR', $db_type, $five);
@@ -407,11 +413,10 @@ sub UTR {
 }
 
 sub Exon {
-  my ($self, $id, $species, $db_type) = @_;
+  my ($self, $transcript, $species, $db_type) = @_;
 
   my @exons;
-  my $object = $self->find_object($id, $species, 'Transcript', $db_type);
-  my $exons = $object->get_all_Exons;
+  my $exons = $transcript->get_all_Exons;
   foreach my $exon(@$exons) {
     push @exons, $self->features_as_hash($exon->stable_id, $species, 'Exon', $db_type, $exon);
   }

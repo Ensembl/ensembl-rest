@@ -1,5 +1,6 @@
 #!/bin/bash -ex
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016] EMBL-European Bioinformatics Institute
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,6 +38,7 @@ for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl ensembl-
   PERL5LIB=$ENS_GIT_ROOT_DIR/$ensdir/modules:$PERL5LIB
 done
 PERL5LIB=$APP_HOME/../bioperl-live:$PERL5LIB
+PERL5LIB=$APP_HOME/../Bio-HTS/blib/arch:$APP_HOME/../Bio-HTS/blib/lib:$PERL5LIB
 PERL5LIB=$APP_HOME/lib:$PERL5LIB
 export PERL5LIB
 

@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016] EMBL-European Bioinformatics Institute
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,7 +44,7 @@ Catalyst::Test->import('EnsEMBL::REST');
     strand => 0,
     feature_type => 'regulatory',
     ID => 'ENSR00001208657',
-    activity_evidence => 1,
+    activity => 1,
     description => "Predicted promoter flanking region",
     cell_type => "MultiCell",
   }], 'Getting regulatory_feature as JSON');

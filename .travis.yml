@@ -2,9 +2,9 @@ language: "perl"
 
 perl:
   - "5.14"
-  
+
 sudo: false
-  
+
 addons:
   apt:
     packages:
@@ -21,35 +21,22 @@ before_install:
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-variation.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-funcgen.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-io.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-hdf5.git
-    - wget https://github.com/bioperl/bioperl-live/archive/bioperl-release-1-2-3.zip
-    - unzip bioperl-release-1-2-3.zip
-    - git clone --branch master --depth 1 https://github.com/samtools/tabix.git
-    - cd tabix
-    - make
-    - cd perl
-    - perl Makefile.PL
-    - make && make install
-    - cd ../../
+    - git clone -b bioperl-release-1-6-1 --depth 1 https://github.com/bioperl/bioperl-live.git
     - cd ensembl-variation/C_code/
     - make
     - cd ../../
     - git clone --branch master --depth 1 https://github.com/samtools/htslib.git
     - cd htslib
     - make
-    - cd ../
-    - git clone --branch master --depth 1 https://github.com/Ensembl/faidx_xs.git
-    - cd faidx_xs
-    - perl Makefile.PL
-    - make
-    - cp lib/Faidx.pm ..
-    - cp blib/arch/auto/Faidx/Faidx.so ..
-    - cd ../
+    - export HTSLIB_DIR=$(pwd -P)
+    - cd ..
+
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --with-recommends --notest .
     - cpanm -n Devel::Cover::Report::Coveralls
+    - cpanm Bio::DB::HTS
     - cp travisci/MultiTestDB.conf.travisci t/MultiTestDB.conf
 
 script: "./travisci/harness.sh"
@@ -58,3 +45,5 @@ notifications:
   email:
     on_success: always
     on_failure: always
+  slack:
+    secure: gTcWzQsVHKPxRJ1u0U2l2+QVujmG1uFW44kAO3l46V5Im5uLTOLeM20ykk6ox4kaPHLs5ky7NGzcJmTDLaHBKjI4Sa34l4tJd0lhkv+hKj9TSv5pDDCdUX8v869Nm8LqJKh26HqvVcN7eHFRatLD/tfYvvkaP1rLLhwLLdr7czQ=

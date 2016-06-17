@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	83
+601	\N	schema_version	85
 3	\N	patch	patch_75_76_a.sql|schema_version
 4	\N	patch	patch_75_76_b.sql|result/feature_set.experiment_id & experiment/input_subset.display_url/archive_id
 5	\N	patch	patch_75_76_c.sql|cell_type.display_label
@@ -17,3 +17,10 @@
 592	\N	patch	patch_80_81_a.sql|schema_version
 593	\N	patch	patch_81_82_a.sql|schema_version
 594	\N	patch	patch_82_83_a.sql|schema_version
+595	\N	patch	patch_83_84_a.sql|schema_version
+596	\N	patch	patch_83_84_b.sql|Drop unique key for cell_type.efo_id
+597	\N	patch	patch_83_84_c.sql|Add not null constraint to cell_type.display_label
+598	\N	patch	patch_83_84_d.sql|Add segmentation enum to result_set.feature_class
+599	\N	patch	patch_83_84_e.sql|Increase length of regbuild_string.name
+600	\N	patch	patch_83_84_f.sql|Change regulatory_feature has_evidence to activity
+602	\N	patch	patch_84_85_a.sql|schema_version

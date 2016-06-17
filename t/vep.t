@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [2016] EMBL-European Bioinformatics Institute
+# Copyright [2016] EMBL-European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -70,7 +71,20 @@ my $vep_output =
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
       strand => 1,
-      transcript_id => 'ENST00000536043',
+      transcript_id => 'ENST00000361669',
+      variant_allele => 'G'
+    },
+    {
+      biotype => 'protein_coding',
+      consequence_terms => [
+        'intron_variant'
+      ],
+      impact => 'MODIFIER',
+      gene_id => 'ENSG00000198822',
+      gene_symbol => 'GRM3',
+      gene_symbol_source => 'HGNC',
+      strand => 1,
+      transcript_id => 'ENST00000394720',
       variant_allele => 'G'
     },
     {
@@ -96,7 +110,7 @@ my $vep_output =
       gene_symbol => 'GRM3',
       gene_symbol_source => 'HGNC',
       strand => 1,
-      transcript_id => 'ENST00000361669',
+      transcript_id => 'ENST00000536043',
       variant_allele => 'G'
     },
     {
@@ -112,64 +126,12 @@ my $vep_output =
       transcript_id => 'ENST00000546348',
       variant_allele => 'G'
     },
-    {
-      biotype => 'protein_coding',
-      consequence_terms => [
-        'intron_variant'
-      ],
-      impact => 'MODIFIER',
-      gene_id => 'ENSG00000198822',
-      gene_symbol => 'GRM3',
-      gene_symbol_source => 'HGNC',
-      strand => 1,
-      transcript_id => 'ENST00000394720',
-      variant_allele => 'G'
-    }
   ]}];
 
 my $vep_output_2 =
   { data => [
-    {"Consequence" => "intron_variant",
-     "GMAF" => "C:0.0399",
-     "STRAND" => 1,
-     "SYMBOL" => "GRM3",
-     "SYMBOL_SOURCE" => "HGNC",
-     "BIOTYPE" => 'protein_coding',
-     "Feature_type" => "Transcript",
-     "Uploaded_variation" => "temp",
-     "Existing_variation" => "rs2299222",
-     "Allele" => "G",
-     "Gene" => "ENSG00000198822",
-      IMPACT => 'MODIFIER',
-     "CDS_position" => "-",
-     "cDNA_position" => "-",
-     "Protein_position" => "-",
-     "Amino_acids" => undef,
-     "Feature" => "ENST00000536043",
-     "Codons" => undef,
-     "Location" => "7:86442404"
-    },
-    {"Consequence" => "intron_variant",
-     "GMAF" => "C:0.0399",
-     "STRAND" => 1,
-     "SYMBOL" => "GRM3",
-     "SYMBOL_SOURCE" => "HGNC",
-     "BIOTYPE" => "protein_coding",
-     "Uploaded_variation" => "temp",
-     "Existing_variation" => "rs2299222",
-     "Allele" => "G",
-     "Gene" => "ENSG00000198822",
-      IMPACT => 'MODIFIER',
-     "CDS_position" => "-",
-     "cDNA_position" => "-",
-     "Protein_position" => "-",
-     "Amino_acids" => undef,
-     "Feature" => "ENST00000439827",
-     "Feature_type" => "Transcript",
-     "Codons" => undef,
-     "Location" => "7:86442404"
-     },
-     {"Consequence" => "intron_variant",
+    {
+      "Consequence" => "intron_variant",
       "GMAF" => "C:0.0399",
       "STRAND" => 1,
       "SYMBOL" => "GRM3",
@@ -180,7 +142,7 @@ my $vep_output_2 =
       "Existing_variation" => "rs2299222",
       "Allele" => "G",
       "Gene" => "ENSG00000198822",
-       IMPACT => 'MODIFIER',
+      IMPACT => 'MODIFIER',
       "CDS_position" => "-",
       "cDNA_position" => "-",
       "Protein_position" => "-",
@@ -188,47 +150,92 @@ my $vep_output_2 =
       "Feature" => "ENST00000361669",
       "Codons" => undef,
       "Location" => "7:86442404"
-      },
-      {"Consequence" => "intron_variant",
-       "GMAF" => "C:0.0399",
-       "STRAND" => 1,
-       "SYMBOL" => "GRM3",
-       "SYMBOL_SOURCE" => "HGNC",
-       "BIOTYPE" => "protein_coding",
-       "Feature_type" => "Transcript",
-       "Uploaded_variation" => "temp",
-       "Existing_variation" => "rs2299222",
-       "Allele" => "G",
-       "Gene" => "ENSG00000198822",
-        IMPACT => 'MODIFIER',
-       "CDS_position" => "-",
-       "cDNA_position" => "-",
-       "Protein_position" => "-",
-       "Amino_acids" => undef,
-       "Feature" => "ENST00000546348",
-       "Codons" => undef,
-       "Location" => "7:86442404"
-       },
-       {"Consequence" => "intron_variant",
-        "GMAF" => "C:0.0399",
-        "STRAND" => 1,
-        "SYMBOL" => "GRM3",
-        "SYMBOL_SOURCE" => "HGNC",
-        "BIOTYPE" => "protein_coding",
-        "Feature_type" => "Transcript",
-        "Uploaded_variation" => "temp",
-        "Existing_variation" => "rs2299222",
-        "Allele" => "G",
-        "Gene" => "ENSG00000198822",
-         IMPACT => 'MODIFIER',
-        "CDS_position" => "-",
-        "cDNA_position" => "-",
-        "Protein_position" => "-",
-        "Amino_acids" => undef,
-        "Feature" => "ENST00000394720",
-        "Codons" => undef,
-        "Location" => "7:86442404"}
-      ]};
+    },
+    {
+      "Consequence" => "intron_variant",
+      "GMAF" => "C:0.0399",
+      "STRAND" => 1,
+      "SYMBOL" => "GRM3",
+      "SYMBOL_SOURCE" => "HGNC",
+      "BIOTYPE" => "protein_coding",
+      "Feature_type" => "Transcript",
+      "Uploaded_variation" => "temp",
+      "Existing_variation" => "rs2299222",
+      "Allele" => "G",
+      "Gene" => "ENSG00000198822",
+      IMPACT => 'MODIFIER',
+      "CDS_position" => "-",
+      "cDNA_position" => "-",
+      "Protein_position" => "-",
+      "Amino_acids" => undef,
+      "Feature" => "ENST00000394720",
+      "Codons" => undef,
+      "Location" => "7:86442404"
+    },
+    {
+      "Consequence" => "intron_variant",
+      "GMAF" => "C:0.0399",
+      "STRAND" => 1,
+      "SYMBOL" => "GRM3",
+      "SYMBOL_SOURCE" => "HGNC",
+      "BIOTYPE" => "protein_coding",
+      "Uploaded_variation" => "temp",
+      "Existing_variation" => "rs2299222",
+      "Allele" => "G",
+      "Gene" => "ENSG00000198822",
+      IMPACT => 'MODIFIER',
+      "CDS_position" => "-",
+      "cDNA_position" => "-",
+      "Protein_position" => "-",
+      "Amino_acids" => undef,
+      "Feature" => "ENST00000439827",
+      "Feature_type" => "Transcript",
+      "Codons" => undef,
+      "Location" => "7:86442404"
+    },
+    {
+      "Consequence" => "intron_variant",
+      "GMAF" => "C:0.0399",
+      "STRAND" => 1,
+      "SYMBOL" => "GRM3",
+      "SYMBOL_SOURCE" => "HGNC",
+      "BIOTYPE" => 'protein_coding',
+      "Feature_type" => "Transcript",
+      "Uploaded_variation" => "temp",
+      "Existing_variation" => "rs2299222",
+      "Allele" => "G",
+      "Gene" => "ENSG00000198822",
+      IMPACT => 'MODIFIER',
+      "CDS_position" => "-",
+      "cDNA_position" => "-",
+      "Protein_position" => "-",
+      "Amino_acids" => undef,
+      "Feature" => "ENST00000536043",
+      "Codons" => undef,
+      "Location" => "7:86442404"
+    },
+    {
+      "Consequence" => "intron_variant",
+      "GMAF" => "C:0.0399",
+      "STRAND" => 1,
+      "SYMBOL" => "GRM3",
+      "SYMBOL_SOURCE" => "HGNC",
+      "BIOTYPE" => "protein_coding",
+      "Feature_type" => "Transcript",
+      "Uploaded_variation" => "temp",
+      "Existing_variation" => "rs2299222",
+      "Allele" => "G",
+      "Gene" => "ENSG00000198822",
+      IMPACT => 'MODIFIER',
+      "CDS_position" => "-",
+      "cDNA_position" => "-",
+      "Protein_position" => "-",
+      "Amino_acids" => undef,
+      "Feature" => "ENST00000546348",
+      "Codons" => undef,
+      "Location" => "7:86442404"
+    },
+  ]};
 
 # Test vep/region
 my $json = json_GET($vep_get,'GET a VEP region');
@@ -332,7 +339,20 @@ $vep_output =
       gene_symbol_source => 'HGNC',
       impact => 'MODIFIER',
       strand => 1,
-      transcript_id => 'ENST00000536043',
+      transcript_id => 'ENST00000361669',
+      variant_allele => 'C'
+    },
+    {
+      biotype => 'protein_coding',
+      consequence_terms => [
+        'intron_variant'
+      ],
+      gene_id => 'ENSG00000198822',
+      gene_symbol => 'GRM3',
+      gene_symbol_source => 'HGNC',
+      impact => 'MODIFIER',
+      strand => 1,
+      transcript_id => 'ENST00000394720',
       variant_allele => 'C'
     },
     {
@@ -358,7 +378,7 @@ $vep_output =
       gene_symbol_source => 'HGNC',
       impact => 'MODIFIER',
       strand => 1,
-      transcript_id => 'ENST00000361669',
+      transcript_id => 'ENST00000536043',
       variant_allele => 'C'
     },
     {
@@ -372,19 +392,6 @@ $vep_output =
       impact => 'MODIFIER',
       strand => 1,
       transcript_id => 'ENST00000546348',
-      variant_allele => 'C'
-    },
-    {
-      biotype => 'protein_coding',
-      consequence_terms => [
-        'intron_variant'
-      ],
-      gene_id => 'ENSG00000198822',
-      gene_symbol => 'GRM3',
-      gene_symbol_source => 'HGNC',
-      impact => 'MODIFIER',
-      strand => 1,
-      transcript_id => 'ENST00000394720',
       variant_allele => 'C'
     },
   ]
@@ -427,7 +434,28 @@ $vep_output_2 =
       STRAND => 1,
       SYMBOL => 'GRM3',
       SYMBOL_SOURCE => 'HGNC',
-      Feature => 'ENST00000536043',
+      Feature => 'ENST00000361669',
+      Feature_type => 'Transcript',
+      Gene => 'ENSG00000198822',
+      Location => '7:86442404',
+      Protein_position => '-',
+      Uploaded_variation => 'var2',
+      cDNA_position => '-'
+    },
+    {
+      Allele => 'C',
+      Amino_acids => undef,
+      BIOTYPE => "protein_coding",
+      CDS_position => '-',
+      Codons => undef,
+      Consequence => 'intron_variant',
+      Existing_variation => 'rs2299222',
+      GMAF => 'C:0.0399',
+      IMPACT => 'MODIFIER',
+      STRAND => 1,
+      SYMBOL => 'GRM3',
+      SYMBOL_SOURCE => 'HGNC',
+      Feature => 'ENST00000394720',
       Feature_type => 'Transcript',
       Gene => 'ENSG00000198822',
       Location => '7:86442404',
@@ -469,7 +497,7 @@ $vep_output_2 =
       STRAND => 1,
       SYMBOL => 'GRM3',
       SYMBOL_SOURCE => 'HGNC',
-      Feature => 'ENST00000361669',
+      Feature => 'ENST00000536043',
       Feature_type => 'Transcript',
       Gene => 'ENSG00000198822',
       Location => '7:86442404',
@@ -498,27 +526,6 @@ $vep_output_2 =
       Uploaded_variation => 'var2',
       cDNA_position => '-'
     },
-    {
-      Allele => 'C',
-      Amino_acids => undef,
-      BIOTYPE => "protein_coding",
-      CDS_position => '-',
-      Codons => undef,
-      Consequence => 'intron_variant',
-      Existing_variation => 'rs2299222',
-      GMAF => 'C:0.0399',
-      IMPACT => 'MODIFIER',
-      STRAND => 1,
-      SYMBOL => 'GRM3',
-      SYMBOL_SOURCE => 'HGNC',
-      Feature => 'ENST00000394720',
-      Feature_type => 'Transcript',
-      Gene => 'ENSG00000198822',
-      Location => '7:86442404',
-      Protein_position => '-',
-      Uploaded_variation => 'var2',
-      cDNA_position => '-'
-    }
   ]
 };
 

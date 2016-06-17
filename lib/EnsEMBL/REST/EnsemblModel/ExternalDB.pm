@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -72,14 +73,18 @@ has 'description'   => ( isa => 'Maybe[Str]', is => 'ro', required => 1 );
 =cut
 
 sub get_ExternalDBs {
-  my ($class, $dba, $filter) = @_;
+  my ($class, $dba, $filter, $feature) = @_;
   assert_ref($dba, 'Bio::EnsEMBL::DBSQL::DBAdaptor', 'DBAdaptor');
   $filter ||= '%';
   my $sql = <<'SQL';
-select external_db_id, db_name, db_release, db_display_name, description
-from external_db
-where db_name like ?
+select distinct e.external_db_id, e.db_name, e.db_release, e.db_display_name, e.description
+from external_db e where db_name like ?
 SQL
+  if ($feature) {
+    my @dbis = @{ $dba->dbc->sql_helper->execute_simple(-SQL => "select distinct external_db_id from $feature where external_db_id is not null") };
+    my $list = join( ',', @dbis );
+    $sql .= " and e.external_db_id in ($list)";
+  }
   my $results = $dba->dbc->sql_helper->execute(-SQL => $sql, -PARAMS => [$filter], -CALLBACK => sub {
     my ($row) = @_;
     my ($id, $name, $release, $display_name, $description) = @{$row};

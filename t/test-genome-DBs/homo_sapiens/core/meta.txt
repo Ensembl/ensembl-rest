@@ -1,5 +1,5 @@
 1775	1	xref.timestamp	2012-09-03 21:14:58
-1	\N	schema_version	84
+1	\N	schema_version	85
 2	\N	patch	patch_52_53_a.sql|schema_version
 3	\N	patch	patch_52_53_b.sql|external_db_type_enum
 4	\N	patch	patch_52_53_c.sql|identity_xref_rename
@@ -208,3 +208,7 @@
 1820	\N	patch	patch_83_84_a.sql|schema_version
 1821	\N	patch	patch_83_84_b.sql|xref.version_default
 1822	\N	patch	patch_83_84_c.sql|protein_feature_unique
+1823	\N	patch	patch_83_84_d.sql|longer_synonym
+1824	\N	patch	patch_83_84_e.sql|nullable_versions
+1825	\N	patch	patch_84_85_a.sql|schema_version
+1826	\N	patch	patch_84_85_b.sql|remove_duplicated_key
