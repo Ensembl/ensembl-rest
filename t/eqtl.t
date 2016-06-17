@@ -40,13 +40,18 @@ my $multi = Bio::EnsEMBL::Test::MultiTestDB->new();
 my $var_dba = $multi->get_DBAdaptor('variation');
 my $core_dba = $multi->get_DBAdaptor('core');
 require EnsEMBL::REST;
-my $sql  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5.sqlite3';
-
+#my $sql  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/table.sql';
+my $sql  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.sql';
+my $sqlite  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5.sqlite3';
 my $hdf5 = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5';
-my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sql);
-print "Attempt to create $eqtl_a using $hdf5 and $sql\n";
 
+if(!-e $sql){warn "Missing SQL file $sql"}
+if(!-e $hdf5){warn "Missing HDF5 file $hdf5"}
 
+say "SQL  file used: $sql";
+say "HDF5 file used: $hdf5";
+my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite);
+say 'Adaptor: '. ref($eqtl_a);
 
 # warn ref($eqtl_a);
 my $expected = {value => '0.985863302490807'};
