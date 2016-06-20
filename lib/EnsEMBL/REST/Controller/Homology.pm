@@ -21,6 +21,8 @@ package EnsEMBL::REST::Controller::Homology;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
+use Bio::EnsEMBL::Compara::Utils::HomologyHash;
+
 require EnsEMBL::REST;
 
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
@@ -38,7 +40,7 @@ __PACKAGE__->config(
 my $CONTENT_TYPE_REGEX = qr/(?^:(?:text\/(?:javascript|xml)|application\/json))/;
 
 
-my $FORMAT_LOOKUP = { full => '_full_encoding', condensed => '_condensed_encoding' };
+my $FORMAT_LOOKUP = { full => 1, condensed => 1 };
 my $TYPE_TO_COMPARA_TYPE = { orthologues => 'ENSEMBL_ORTHOLOGUES', paralogues => 'ENSEMBL_PARALOGUES', projections => 'ENSEMBL_PROJECTIONS', all => ''};
 
 has default_compara => ( is => 'ro', isa => 'Str', default => 'multi' );
@@ -50,24 +52,11 @@ sub get_adaptors :Private {
     my $species = $c->stash()->{species};
     my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'), $self->default_compara());
     my $gma = $compara_dba->get_GeneMemberAdaptor();
-    my $sma = $compara_dba->get_SeqMemberAdaptor();
     my $ha = $compara_dba->get_HomologyAdaptor();
-    my $mlssa = $compara_dba->get_MethodLinkSpeciesSetAdaptor();
-    my $ma = $compara_dba->get_MethodAdaptor();
-    my $gdba = $compara_dba->get_GenomeDBAdaptor();
-    my $asa = $compara_dba->get_AlignSliceAdaptor();
-    my $gata = $compara_dba->get_GenomicAlignTreeAdaptor();
-    my $gaba = $compara_dba->get_GenomicAlignBlockAdaptor();
     
     $c->stash(
       gene_member_adaptor => $gma,
       homology_adaptor => $ha,
-      method_link_species_set_adaptor => $mlssa,
-      genome_db_adaptor => $gdba,
-      align_slice_adaptor => $asa,
-      genomic_align_tree_adaptor => $gata,
-      genomic_align_block_adaptor => $gaba,
-      method_adaptor => $ma,
     );
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
@@ -166,86 +155,19 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   $c->stash(homology_data => \@final_homologies);
 }
 
-sub _full_encoding {
-  my ($self, $c, $homologies, $stable_id) = @_;
-  my @output;
-  
-  my $sequence_param = $c->request->param('sequence') || 'protein';
-  my $seq_type = $sequence_param eq 'protein' ? undef : 'cds';
-  my $aligned = $c->request->param('aligned');
-  $aligned = 1 unless defined $aligned;
-  my $cigar_line = $c->request->param('cigar_line');
-  $cigar_line = 1 unless defined $cigar_line;
-  
-  my $encode = sub {
-    my ($member) = @_;
-    my $gene = $member->gene_member();
-    my $genome_db = $gene->genome_db();
-    my $taxon_id = $genome_db->taxon_id();
-    my $result = {
-      id => $gene->stable_id(),
-      species => $genome_db->name(),
-      perc_id => ($member->perc_id()*1),
-      perc_pos => ($member->perc_pos()*1),
-      protein_id => $member->stable_id(),
-    };
-    $result->{cigar_line} = $member->cigar_line() if $cigar_line;
-    $result->{taxon_id} = ($taxon_id+0) if defined $taxon_id;
-    if($aligned && $member->cigar_line()) {
-      $result->{align_seq} = $member->alignment_string($seq_type);
-    }
-    else {
-      $result->{seq} = $member->other_sequence($seq_type);
-    }
-    return $result;
-  };
-  
-  Bio::EnsEMBL::Compara::MemberSet->_load_all_missing_sequences($seq_type, @{$homologies});
-  while(my $h = shift @{$homologies}) {
-    my ($src, $trg) = @{ $h->get_all_Members() };
-    my $e = {
-      type => $h->description(),
-      taxonomy_level => $h->taxonomy_level(),
-      dn_ds => $h->dnds_ratio(),
-      source => $encode->($src),
-      target => $encode->($trg),
-      method_link_type => $h->method_link_species_set()->method()->type(),
-    };
-    $e->{dn_ds} = $e->{dn_ds}*1 if defined $e->{dn_ds};
-    push(@output, $e);
-  }
-  return \@output;
-}
-
-sub _condensed_encoding {
-  my ($self, $c, $homologies, $stable_id) = @_;
-  $c->log()->debug('Starting condensed encoding');
-  my @output;
-  while(my $h = shift @{$homologies}) {
-    my ($src, $trg) = @{ $h->get_all_Members() };
-    my $gene_member = $trg->gene_member();
-    my $e = {
-      type => $h->description(),
-      taxonomy_level => $h->taxonomy_level(),
-      id => $gene_member->stable_id(),
-      protein_id => $trg->stable_id(),
-      species => $gene_member->genome_db->name(),
-      method_link_type => $h->method_link_species_set()->method()->type(),
-    };
-    push(@output, $e);
-  }
-  $c->log()->debug('Finished condensed encoding');
-  return \@output;
-}
 
 sub get_orthologs_GET {
   my ( $self, $c ) = @_;
 
   if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
-    my $format = $c->request->param('format') || 'full';
-    my $target = $FORMAT_LOOKUP->{$format};
+    my $format          = $c->request->param('format') || 'full';
+    my $sequence_param  = $c->request->param('sequence') || 'protein';
+    my $seq_type        = $sequence_param eq 'protein' ? undef : 'cds';
+    my $aligned         = $c->request->param('aligned') // 1;
+    my $cigar_line      = $c->request->param('cigar_line') // 1;
+
     foreach my $ref (@{$c->stash->{homology_data}}) {
-        $ref->{homologies} = $self->$target($c, $ref->{homologies}, $ref->{id});
+        $ref->{homologies} = Bio::EnsEMBL::Compara::Utils::HomologyHash->convert($ref->{homologies}, -FORMAT_PRESET => $format, -SEQ_TYPE => $seq_type, -ALIGNED => $aligned, -CIGAR_LINE => $cigar_line);
     }
     return $self->status_ok( $c, entity => { data => $c->stash->{homology_data} } );
 

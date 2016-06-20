@@ -272,9 +272,7 @@ sub _build_species_info {
   #Aliases is backwards i.e. alias -> species
   my %alias_lookup;
   while (my ($alias, $species) = each %{ $Bio::EnsEMBL::Registry::registry_register{_ALIAS} }) {
-    if($alias ne $species) {
       push(@{$alias_lookup{$species}}, $alias); # iterate through the alias,species pairs & reverse
-    }
   }
   
   my @all_dbadaptors = grep {$_->dbc->dbname ne 'ncbi_taxonomy'} @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
@@ -367,10 +365,15 @@ sub _build_species_info {
   foreach my $dba (@core_dbadaptors) {
     my $species = $dba->species();
     my $species_lc = ($species);
+    my $aliases_to_skip = {
+        $species => 1,
+        (lc "$species $assembly_lookup{$species}") => 1,    # automatically added by the Compara API
+    };
+    my $good_aliases = [grep {!$aliases_to_skip->{$_}} @{$alias_lookup{$species} || []}];
     my $info = {
       name => $species,
       release => $release_lookup{$species},
-      aliases => $alias_lookup{$species} || [],
+      aliases => $good_aliases,
       groups  => $groups_lookup{$species},
       division => $division_lookup{$species},
       common_name => $common_lookup{$species},
@@ -485,6 +488,7 @@ after 'BUILD' => sub {
     my $log = $self->log();
     $log->info('Triggering preload of the registry');
     $self->_registry();
+    $_->get_MethodLinkSpeciesSetAdaptor()->fetch_all() for @{ $self->get_all_DBAdaptors('compara') };
     $self->_build_species_info();
     $log->info('Done');
   }
