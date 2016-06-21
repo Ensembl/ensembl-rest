@@ -101,11 +101,18 @@ sub fetch_all_Datasets{
   my $vca = Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor->new( -config => $self->{ga_config} );
 
   my %collections;
+  ## save all genotype sets
   foreach my $collection(@{$vca->fetch_all} ) { 
     ## calculate id from source name
     my $ga_id = md5_hex($collection->source_name());
-    $collections{$ga_id} = $collection->source_name();
+    $collections{$ga_id}{name}  = $collection->source_name();
+    $collections{$ga_id}{desc}  = $collection->source_name() . " genotypes";
   }
+
+  ## add default ensembl set for gene annotation
+  $collections{'Ensembl'}{name}  = 'Ensembl';
+  $collections{'Ensembl'}{desc}  = 'Ensembl annotation';
+
 
   return \%collections;
 }

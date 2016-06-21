@@ -68,7 +68,10 @@ sub fetch_datasets{
     }
 
      ## save and increment
-     my $dataset = { id => $id, description => $datasets->{$id} };
+     my $dataset = { id => $id, 
+                     name => $datasets->{$id}->{name},
+                     description => $datasets->{$id}->{desc} 
+                   };
      push @datasets, $dataset;
      $count++;
   }
@@ -89,7 +92,7 @@ sub getDataset{
 
   return undef unless defined $collections->{$id};
 
-  return {id => $id, description => $collections->{$id} }; 
+  return {id => $id, name => $collections->{$id}->{name}, description => $collections->{$id}->{desc} }; 
 
 }
 
