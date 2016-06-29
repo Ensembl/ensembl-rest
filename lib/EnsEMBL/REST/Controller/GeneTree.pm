@@ -118,7 +118,7 @@ sub _set_genetree {
   if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
     # If it wasn't a special format convert GT into a Hash data structure and let the normal serialisation
     # code deal with it.
-    my $hash = Bio::EnsEMBL::Compara::Utils::GeneTreeHash->convert ($gt, -no_sequences => $no_sequences, -aligned => $aligned, -cdna => $cdna, -exon_boundaries => 0, -gaps => 0, -full_tax_info => 0, -cigar_line => $cigar_line);
+    my $hash = Bio::EnsEMBL::Compara::Utils::GeneTreeHash->convert ($gt, -no_sequences => $no_sequences, -aligned => $aligned, -cdna => $cdna, -exon_boundaries => 0, -gaps => 0, -cigar_line => $cigar_line);
     $gt->release_tree();
     return $self->status_ok($c, entity => $hash);
   }
