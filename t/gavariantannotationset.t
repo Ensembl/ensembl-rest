@@ -35,23 +35,23 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 my $base = '/ga4gh/variantannotationsets/search';
 
-my $post_data1 = '{ "variantSetId": "84", "pageSize": 1 }';
+my $post_data1 = '{ "variantSetId": "Ensembl", "pageSize": 1 }';
 
 my $expected_data1 = {                                  
   variantAnnotationSets => [
     {                                                                                
       analysis => {                                                                  
-        created => undef,                                                            
+        createDateTime => undef,                                                            
         description => undef,                                                        
-        id => '84',                                                                  
+        id => '85',                                               
         info => {                                                                    
-          'assembly.accession' => 'GCA_000001405.9',                                 
-          'assembly.long_name' => 'Genome Reference Consortium Human Reference 37',  
-          'assembly.name' => 'GRCh37.p8',                                            
-          'dbSNP_version' => '138',                                                    
-          'genebuild.havana_datafreeze_date' => '2012-06-11',                        
-          'genebuild.id' => '25',                                                    
-          'genebuild.last_geneset_update' => '2012-10'                               
+          'assembly.accession'               => ['GCA_000001405.9'],                                 
+          'assembly.long_name'               => ['Genome Reference Consortium Human Reference 37'], 
+          'assembly.name'                    => ['GRCh37.p8'],                                            
+          'dbSNP_version'                    => ['138'],                               
+          'genebuild.havana_datafreeze_date' => ['2012-06-11'],                        
+          'genebuild.id'                     => ['25'],                             
+          'genebuild.last_geneset_update'    => ['2012-10']                               
         },                                                                           
         name => 'Ensembl',                                                           
         software => [                                                                
@@ -60,9 +60,9 @@ my $expected_data1 = {
         type => 'variant annotation',                                                
         updated => undef                                                             
       },                                                                             
-      id => 'Ensembl:84',                                                            
-      name => 'Ensembl:84',                                                          
-      variantSetId => '84'                                                           
+      id => 'Ensembl.85.GRCh37',                                                            
+      name => 'Ensembl.85.GRCh37',                                                          
+      variantSetId => 'Ensembl.85.GRCh37'                                                           
     }                                                                                
   ],
   nextPageToken => undef                                                                               
@@ -77,20 +77,20 @@ eq_or_diff($json1, $expected_data1, "Checking the result from the ga4gh dataset 
 ### check get
 
 $base =~ s/\/search//;
-my $id = 'Ensembl:84';
+my $id = 'Ensembl';
 my $expected_data2 = {  
      analysis => {                                                                 
-       created => undef,                                                           
+       createDateTime => undef,                                                           
        description => undef,                                                       
-       id => '84',                                                                 
+       id => '85',                                                                
        info => {                                                                   
-         'assembly.accession' => 'GCA_000001405.9',                                
-         'assembly.long_name' => 'Genome Reference Consortium Human Reference 37', 
-         'assembly.name' => 'GRCh37.p8',                                           
-         dbSNP_version => '138',                                                   
-         'genebuild.havana_datafreeze_date' => '2012-06-11',                       
-         'genebuild.id' => '25',                                                   
-         'genebuild.last_geneset_update' => '2012-10'                              
+         'assembly.accession'               => ['GCA_000001405.9'],                                
+         'assembly.long_name'               => ['Genome Reference Consortium Human Reference 37'], 
+         'assembly.name'                    => ['GRCh37.p8'],                                           
+         'dbSNP_version'                    => ['138'],                                                   
+         'genebuild.havana_datafreeze_date' => ['2012-06-11'],
+         'genebuild.id'                     => ['25'],                                                   
+         'genebuild.last_geneset_update'    => ['2012-10']                             
        },                                                                          
        name => 'Ensembl',                                                          
        software => [                                                               
@@ -99,9 +99,9 @@ my $expected_data2 = {
        type => 'variant annotation',                                               
        updated => undef                                                            
      },                                                                            
-     id => 'Ensembl:84',                                                           
-     name => 'Ensembl:84',                                                         
-     variantSetId => '84'                                                          
+     id => 'Ensembl.85.GRCh37',                                                           
+     name => 'Ensembl.85.GRCh37',                                                         
+     variantSetId => 'Ensembl.85.GRCh37'                                                          
 };
 
   

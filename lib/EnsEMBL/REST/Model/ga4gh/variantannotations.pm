@@ -22,12 +22,8 @@ use Moose;
 extends 'Catalyst::Model';
 use Catalyst::Exception;
 
-use Bio::DB::Fasta;
-use Bio::EnsEMBL::Variation::VariationFeature;
-use Bio::EnsEMBL::Variation::DBSQL::VariationFeatureAdaptor;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
-use Time::HiRes qw(gettimeofday);
-use Data::Dumper;
+
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
 
@@ -45,18 +41,14 @@ sub searchVariantAnnotations {
   my ($self, $data ) = @_;
 
   $data->{species} = 'homo_sapiens'; 
-  ## format look up lists if any specified
-  $data->{required_features} = $self->extractRequired( $data->{featureIds}, 'features') if $data->{featureIds}->[0];
-  $data->{required_effects}  = $self->extractRequired( $data->{effects}, 'SO' )          if $data->{effects}->[0];
+  ## create look up hashs if any filters specified
+  $data->{required_features} = $self->extract_required( $data->{featureIds}, 'features') if $data->{featureIds}->[0];
+  $data->{required_effects}  = $self->extract_required( $data->{effects}, 'SO' )         if $data->{effects}->[0];
 
   if ( $data->{variantAnnotationSetId} =~/compliance/){
     return $self->searchVariantAnnotations_compliance($data);
   }
   else{
-
-    ## extract analysis date from variation database
-    $data->{timestamp} = $self->get_timestamp();
-
     return $self->searchVariantAnnotations_database($data);
   }
 }
@@ -65,13 +57,15 @@ sub searchVariantAnnotations_database {
 
   my ($self, $data ) = @_;
 
-  ## annotation set id = Ensembl.version
-  $data->{current_version} = $self->getEnsemblVersion($data);
-  $data->{current_set} = 'Ensembl.' . $data->{current_version}; 
+  ## annotation set id = Ensembl.version.assembly
+  $data = $self->get_version($data);
 
   Catalyst::Exception->throw( " No annotations available for this set: " . $data->{variantAnnotationSetId} )
     if defined $data->{variantAnnotationSetId}  && $data->{variantAnnotationSetId} ne $data->{current_set} && $data->{variantAnnotationSetId} ne 'Ensembl'; 
 
+
+  ## extract analysis date from variation database
+  $data->{timestamp} = $self->get_timestamp();
 
   ## loop over features if supplied
   return $self->searchVariantAnnotations_by_features( $data)
@@ -118,13 +112,14 @@ sub searchVariantAnnotations_by_features {
     next unless $ok_trans == 1;
 
     ## feature id is stable_id.version
-    Catalyst::Exception->throw( " feature id $req_feat not recognised")
-      unless $req_feat =~ /\./;
+#    Catalyst::Exception->throw( " feature id $req_feat not recognised")
+#      unless $req_feat =~ /\./;
 
     my ($stable_id, $version) = split/\./,$req_feat;
 
     my $transcript = $tra->fetch_by_stable_id_version( $stable_id, $version );  
-    Catalyst::Exception->throw( " feature $req_feat not found")
+    return ({"variantAnnotations"  => [],
+             "nextPageToken"       => undef })
       if !$transcript;
 
     my $tvs;
@@ -159,7 +154,7 @@ sub searchVariantAnnotations_by_features {
       ## get consequences for each alt allele
       my $tvas = $tv->get_all_alternate_TranscriptVariationAlleles();
       foreach my $tva(@{$tvas}) {
-        my $ga_annotation  = $self->formatTVA( $tva, $tv, $data->{required_effects} ) ;
+        my $ga_annotation  = $self->format_TVA( $tva, $tv, $data->{required_effects} ) ;
 
         push @{$var_ann->{transcriptEffects}}, $ga_annotation if defined $ga_annotation->{featureId};
 
@@ -203,31 +198,32 @@ sub searchVariantAnnotations_by_region {
 
   my $sla = $c->model('Registry')->get_adaptor($data->{species}, 'Core', 'Slice');
 
-#  my $start = $data->{start};
-# $start = $data->{pageToken} if defined $data->{pageToken};  
   my $start = (defined $data->{pageToken}? $data->{pageToken} : $data->{start});
-  
+
+  if( defined $data->{referenceId}){
+    my $seq = $self->context->model('ga4gh::ga4gh_utils')->get_sequence( $data->{referenceId} );
+    Catalyst::Exception->throw("sequence $data->{referenceId} not found") if !$seq;
+    $data->{referenceName} = $seq->{name};
+  }  
+
   my $location = "$data->{referenceName}\:$start\-$data->{end}";
   my $slice = $sla->fetch_by_toplevel_location($location);
 
   Catalyst::Exception->throw("sequence  location: $location not available in this assembly") if !$slice;
 
-  my ($annotations, $nextPageToken) =  $self->extractVFbySlice($data, $slice);
+  my ($annotations, $nextPageToken) =  $self->extract_VF_by_Slice($data, $slice);
 
-  return ({"variant_annotation"  => $annotations,
+  return ({"variantAnnotations"  => $annotations,
            "nextPageToken"       => $nextPageToken });
 }
 
 ## get VF by slice and return appropriate number + next token 
 
-sub extractVFbySlice{
+sub extract_VF_by_Slice{
 
   my $self  = shift;
   my $data  = shift;
   my $slice = shift;
-  my $count = shift; ## handle multiple regions in one response. Is this a good idea?
-
-  $count ||= 0;
 
   my @response;
 
@@ -251,6 +247,8 @@ sub extractVFbySlice{
   }
 
   my $next_pos; ## save this for paging
+  my $count = 0;
+
   foreach my $vf(@{$vfs}){
      next unless $vf->{variation_name} =~/rs|COS/; ## Exclude non dbSNP/ COSMIC for now
 
@@ -260,11 +258,9 @@ sub extractVFbySlice{
       last;
     }
 
-    ## filter by variant name if required
-    next if defined $data->{variantName} && $vf->{variation_name} ne  $data->{variantName};
 
     ## extract & format - may not get a result if filtering applied
-    my $var_an = $self->fetchByVF($vf, $data);
+    my $var_an = $self->fetch_by_VF($vf, $data);
     if (exists $var_an->{variantId}){
       push @response, $var_an ;
       $count++;
@@ -277,7 +273,7 @@ sub extractVFbySlice{
 
 ## extact and check annotation for a single variant
 
-sub fetchByVF{
+sub fetch_by_VF{
 
   my $self = shift;
   my $vf   = shift;
@@ -287,7 +283,7 @@ sub fetchByVF{
   my $var_ann;
   $var_ann->{variantId}              = $data->{current_version} .':'. $vf->variation_name();
   $var_ann->{variantAnnotationSetId} = $data->{current_set};
-  $var_ann->{created}                = $data->{timestamp};
+  $var_ann->{createDateTime}         = $data->{timestamp};
 
 
   my $tvs =  $vf->get_all_TranscriptVariations();
@@ -301,7 +297,7 @@ sub fetchByVF{
     my $tvas = $tv->get_all_alternate_TranscriptVariationAlleles();
     foreach my $tva(@{$tvas}) {
 
-      my $ga_annotation  = $self->formatTVA( $tva, $tv, $data->{required_effects} ) ;
+      my $ga_annotation  = $self->format_TVA( $tva, $tv, $data->{required_effects} ) ;
       push @{$var_ann->{transcriptEffects}}, $ga_annotation if defined $ga_annotation;
     }
   }
@@ -325,7 +321,7 @@ sub fetchByVF{
 }
 
 
-sub formatTVA{
+sub format_TVA{
 
   my $self = shift;
   my $tva  = shift;
@@ -339,8 +335,7 @@ sub formatTVA{
   my $ocs = $tva->get_all_OverlapConsequences();
 
   ## consequence filter
-  my $found_required = 1;
-  $found_required    = 0 if defined $effects;
+  my $found_required = ( defined $effects ? 0 : 1);
 
   foreach my $oc(@{$ocs}) {
     my $term = $oc->SO_term();
@@ -438,7 +433,7 @@ sub protein_impact{
 
 ## put required features ids/ SO accessions in a hash for look up
 
-sub extractRequired{
+sub extract_required{
 
   my $self     = shift;
   my $req_list = shift;
@@ -453,18 +448,29 @@ sub extractRequired{
   return $req_hash;
 }
 
-## create temp feature set name from curent db version
+## create temp feature set name from current db version
 ## replace with GA4GH id when format available
 
-sub getEnsemblVersion{
+sub get_version{
 
   my $self = shift;
   my $data = shift;
 
-  my $var_ad   = $self->context->model('Registry')->get_DBAdaptor('homo_sapiens', 'variation');
-  my $var_meta = $var_ad->get_MetaContainer();
+  ## extract required meta data from variation database to create set name
+  my $core_ad = $self->context->model('Registry')->get_DBAdaptor('homo_sapiens', 'core' );
+  my $meta_ext_sth = $core_ad->dbc->db_handle->prepare(qq[ select meta_key, meta_value from meta]);
+  $meta_ext_sth->execute();
+  my $stuff = $meta_ext_sth->fetchall_arrayref();
 
-  return $var_meta->schema_version() ;
+  my %meta;
+  foreach my $l(@{$stuff}){
+    $meta{$l->[0]} = $l->[1] if defined $l->[1];
+  }
+
+  ## need better ids
+  $data->{current_set}      = 'Ensembl.' . $meta{schema_version} . '.'. $meta{"assembly.default"};
+  $data->{current_version}  = $meta{schema_version};
+  return $data;
 }
 
 sub searchVariantAnnotations_compliance{
@@ -535,8 +541,7 @@ sub searchVariantAnnotations_compliance{
     $variation_hash->{variantAnnotationSetId}  = $data->{variantAnnotationSetId};
     $variation_hash->{variantId}               = $variantSetId .":".$name;
 
-    $variation_hash->{created}                 = $data->{vcf_collection}->created || undef;
-    $variation_hash->{updated}                 = $data->{vcf_collection}->updated || undef; 
+    $variation_hash->{createDateTime}          = $data->{vcf_collection}->created || undef;
 
 
     ## format array of transcriptEffects

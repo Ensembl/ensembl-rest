@@ -38,21 +38,21 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 my $base = '/ga4gh/variantannotations/search';
 
-my $post_data1 = '{"pageSize": 1, "variantAnnotationSetId": "Ensembl:84", "featureIds":[ "ENST00000381657.2" ] }';
+my $post_data1 = '{"pageSize": 1, "variantAnnotationSetId": "Ensembl", "featureIds":[ "ENST00000381657.2" ] }';
 
-my $post_data2 = '{"pageSize": 1, "variantAnnotationSetId": "Ensembl:84", "featureIds":[ "ENST00000381657.2" ],"effects" : [ {"sourceName":"SO","term":"missense_variant","id":"SO:0001583"}]  }';
+my $post_data2 = '{"pageSize": 1, "variantAnnotationSetId": "Ensembl", "featureIds":[ "ENST00000381657.2" ],"effects" : [ {"sourceName":"SO","term":"missense_variant","id":"SO:0001583"}]  }';
  
-my $post_data3 = '{ "referenceName": "X","start": 215790 ,"end": 215978, "variantAnnotationSetId": "Ensembl:84" ,"pageSize": 1}';
+my $post_data3 = '{ "referenceName": "X","start": 215790 ,"end": 215978, "variantAnnotationSetId": "Ensembl" ,"pageSize": 1}';
 
-my $post_data4 = '{ "referenceName": "X","start": 215000 ,"end": 217000 ,"pageSize": 1, "variantAnnotationSetId": "Ensembl:84",  "pageToken": 215811  }';
+my $post_data4 = '{ "referenceName": "X","start": 215000 ,"end": 217000 ,"pageSize": 1, "variantAnnotationSetId": "Ensembl",  "pageToken": 215811  }';
 
-my $post_data5 = '{ "referenceName": "X","start": 215000 ,"end": 217000 ,"pageSize": 1, "variantAnnotationSetId": "Ensembl:84",  "effects" : [ {"sourceName":"SO","term":"missense_variant","id":"SO:0001583"}]  }';
+my $post_data5 = '{ "referenceName": "X","start": 215000 ,"end": 217000 ,"pageSize": 1, "variantAnnotationSetId": "Ensembl",  "effects" : [ {"sourceName":"SO","term":"missense_variant","id":"SO:0001583"}]  }';
 
 
 
 my $expected_data1 = {                                             
   nextPageToken => 'ENST00000381657.2_208197',                      
-  variant_annotation => [          
+  variantAnnotations => [          
     {                                                           
       transcriptEffects => [                                        
         { 
@@ -68,21 +68,21 @@ my $expected_data1 = {
             {   
               id => 'SO:0001627',                              
               term => 'intron_variant', 
-              sourceVersion => '',                      
+              sourceVersion => undef,                      
               sourceName => 'Sequence Ontology'          
             },                                              
             {                                              
               id => 'SO:0001906',                         
               term => 'feature_truncation',            
               sourceName => 'Sequence Ontology', 
-              sourceVersion => ''
+              sourceVersion => undef
             }                                          
          ] 
         }                                           
     ],                                           
-    variantId => '84:tmp__',                                                                                                           
-    variantAnnotationSetId => 'Ensembl:84',         
-    created => undef,
+    variantId => '85:tmp__',                                                                                                           
+    variantAnnotationSetId => 'Ensembl.85.GRCh37', 
+    createDateTime => undef,
     info => {},                                           
    }
  ]
@@ -91,7 +91,7 @@ my $expected_data1 = {
             
 
 my $expected_data2 = { nextPageToken => 'ENST00000381657.2_208197',
-  variant_annotation => [                          
+  variantAnnotations => [                          
     {                                                       
       transcriptEffects => [                   
         {
@@ -116,7 +116,7 @@ my $expected_data2 = { nextPageToken => 'ENST00000381657.2_208197',
             start => 1456,
             referenceSequence => undef
           },                         
-          cdsLocation => {          
+          CDSLocation => {          
             alternateSequence => 'ACG',            
             end => 943,                    
             start => 942,                 
@@ -127,7 +127,7 @@ my $expected_data2 = { nextPageToken => 'ENST00000381657.2_208197',
               id => 'SO:0001583',           
               term => 'missense_variant',           
               sourceName => 'Sequence Ontology',
-              sourceVersion => ''
+              sourceVersion => undef
             }                                    
           ],
           proteinLocation => {                 
@@ -138,9 +138,9 @@ my $expected_data2 = { nextPageToken => 'ENST00000381657.2_208197',
          }                              
         }                               
       ],                               
-      variantId => '84:COSM1119154',                                            
-      variantAnnotationSetId => 'Ensembl:84',       
-      created => undef,  
+      variantId => '85:COSM1119154',                                            
+      variantAnnotationSetId => 'Ensembl.85.GRCh37',    
+      createDateTime => undef,  
       info => {},
     }
   ]
@@ -149,10 +149,10 @@ my $expected_data2 = { nextPageToken => 'ENST00000381657.2_208197',
 
 my $expected_data3 = { 
   nextPageToken => 215811,                             
-  variant_annotation => [                              
+  variantAnnotations => [                              
     {                                                  
-      variantAnnotationSetId => 'Ensembl:84',                 
-      created => undef,                 
+      variantAnnotationSetId => 'Ensembl.85.GRCh37',           
+      createDateTime => undef,                 
       info => {},
       transcriptEffects => [                           
         {
@@ -170,7 +170,7 @@ my $expected_data3 = {
             end => 1279,                        
             start => 1278                       
           },                                           
-          cdsLocation => {                             
+          CDSLocation => {                             
             alternateSequence => 'ACA',                
             end => 765,                         
             start => 764,                       
@@ -181,7 +181,7 @@ my $expected_data3 = {
               id => 'SO:0001819',                      
               term => 'synonymous_variant',            
               sourceName => 'Sequence Ontology',
-              sourceVersion => ''    
+              sourceVersion => undef   
             }                                          
           ],
           proteinLocation => {                         
@@ -192,17 +192,17 @@ my $expected_data3 = {
           }                                            
         }                                              
       ],                                               
-      variantId => '84:rs370879507'                
+      variantId => '85:rs370879507'                
     }
   ]
 };
 
 my $expected_data4 = {
   nextPageToken => 215818,                           
-  variant_annotation => [                            
+  variantAnnotations => [                            
     {                                                
-      variantAnnotationSetId => 'Ensembl:84',               
-      created => undef,
+      variantAnnotationSetId => 'Ensembl.85.GRCh37',               
+      createDateTime => undef,
       info => {}, 
       transcriptEffects => [                         
         { 
@@ -227,7 +227,7 @@ my $expected_data4 = {
             start => 1294,
             referenceSequence => undef,                    
           },                                         
-          cdsLocation => {                           
+          CDSLocation => {                           
             alternateSequence => 'ATT',              
             end => 781,                       
             start => 780,                     
@@ -238,7 +238,7 @@ my $expected_data4 = {
               id => 'SO:0001583',                    
               term => 'missense_variant',            
               sourceName => 'Sequence Ontology',
-              sourceVersion => ''                                        
+              sourceVersion => undef                                        
             }],
           proteinLocation => {                       
             alternateSequence => 'I',                
@@ -248,7 +248,7 @@ my $expected_data4 = {
           }                                          
         }                                            
       ],                                             
-      variantId => '84:rs368117410'                     
+      variantId => '85:rs368117410'      
     }                                                
   ]
 };
@@ -271,11 +271,11 @@ my $json5 = json_POST($base, $post_data5, 'variantannotations by region');
 eq_or_diff($json5, $expected_data4, "Checking the result from the variant annotation endpoint - by region & effect");
 
 
-my $bad_post1 = '{ "pageSize": 2, "variantAnnotationSet": "Ensembl:84", "featureIds":[ "ENST00000381657" ]}';
+my $bad_post1 = '{ "pageSize": 2, "variantAnnotationSet": "Ensembl", "featureIds":[ "ENST00000381657" ]}';
 
 action_bad_post($base, $bad_post1, qr/variantAnnotationSetId/, 'Throw bad feature request at endpoint' );
 
-my $bad_post2 = '{ "pageSize": 1, "variantAnnotationSetId": "Ensembl:84", "featureIds":[ "ENST00000000000" ]}';
+my $bad_post2 = '{ "pageSize": 1, "variantAnnotationSetId": "Ensembl", "featureIds":[ "ENST00000000000" ]}';
 
 action_bad_post($base, $bad_post2, qr/feature ENST00000000000 not found/, 'Throw bad transcript request at endpoint' );
 
