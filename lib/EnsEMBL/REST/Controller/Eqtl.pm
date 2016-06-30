@@ -42,8 +42,24 @@ BEGIN {
 
 sub species_id_GET {}
 sub species_variant_GET {}
+sub tissue_GET {}
 
-# /eqtl/gtxstable_idd/:species/:id?tissue=*;statistic=*;variant_name=*
+
+sub tissue: Chained('/') : PathPart('eqtl/tissue') : Args(1) ActionClass('REST') {
+  my ($self, $c, $species) = @_;
+
+  my $u_param->{species}  = $species;
+
+  try {
+    $self->status_ok($c, entity => $c->model('Eqtl')->fetch_all_tissues($u_param));
+  }
+  catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
+}
+
+# /eqtl/gtxstable_id/:species/:id?tissue=*;statistic=*;variant_name=*
 sub species_id: Chained('/') : PathPart('eqtl/id') : Args(2) ActionClass('REST') {
   my ($self, $c, $species, $stable_id) = @_;
 
@@ -55,6 +71,7 @@ sub species_id: Chained('/') : PathPart('eqtl/id') : Args(2) ActionClass('REST')
   $u_param->{tissue}       = $c->req->param('tissue');
   $u_param->{variant_name} = $c->req->param('variant_name');
   $u_param->{statistic}    = $c->req->param('statistic');
+  $u_param->{web}    = $c->req->param('web');
 
 
   try {
@@ -77,6 +94,7 @@ sub species_variant: Chained('/') : PathPart('eqtl/variant_name') : Args(2) Acti
   $u_param->{tissue}       = $c->req->param('tissue');
   $u_param->{stable_id}    = $c->req->param('stable_id');
   $u_param->{statistic}    = $c->req->param('statistic');
+  $u_param->{web}    = $c->req->param('web');
 
   try {
     $self->status_ok($c, entity => $c->model('Eqtl')->fetch_eqtl($u_param));
