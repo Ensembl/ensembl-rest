@@ -56,7 +56,7 @@ sub searchFeatures {
   ##silent fail if unsupported feature requested
   return { nextPageToken => undef,
            features =>  []}  
-         unless defined $data->{required_types}; 
+         if ! defined $data->{required_types} || $data->{pageSize} < 1; 
 
 
   $data->{featureSet} = $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSet();

@@ -44,9 +44,13 @@ sub searchReferenceSets_POST {
   my ( $self, $c ) = @_;
 
   my $referenceSets;
+  my $post_data = $c->req->data ;
+
+  ## set a default page size if not supplied or not a number
+  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} && $post_data->{pageSize} =~ /\d+/);
 
   try {
-    $referenceSets = $c->model('ga4gh::referenceSets')->searchReferenceSet( $c->req->data );
+    $referenceSets = $c->model('ga4gh::referenceSets')->searchReferenceSet( $post_data );
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };

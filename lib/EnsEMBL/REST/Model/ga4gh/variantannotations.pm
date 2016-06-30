@@ -40,6 +40,11 @@ sub searchVariantAnnotations {
  
   my ($self, $data ) = @_;
 
+  ## return empty results for zero page size
+  return ({"variantAnnotations"  => [],
+           "nextPageToken"       => $data->{pageToken} }) 
+    if $data->{pageSize} < 1 ;
+
   $data->{species} = 'homo_sapiens'; 
   ## create look up hashs if any filters specified
   $data->{required_features} = $self->extract_required( $data->{featureIds}, 'features') if $data->{featureIds}->[0];
@@ -110,10 +115,6 @@ sub searchVariantAnnotations_by_features {
 
     $ok_trans = 1 if defined $current_trans && $req_feat eq $current_trans;
     next unless $ok_trans == 1;
-
-    ## feature id is stable_id.version
-#    Catalyst::Exception->throw( " feature id $req_feat not recognised")
-#      unless $req_feat =~ /\./;
 
     my ($stable_id, $version) = split/\./,$req_feat;
 

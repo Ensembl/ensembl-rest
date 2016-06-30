@@ -79,9 +79,8 @@ sub searchVariants_POST {
 
 
   ## set a default page size if not supplied or not a number
-  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&
-                                      $post_data->{pageSize} =~ /\d+/ &&
-                                      $post_data->{pageSize} >0  );
+  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} && $post_data->{pageSize} =~ /\d+/ );
+
 
   ## set a maximum page size 
   $post_data->{pageSize} =  1000 if $post_data->{pageSize} > 1000; 

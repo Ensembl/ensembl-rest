@@ -38,10 +38,13 @@ sub build_per_context_instance {
 sub searchReferenceSet {
   
   my $self = shift;
+  my $data = shift; 
 
-  #$c->log->debug(Dumper $elf->context()->req->data);
+  return ({ referenceSets => [],
+            nextPageToken => $data->{pageToken} }) if $data->{pageSize} < 1; ;
 
-  my ( $referenceSets, $nextPageToken)  =  $self->fetchData( $self->context()->req->data );
+
+  my ( $referenceSets, $nextPageToken)  =  $self->fetchData( $data );
 
   return ({ referenceSets => $referenceSets,
             nextPageToken => $nextPageToken });
@@ -116,7 +119,7 @@ sub fetchData{
 
 
     ## paging - only return requested page size
-    if (defined $data->{pageSize} && $data->{pageSize} ne '' && $count == $data->{pageSize}){
+    if ($count == $data->{pageSize}){
       $nextPageToken = $n;
       last;
     }

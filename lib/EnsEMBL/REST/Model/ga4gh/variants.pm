@@ -41,8 +41,6 @@ has 'context' => (is => 'ro', weak_ref => 1);
 Now mapping ensembl source        => GA4GH dataset
                     VCFcollection => variationSet
 
-08/2015 Master version
-
 =cut
 
 sub build_per_context_instance {
@@ -54,6 +52,10 @@ sub build_per_context_instance {
 sub fetch_gavariant {
 
   my ($self, $data ) = @_; 
+
+  return ({ "variants"      => [],
+            "nextPageToken" => $data->{pageToken}
+          }) if $data->{pageSize} < 1;
 
   ## get the VCF collection object for the required set
   $data->{vcf_collection} =  $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});

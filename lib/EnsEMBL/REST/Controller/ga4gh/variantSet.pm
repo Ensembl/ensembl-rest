@@ -61,8 +61,8 @@ sub searchVariantSets: Chained('/') PathPart('ga4gh/variantsets/search') ActionC
 
   ## set a default page size if not supplied or not a number
   $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&  
-                                      $post_data->{pageSize} =~ /\d+/ &&
-                                      $post_data->{pageSize} >0  );
+                                      $post_data->{pageSize} =~ /\d+/);
+
 
   my $variantSets;
 

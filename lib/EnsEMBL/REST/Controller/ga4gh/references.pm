@@ -48,13 +48,19 @@ BEGIN {extends 'Catalyst::Controller::REST'; }
 sub searchReferences_POST {
   my ( $self, $c ) = @_;
 
-   my $references;
+  my $references;
+
+  my $post_data = $c->req->data;
 
   $c->go( 'ReturnError', 'custom', [ ' Cannot find "referenceSetId" key in your request' ] )
-    unless defined $c->req->data && exists $c->req->data->{referenceSetId} ;
+    unless exists $post_data->{referenceSetId} ;
+
+   ## set a default page size if not supplied or not a number
+   $post_data->{pageSize} = 50 unless (defined  $post_data->{pageSize} && $post_data->{pageSize} =~ /\d+/);
+
 
   try {
-    $references = $c->model('ga4gh::references')->fetch_references( $c->req->data );
+    $references = $c->model('ga4gh::references')->fetch_references( $post_data );
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };
