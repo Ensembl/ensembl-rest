@@ -25,8 +25,8 @@ use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::HDF5::EQTLAdaptor;
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
 
-#use feature qw(say);
-#use Data::Dumper;
+use feature qw(say);
+use Data::Dumper;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -77,6 +77,33 @@ sub fetch_eqtl {
       });
 
   return $results;
+}
+
+=head2 fetch_eqtl
+
+  Arg [1]    : HASHREF $constraints
+  Example    : $eqtls = $eqtl_adaptor->fetch_eqtl($constraints);
+  Description: Fetches all tissues currently available in the DB
+  Returntype : HASHREF
+  Exceptions : Throws if species is not available in Ensembl
+  Caller     : general
+  Status     : Stable
+
+=cut
+
+sub fetch_all_tissues {
+  my ($self, $constraints) = @_;
+
+  my $user_species    = $constraints->{species};
+  my $ensembl_species = $self->{'registry'}->get_alias($user_species);
+  if(! $ensembl_species) {
+    Catalyst::Exception->throw("Species '$user_species' not recognised. Check your URL");
+  }
+
+  my $eqtl_a = $self->{'registry'}->get_eqtl_adaptor($ensembl_species);
+  my $result = $eqtl_a->fetch_all_tissues();
+
+  return($result);
 }
 
 =head2 _validate_stable_id
