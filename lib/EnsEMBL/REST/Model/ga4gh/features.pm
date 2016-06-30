@@ -21,18 +21,11 @@ package EnsEMBL::REST::Model::ga4gh::features;
 use Moose;
 extends 'Catalyst::Model';
 
-use Bio::DB::Fasta;
-use Bio::EnsEMBL::Variation::VariationFeature;
-
 use Scalar::Util qw/weaken/;
-use Data::Dumper;
+use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro');
-
-## next token is seq & pos start if in region mode
-##    will fail for co-located features
-##   not yet implemented for search by parent 
 
 
 ## Returning only the features required for Var Ann initially
@@ -58,18 +51,26 @@ sub searchFeatures {
   my ($self, $data ) = @_; 
 
   ## check input types against supported types
-  $data->{required_types} = $self->getTypes($data);
+  $data = $self->getTypes($data);
 
   ##silent fail if unsupported feature requested
   return { nextPageToken => undef,
            features =>  []}  
          unless defined $data->{required_types}; 
 
-  ## TEMP - using Ensembl version as feature set
-  $data->{current_set} = $self->getSet();
+
+  $data->{featureSet} = $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSet();
+
+  ## check any supplied featureSet
+  if($data->{featureSetId} && 
+     $data->{featureSetId} ne $data->{featureSet}->{id} &&
+     $data->{featureSetId} ne 'Ensembl'){
+
+     return { nextPageToken => undef,
+           features =>  []};
+  }
 
   ## Paging
-  #$data->{start} = (split/\_/,$data->{pageToken})[0]  if defined $data->{pageToken};
   $data->{start} = $data->{pageToken}  if defined $data->{pageToken};
 
   return $self->searchFeaturesParent($data) if defined $data->{parentId} && $data->{parentId} =~/\w+/;
@@ -103,7 +104,6 @@ sub searchFeaturesSet {
   push @features, @{$self->extractExonsBySegment( $data )}
     if exists $data->{required_types}->{exons};
 
-  ## FIXME - add CDS
 
   ## sort & trim features
   my $sorted_features = sort_features(\@features);
@@ -306,18 +306,18 @@ sub getFeature{
   my $id   = shift;
   
   my $data;
-  $data->{current_set} = $self->getSet();
+  $data->{featureSet} = $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSet();
 
-#  return $self->getCDS($id, $data)        if $id =~/ENST\d+\.\d+\.\d+/;
   return $self->getTranscript($id, $data) if $id =~/ENST\d+\.\d+/;
   return $self->getGene($id, $data)       if $id =~/ENSG/;
   return $self->getProtein($id, $data)    if $id =~/ENSP/;
   return $self->getExon($id, $data)       if $id =~/ENSE/;
 
+  return {};  ## not the id of a supported feature
 }
 
 #### look up features by id
-## FIX: to use UUID
+
 
 sub getTranscript{
 
@@ -410,26 +410,9 @@ sub fetchSO{
   return $ontologyTerm;
 }
 
-=head2 getSet
-      create temp feature set name from current genebuild version
-=cut
-# replace with GA4GH id when format available
-# TARK integration needed
-sub getSet{
-
-  my $self = shift;
-
-  my $core_ad = $self->context->model('Registry')->get_DBAdaptor('homo_sapiens', 'Core'  );
-
-  my $meta_ext_sth = $core_ad->dbc->db_handle->prepare(qq[ select meta_value from meta where meta_key = 'schema_version']);
-  $meta_ext_sth->execute();
-  my $version = $meta_ext_sth->fetchall_arrayref();
-
-  return 'Ensembl.' . $version->[0]->[0];
-}
-
 =head2 getTypes
       compare requested types, if any to supported types
+      seek SO terms for required types
 =cut
 sub getTypes{
 
@@ -438,26 +421,30 @@ sub getTypes{
 
   my $allowed_features = $self->allowed_features();
 
-  ## check feature type is supported
-  my %required_types;
-
+  ## check if requested feature type is supported
   if (exists $data->{featureTypes}->[0] ){
 
     foreach my $term (@{$data->{featureTypes}}){
-      $required_types{$term} = 1 if exists $allowed_features->{$term};
+      $data->{required_types}->{$term} = 1 if exists $allowed_features->{$term};
     }
  
     ## exit if only unsupported features are requested
-    return undef unless scalar keys(%required_types) >0  ;
+    return undef unless scalar keys(%{$data->{required_types}}) >0  ;
   }
   else{
     ## return all features
     foreach my $type (keys %{$allowed_features} ){
-      $required_types{$type} = 1;
+      $data->{required_types}->{$type} = 1;
     }
   }
 
-  return \%required_types;
+
+  ## look up SO terms once if extracting many via search
+  foreach my $type (keys %{$data->{required_types}}){
+    $data->{ontol}->{$type} = $self->fetchSO($type);
+  }
+
+  return $data;
 }
 
 ###### format
@@ -555,7 +542,7 @@ sub formatFeature{
   my $gaFeature  = { id            => $feat->stable_id_version(),
                      parentId      => undef,
                      childIds      => [],
-                     featureSetId  => $data->{current_set},
+                     featureSetId  => $data->{featureSet}->{id},
                      referenceName => $feat->seq_region_name(),
                      start         => $feat->seq_region_start() - 1,
                      end           => $feat->seq_region_end(),
@@ -607,7 +594,7 @@ sub formatProtein{
   my $gaFeature  = { id            => $feat->stable_id(),
                      parentId      => $feat->transcript()->stable_id(),
                      childIds      => [],
-                     featureSetId  => $data->{current_set},
+                     featureSetId  => $data->{featureSet}->{id},
                      referenceName => undef,
                      start         => $feat->genomic_start() - 1,
                      end           => $feat->genomic_end(),
@@ -622,7 +609,7 @@ sub formatProtein{
   $gaFeature->{featureType} = $data->{ontol}->{'polypeptide'};
 
 
-  ## what is interesting here?
+
   $gaFeature->{attributes} = { version => [ $feat->version() ],
                                created => [ $feat->created_date() ],
                                updated => [ $feat->modified_date()]
@@ -631,7 +618,7 @@ sub formatProtein{
   return $gaFeature;
 }
 
-## What to use as id???
+
 sub formatCDS{
 
   my $self = shift;
@@ -641,7 +628,7 @@ sub formatCDS{
   my $gaFeature  = { id            => $feat->transcript()->stable_id_version() . "." . $feat->seq_region_start(),
                      parentId      => $feat->transcript()->stable_id_version(),
                      childIds      => [$feat->transcript()->translation()->stable_id_version()],
-                     featureSetId  => $data->{current_set},
+                     featureSetId  => $data->{featureSet}->{id},
                      referenceName => undef,
                      start         => $feat->seq_region_start() - 1,
                      end           => $feat->seq_region_end(),
@@ -686,8 +673,8 @@ sub reduce_size{
 
   if(scalar(@{$features}) > $pageSize){
     @return_features = splice(@{$features}, 0, $pageSize);
-    ## cannot just use location as token as features may have the same start coordinate
-    $nextPageToken = $features->[0]->{start}; # ."_". $features->[0]->{id};
+    ## duplication problem if features may have the same start coordinate
+    $nextPageToken = $features->[0]->{start}; 
   }
   else{
     @return_features = @{$features};

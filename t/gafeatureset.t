@@ -41,7 +41,7 @@ my $expected_data1 = {
   featureSets => [                                              
         {                                                       
           datasetId => 'Ensembl',                               
-          id => '25',                                           
+          id => 'Ensembl.85.GRCh37',                                           
           info => {                                             
             'assembly.accession' => [                           
               'GCA_000001405.9'                                 
@@ -75,10 +75,10 @@ eq_or_diff($json1, $expected_data1, "Checking the result from the ga4gh dataset 
 ### check get
 
 $base =~ s/\/search//;
-my $id = '25';
+my $id = 'Ensembl';
 my $expected_data2 = {                                     
       datasetId => 'Ensembl',
-      id => '25',                                           
+      id => 'Ensembl.85.GRCh37',                                           
       info => {                                             
         'assembly.accession' => [                           
           'GCA_000001405.9'                                 

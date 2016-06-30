@@ -38,23 +38,23 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 my $base = '/ga4gh/features';
 
-my $post_data1 = '{"pageSize": 1, "featureSetId": 1, "start":1080164, "end": 1190164, "referenceName":"6", "featureTypes":["transcript"]}';
+my $post_data1 = '{"pageSize": 1, "featureSetId": "Ensembl", "start":1080164, "end": 1190164, "referenceName":"6", "featureTypes":["transcript"]}';
 
-my $post_data2 = '{"pageSize": 1, "featureSetId": 1, "start":1080164, "end": 1190164, "referenceName":"6", "featureTypes":["transcript"], "pageToken": 1186752}';
+my $post_data2 = '{"pageSize": 1, "featureSetId": "Ensembl", "start":1080164, "end": 1190164, "referenceName":"6", "featureTypes":["transcript"], "pageToken": 1186752}';
 
-my $post_data3 = '{"pageSize": 1, "featureSetId": 1, "start":1080164, "end": 1090164, "referenceName":"6", "featureTypes":["gene"] }';
+my $post_data3 = '{"pageSize": 1, "featureSetId": "Ensembl", "start":1080164, "end": 1090164, "referenceName":"6", "featureTypes":["gene"] }';
 
 
 my $expected_data1 = {                                               
   features => [                                 
     {                                           
       attributes => {                           
-        biotype => 'protein_coding',            
-        created => '1209467861',                
-        source => 'ensembl',
-        external_name => 'AL033381.1-201',
-        updated => '1209467861',                
-        version => '1'
+        biotype => ['protein_coding'],            
+        created => ['1209467861'],                
+        source  => ['ensembl'],
+        external_name => ['AL033381.1-201'],
+        updated => ['1209467861'],        
+        version => ['1']
       },                                        
       childIds => [ 
         'ENSE00001271861.1', 
@@ -65,7 +65,7 @@ my $expected_data1 = {
         'ENST00000314040.1.1102041' 
       ],
       parentId => 'ENSG00000176515.1',
-      featureSetId => '25',  
+      featureSetId => 'Ensembl.85.GRCh37',  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
@@ -86,17 +86,18 @@ my $expected_data2 = {
   features => [
     {                                           
       attributes => {                           
-        biotype => 'snoRNA',                    
-        created => '1268996515',
-        source => 'ensembl',
-        external_name => 'snoU13.72-201',              
-        updated => '1268996515',                
-        Structure => '1:103	.18(3.2(4.2(5.5)5.7(8.2(.(6.3)3.)3.).2)8.3)4.2)3',        version => '1'                          
+        biotype => ['snoRNA'],                    
+        created => ['1268996515'],
+        source => ['ensembl'],
+        external_name => ['snoU13.72-201'],              
+        updated => ['1268996515'],                
+        structure => ['1:103	.18(3.2(4.2(5.5)5.7(8.2(.(6.3)3.)3.).2)8.3)4.2)3'],
+        version => ['1']                          
       },
       childIds => [ 
           'ENSE00001808595.1'
       ],                           
-      featureSetId => '25',  
+      featureSetId => 'Ensembl.85.GRCh37',  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
@@ -120,20 +121,19 @@ my $expected_data3 = {
 features => [                        
   {                                  
     attributes => {                  
-      'Gene GC' => '44.14',          
-      biotype => 'protein_coding',   
-      created => '1209467861',       
-      external_name => 'AL033381.1', 
-                                     
-      source => 'ensembl',           
-      updated => '1209467861',       
-      version => '1'                 
+      'gene gc' => ['44.14'],          
+      biotype => ['protein_coding'],   
+      created => ['1209467861'],       
+      external_name => ['AL033381.1'],              
+      source => ['ensembl'],  
+      updated => ['1209467861'],       
+      version => ['1']                 
     },                               
     childIds => [                    
       'ENST00000314040.1'            
     ],                               
     end => 1105181,                  
-    featureSetId => '25',            
+    featureSetId => 'Ensembl.85.GRCh37',     
     featureType => {                 
       id => 'SO:0000704',            
       sourceName => 'SO',            
@@ -181,19 +181,19 @@ my $json4 = json_GET("$base/$id", 'get transcript');
 
 my $expected_data4 =  {                                           
       attributes => {                           
-        biotype => 'antisense',                 
-        created => '1321005463',                
-        Author => 'Havana',
-        Name => 'RP4-668J24.2-001',
-        external_name => 'RP4-668J24.2-001',
-        source => 'havana',      
-        updated => '1321005463',                
-        version => '1'                          
+        biotype => ['antisense'],                 
+        created => ['1321005463'],                
+        author  => ['Havana'],
+        name    => ['RP4-668J24.2-001'],
+        external_name => ['RP4-668J24.2-001'],
+        source => ['havana'],      
+        updated => ['1321005463'],                
+        version => ['1']                          
       },
       childIds => [
        'ENSE00002577443.1'
       ],                          
-      featureSetId => '25',  
+      featureSetId => 'Ensembl.85.GRCh37',  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
