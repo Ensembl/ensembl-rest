@@ -16,6 +16,8 @@ limitations under the License.
 
 =cut
 
+###  Feature search support to be reinstated for e!86
+
 package EnsEMBL::REST::Model::ga4gh::variantannotations;
 
 use Moose;
@@ -47,7 +49,7 @@ sub searchVariantAnnotations {
 
   $data->{species} = 'homo_sapiens'; 
   ## create look up hashs if any filters specified
-  $data->{required_features} = $self->extract_required( $data->{featureIds}, 'features') if $data->{featureIds}->[0];
+
   $data->{required_effects}  = $self->extract_required( $data->{effects}, 'SO' )         if $data->{effects}->[0];
 
   if ( $data->{variantAnnotationSetId} =~/compliance/){
@@ -72,9 +74,6 @@ sub searchVariantAnnotations_database {
   ## extract analysis date from variation database
   $data->{timestamp} = $self->get_timestamp();
 
-  ## loop over features if supplied
-  return $self->searchVariantAnnotations_by_features( $data)
-    if exists $data->{featureIds}->[0];
 
   ## search by region otherwise
   return $self->searchVariantAnnotations_by_region( $data)
@@ -83,112 +82,6 @@ sub searchVariantAnnotations_database {
   warn "uncaught error in searchVariantAnnotations\n";
 
 }
-
-
-## get annotation by list of features
-sub searchVariantAnnotations_by_features {
-
-  my ($self, $data ) = @_;
-
-  my @annotations;
-  my $nextPageToken;
-
-  my $c = $self->context();
- 
-  my $tra = $c->model('Registry')->get_adaptor($data->{species}, 'Core',      'Transcript');
-  my $tva = $c->model('Registry')->get_adaptor($data->{species}, 'variation', 'TranscriptVariation');
-
-
-
-  ## paging
-  my $running_total = 0;
-
-  my ($current_trans, $next_pos);
-  my $ok_trans = 1;
-  if (exists $data->{pageToken}){
-     ($current_trans, $next_pos) = split/\_/, $data->{pageToken}; 
-     $ok_trans = 0 ;
-  }
-
-  ## extract one transcripts worth at once for paging
-  foreach my $req_feat ( @{$data->{featureIds}} ){
-
-    $ok_trans = 1 if defined $current_trans && $req_feat eq $current_trans;
-    next unless $ok_trans == 1;
-
-    my ($stable_id, $version) = split/\./,$req_feat;
-
-    my $transcript = $tra->fetch_by_stable_id_version( $stable_id, $version );  
-    return ({"variantAnnotations"  => [],
-             "nextPageToken"       => undef })
-      if !$transcript;
-
-    my $tvs;
-    if(exists $data->{required_effects}){
-      my @cons_terms = (keys %{$data->{required_effects} });
-
-      my $constraint = " tv.consequence_types IN (";
-      foreach my $cons(@cons_terms){ $constraint .= "\"$cons\",";}
-      $constraint =~ s/\,$/\)/;
-      $tvs = $tva->fetch_all_by_Transcripts_with_constraint([$transcript], $constraint );	
-    }
-    else{
-      $tvs = $tva->fetch_all_by_Transcripts([$transcript]);
-    }
-
-    next unless scalar(@{$tvs}) > 0; 
-
-    ## create an annotation record at the variation_feature level
-    foreach my $tv (@{$tvs}){
-
-      my $pos = $tv->variation_feature->seq_region_start();
-      ## skip if already returned
-      next if defined $next_pos && $pos < $next_pos;
-
-      if($running_total == $data->{pageSize}){
-        $nextPageToken = $req_feat . "_" . $pos;
-        last;
-      }
-
-      my $var_ann;
-
-      ## get consequences for each alt allele
-      my $tvas = $tv->get_all_alternate_TranscriptVariationAlleles();
-      foreach my $tva(@{$tvas}) {
-        my $ga_annotation  = $self->format_TVA( $tva, $tv, $data->{required_effects} ) ;
-
-        push @{$var_ann->{transcriptEffects}}, $ga_annotation if defined $ga_annotation->{featureId};
-
-      }
-      ## don't count or store until TV available
-      next unless exists $var_ann->{transcriptEffects};
-
-      $running_total++;
-      $var_ann->{variantId} = $data->{current_version} .':'. $tv->variation_feature->variation_name();
-      $var_ann->{variantAnnotationSetId} = $data->{current_set};
-      $var_ann->{createDateTime} = $data->{timestamp};
-
-
-      if( defined $tv->variation_feature->minor_allele() ) {    
-        $var_ann->{info}  = {  "1KG_minor_allele"           =>  $tv->variation_feature->minor_allele(),
-                               "1KG_minor_allele_frequency" =>  $tv->variation_feature->minor_allele_frequency()
-                            };
-      }
-      else{ $var_ann->{info} = {};}
-      ## Add ClinVar summary info
-      my $clinsig = $tv->variation_feature->get_all_clinical_significance_states();
-      $var_ann->{info}->{"ClinVar_classification"} = join(",",@{$clinsig}) if defined $clinsig->[0];
-
-      push @annotations, $var_ann;
-    }
-  }
-
-
-  ## may have no annotations if a transcript & consequence specified => return empty array
-  return ({"variantAnnotations"  => \@annotations,
-           "nextPageToken"       => $nextPageToken });
-}
-
 
 
 sub searchVariantAnnotations_by_region {
@@ -291,9 +184,6 @@ sub fetch_by_VF{
   return undef unless scalar(@{$tvs} > 0);
 
   foreach my $tv (@{$tvs}){   
-
-    ## check if a feature list was specified
-    next if scalar @{$data->{featureIds}}>0 && !exists $data->{required_features}->{ $tv->transcript()->stable_id_version()} ; 
 
     my $tvas = $tv->get_all_alternate_TranscriptVariationAlleles();
     foreach my $tva(@{$tvas}) {
@@ -442,7 +332,6 @@ sub extract_required{
   my $req_hash;
 
   foreach my $required ( @{$req_list} ){
-    $req_hash->{$required}         = 1 if $type eq 'features';
     $req_hash->{$required->{term}} = 1 if $type eq 'SO';
   }
 
@@ -570,9 +459,6 @@ sub searchVariantAnnotations_compliance{
 
       ## check if a consequence list was specified that this consequence is required
       next if scalar @{$data->{effects}}>0 && !exists $data->{required_effects}->{ $annotation{Annotation} } ;
-
-      ## check if a feature list was specified that this feature is required
-      next if scalar @{$data->{featureIds}}>0 && !exists $data->{required_features}->{ $annotation{Feature_ID} } ;
 
       my ($cdna_pos, $cdna_length ) = split /\//, $annotation{"cDNA.pos / cDNA.length"} 
         if defined $annotation{"cDNA.pos / cDNA.length"}; 

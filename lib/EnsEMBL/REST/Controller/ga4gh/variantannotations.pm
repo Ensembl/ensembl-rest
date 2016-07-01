@@ -35,7 +35,6 @@ POST requests : /ga4gh/variantannotations/search -d
  "referenceName": 7,
  "start":  140419275,
  "end": 140429275,
- "featureIds" : [ "ENST00000450305"]
  "effects"  : [ {"source":"SO","name":"missense_variant","id":"SO:0001583"}]         
  "pageToken":  null,
  "pageSize": 10
@@ -55,15 +54,11 @@ sub searchVariantAnnotations_POST {
 #  $c->log->debug(Dumper $post_data);
 
   ## required by spec, so check early
-  $c->go( 'ReturnError', 'custom', [ ' Cannot find "referenceName", "referenceId" or "featureIds"  key in your request' ] )
-    unless (exists $post_data->{referenceName} || exists $post_data->{referenceId} || exists $post_data->{featureIds});
+  $c->go( 'ReturnError', 'custom', [ ' Cannot find "referenceName", "referenceId"  key in your request' ] )
+    unless (exists $post_data->{referenceName} || exists $post_data->{referenceId});
 
-  $c->go( 'ReturnError', 'custom', [ ' Cannot find "start" or "featureIds" in your request'])
-    unless (exists $post_data->{start} || exists $post_data->{featureIds});
-
-  $c->go( 'ReturnError', 'custom', [ ' Cannot find "end" or "featureIds" in your request'])
-    unless (exists $post_data->{end}|| exists $post_data->{featureIds});
-
+  $c->go( 'ReturnError', 'custom', [ ' Cannot find "start" or "end" your request'])
+    unless (exists $post_data->{start} && exists $post_data->{end});
 
   $c->go( 'ReturnError', 'custom', [ '  End of interval cannot be greater than start of interval'])
     if defined $post_data->{end} && 
