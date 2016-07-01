@@ -118,8 +118,8 @@ sub fetchData{
                                          &&  $data->{assemblyId}  ne $refset_hash->{id};
 
 
-    ## paging - only return requested page size
-    if ($count == $data->{pageSize}){
+    ## paging - only return requested page size for POST requests
+    if (defined $data->{pageSize} && $count == $data->{pageSize}){
       $nextPageToken = $n;
       last;
     }
