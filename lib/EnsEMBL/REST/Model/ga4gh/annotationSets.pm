@@ -22,7 +22,7 @@ use Scalar::Util qw/weaken/;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 
 sub build_per_context_instance {

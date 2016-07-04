@@ -24,7 +24,7 @@ use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 
