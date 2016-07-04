@@ -389,7 +389,7 @@ sub get_compliance_variant{
 
   my ($self, $variantSetId, $varname ) = @_;
 
-  return  unless $variantSetId ==11;
+  return unless $variantSetId ==11 || $variantSetId ==12;
 
   ## create post style input structure
   my $data;
@@ -402,8 +402,9 @@ sub get_compliance_variant{
 
   ## load VCFcollections object for variantSet 
   $data->{vcf_collection} = $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});
-  $self->context()->go( 'ReturnError', 'custom', [ " Failed to find the specified variantSetId"])
-    unless defined $data->{vcf_collection};
+  Catalyst::Exception->throw( " Failed to find the specified variantSetId")
+    unless defined $data->{vcf_collection};  
+ 
 
   ## create fake token
   $data->{pageSize} = 1;
