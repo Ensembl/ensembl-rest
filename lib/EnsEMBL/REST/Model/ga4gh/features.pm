@@ -25,7 +25,7 @@ use Scalar::Util qw/weaken/;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 
 ## Returning only the features required for Var Ann initially
@@ -398,16 +398,25 @@ sub fetchSO{
   my $self = shift;
   my $type = shift;
 
+  ## a default in case of database unavailability 
+  my $default = { id            => undef,
+                  term          => $type,
+                  sourceName    => undef,
+                  sourceVersion => undef
+                  };
+
   my $onta = $self->context->model('Registry')->get_adaptor('Multi', 'Ontology', 'OntologyTerm');
+  return $default  unless defined $onta;
+
   my $ont  = $onta->fetch_all_by_name($type); 
+  return $default  unless defined $ont;
 
-  my $ontologyTerm = { id            => $ont->[0]->accession(),
-                       term          => $ont->[0]->name(), 
-                       sourceName    => $ont->[0]->ontology(),
-                       sourceVersion => undef 
-                     };
 
-  return $ontologyTerm;
+  return ( { id            => $ont->[0]->accession(),
+             term          => $ont->[0]->name(), 
+             sourceName    => $ont->[0]->ontology(),
+             sourceVersion => undef 
+            });
 }
 
 =head2 getTypes
@@ -473,13 +482,6 @@ sub formatTranscript{
   if (defined $tr->translation()){
     ## add protein feature
     push @{$feature->{childIds}}, $tr->translation()->stable_id_version();
-
-    ## add CDS features
-    my $cdsfs = $tr->get_all_CDS();
-    foreach my $cdsf (@{$cdsfs}){
-      ### what to use as CDS region id?
-      push @{$feature->{childIds}}, $tr->stable_id_version() . "." . $cdsf->seq_region_start(); 
-    }
   }
 
   return $feature;
