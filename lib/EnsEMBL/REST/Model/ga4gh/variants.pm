@@ -42,8 +42,6 @@ has 'context' => (is => 'ro', weak_ref => 1);
 Now mapping ensembl source        => GA4GH dataset
                     VCFcollection => variationSet
 
-08/2015 Master version
-
 =cut
 
 sub build_per_context_instance {
@@ -55,6 +53,10 @@ sub build_per_context_instance {
 sub fetch_gavariant {
 
   my ($self, $data ) = @_; 
+
+  return ({ "variants"      => [],
+            "nextPageToken" => $data->{pageToken}
+          }) if $data->{pageSize} < 1;
 
   ## get the VCF collection object for the required set
   $data->{vcf_collection} =  $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});
@@ -186,7 +188,7 @@ sub get_next_by_token{
 
   ## exits here if unsupported chromosome requested
   return (\@var, $nextToken) unless -e $file;
- #warn "seeking: $data->{referenceName}, $data->{pageToken}, $data->{end} in $file\n";
+
   my $parser = Bio::EnsEMBL::IO::Parser::VCF4Tabix->open( $file ) || die "Failed to get parser : $!\n";
   $parser->seek($data->{referenceName}, $data->{pageToken}, $data->{end});
 
@@ -198,6 +200,8 @@ sub get_next_by_token{
     last if $got_something ==0;
 
     my $name = $parser->get_IDs->[0];
+    ## create placeholder name if not supplied
+    $name = $parser->get_seqname ."_". $parser->get_raw_start if $name eq "." ;
 
     if ($n == $data->{pageSize} ){
       ## batch complete 
@@ -213,11 +217,9 @@ sub get_next_by_token{
     next if $name=~ /esv/; ##skip these for now
 
     ## format array of genotypes
-    my $genotype_calls = $self->sort_genotypes($parser, $data, $data->{vcf_collection}->{is_remapped});
-
-
-    ## check there are genotypes to return
-    next unless defined $genotype_calls;
+    my $genotype_calls = [];
+    $genotype_calls = $self->sort_genotypes($parser, $data, $data->{vcf_collection}->{is_remapped})
+      unless $data->{variantSetId} =~/11|12/;  ## hack for compliance suite
 
     $n++;
     my $variation_hash;
@@ -242,7 +244,7 @@ sub get_next_by_token{
 
     ## What can be trusted if variants re-mapped but not re-called? Start with: AC, AF, AN
     my $var_info = $parser->get_info();
-    if( $data->{vcf_collection}->{is_remapped} ){
+    if( $data->{vcf_collection}->{is_remapped} || $data->{variantSetId} =~ /11|12/){ ## hack for compliance suite ){
       $variation_hash->{info} = { AC => [$var_info->{AC}],
                                   AN => [$var_info->{AN}],
                                   AF => [$var_info->{AF}]
@@ -283,7 +285,7 @@ sub getVariant{
   my $c = $self->context();
   my $species = "homo_sapiens"; 
   my $varfeat;
- 
+
   my $va  = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'VariationFeature');
 
@@ -291,6 +293,10 @@ sub getVariant{
  
   my ($variantSetId, $variantId) = split/\:/, $id;
 
+  ## nameless compliance variants
+  if( $variantSetId =~/11|12/){
+    return $self->get_compliance_variant( $variantSetId, $variantId); 
+  }
   ## look up position in ensembl db 
   my $var = $va->fetch_by_name($variantId);
   my $vf  = $vfa->fetch_all_by_Variation($var) if defined $var;  
@@ -377,7 +383,42 @@ sub getSingleCallSets{
 
 }
 
+## nameless (fake?) variants not in the database
+## id is based on chrom and location
+## create private GA4GH database?
+sub get_compliance_variant{
 
+  my ($self, $variantSetId, $varname ) = @_;
+
+  return unless $variantSetId ==11 || $variantSetId ==12;
+
+  ## create post style input structure
+  my $data;
+  my ($chr, $pos) = split/\_/, $varname ;
+
+  $data->{start}         = $pos - 1;
+  $data->{end }          = $pos;
+  $data->{referenceName} = $chr;
+  $data->{variantSetId}  = $variantSetId; 
+
+  ## load VCFcollections object for variantSet 
+  $data->{vcf_collection} = $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});
+  Catalyst::Exception->throw( " Failed to find the specified variantSetId")
+    unless defined $data->{vcf_collection};  
+ 
+
+  ## create fake token
+  $data->{pageSize} = 1;
+  $data->{pageToken} = $data->{start};
+
+  my ($var_info, $next_ds) = $self->get_next_by_token($data);
+
+  ## exit if none found
+  Catalyst::Exception->throw(" No variant $varname available " )
+     unless defined $var_info ;
+
+  return $var_info->[0];
+}
 
 sub numeric{
   my $string = shift;

@@ -62,10 +62,7 @@ sub searchCallSets: Chained('/') PathPart('ga4gh/callsets/search') ActionClass('
   my $callSet;
 
   ## set a default page size if not supplied or not a number
-  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&  
-                                      $post_data->{pageSize} =~ /\d+/ &&
-                                      $post_data->{pageSize} >0  );
-
+  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} &&  $post_data->{pageSize} =~ /\d+/ );
 
 
   try {

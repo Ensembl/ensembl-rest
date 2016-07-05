@@ -32,7 +32,7 @@ use Scalar::Util qw/weaken/;
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro',  weak_ref => 1);
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 sub build_per_context_instance {
@@ -69,7 +69,10 @@ sub fetch_datasets{
     }
 
      ## save and increment
-     my $dataset = { id => $id, description => $datasets->{$id} };
+     my $dataset = { id => $id, 
+                     name => $datasets->{$id}->{name},
+                     description => $datasets->{$id}->{desc} 
+                   };
      push @datasets, $dataset;
      $count++;
   }
@@ -90,7 +93,7 @@ sub getDataset{
 
   return undef unless defined $collections->{$id};
 
-  return {id => $id, description => $collections->{$id} }; 
+  return {id => $id, name => $collections->{$id}->{name}, description => $collections->{$id}->{desc} }; 
 
 }
 
