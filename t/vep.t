@@ -820,6 +820,21 @@ $vep_output = [{
 $json = json_GET($vep_plugin_get,'GET consequences with test plugin');
 eq_or_diff($json, $vep_output, 'VEP plugin test');
 
+# test using refseq cache
+my $vep_refseq_get = '/vep/homo_sapiens/region/7:34097707-34097707:1/C?content-type=application/json&refseq=1';
+$json = json_GET($vep_refseq_get,'GET consequences with refseq cache');
+
+is_deeply(
+  {map {$_->{transcript_id} => 1} @{$json->[0]->{transcript_consequences}}},
+  {
+    'NM_133468.4' => 1,
+    'XM_005249632.1' => 1,
+    'XM_005249633.1' => 1,
+    'XM_005249634.1' => 1,
+  },
+  'refseq transcripts'
+);
+
 my $body = '{ "blurb" : "stink" }';
 # Test malformed messages
 action_bad_post($vep_post,$body, qr/key in your POST/, 'Using a bad message format causes an exception');

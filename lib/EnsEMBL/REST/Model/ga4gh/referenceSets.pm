@@ -25,7 +25,7 @@ use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 
@@ -39,10 +39,13 @@ sub build_per_context_instance {
 sub searchReferenceSet {
   
   my $self = shift;
+  my $data = shift; 
 
-  #$c->log->debug(Dumper $elf->context()->req->data);
+  return ({ referenceSets => [],
+            nextPageToken => $data->{pageToken} }) if $data->{pageSize} < 1; ;
 
-  my ( $referenceSets, $nextPageToken)  =  $self->fetchData( $self->context()->req->data );
+
+  my ( $referenceSets, $nextPageToken)  =  $self->fetchData( $data );
 
   return ({ referenceSets => $referenceSets,
             nextPageToken => $nextPageToken });
@@ -116,8 +119,8 @@ sub fetchData{
                                          &&  $data->{assemblyId}  ne $refset_hash->{id};
 
 
-    ## paging - only return requested page size
-    if (defined $data->{pageSize} && $data->{pageSize} ne '' && $count == $data->{pageSize}){
+    ## paging - only return requested page size for POST requests
+    if (defined $data->{pageSize} && $count == $data->{pageSize}){
       $nextPageToken = $n;
       last;
     }

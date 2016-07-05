@@ -438,9 +438,30 @@ sub _new_slice_seq {
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
   # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/hgvs ccds numbers domains canonical protein xref_refseq version/);
+  my @valid_keys = (qw/
+    hgvs
+    ccds
+    numbers
+    domains
+    canonical
+    protein
+    xref_refseq
+    version
+    refseq
+    merged
+    all_refseq
+  /);
   
   my %vep_params = %{ $c->config->{'Controller::VEP'} };
+
+  # refseq or merged?
+  if($user_config->{refseq} && $vep_params{refseq_dir}) {
+    $vep_params{dir} = $vep_params{refseq_dir};
+  }
+  elsif($user_config->{merged} && $vep_params{merged_dir}) {
+    $vep_params{dir} = $vep_params{merged_dir};
+  }
+
   read_cache_info(\%vep_params);
   # $c->log->debug("Before ".Dumper \%vep_params);
   # Values in user_config come from POST body while request_params() contains config from url

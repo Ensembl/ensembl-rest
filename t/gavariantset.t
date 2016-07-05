@@ -222,7 +222,8 @@ my $expected_data2 = {
       ],
       referenceSetId => 'GRCh37'                                           
     },
-  ]
+  ],
+  nextPageToken => undef
 };                
 
 my $json2 = json_POST($base, $post_data2, 'variantset by datasetid');

@@ -70,7 +70,6 @@ sub encode_phyloxml {
     }
   } elsif ($c->namespace eq 'genetree') {
     #gene tree
-    $trees->preload();
     push @$roots, $trees;
   }
   $w->write_trees($roots);
@@ -99,8 +98,6 @@ sub encode_orthoxml {
   );
 
   my $tree = $c->stash->{$stash_key};
-  $tree->preload();
-
   $w->write_trees($tree);
   $w->finish();
 
@@ -113,10 +110,13 @@ sub encode_nh {
   $stash_key ||= 'rest';
   my $gt = $c->stash->{$stash_key};
   my $nh_format = $c->request->param('nh_format') || 'simple';
-  $gt->preload() if ($gt->can('preload'));
   my $root = $gt->root();
   my $str = $root->newick_format($nh_format);
-  $root->release_tree() if ($root->can('release_tree'));
+  if ($gt->can('release_tree')) {
+    $gt->release_tree();
+  } elsif ($root->can('release_tree')) {
+    $root->release_tree();
+  }
   return \$str;
 }
 

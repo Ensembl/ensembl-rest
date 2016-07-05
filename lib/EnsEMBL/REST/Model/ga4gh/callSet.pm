@@ -59,6 +59,11 @@ sub fetch_callSets {
 
   my ($self, $data ) = @_;
 
+  ## handle zero or negative page sizes   
+  return ({ callSets      => [],
+            nextPageToken => $data->{pageToken}})  if $data->{pageSize} < 1;
+
+
   my ($callsets, $nextPageToken ) = $self->fetch_batch($data);
 
   return undef unless defined $callsets;
@@ -103,7 +108,7 @@ sub fetch_batch{
 
   ## return empty array if non available
   return (\@callsets, $nextPageToken) unless defined $samples;
-  
+
   ## loop over callSets
   for (my $n = $data->{pageToken}; $n < scalar(@{$samples}); $n++) {  
 
@@ -114,17 +119,15 @@ sub fetch_batch{
     my $sample_id   = $data->{variantSetId} . ":" . $sample_name;
 
     ## filter by name if required
-    next if defined $data->{name} && $sample_name !~ /$data->{name}/; 
+    next if defined $data->{name} && $data->{name} =~/\w+/ && $sample_name !~ /$data->{name}/; 
 
     ## filter by id from GET request
-    next if defined $data->{req_callset} && $sample_id !~ /$data->{req_callset}/;
+    next if defined $data->{req_callset} && $data->{req_callset} =~ /\w+/ && $sample_id !~ /$data->{req_callset}/;
  
 
-    ## if requested batch size reached set new page token
+    ## for POST: if requested batch size reached set new page token
     $count_ind++;
-    $nextPageToken = $n + 1  if (defined  $data->{pageSize} &&  
-                                 $data->{pageSize} =~/\w+/ && 
-                                 $count_ind == $data->{pageSize} &&
+    $nextPageToken = $n + 1  if (defined $data->{pageSize} && $count_ind == $data->{pageSize} &&
                                  $n +1 < scalar(@{$samples}) ); ## is there anything left?
 
     ## save info
