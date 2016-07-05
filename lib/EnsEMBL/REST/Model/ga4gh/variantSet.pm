@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@ package EnsEMBL::REST::Model::ga4gh::variantSet;
 
 use Moose;
 extends 'Catalyst::Model';
-use Data::Dumper;
+
 use Scalar::Util qw/weaken/;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
@@ -50,13 +51,17 @@ sub fetch_variantSets {
 
   my ($self, $data ) = @_;
 
+ return ({ "variantSets"   => [],
+           "nextPageToken" => $data->{pageToken}
+          }) if $data->{pageSize} < 1;
+
+
   ## extract required variant sets
   my ($variantSets, $newPageToken ) = $self->fetch_sets($data);
 
-  my $ret = { variantSets => $variantSets};
-  $ret->{pageToken} = $newPageToken  if defined $newPageToken ;
+  return ( { variantSets   => $variantSets,
+             nextPageToken => $newPageToken});
 
-  return $ret;
 }
 
 =head fetch_sets
@@ -97,9 +102,9 @@ sub fetch_sets{
     next if defined $data->{datasetId} && $data->{datasetId} ne ''
       &&  $datasetId ne $data->{datasetId} ; 
 
-    ## set next token and stop storing if page size reached
+    ## set next token and stop storing if page size reached if pageSize defined (ie POST request)
     if (defined $data->{pageSize} &&  $n == $data->{pageSize}){
-      $newPageToken = $varset_id if defined $data->{pageSize} && $n == $data->{pageSize};
+      $newPageToken = $varset_id;
       last;
     }
 

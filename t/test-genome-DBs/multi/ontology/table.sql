@@ -14,6 +14,7 @@ CREATE TABLE `closure` (
   `subparent_term_id` int(10) unsigned DEFAULT NULL,
   `distance` tinyint(3) unsigned NOT NULL,
   `ontology_id` int(10) unsigned NOT NULL,
+  `confident_relationship` tinyint(1) NOT NULL,
   PRIMARY KEY (`closure_id`),
   UNIQUE KEY `child_parent_idx` (`child_term_id`,`parent_term_id`,`subparent_term_id`,`ontology_id`),
   KEY `parent_subparent_idx` (`parent_term_id`,`subparent_term_id`)
@@ -26,12 +27,13 @@ CREATE TABLE `meta` (
   `species_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `key_value_idx` (`meta_key`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `ontology` (
   `ontology_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(64) NOT NULL,
   `namespace` varchar(64) NOT NULL,
+  `data_version` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`ontology_id`),
   UNIQUE KEY `name_namespace_idx` (`name`,`namespace`)
 ) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
@@ -68,6 +70,7 @@ CREATE TABLE `synonym` (
   `term_id` int(10) unsigned NOT NULL,
   `name` text NOT NULL,
   `type` enum('EXACT','BROAD','NARROW','RELATED') DEFAULT NULL,
+  `dbxref` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`synonym_id`),
   UNIQUE KEY `term_synonym_idx` (`term_id`,`synonym_id`),
   KEY `name_idx` (`name`(50))

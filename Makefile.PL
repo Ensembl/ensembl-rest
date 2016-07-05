@@ -7,6 +7,14 @@ use Module::Install::Catalyst; # Complain loudly if you don't have
                                # 'make dist' to create a standalone tarball.
 use Cwd            ();
 use File::Basename ();
+use File::Copy;
+
+my $default_config = File::Basename::dirname( Cwd::realpath($0) ).'/ensembl_rest.conf.default';
+if (-f $default_config) {
+	my $new_config = File::Basename::dirname( Cwd::realpath($0) ).'/ensembl_rest.conf';
+	copy($default_config, $new_config);
+}
+
 my $cpanfile_path = File::Basename::dirname( Cwd::realpath($0) ).'/cpanfile';
 do $cpanfile_path;
 

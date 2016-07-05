@@ -1,5 +1,6 @@
 =head
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -22,7 +23,7 @@ use Data::Dumper;
 use Try::Tiny;
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 use Bio::DB::Fasta;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
@@ -41,7 +42,12 @@ sub fetch_references {
   
   my $self = shift;
 
-  my ($references, $nextPageToken) = $self->extract_data( $self->context()->req->data() );
+  my $data = $self->context()->req->data();
+
+  return ({ references    => [],
+            nextPageToken => $data->{pageToken} }) if $data->{pageSize} < 1;
+
+  my ($references, $nextPageToken) = $self->extract_data( $data );
 
   return ({ references    => $references, 
             nextPageToken => $nextPageToken});
@@ -53,7 +59,7 @@ sub getReference{
 
   my ($self, $get_id, $bases ) = @_;
 
-  my $reference = $self->get_sequence($get_id);
+  my $reference = $self->context->model('ga4gh::ga4gh_utils')->get_sequence($get_id);
 
   return undef unless defined $reference && ref($reference) eq 'HASH' ; 
 
@@ -104,7 +110,7 @@ sub extract_data{
 
     ## rough paging
     $count++;
-    if (defined $post_data->{pageSize} &&  $post_data->{pageSize} ne '' && $count > $post_data->{pageSize}){
+    if ( $count > $post_data->{pageSize}){
       $nextPageToken = $n;
       last;
     }
@@ -140,7 +146,7 @@ sub format_sequence{
 
 
   ## define url - ensembl version not in config
-  if( $ref{sourceAccessions}->[0] =~ /GA4GH/){
+  if( $ref{sourceAccessions} && $ref{sourceAccessions}->[0] =~ /GA4GH/){
      $ref{sourceURI} = "https://github.com/ga4gh/compliance/blob/master/test-data/";
   }
   else{
@@ -165,26 +171,6 @@ sub get_ensembl_version{
 
 }
 
-## extract specific reference sequence from config data
-sub get_sequence{
-
-  my $self = shift;
-  my $id   = shift;
-
-  my $config = $self->context->model('ga4gh::ga4gh_utils')->read_sequence_config();
-  return undef unless exists $config->{referenceSets};
-
-  foreach my $referenceSet (@{$config->{referenceSets}}){
-
-    foreach my $seq (@{$referenceSet->{sequences}}){
-      $seq->{fastafile} = $config->{fasta_dir} ."/". $seq->{localFile} if defined $seq->{localFile};
-      $seq->{assembly}  = $referenceSet->{id};
-      $seq->{sourceURI} = $referenceSet->{sourceUri};
-      return $seq if $seq->{md5} eq $id;
-    } 
-  }
-  return undef;
-}
 
 ## extract specific reference set from config data
 sub get_sequenceset{

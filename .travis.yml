@@ -20,15 +20,7 @@ before_install:
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-variation.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-funcgen.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-io.git
-    - wget https://github.com/bioperl/bioperl-live/archive/bioperl-release-1-2-3.zip
-    - unzip bioperl-release-1-2-3.zip
-    - git clone --branch master --depth 1 https://github.com/samtools/tabix.git
-    - cd tabix
-    - make
-    - cd perl
-    - perl Makefile.PL
-    - make && make install
-    - cd ../../
+    - git clone -b bioperl-release-1-6-1 --depth 1 https://github.com/bioperl/bioperl-live.git
     - cd ensembl-variation/C_code/
     - make
     - cd ../../
@@ -36,19 +28,14 @@ before_install:
     - cd htslib
     - make
     - export HTSLIB_DIR=$(pwd -P)
-    - cd ../
-    - git clone --branch master --depth 1 https://github.com/Ensembl/Bio-HTS
-    - cd Bio-HTS
-    - perl Build.PL --htslib $HTSLIB_DIR
-    - ./Build
-    - cp blib/arch/auto/Bio/DB/HTS/Faidx/Faidx.so ..
-    - cp blib/arch/auto/Bio/DB/HTS/HTS.so ..
-    - cd ../
+    - cd ..
+
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --with-recommends --notest .
     - cpanm -n Devel::Cover::Report::Coveralls
+    - cpanm Bio::DB::HTS
     - cp travisci/MultiTestDB.conf.travisci t/MultiTestDB.conf
 
 script: "./travisci/harness.sh"
@@ -57,3 +44,5 @@ notifications:
   email:
     on_success: always
     on_failure: always
+  slack:
+    secure: gTcWzQsVHKPxRJ1u0U2l2+QVujmG1uFW44kAO3l46V5Im5uLTOLeM20ykk6ox4kaPHLs5ky7NGzcJmTDLaHBKjI4Sa34l4tJd0lhkv+hKj9TSv5pDDCdUX8v869Nm8LqJKh26HqvVcN7eHFRatLD/tfYvvkaP1rLLhwLLdr7czQ=

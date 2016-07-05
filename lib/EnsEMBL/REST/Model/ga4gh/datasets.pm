@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,7 +32,7 @@ use Scalar::Util qw/weaken/;
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro',  weak_ref => 1);
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 sub build_per_context_instance {
@@ -68,7 +69,10 @@ sub fetch_datasets{
     }
 
      ## save and increment
-     my $dataset = { id => $id, description => $datasets->{$id} };
+     my $dataset = { id => $id, 
+                     name => $datasets->{$id}->{name},
+                     description => $datasets->{$id}->{desc} 
+                   };
      push @datasets, $dataset;
      $count++;
   }
@@ -89,7 +93,7 @@ sub getDataset{
 
   return undef unless defined $collections->{$id};
 
-  return {id => $id, description => $collections->{$id} }; 
+  return {id => $id, name => $collections->{$id}->{name}, description => $collections->{$id}->{desc} }; 
 
 }
 

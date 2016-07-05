@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,6 +32,7 @@ sub begin : Private {
   $c->stash()->{endpoints} = $endpoints;
   my $cfg = EnsEMBL::REST->config();
   $c->stash(
+    site_name => $cfg->{site_name},
     service_name => $cfg->{service_name},
     service_logo => $cfg->{service_logo},
     service_parent_url => $cfg->{service_parent_url},
@@ -38,6 +40,8 @@ sub begin : Private {
     service_version => $EnsEMBL::REST::VERSION,
     ensembl_version => software_version(),
     copyright_footer => $cfg->{copyright_footer},
+    wiki_url => $cfg->{wiki_url},
+    bootstrap_css => $cfg->{bootstrap_css},
   );
   return;
 }

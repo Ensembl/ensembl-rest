@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,8 +51,9 @@ sub searchDatasets: Chained('/') PathPart('ga4gh/datasets/search') ActionClass('
 
   my $post_data = $c->req->data;
 
-  ## set a maximum page size - not likely to be neccessary
-  $post_data->{pageSize} =  100 if !defined $post_data->{pageSize} || $post_data->{pageSize} > 100; 
+  ## set a default page size if not supplied or not a number
+  $post_data->{pageSize} = 100 unless (defined  $post_data->{pageSize} &&  
+                                       $post_data->{pageSize} =~ /\d+/);
 
   my $dataset;
 
