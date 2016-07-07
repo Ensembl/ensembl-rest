@@ -25,3 +25,4 @@ MultiTestDB.conf
 *.index
 ensembl_rest.conf
 ensrest.psgi
+*.swp
