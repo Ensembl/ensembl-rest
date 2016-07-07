@@ -52,3 +52,12 @@ say "SQL  file used: $sql";
 say "HDF5 file used: $hdf5";
 my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite);
 $multi->add_DBAdaptor('eqtl', $eqtl_a);
+
+my $response = [
+  {
+    value => -0.0177490254058113,
+  }
+];
+
+is_json_GET("/eqtl/id/homo_sapiens/ENSG00000223972?content-type=application/json;statistic=p-value;tissue=arm;variant_name=rs4951859", $response, "Return p-value for known gene and variant");
+done_testing();
