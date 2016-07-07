@@ -49,7 +49,7 @@ sub fetch_regulatory {
     Catalyst::Exception->throw("$regf_id not found for $species");
   }
   my $sum = $rf->summary_as_hash();
-  return($sum);
+  return([$sum]);
 
 }
 
