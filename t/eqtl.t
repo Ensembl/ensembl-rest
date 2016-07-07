@@ -41,8 +41,8 @@ my $core_dba = $multi->get_DBAdaptor('core');
 require EnsEMBL::REST;
 #my $sql  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/table.sql';
 #my $sql  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/SQLite/homo_sapiens.sql';
-my $sqlite  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/SQLite/homo_sapiens.hdf5.sqlite3';
-my $hdf5 = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/SQLite/homo_sapiens.hdf5';
+my $sqlite  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5.sqlite3';
+my $hdf5 = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5';
 my $sql = $hdf5;
 
 if(!-e $sql){warn "Missing SQL file $sql"}
