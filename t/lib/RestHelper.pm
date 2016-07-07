@@ -134,7 +134,7 @@ sub do_GET($;$) {
   note "GET $url";
   my $req = HTTP::Request->new(GET => $url);
   $req->header('Content-Type', $content_type);
-  
+
   #Go a level higher until you get out of this package
   my $parent;
   my $level = 0;
@@ -145,7 +145,7 @@ sub do_GET($;$) {
     }
   }
   my $parent_request_name = "${parent}::request";
-  
+
   my $resp;
   {
     no strict 'refs';
@@ -168,7 +168,7 @@ sub do_POST($$) {
     }
   }
   my $parent_request_name = "${parent}::request";
-  
+
   my $resp;
   {
     no strict 'refs';
