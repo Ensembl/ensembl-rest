@@ -17,6 +17,7 @@ before_install:
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-hdf5.git
+    - rm ensembl-hdf5/modules/Bio/EnsEMBL/HDF5.pm
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-compara.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-variation.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-funcgen.git
