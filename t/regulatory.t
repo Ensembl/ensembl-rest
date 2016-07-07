@@ -36,17 +36,17 @@ Catalyst::Test->import('EnsEMBL::REST');
 #Regulatory feature testing
 {
   is_json_GET("/regulatory/homo_sapiens/ENSR00001208657", [{
-    start => 1024250,
-    end => 1025449,
-    bound_start => 1024250,
-    bound_end => 1025449,
-    seq_region_name => '6',
-    strand => 0,
-    feature_type => 'regulatory',
-    ID => 'ENSR00001208657',
-    activity => 1,
-    description => "Predicted promoter flanking region",
-    cell_type => "MultiCell",
+  source => "Regulatory_Build",
+  ID => "ENSR00001208657",
+  feature_type => "Promoter Flanking Region",
+  description => "Predicted promoter flanking region",
+  end => 1025449,
+  seq_region_name => "6",
+  strand => "0",
+  bound_start => 1024250,
+  bound_end => 1025449,
+  start => 1024250
+
   }], 'Getting regulatory_feature as JSON');
 }
 

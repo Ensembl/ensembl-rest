@@ -41,34 +41,17 @@ sub fetch_regulatory {
    Catalyst::Exception->throw("No regulatory feature stable ID given. Please specify an stable ID to retrieve from this service");
 
   my $c          = $self->context;
-  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
   my $species    = $c->stash->{species};
-  my @rfs        = ();
 
-  if(scalar @ctypes > 0){
-    foreach my $ctype_name (@ctypes) {
-      my $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:'.$ctype_name) ||  
-        Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:$ctype_name");
-      my $rf = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature')->fetch_by_stable_id($regf_id, $fset);
-      if (defined $rf) {
-        push @rfs, $rf;
-      }
-    }
-  }else{
-    my $fset = $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:MultiCell') ||  
-      throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:MultiCell");
-    my $rf = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature')->fetch_by_stable_id($regf_id, $fset);
-    if (!defined $rf) {
-      Catalyst::Exception->throw("$regf_id not found for $species");
-    }
-    push @rfs, $rf;
+  my $rf_a = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature');
+  my $rf = $rf_a->fetch_by_stable_id($regf_id);
+  if(! defined $rf) {
+    Catalyst::Exception->throw("$regf_id not found for $species");
   }
+  my $sum = $rf->summary_as_hash();
+  return($sum);
 
-  #Add support to include_attributes here by embedding hash summaries
-  my @hashes = map {$_->summary_as_hash} @rfs;
-  return \@hashes;
 }
-
 
 #If required look at Variation::to_hash for example of enriched hash
 #and additional data types that can be embedded

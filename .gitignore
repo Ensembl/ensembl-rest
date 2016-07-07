@@ -25,3 +25,5 @@ MultiTestDB.conf
 *.index
 ensembl_rest.conf
 ensrest.psgi
+*DS_Store
+*.swp
