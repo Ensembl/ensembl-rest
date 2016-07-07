@@ -34,7 +34,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory segmentation motif chipseq array_probe band/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory  motif chipseq array_probe band/
   };
 });
 
@@ -56,12 +56,12 @@ sub build_per_context_instance {
 
 sub fetch_features {
   my ($self) = @_;
-  
+
   my $c = $self->context();
   my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
   my $is_bed = $self->is_content_type($c, 'text/x-bed');
   my $species = $c->stash->{species};
-  
+
   my $allowed_features = $self->allowed_features();
   my $feature = $c->request->parameters->{feature};
   Catalyst::Exception->throw("No feature given. Please specify a feature to retrieve from this service") if ! $feature;
@@ -75,7 +75,7 @@ sub fetch_features {
 
   # record when we've processed a feature type already
   my %processed_feature_types;
-  
+
   my $slice = $c->stash()->{slice};
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
   if ($vfa) {
@@ -98,7 +98,7 @@ sub fetch_features {
     }
     $processed_feature_types{$feature_type} = 1;
   }
-  
+
   return \@final_features;
 }
 
@@ -187,7 +187,7 @@ sub band {
 sub gene {
   my ($self, $slice) = @_;
   my $c = $self->context();
-  my ($dbtype, $load_transcripts, $source, $biotype) = 
+  my ($dbtype, $load_transcripts, $source, $biotype) =
     (undef, undef, $c->request->parameters->{source}, $c->request->parameters->{biotype});
   return $slice->get_all_Genes($self->_get_logic_dbtype(), $load_transcripts, $source, $biotype);
 }
@@ -250,11 +250,11 @@ sub transcript_variation {
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
-  
+
   my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
   my $vfs = $transcript->feature_Slice->get_all_VariationFeatures();
   $c->stash->{_cached_vfs} = $vfs;
-  
+
   my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
     $transcript_variants = $tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms);
@@ -274,17 +274,17 @@ sub somatic_transcript_variation {
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
-  
+
   my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
   my $vfs = $transcript->feature_Slice->get_all_somatic_VariationFeatures();
   $c->stash->{_cached_vfs} = $vfs;
-  
+
   my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
     # HACK FOR DATA BUG IN VARIATION DB
     $transcript_variants = [@{$tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms)}, @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms)}];
     # $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript]);
-  } 
+  }
   else {
     # HACK FOR DATA BUG IN VARIATION DB
     $transcript_variants = [@{$tva->fetch_all_somatic_by_Transcripts([$transcript])}, @{$tva->fetch_all_by_Transcripts([$transcript])}];
@@ -302,13 +302,13 @@ sub _filter_transcript_variation {
   foreach my $tv (@{$transcript_variants}) {
     # filter out up/downstream TVs
     next unless $tv->cds_start || $tv->cds_end;
-    
+
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
 
     my $vf = $cached_vfs{$tv->{_variation_feature_id}};
     next unless $vf;
     $tv->variation_feature($vf);
-    
+
     my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
     push(@vfs, $blessed_vf);
   }
@@ -329,7 +329,7 @@ sub variation {
   my ($self, $slice) = @_;
 
   my $c = $self->context();
-  
+
   if( $c->request->parameters->{variant_set}){
 
     my $set = $self->_get_VariationSet();
@@ -379,47 +379,38 @@ sub constrained {
 
 
 sub regulatory {
-  my $self       = shift;
-  my $slice      = shift;
+  my ($self, $slice) = @_;
   my $c          = $self->context();
-  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
   my $species    = $c->stash->{species};
-  my @fsets      = ();
-
-  if(scalar @ctypes > 0){
-    foreach my $ctype_name (@ctypes) {
-      push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:'.$ctype_name) ||  
-       Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:$ctype_name");
-    }
-  }else {
-    push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('RegulatoryFeatures:MultiCell') ||  
-     Catalyst::Exception->throw("No $species regulatory FeatureSet available with name:\tRegulatoryFeatures:MultiCell");
-  }
-
-  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature')->fetch_all_by_Slice_FeatureSets($slice, \@fsets);
+  my $rfa = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature');
+  my $rfs = $rfa->fetch_all_by_Slice($slice);
+  return($rfs);
 }
 
+# Removed for e85 as we currently use different methods for different species
+# Regulation will streamline it for e86 and reintroduce
 
-sub segmentation {
-  my $self       = shift;
-  my $slice      = shift;
-  my $c          = $self->context();
-  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
-  my $species    = $c->stash->{species};
-  my @fsets	 = ();
+#sub segmentation {
+#  my $self       = shift;
+#  my $slice      = shift;
+#  my $c          = $self->context();
+#  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
+#  my $species    = $c->stash->{species};
+#  my @fsets = ();
+#
+#  if(scalar @ctypes > 0){
+#    foreach my $ctype_name (@ctypes) {
+#      push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('Segmentation:'.$ctype_name)
+#        || Catalyst::Exception->throw("No $species segmentation FeatureSet available with name: Segmentation:$ctype_name");
+#    }
+#  }
+#  else{
+#    Catalyst::Exception->throw("Must provide a cell_type parameter for a segmentation overlap query");
+#  }
+#
+#  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'SegmentationFeature')->fetch_all_by_Slice_FeatureSets($slice, \@fsets);
+#}
 
-  if(scalar @ctypes > 0){
-    foreach my $ctype_name (@ctypes) {
-      push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('Segmentation:'.$ctype_name) 
-              || Catalyst::Exception->throw("No $species segmentation FeatureSet available with name: Segmentation:$ctype_name");
-    }
-  }
-  else{
-    Catalyst::Exception->throw("Must provide a cell_type parameter for a segmentation overlap query");
-  }
-
-  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'SegmentationFeature')->fetch_all_by_Slice_FeatureSets($slice, \@fsets);
-}
 
 sub motif {
   my $self    = shift;
@@ -458,7 +449,7 @@ sub chipseq {
   }
 
   my $afa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'annotatedfeature');
-  my $constraint = $afa->compose_constraint_query($params); 
+  my $constraint = $afa->compose_constraint_query($params);
   my $afeats     = $afa->fetch_all_by_Slice_constraint($slice, $constraint);
   $afa->reset_true_tables;
   return $afeats;
@@ -473,12 +464,13 @@ sub array_probe {
   my $pfa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'probefeature') ||
    Catalyst::Exception->throw("No adaptor found for species $species, object ProbeFeature and DB funcgen");
 
-  if (scalar @array_names > 0) { 
+  if (scalar @array_names > 0) {
     my $aa      = $c->model('Registry')->get_adaptor($species, 'funcgen', 'array') ||
      Catalyst::Exception->throw("No adaptor found for species $species, object Array and DB funcgen");
     my @arrays  = map {$aa->fetch_by_name_vendor($_) } @array_names;
     return $pfa->fetch_all_by_Slice_Arrays($slice, \@arrays);
-  } else {
+  }
+  else {
     return $pfa->fetch_all_by_Slice($slice);
   }
 }
@@ -503,9 +495,9 @@ sub _get_SO_terms {
   my ($self) = @_;
   my $c = $self->context();
   my $so_term = $c->request->parameters->{so_term};
-  my $terms = (! defined $so_term)  ? [] 
-                                    : (ref($so_term) eq 'ARRAY') 
-                                    ? $so_term 
+  my $terms = (! defined $so_term)  ? []
+                                    : (ref($so_term) eq 'ARRAY')
+                                    ? $so_term
                                     : [$so_term];
   my @final_terms;
   foreach my $term (@{$terms}) {
@@ -554,31 +546,31 @@ sub _get_logic_dbtype {
 sub _trim_features {
   my ($self, $features) = @_;
   my $c = $self->context();
-  my ($trim_upstream, $trim_downstream) = 
-    ($c->request->parameters->{trim_upstream}, 
+  my ($trim_upstream, $trim_downstream) =
+    ($c->request->parameters->{trim_upstream},
      $c->request->parameters->{trim_downstream});
 
   # skip if not interested in trimming
   return $features
     unless $trim_upstream or $trim_downstream;
- 
+
   my $filtered_features;
   my $slice = $c->stash()->{slice};
-  my ($sstart, $send, $strand) = 
+  my ($sstart, $send, $strand) =
     ($slice->start, $slice->end, $slice->strand);
   my $circular = $slice->is_circular();
 
   foreach my $feature (@{$features}) {
     my $trim = 0;
-    my ($start, $end) = 
+    my ($start, $end) =
       ($feature->seq_region_start,
        $feature->seq_region_end);
 
     # customosised checks in case of
     # circular chrmosomes
-    next if $circular and 
-      $self->has_to_be_trimmed_in_circ_chr($feature, 
-					   $trim_upstream, 
+    next if $circular and
+      $self->has_to_be_trimmed_in_circ_chr($feature,
+					   $trim_upstream,
 					   $trim_downstream);
 
     if ($trim_upstream and $trim_downstream) {
@@ -599,7 +591,7 @@ sub _trim_features {
 
     push @{$filtered_features}, $feature;
   }
-  
+
   return $filtered_features;
 }
 
@@ -608,18 +600,18 @@ sub _has_to_be_trimmed_in_circ_chr {
 
   my $slice = $self->context()->stash()->{slice};
 
-  my ($sstart, $send, $strand) = 
+  my ($sstart, $send, $strand) =
     ($slice->start, $slice->end, $slice->strand);
   my $seq_region_len = $slice->seq_region_length();
 
-  my ($seq_region_start, $seq_region_end) = 
+  my ($seq_region_start, $seq_region_end) =
     ($feature->seq_region_start,
      $feature->seq_region_end);
 
   my $trim = 0;
   my ($start, $end);
 
-  if ($strand == 1) { # Positive strand		
+  if ($strand == 1) { # Positive strand
     $start = $seq_region_start - $sstart + 1;
     $end   = $seq_region_end - $sstart + 1;
 
@@ -632,7 +624,7 @@ sub _has_to_be_trimmed_in_circ_chr {
 
       if ($start > $end) {
 	# Looking at a feature overlapping the chromsome origin.
-	if ($end > $sstart) { 
+	if ($end > $sstart) {
 	  # Looking at the region in the beginning of the chromosome.
 	  $start -= $seq_region_len;
 	}
@@ -648,7 +640,7 @@ sub _has_to_be_trimmed_in_circ_chr {
 	}
       }
     }
-    
+
   } else { # Negative strand
     $start = $send - $seq_region_end + 1;
     $end = $send - $seq_region_start + 1;
@@ -657,7 +649,7 @@ sub _has_to_be_trimmed_in_circ_chr {
       if ($sstart > $send) { # slice spans origin or replication
 	if ($seq_region_start >= $sstart) {
 	  $end += $seq_region_len;
-	  $start += $seq_region_len 
+	  $start += $seq_region_len
 	    if $seq_region_end > $sstart;
 
 	} elsif ($seq_region_start <= $send) {
@@ -705,7 +697,7 @@ sub _has_to_be_trimmed_in_circ_chr {
       $trim = 1 if $start < $0;
     }
   }
-  
+
   return $trim;
 }
 

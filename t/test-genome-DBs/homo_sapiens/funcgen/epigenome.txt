@@ -1,0 +1,1 @@
+14	K562		Human myelogenous leukaemia cell line	K562	female	efo:EFO_0002067	\N	blood
