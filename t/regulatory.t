@@ -35,7 +35,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 #Regulatory feature testing
 {
-  is_json_GET("/regulatory/homo_sapiens/ENSR00001208657", [{
+  is_json_GET("/regulatory/homo_sapiens/ENSR00001208657", {
   source => "Regulatory_Build",
   ID => "ENSR00001208657",
   feature_type => "Promoter Flanking Region",
@@ -47,7 +47,7 @@ Catalyst::Test->import('EnsEMBL::REST');
   bound_end => 1025449,
   start => 1024250
 
-  }], 'Getting regulatory_feature as JSON');
+  }, 'Getting regulatory_feature as JSON');
 }
 
 done_testing();
