@@ -48,7 +48,10 @@ if(!-e $hdf5){warn "Missing HDF5 file $hdf5"}
 
 say "SQLITE  file used: $sqlite";
 say "HDF5 file used: $hdf5";
-my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite, -GENE_IDS => $genes);
+my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite);
+if (!defined $eqtl_a) {
+  die;
+}
 $multi->add_DBAdaptor('eqtl', $eqtl_a);
 
 my $response = [
