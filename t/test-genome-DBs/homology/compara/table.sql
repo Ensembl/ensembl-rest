@@ -79,7 +79,7 @@ CREATE TABLE `external_db` (
   `description` text,
   PRIMARY KEY (`external_db_id`),
   UNIQUE KEY `db_name_db_release_idx` (`db_name`,`db_release`)
-) ENGINE=MyISAM ;
+) ENGINE=MyISAM CHARSET=latin1 ;
 
 CREATE TABLE `family` (
   `family_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
