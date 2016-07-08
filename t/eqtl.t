@@ -51,4 +51,14 @@ if(!-e $hdf5){warn "Missing HDF5 file $hdf5"}
 say "SQL  file used: $sql";
 say "HDF5 file used: $hdf5";
 my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite);
+say 'Adaptor: '. ref($eqtl_a);
 $multi->add_DBAdaptor('eqtl', $eqtl_a);
+
+# warn ref($eqtl_a);
+my $expected = {value => '0.985863302490807'};
+json_GET(
+  'eqtl/variant_name/homo_sapiens/rs4951859?content-type=application/json;statistic=p-value;stable_id=ENSG00000227232;tissue=Whole_Blood',  "Returned"
+);
+#
+
+done_testing();
