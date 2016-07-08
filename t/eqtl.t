@@ -39,26 +39,22 @@ my $multi = Bio::EnsEMBL::Test::MultiTestDB->new();
 my $var_dba = $multi->get_DBAdaptor('variation');
 my $core_dba = $multi->get_DBAdaptor('core');
 require EnsEMBL::REST;
-#my $sql  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/table.sql';
-#my $sql  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/SQLite/homo_sapiens.sql';
-my $sqlite  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/SQLite/homo_sapiens.hdf5.sqlite3';
-my $hdf5 = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/SQLite/homo_sapiens.hdf5';
+my $sqlite  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5.sqlite3';
+my $hdf5 = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5';
 my $sql = $hdf5;
+my $genes = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5.gtex.gene.ids';
 
 if(!-e $sql){warn "Missing SQL file $sql"}
 if(!-e $hdf5){warn "Missing HDF5 file $hdf5"}
 
 say "SQL  file used: $sql";
 say "HDF5 file used: $hdf5";
-my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite);
-say 'Adaptor: '. ref($eqtl_a);
+my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite, -GENE_IDS => $genes);
 $multi->add_DBAdaptor('eqtl', $eqtl_a);
 
-# warn ref($eqtl_a);
-my $expected = {value => '0.985863302490807'};
-json_GET(
-  'eqtl/variant_name/homo_sapiens/rs4951859?content-type=application/json;statistic=p-value;stable_id=ENSG00000227232;tissue=Whole_Blood',  "Returned"
-);
-#
 
+my $response = [
+{    value => 0.985863302490807}];
+
+is_json_GET("/eqtl/id/homo_sapiens/ENSG00000223972?content-type=application/json;statistic=p-value;tissue=Whole_Blood;variant_name=rs4951859", $response, "Return p-value for known gene and variant");
 done_testing();
