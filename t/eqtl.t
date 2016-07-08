@@ -42,14 +42,13 @@ require EnsEMBL::REST;
 my $sqlite  = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5.sqlite3';
 my $hdf5 = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5';
 my $sql = $hdf5;
-my $genes = $Bin . '/test-genome-DBs/homo_sapiens/eqtl/homo_sapiens.hdf5.gtex.gene.ids';
 
 if(!-e $sql){warn "Missing SQL file $sql"}
 if(!-e $hdf5){warn "Missing HDF5 file $hdf5"}
 
-say "SQL  file used: $sql";
-say "HDF5 file used: $hdf5";
-my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite, -GENE_IDS => $genes);
+ say "SQL  file used: $sql";
+ say "HDF5 file used: $hdf5";
+my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB_ADAPTOR => $core_dba, VAR_DB_ADAPTOR => $var_dba, -DB_FILE => $sqlite);
 $multi->add_DBAdaptor('eqtl', $eqtl_a);
 
 
