@@ -123,7 +123,8 @@ sub _validate_stable_id {
   my ($self, $eqtl_a, $stable_id) = @_;
   # Check for EnsemblIDs with more/less than 11 digits
   if (defined $stable_id){
-    if( ($stable_id =~ /ENS[A-Z]+[0-9]{11}/)  and (! exists $eqtl_a->{gene_ids}->{$stable_id}) ) {
+    eval { $eqtl_a->_convert_coords({gene => $stable_id}); };
+    if ($@) {
       Catalyst::Exception->throw("Stable ID '$stable_id' not present in the current Ensembl release");
     }
   }
