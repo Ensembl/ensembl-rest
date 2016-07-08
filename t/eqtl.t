@@ -53,7 +53,8 @@ $multi->add_DBAdaptor('eqtl', $eqtl_a);
 
 
 my $response = [
-{    value => 0.985863302490807}];
+{ minus_log10_p_value => '0.00618329914558938',
+  value => 0.985863302490807}];
 
 is_json_GET("/eqtl/id/homo_sapiens/ENSG00000223972?content-type=application/json;statistic=p-value;tissue=Whole_Blood;variant_name=rs4951859", $response, "Return p-value for known gene and variant");
 done_testing();
