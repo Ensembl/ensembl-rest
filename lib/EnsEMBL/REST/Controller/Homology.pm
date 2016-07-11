@@ -163,11 +163,12 @@ sub get_orthologs_GET {
     my $format          = $c->request->param('format') || 'full';
     my $sequence_param  = $c->request->param('sequence') || 'protein';
     my $seq_type        = $sequence_param eq 'protein' ? undef : 'cds';
+    my $no_seq          = $sequence_param eq 'none' ? 1 : 0;
     my $aligned         = $c->request->param('aligned') // 1;
     my $cigar_line      = $c->request->param('cigar_line') // 1;
 
     foreach my $ref (@{$c->stash->{homology_data}}) {
-        $ref->{homologies} = Bio::EnsEMBL::Compara::Utils::HomologyHash->convert($ref->{homologies}, -FORMAT_PRESET => $format, -SEQ_TYPE => $seq_type, -ALIGNED => $aligned, -CIGAR_LINE => $cigar_line);
+        $ref->{homologies} = Bio::EnsEMBL::Compara::Utils::HomologyHash->convert($ref->{homologies}, -FORMAT_PRESET => $format, -NO_SEQ => $no_seq, -SEQ_TYPE => $seq_type, -ALIGNED => $aligned, -CIGAR_LINE => $cigar_line);
     }
     return $self->status_ok( $c, entity => { data => $c->stash->{homology_data} } );
 

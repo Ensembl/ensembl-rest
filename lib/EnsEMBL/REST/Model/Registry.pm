@@ -367,8 +367,11 @@ sub _build_species_info {
     my $species_lc = ($species);
     my $aliases_to_skip = {
         $species => 1,
-        (lc "$species $assembly_lookup{$species}") => 1,    # automatically added by the Compara API
     };
+    if ($assembly_lookup{$species}) {   # Species like "Ancestral sequences" are not in %assembly_lookup
+        # Automatically added by the Compara API when the Compara objects are preloaded.
+        $aliases_to_skip->{ lc "$species $assembly_lookup{$species}" } = 1;
+    }
     my $good_aliases = [grep {!$aliases_to_skip->{$_}} @{$alias_lookup{$species} || []}];
     my $info = {
       name => $species,
