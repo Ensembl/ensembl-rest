@@ -124,7 +124,7 @@ sub _validate_stable_id {
   # Check for EnsemblIDs with more/less than 11 digits
   if (defined $stable_id){
     if( ($stable_id =~ /ENS[A-Z]+[0-9]{11}/)  and (! exists $eqtl_a->{gene_ids}->{$stable_id}) ) {
-      Catalyst::Exception->throw("Stable ID '$stable_id' not present in the current Ensembl release");
+      Catalyst::Exception->throw("Stable ID '$stable_id' not present in EQTL database.");
     }
   }
 }

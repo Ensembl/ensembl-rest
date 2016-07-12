@@ -136,7 +136,10 @@ sub _get_eqtl_adaptor {
   my ($self) = @_;
   my $eqtl_adaptors = {};
 
-  return {} if(! $self->eqtl_dbs);
+  if(! $self->eqtl_dbs) {
+    $self->log->debug("No EQTL database files defined. /eqtl endpoints will fail:\n");
+    return {}
+  }
   # load if not loaded
   Catalyst::Utils::ensure_class_loaded('Bio::EnsEMBL::HDF5::EQTLAdaptor');
 
