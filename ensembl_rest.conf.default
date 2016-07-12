@@ -69,11 +69,12 @@ jsonp=1
   # Trigger a preload of the registry the moment the Model::Registry object is contrstructed. Otherwise we
   # wait until the 1st request for an adaptor comes in. Use in conjunction with pre-fork PSGI deployments
   # to stop registry reload issues
-  preload = 1 
-  <eqtl_dbs>
-    human = /mnt/hdf5_data/eqtl.hdf5 
-    human_test = /mnt/hdf5_data/eqtl.hdf5 
-  </eqtl_dbs>
+  preload = 0 
+  
+  # Location of HDF5/SQLite DBs if EQTL endpoint is used
+  # <eqtl_dbs>
+  #   species = /path/to/hdf5 db
+  # </eqtl_dbs>
   
 </Model::Registry>
 
