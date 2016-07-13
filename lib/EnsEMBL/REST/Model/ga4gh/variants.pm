@@ -366,8 +366,8 @@ sub getSingleCallSets{
 
   ## load VCFcollections object for variantSet 
   $data->{vcf_collection} = $self->context->model('ga4gh::ga4gh_utils')->fetch_VCFcollection_by_id($data->{variantSetId});
-  Catalyst::Exception->throw( " Failed to find the specified variantSetId")
-    unless defined $data->{vcf_collection}; 
+
+  return undef unless defined $data->{vcf_collection}; 
 
   ## create fake token -what should really be returned for get??
   $data->{pageSize} = 1;
