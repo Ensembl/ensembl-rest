@@ -187,6 +187,9 @@ sub getVariantSet{
 
   my ($self, $id ) = @_; 
 
+  ## default current set for variant annotations
+  return $self->getEnsemblSet($id) if $id =~ /Ensembl/;
+
   ## extract required variant set 
   my ($variantSets, $newPageToken ) = $self->fetch_sets( {req_variantset => $id} );
 
@@ -195,6 +198,35 @@ sub getVariantSet{
   return $variantSets->[0];
 }
 
+sub getEnsemblSet{
+
+  my $self = shift;
+  my $id   = shift;
+
+  my $species = 'homo_sapiens';
+  my $core_ad = $self->context->model('Registry')->get_DBAdaptor($species, 'Core'  );
+
+  ## extract required meta data from core db
+  my $cmeta_ext_sth = $core_ad->dbc->db_handle->prepare(qq[ select meta_key, meta_value from meta]);
+  $cmeta_ext_sth->execute();
+  my $core_meta = $cmeta_ext_sth->fetchall_arrayref();
+
+  my %cmeta;
+  foreach my $l(@{$core_meta}){
+    $cmeta{$l->[0]} = $l->[1];
+  }
+
+  my $current_set = 'Ensembl.' . $cmeta{schema_version} . '.'. $cmeta{"assembly.default"};
+  return undef unless $id eq $current_set;
+
+  return  { id             => $current_set,
+            datasetId      => 'Ensembl',
+            metadata       => [],
+            referenceSetId => $cmeta{"assembly.default"},
+            name           => $current_set
+          };
+
+}
 sub sort_num{
   $a<=>$b;
 }
