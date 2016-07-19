@@ -123,6 +123,28 @@ is_json_GET(
     'Gene-tree (ncRNA) by ID pruned to a subtree',
 );
 
+is_json_GET(
+    '/genetree/member/id/ENSG00000176515?compara=homology;subtree_node_id=100462673',
+    $restricted_RF01299,
+    'Gene-tree (ncRNA) by gene ID pruned to a subtree',
+);
+
+is_json_GET(
+    '/genetree/member/id/ENST00000314040?compara=homology;subtree_node_id=100462673',
+    $restricted_RF01299,
+    'Gene-tree (ncRNA) by transcript ID pruned to a subtree',
+);
+
+# Aliases are somehow not loaded yet, so we need to add one here
+Bio::EnsEMBL::Registry->add_alias('homo_sapiens', 'johndoe');
+
+is_json_GET(
+    '/genetree/member/symbol/johndoe/AL033381.1?compara=homology;subtree_node_id=100462673',
+    $restricted_RF01299,
+    'Gene-tree (ncRNA) by transcript ID pruned to a subtree',
+);
+
+
 my $rodents_RF01299 = {
     'tree' => {
         'branch_length' => '0.00724822',
