@@ -58,10 +58,11 @@ sub fetch_LDFeatureContainer_variation_name {
   }
   my $variation = $va->fetch_by_name($variation_name);
   Catalyst::Exception->throw("Could not fetch variation object for id: $variation_name.") if ! $variation;
-  my $vfs = $variation->get_all_VariationFeatures();
-  Catalyst::Exception->throw("Variant maps more than once to the genome.") if (scalar @$vfs > 1);
-  Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @$vfs == 0);
-  my $vf = $vfs->[0];
+  my @vfs = grep { $_->slice->is_reference } @{$variation->get_all_VariationFeatures()};
+
+  Catalyst::Exception->throw("Variant maps more than once to the genome.") if (scalar @vfs > 1);
+  Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @vfs == 0);
+  my $vf = $vfs[0];
 
   my $population_name = $c->request->param('population_name');
   if ($population_name) {
