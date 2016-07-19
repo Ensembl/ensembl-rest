@@ -49,67 +49,65 @@ my $restricted_RF01299 = {
             'type' => 'speciation'
         },
         'taxonomy' => {
-            'scientific_name' => 'Clupeocephala',
-            'common_name' => 'Teleost fishes',
-            'id' => 186625,
-            'timetree_mya' => '265.5' 
+            'scientific_name' => 'Eutheria',
+            'common_name' => 'Placental mammals',
+            'id' => 9347,
+            'timetree_mya' => '104.2'
         },
-        'confidence' => {
-            'bootstrap' => 6
-        },
+        'confidence' => {},
         'children' => [
             {
                 'sequence' => {
-                    'location' => '17:14654245-14654320',
+                    'location' => '3:186784796-186784864',
                     'mol_seq' => {
-                        'seq' => 'GAGTGATATGATGGCATACCATCTTTCGGGACTGACTGAAACATGGAGAGTCCTTTTATTGTTGTACTGATCACTC',
+                        'seq' => 'AAGTGAAATGATGGCAATCATCTTTCGGGACTGACCTGAAATGAAGAGAATACTCATTGCTGATCACTT',
                         'is_aligned' => 0
                     },
                     'name' => 'SNORD2-201',
                     'id' => [
                         {
                             'source' => 'EnsEMBL',
-                            'accession' => 'ENSORLT00000026615'
+                            'accession' => 'ENST00000459163'
                         }
                     ]
                 },
-                'branch_length' => '0.0716974',
-                'taxonomy' => { 
-                    'scientific_name' => 'Oryzias latipes',
-                    'common_name' => 'Medaka',
-                    'id' => 8090
+                'branch_length' => 0.1,
+                'taxonomy' => {
+                    'scientific_name' => 'Homo sapiens',
+                    'common_name' => 'Human',
+                    'id' => 9606
                 },
                 'confidence' => {},
                 'id' => {
                     'source' => 'EnsEMBL',
-                    'accession' => 'ENSORLG00000021634'
+                    'accession' => 'ENSG00000176515'
                 }
             },
             {
                 'sequence' => {
-                    'location' => 'KI519677.1:381062-381137',
+                    'location' => '3:188240400-188240468',
                     'mol_seq' => {
-                        'seq' => 'GAGTGATGTGATGGTATACCATCTTTCGGGACTGACTCTTGAGATGGAGAGTTCCTTTCTGACTTACTGATCACTG',
+                        'seq' => 'AAGTGAAATGATGGCAATCATCTTTCGGGACTGACCTGAAATGAAGAGAATACTCATTGCTGATCACTT',
                         'is_aligned' => 0
                     },
                     'name' => 'SNORD2-201',
                     'id' => [
                         {
                             'source' => 'EnsEMBL',
-                            'accession' => 'ENSPFOT00000021580'
+                            'accession' => 'ENSGGOT00000038576'
                         }
                     ]
                 },
-                'branch_length' => '0.0877229',
+                'branch_length' => 0.2,
                 'taxonomy' => {
-                    'scientific_name' => 'Poecilia formosa',
-                    'common_name' => 'Amazon molly',
-                    'id' => 48698
+                    'scientific_name' => 'Gorilla gorilla gorilla',
+                    'common_name' => 'Gorilla',
+                    'id' => 9595
                 },
                 'confidence' => {},
                 'id' => {
                     'source' => 'EnsEMBL',
-                    'accession' => 'ENSPFOG00000021430'
+                    'accession' => 'ENSGGOG00000032407'
                 }
             }
         ]
@@ -120,7 +118,7 @@ my $restricted_RF01299 = {
 };
 
 is_json_GET(
-    '/genetree/id/RF01299?compara=homology;subtree_node_id=100462639',
+    '/genetree/id/RF01299?compara=homology;subtree_node_id=100462673',
     $restricted_RF01299,
     'Gene-tree (ncRNA) by ID pruned to a subtree',
 );
@@ -227,37 +225,37 @@ sub edit_leaf {
 }
 
 edit_leaf($restricted_RF01299->{tree}, {
-        'ENSORLG00000021634' => { 
-            'cigar_line' => '6M2D10MD19M2D3M2D5M2D9M7D3M4D2M3D13M25D6M',
-            'seq' => 'GAGTGATATGATGGCATACCATCTTTCGGGACTGACTGAAACATGGAGAGTCCTTTTATTGTTGTACTGATCACTC',
+        'ENSG00000176515' => {
+            'cigar_line' => '6M2D9M2D19M2D3M2D3MDM2D7M11DM4D2M3D4MD8M26D6M',
+            'seq' => 'AAGTGAAATGATGGCAATCATCTTTCGGGACTGACCTGAAATGAAGAGAATACTCATTGCTGATCACTT',
             'is_aligned' => 0
         },
-        'ENSPFOG00000021430' => { 
-            'cigar_line' => '6M2D10MD24M2D3MDM2D9M7D3M4D2M3D4MD8M25D6M',
-            'seq' => 'GAGTGATGTGATGGTATACCATCTTTCGGGACTGACTCTTGAGATGGAGAGTTCCTTTCTGACTTACTGATCACTG',
+        'ENSGGOG00000032407' => {
+            'cigar_line' => '6M2D9M2D19M2D3M3D3MDM2D7M11DM4D2M3D4MD8M25D6M',
+            'seq' => 'AAGTGAAATGATGGCAATCATCTTTCGGGACTGACCTGAAATGAAGAGAATACTCATTGCTGATCACTT',
             'is_aligned' => 0
         },
     });
 
 is_json_GET(
-    '/genetree/id/RF01299?compara=homology;subtree_node_id=100462639;cigar_line=1',
+    '/genetree/id/RF01299?compara=homology;subtree_node_id=100462673;cigar_line=1',
     $restricted_RF01299,
     'Gene-tree (ncRNA) by ID pruned to a subtree, with cigar_line',
 );
 
 edit_leaf($restricted_RF01299->{tree}, {
-        'ENSORLG00000021634' => { 
-            'seq' => 'GAGTGATATGATGGCATACCATCTTTCGGGACTGA--CTGAAACATGGAGAGTCCTTTTATTGTTGTACTGATCACTC',
+        'ENSG00000176515' => {
+            'seq' => 'AAGTGAAATGATGGCAATCATCTTTCGGGACTGACCTGAA-A-TGAAGAG-A-AT-ACTC-ATTGCTGA-TCACTT',
             'is_aligned' => 1
         },
-        'ENSPFOG00000021430' => { 
-            'seq' => 'GAGTGATGTGATGGTATACCATCTTTCGGGACTGACTCTTGAG-ATGGAGAGTTCCTTTCTGA-CTTACTGATCACTG',
+        'ENSGGOG00000032407' => {
+            'seq' => 'AAGTGAAATGATGGCAATCATCTTTCGGGACTGACCT-GAA-A-TGAAGAG-A-AT-ACTC-ATTGCTGATCACTT',
             'is_aligned' => 1
         },
     });
 
 is_json_GET(
-    '/genetree/id/RF01299?compara=homology;subtree_node_id=100462639;aligned=1',
+    '/genetree/id/RF01299?compara=homology;subtree_node_id=100462673;aligned=1',
     $restricted_RF01299,
     'Gene-tree (ncRNA) by ID pruned to a subtree, with aligned sequences',
 );
@@ -265,7 +263,7 @@ is_json_GET(
 
 edit_leaf($restricted_RF01299->{tree}, {});
 is_json_GET(
-    '/genetree/id/RF01299?compara=homology;subtree_node_id=100462639;aligned=1;sequence=none',
+    '/genetree/id/RF01299?compara=homology;subtree_node_id=100462673;aligned=1;sequence=none',
     $restricted_RF01299,
     'Gene-tree (ncRNA) by ID pruned to a subtree, with no sequences',
 );
