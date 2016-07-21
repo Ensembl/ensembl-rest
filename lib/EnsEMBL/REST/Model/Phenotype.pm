@@ -41,18 +41,7 @@ fetch phenotype features by phenotype ontology accession
 sub fetch_by_accession  {
   my ($self, $species, $accession) = @_;
 
-#  my @phenotype_features;
-#warn "fetch_by_accession: species, $accession\n";
   my $ont_ad   = $self->context->model('Registry')->get_adaptor( 'Multi', 'Ontology', 'OntologyTerm'); 
-#  my $phen_ad  = $self->context->model('Registry')->get_adaptor( $species,'Variation', 'Phenotype');
-
-
-#  my $phenotypes = $phen_ad->fetch_all_by_ontology_accession( $accession );
-#  foreach my $pheno(@{$phenotypes}){
-#     @phenotype_features = (@phenotype_features, @{ $self->fetch_features($pheno, $accession)});
-
-# }
-
   my @phenotype_features = @{$self->fetch_features($species, $accession)};
 
 
@@ -62,11 +51,6 @@ warn "getting children\n";
     my $childterms = $ont_ad->fetch_all_by_parent_term($parentterm);
     foreach my $childterm (@{$childterms}){
       @phenotype_features = (@phenotype_features, @{$self->fetch_features($species, $childterm->accession)}  );
-
-#      my $phenotypes = $phen_ad->fetch_all_by_ontology_accession($childterm->accession());
-#      foreach my $pheno(@{$phenotypes}){
-#        @phenotype_features = (@phenotype_features, @{$self->fetch_features($pheno, $childterm->accession())});
-#      }
     }
   }
 
@@ -114,14 +98,12 @@ extract phenotype features by phenotype accession
 sub fetch_features{
 
   my $self      = shift;
-#  my $phenotype = shift;
   my $species   = shift;
   my $accession = shift;
 
   my $phenfeat_ad = $self->context->model('Registry')->get_adaptor($species,'variation', 'phenotypefeature');
 
-#  my $pfs = $phenfeat_ad->fetch_all_by_phenotype_id_source_name($phenotype->dbID(), $self->context->request->param('source'));
-my $pfs = $phenfeat_ad->fetch_all_by_phenotype_accession_source($accession, $self->context->request->param('source'));
+  my $pfs = $phenfeat_ad->fetch_all_by_phenotype_accession_source($accession, $self->context->request->param('source'));
 
   my @phenotype_features;
   foreach my $pf(@{$pfs}){
