@@ -194,6 +194,7 @@ CREATE TABLE `gene_tree_root` (
   `tree_type` enum('clusterset','supertree','tree') NOT NULL,
   `clusterset_id` varchar(20) NOT NULL DEFAULT 'default',
   `method_link_species_set_id` int(10) unsigned NOT NULL,
+  `species_tree_root_id` int(10) unsigned DEFAULT NULL,
   `gene_align_id` int(10) unsigned DEFAULT NULL,
   `ref_root_id` int(10) unsigned DEFAULT NULL,
   `stable_id` varchar(40) DEFAULT NULL,
@@ -420,7 +421,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=71 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -640,7 +641,6 @@ CREATE TABLE `species_tree_root` (
   `root_id` int(10) unsigned NOT NULL,
   `method_link_species_set_id` int(10) unsigned NOT NULL,
   `label` varchar(256) NOT NULL DEFAULT 'default',
-  `species_tree` mediumtext,
   PRIMARY KEY (`root_id`),
   UNIQUE KEY `method_link_species_set_id_2` (`method_link_species_set_id`,`label`),
   KEY `method_link_species_set_id` (`method_link_species_set_id`)

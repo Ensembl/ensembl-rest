@@ -5,7 +5,7 @@
 7	patch	patch_71_72_d.sql|patch_version_fix	\N
 8	patch	patch_71_72_e.sql|is_obsolete	\N
 1	schema_type	ontology	\N
-5	schema_version	85	\N
+5	schema_version	86	\N
 10	patch	patch_72_73_a.sql|schema_version	\N
 11	patch	patch_72_73_b.sql|meta_species	\N
 13	patch	patch_73_74_a.sql|schema_version	\N
@@ -24,3 +24,4 @@
 27	patch	patch_84_85_b.sql|confident_relationship	\N
 28	patch	patch_84_85_c.sql| add synonym dbxref	\N
 29	patch	patch_84_85_d.sql| add ontology data-version	\N
+30	patch	patch_85_86_a.sql|schema_version	\N
