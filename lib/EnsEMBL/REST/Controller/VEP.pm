@@ -358,6 +358,20 @@ sub get_id_POST {
   $self->_give_POST_to_VEP($c,\@ids,$config);
 }
 
+
+sub get_hgvs_POST {
+  my ($self, $c) = @_;
+
+  my $post_data = $c->req->data;
+  my $config = $self->_include_user_params($c,$post_data);
+  unless (exists $post_data->{hgvs_notations}) {
+    $c->go( 'ReturnError', 'custom', [ ' Cannot find "hgvs_notations" key in your POST. Please check the format of your message against the documentation' ] );
+  }
+  my @hgvs = @{$post_data->{hgvs_notations}};
+  $self->assert_post_size($c,\@hgvs);
+  $self->_give_POST_to_VEP($c,\@hgvs,$config);
+}
+
 # Cribbed from Utils::VEP
 # Turns a series of parameters into a VariationFeature object
 sub _build_vf {
