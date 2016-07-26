@@ -3029,3 +3029,5 @@
 3029	1952	"accession" []	\N
 3030	1952	"databank entry" []	\N
 3031	1953	"gene segment" []	\N
+56655	25934	"inhibition of epithelial cell proliferation" []	NARROW	\N
+145220	56655	"Dream disease"	EXACT	\N

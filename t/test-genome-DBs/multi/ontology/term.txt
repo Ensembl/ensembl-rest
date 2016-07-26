@@ -1951,3 +1951,5 @@
 1951	1	\N	SO:1001288	stop_codon_signal	"A recoding stimulatory signal that is a stop codon and has effect on efficiency of recoding." [PMID:12519954, SO:ke]	0	0
 1952	1	SOFA	SO:2000061	databank_entry	"The sequence referred to by an entry in a databank such as Genbank or SwissProt." [SO:ke]	0	0
 1953	1	\N	SO:3000000	gene_segment	"A gene component region which acts as a recombinational unit of a gene whose functional form is generated through somatic recombination." [GOC:add]	0	0
+56655	7	NULL	Orphanet:130	Brugada syndrome	"Brugada syndrome (BrS) manifests with ST segment elevation in right precordial leads (V1 to V3), incomplete or complete right bundle branch block, and susceptibility to ventricular tachyarrhythmia and sudden death. BrS is an electrical disorder without overt myocardial abnormalities." []	0	0
+70098	7	NULL	Orphanet:101934	Genetic cardiac rhythm disease	"" []	0	0
