@@ -34,6 +34,8 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
+my $version_string =  get_version_string($dba);
+
 my $base = '/ga4gh/variantannotationsets/search';
 
 my $post_data1 = '{ "variantSetId": "Ensembl", "pageSize": 1 }';
@@ -44,7 +46,7 @@ my $expected_data1 = {
       analysis => {                                                                  
         createDateTime => undef,                                                            
         description => undef,                                                        
-        id => '85',                                               
+        id => $version_string,                                 
         info => {                                                                    
           'assembly.accession'               => ['GCA_000001405.9'],                                 
           'assembly.long_name'               => ['Genome Reference Consortium Human Reference 37'], 
@@ -61,9 +63,9 @@ my $expected_data1 = {
         type => 'variant annotation',                                                
         updated => undef                                                             
       },                                                                             
-      id => 'Ensembl.85.GRCh37',                                                            
-      name => 'Ensembl.85.GRCh37',                                                          
-      variantSetId => 'Ensembl.85.GRCh37'                                                           
+      id => 'Ensembl.'. $version_string . '.GRCh37',                                                            
+      name => 'Ensembl.'. $version_string . '.GRCh37',                                                          
+      variantSetId => 'Ensembl.'. $version_string . '.GRCh37'                                                           
     }                                                                                
   ],
   nextPageToken => undef                                                                               
@@ -83,7 +85,7 @@ my $expected_data2 = {
      analysis => {                                                                 
        createDateTime => undef,                                                           
        description => undef,                                                       
-       id => '85',                                                                
+       id => $version_string,                                    
        info => {                                                                   
          'assembly.accession'               => ['GCA_000001405.9'],                                
          'assembly.long_name'               => ['Genome Reference Consortium Human Reference 37'], 
@@ -100,9 +102,9 @@ my $expected_data2 = {
        type => 'variant annotation',                                               
        updated => undef                                                            
      },                                                                            
-     id => 'Ensembl.85.GRCh37',                                                           
-     name => 'Ensembl.85.GRCh37',                                                         
-     variantSetId => 'Ensembl.85.GRCh37'                                                          
+     id => 'Ensembl.'. $version_string . '.GRCh37',                                                       
+     name => 'Ensembl.'. $version_string . '.GRCh37',                                                         
+     variantSetId => 'Ensembl.'. $version_string . '.GRCh37'                                                          
 };
 
   
@@ -112,3 +114,12 @@ eq_or_diff($json2, $expected_data2, "Checking the get result from the variantann
 
 done_testing();
 
+sub get_version_string{
+ 
+  my $multi = shift;
+
+  my $core_ad = $multi->get_DBAdaptor('core');
+
+  ## string required
+  return "". $core_ad->get_MetaContainerAdaptor()->schema_version(); 
+}
