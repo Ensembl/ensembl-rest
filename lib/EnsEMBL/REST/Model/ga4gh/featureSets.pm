@@ -38,15 +38,9 @@ sub searchFeatureSets {
   my $self   = shift;
   my $data   = shift;
 
-  ## only supporting one dataset currently
-  return { featureSets   => [],
-           nextPageToken => undef
-         } unless $data->{datasetId} eq 'Ensembl';
+  my $featureSets = $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSets_by_dataset($data->{datasetId});
 
-
-  my $featureSet = $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSet();
-
-  return { featureSets   => [$featureSet],
+  return { featureSets   => $featureSets,
            nextPageToken => undef
          }; 
 }
@@ -55,14 +49,8 @@ sub searchFeatureSets {
 sub getFeatureSet{
 
   my ($self, $id ) = @_; 
-
-  ## only one feature set supported
-  my $featureSet = $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSet();
-
-  ## check id
-  return {} unless $id eq 'Ensembl' || $id eq $featureSet->{id};
   
-  return $featureSet;
+  return $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSet_by_id($id);
 
 }
 

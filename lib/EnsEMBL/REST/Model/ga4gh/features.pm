@@ -23,6 +23,9 @@ extends 'Catalyst::Model';
 
 use Scalar::Util qw/weaken/;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
+use Bio::EnsEMBL::IO::Parser::GFF3Tabix;
+
+
 with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro', weak_ref => 1);
@@ -53,13 +56,19 @@ sub searchFeatures {
   ## check input types against supported types
   $data = $self->getTypes($data);
 
+
+  return $self->fetch_compliance_data($data) 
+    if (defined $data->{featureSetId} && $data->{featureSetId} =~/^c/ ) ||
+       (defined $data->{parentId} && $data->{parentId} =~/^c/ );
+
+
   ##silent fail if unsupported feature requested
   return { nextPageToken => undef,
            features =>  []}  
          if ! defined $data->{required_types} || $data->{pageSize} < 1; 
 
 
-  $data->{featureSet} = $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSet();
+  $data->{featureSet} = $self->context->model('ga4gh::ga4gh_utils')->fetch_DBfeatureSet();
 
   ## check any supplied featureSet
   if($data->{featureSetId} && 
@@ -259,7 +268,7 @@ sub getTranscriptChildren{
 
 }
 =head2 getGeneChildren
-      return transcripts
+      return transcripts only and not 'grandchildren'
 =cut
 sub getGeneChildren{
 
@@ -305,14 +314,18 @@ sub getFeature{
   my $self = shift;
   my $id   = shift;
   
+  ## Compliance data is not in the database
+  return $self->get_compliance_data($id)  if $id =~/^c/;
+
   my $data;
-  $data->{featureSet} = $self->context->model('ga4gh::ga4gh_utils')->fetch_featureSet();
+  $data->{featureSet} = $self->context->model('ga4gh::ga4gh_utils')->fetch_DBfeatureSet();
 
   return $self->getTranscript($id, $data) if $id =~/ENST\d+\.\d+/;
   return $self->getGene($id, $data)       if $id =~/ENSG/;
   return $self->getProtein($id, $data)    if $id =~/ENSP/;
   return $self->getExon($id, $data)       if $id =~/ENSE/;
 
+ 
   return {};  ## not the id of a supported feature
 }
 
@@ -409,8 +422,7 @@ sub fetchSO{
   return $default  unless defined $onta;
 
   my $ont  = $onta->fetch_all_by_name($type); 
-  return $default  unless defined $ont;
-
+  return $default unless defined $ont->[0];
 
   return ( { id            => $ont->[0]->accession(),
              term          => $ont->[0]->name(), 
@@ -471,7 +483,8 @@ sub formatTranscript{
   my $feature = $self->formatFeature($tr, $data, 'transcript');
 
   ## add relatives
-  $feature->{parentId}  = $tr->get_Gene()->stable_id_version(); 
+  my $parent = $tr->get_Gene()->stable_id_version();
+  $feature->{parentId}  = (defined $parent ? $parent : ""); 
 
   my $ea   = $self->context->model('Registry')->get_adaptor('homo_sapiens', 'core', 'exon');
   my $exons = $ea->fetch_all_by_Transcript($tr);
@@ -542,7 +555,7 @@ sub formatFeature{
 
 
   my $gaFeature  = { id            => $feat->stable_id_version(),
-                     parentId      => undef,
+                     parentId      => "",
                      childIds      => [],
                      featureSetId  => $data->{featureSet}->{id},
                      referenceName => $feat->seq_region_name(),
@@ -683,6 +696,133 @@ sub reduce_size{
   }
 
   return(\@return_features, $nextPageToken);
+}
+
+=head fetch_compliance_data
+  POST: accept region & either featureset id or parent id
+        return a page of features
+
+=cut
+sub fetch_compliance_data{
+
+  my $self = shift;
+  my $data = shift;
+
+  my ($featureSetId, $parentId);
+  if (defined $data->{parentId}){
+    ($featureSetId, $parentId) =  split /\:/, $data->{parentId};
+  }
+
+  ## these values may be in compatible - return nothing if they are
+  return if defined $data->{featureSetId} &&  defined $featureSetId &&
+           $data->{featureSetId} ne $featureSetId; 
+
+  $data->{featureSetId} ||= $featureSetId;
+ 
+
+  my ($featureSet, $parser) = $self->context->model('ga4gh::ga4gh_utils')->read_gff_tabix($data->{featureSetId});
+  return {} unless defined $featureSet;
+
+  ## crude paging
+  my $start = (defined $data->{pageToken} ? $data->{pageToken} : $data->{start});
+
+  $parser->seek( $data->{referenceName}, $start, $data->{end});
+
+
+  my $n = 0;
+  my @features;
+  my $nextPageToken = 0;
+
+  while($n < ($data->{pageSize} + 1)){
+
+    my $got_something = $parser->next();
+    last unless $got_something;
+
+    my $attribs = $parser->get_attributes();
+
+    next if $parentId && $parentId ne $attribs->{Parent};
+
+    ## filter by type if required
+    ## - ENSEMBL types are restricted; here more are returned hence check input
+    my $type = $parser->get_type();
+    next if exists $data->{featureTypes}->[0]  && ! $data->{required_types}->{ $type};
+
+    $n++;
+    push @features, $self->format_gff_feature($parser, $data->{featureSetId}); 
+
+  }
+
+  return { features => \@features, nextPageToken  => $nextPageToken};
+}
+
+=head get_compliance_data
+
+  GET: accept feature id & return single feature
+
+=cut
+sub get_compliance_data{
+
+  my $self = shift;
+  my $id   = shift;
+
+  my ($featureSetId, $featureId) =  split /\:/, $id;
+
+  my ($featureSet, $parser) = $self->context->model('ga4gh::ga4gh_utils')->read_gff_tabix($featureSetId);
+
+  return {} unless defined $featureSet;
+
+
+  foreach my $seq_name( keys %{$featureSet->{sequences}}){
+
+    $parser->seek( $seq_name, $featureSet->{sequences}->{$seq_name}->[0], $featureSet->{sequences}->{$seq_name}->[1]);
+
+    while ( my $got_something = $parser->next() ){
+
+      next unless  $parser->get_attribute_by_name('ID') eq $featureId;
+      return $self->format_gff_feature($parser, $featureSetId); 
+    }
+  }
+  ## nothing by this id found - could be slow
+  return {} ;  
+
+}
+
+sub format_gff_feature{
+
+  my $self         = shift;
+  my $parser       = shift;
+  my $featureSetId = shift;
+
+  my $attribs = $parser->get_attributes();
+
+  ## may be nothing in the region
+  return unless $attribs->{ID};
+
+
+  my $strand;
+  $parser->get_strand() eq 1 ? $strand = 'POS_STRAND'
+                             : $strand = 'NEG_STRAND';
+
+  my $parent = (defined $attribs->{Parent} ? $featureSetId . ":" . $attribs->{Parent} : undef);
+
+  my $feature = { id            => $featureSetId . ":" . $attribs->{ID},
+                  parentId      => $parent,
+                  childIds      => undef,
+                  featureSetId  => $featureSetId,
+                  referenceName => $parser->get_seqname(),
+                  start         => $parser->get_start(),
+                  end           => $parser->get_end(),
+                  strand        => $strand, 
+                  featureType   => $self->fetchSO( $parser->get_type())
+               };
+
+  ## add remaining attribs
+  delete $attribs->{ID};
+  delete $attribs->{Parent};
+  $feature->{attributes} = $attribs;
+
+  return $feature;
+
 }
 
 1;
