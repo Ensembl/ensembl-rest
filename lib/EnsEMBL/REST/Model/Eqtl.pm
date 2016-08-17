@@ -22,7 +22,6 @@ use Moose;
 use Catalyst::Exception qw(throw);
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 use Bio::EnsEMBL::Registry;
-use Bio::EnsEMBL::HDF5::EQTLAdaptor;
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
 
 use feature qw(say);
@@ -35,6 +34,7 @@ with 'Catalyst::Component::InstancePerContext';
 # Assign all these to $self->context
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  require Bio::EnsEMBL::HDF5::EQTLAdaptor;
   return $self->new({ registry => $c->model('Registry'), %$self, @args });
 
 }
