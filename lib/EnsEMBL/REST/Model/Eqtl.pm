@@ -23,6 +23,7 @@ use Catalyst::Exception qw(throw);
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 use Bio::EnsEMBL::Registry;
 use Bio::EnsEMBL::DBSQL::DBAdaptor;
+eval { require Bio::EnsEMBL::HDF5::EQTLAdaptor };
 
 use feature qw(say);
 use Data::Dumper;
@@ -34,7 +35,6 @@ with 'Catalyst::Component::InstancePerContext';
 # Assign all these to $self->context
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
-  require Bio::EnsEMBL::HDF5::EQTLAdaptor;
   return $self->new({ registry => $c->model('Registry'), %$self, @args });
 
 }
@@ -64,6 +64,10 @@ sub fetch_eqtl {
   }
 
   my $eqtl_a = $self->{'registry'}->get_eqtl_adaptor($ensembl_species);
+
+  if (!defined $eqtl_a) {
+    Catalyst::Exception->throw("No EQTL adaptor available");
+  }
 
   $self->_validate_stable_id ($eqtl_a, $constraints->{stable_id});
   $self->_validate_tissue    ($eqtl_a, $constraints->{tissue});
@@ -101,9 +105,13 @@ sub fetch_all_tissues {
   }
 
   my $eqtl_a = $self->{'registry'}->get_eqtl_adaptor($ensembl_species);
-  my $result = $eqtl_a->fetch_all_tissues();
+  if (defined $eqtl_a) {
+    my $result = $eqtl_a->fetch_all_tissues();
+    return ($result);
+  } else {
+    Catalyst::Exception->throw("No EQTL adaptor available");
+  }
 
-  return($result);
 }
 
 =head2 _validate_stable_id
