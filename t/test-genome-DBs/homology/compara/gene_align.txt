@@ -1,4 +1,2 @@
 40664	\N	MCoffee	4654
 100000188	\N	infernal	124
-100000187	filtered	infernal	70
-100002017	seq_with_flanking	prank	854

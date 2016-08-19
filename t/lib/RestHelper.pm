@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET fasta_GET json_GET is_json_POST do_POST json_POST seqxml_GET orthoxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_check_code action_raw_bad_regex action_bad_regex action_bad_post/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET is_json_POST do_POST json_POST seqxml_GET orthoxml_GET phyloxml_GET text_GET gff_GET nh_GET bed_GET xml_GET action_bad action_check_code action_raw_bad_regex action_bad_regex action_bad_post/;
 
 use Test::More;
 use Test::Differences;
@@ -109,6 +109,11 @@ sub fasta_GET($$) {
 sub gff_GET($$) {
   my ($url, $msg) = @_;
   return text_GET($url, $msg, 'text/x-gff3');
+}
+
+sub nh_GET($$) {
+  my ($url, $msg) = @_;
+  return text_GET($url, $msg, 'text/x-nh');
 }
 
 sub bed_GET($$) {

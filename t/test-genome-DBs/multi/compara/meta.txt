@@ -1,4 +1,4 @@
-59	\N	schema_version	85
+67	\N	schema_version	86
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -54,3 +54,6 @@
 64	\N	patch	patch_84_85_h.sql|homology_member_float
 65	\N	patch	patch_84_85_i.sql|species_tree_node_attr
 66	\N	patch	patch_84_85_j.sql|method_link_species_set_attr
+68	\N	patch	patch_85_86_a.sql|schema_version
+69	\N	patch	patch_85_86_b.sql|species_tree_root.species_tree
+70	\N	patch	patch_85_86_c.sql|gene_tree_root.species_tree_root_id

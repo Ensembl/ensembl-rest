@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	85
+2	\N	schema_version	86
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -80,3 +80,5 @@
 80	\N	patch	patch_84_85_e.sql|drop the table tagged_variation_feature
 81	\N	patch	patch_84_85_f.sql|add phenotype_ontology_accession
 82	\N	patch	patch_84_85_g.sql|allow the column description to store more text in the source table
+83	\N	patch	patch_85_86_a.sql|schema version
+84	\N	patch	patch_84_85_b.sql|add qualifier & index to phenotype_onology_accession

@@ -36,6 +36,7 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
+my $version =  get_version($dba);
 
 my $base = '/ga4gh/variantannotations/search';
 
@@ -53,7 +54,7 @@ my $expected_data3 = {
   nextPageToken => 215811,                             
   variantAnnotations => [                              
     {                                                  
-      variantAnnotationSetId => 'Ensembl.85.GRCh37',           
+      variantAnnotationSetId => "Ensembl."  . $version . ".GRCh37",           
       createDateTime => undef,                 
       info => {},
       transcriptEffects => [                           
@@ -94,7 +95,7 @@ my $expected_data3 = {
           }                                            
         }                                              
       ],                                               
-      variantId => '85:rs370879507'                
+      variantId => $version .':rs370879507'
     }
   ]
 };
@@ -103,7 +104,7 @@ my $expected_data4 = {
   nextPageToken => 215818,                           
   variantAnnotations => [                            
     {                                                
-      variantAnnotationSetId => 'Ensembl.85.GRCh37',               
+      variantAnnotationSetId => "Ensembl."  . $version . ".GRCh37",               
       createDateTime => undef,
       info => {}, 
       transcriptEffects => [                         
@@ -150,7 +151,7 @@ my $expected_data4 = {
           }                                          
         }                                            
       ],                                             
-      variantId => '85:rs368117410'      
+      variantId => $version.':rs368117410'
     }                                                
   ]
 };
@@ -172,4 +173,11 @@ eq_or_diff($json5, $expected_data4, "Checking the result from the variant annota
 
 done_testing();
 
+sub get_version{
 
+  my $multi = shift;
+
+  my $core_ad = $multi->get_DBAdaptor('core');
+
+  return $core_ad->get_MetaContainerAdaptor()->schema_version(); 
+}

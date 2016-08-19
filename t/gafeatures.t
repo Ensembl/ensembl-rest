@@ -36,6 +36,7 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
+my $set_version = get_set_version($dba);
 
 my $base = '/ga4gh/features';
 
@@ -64,7 +65,7 @@ my $expected_data1 = {
         'ENSP00000320396.1' 
       ],
       parentId => 'ENSG00000176515.1',
-      featureSetId => 'Ensembl.85.GRCh37',  
+      featureSetId => $set_version,  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
@@ -96,7 +97,7 @@ my $expected_data2 = {
       childIds => [ 
           'ENSE00001808595.1'
       ],                           
-      featureSetId => 'Ensembl.85.GRCh37',  
+      featureSetId => $set_version,  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
@@ -132,7 +133,7 @@ features => [
       'ENST00000314040.1'            
     ],                               
     end => 1105181,                  
-    featureSetId => 'Ensembl.85.GRCh37',     
+    featureSetId => $set_version,     
     featureType => {                 
       id => 'SO:0000704',            
       sourceName => 'SO',            
@@ -192,7 +193,7 @@ my $expected_data4 =  {
       childIds => [
        'ENSE00002577443.1'
       ],                          
-      featureSetId => 'Ensembl.85.GRCh37',  
+      featureSetId => $set_version,  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
@@ -209,6 +210,14 @@ my $expected_data4 =  {
 
 eq_or_diff($json4, $expected_data4, "Checking the get result from the sequence annotation endpoint");
 
+sub get_set_version{
+
+  my $multi = shift;
+
+  my $core_ad = $multi->get_DBAdaptor('core');
+
+  return "Ensembl."  . $core_ad->get_MetaContainerAdaptor()->schema_version() . ".GRCh37"; 
+}
 
 
 done_testing();

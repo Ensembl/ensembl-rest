@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	85
+2	\N	schema_version	86
 3	\N	patch	patch_77_78_a.sql|schema_version
 4	\N	patch	patch_77_78_b.sql|source_column_increase
 5	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
@@ -26,3 +26,4 @@
 824	\N	patch	patch_83_84_e.sql|nullable_versions
 825	\N	patch	patch_84_85_a.sql|schema_version
 826	\N	patch	patch_84_85_b.sql|remove_duplicated_key
+827	\N	patch	patch_85_86_a.sql|schema_version

@@ -179,7 +179,7 @@ my $condensed_para_ENSG00000238707 = {
     'taxonomy_level' => 'Eutheria',
     'protein_id' => 'ENST00000459163',
     'type' => 'within_species_paralog',
-    'id' => 'ENSG00000238942',
+    'id' => 'ENSG00000176515',
     'species' => 'homo_sapiens',
     'method_link_type' => 'ENSEMBL_PARALOGUES'
 };
@@ -190,7 +190,23 @@ is_json_GET(
     '"condensed" paralogues'
 );
 
+# Aliases are somehow not loaded yet, so we need to add one here
+Bio::EnsEMBL::Registry->add_alias('homo_sapiens', 'johndoe');
 
+my $condensed_para_ENSG00000176515 = {
+    'taxonomy_level' => 'Eutheria',
+    'protein_id' => 'ENST00000458762',
+    'type' => 'within_species_paralog',
+    'id' => 'ENSG00000238707',
+    'species' => 'homo_sapiens',
+    'method_link_type' => 'ENSEMBL_PARALOGUES'
+};
+
+is_json_GET(
+    '/homology/symbol/johndoe/AL033381.1?format=condensed;type=paralogues;compara=homology',
+    _get_returned_json('ENSG00000176515', $condensed_para_ENSG00000176515),
+    'paralogues via the gene symbol'
+);
 
 my $full_ortho_ENSG00000238707_zebrafish = {
     'dn_ds' => undef,

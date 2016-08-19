@@ -34,6 +34,8 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
+my $set_version = get_set_version($dba);
+
 my $base = '/ga4gh/featuresets/search';
 
 my $post_data1 = '{ "datasetId": "Ensembl", "pageSize": 1 }';
@@ -42,7 +44,7 @@ my $expected_data1 = {
   featureSets => [                                              
         {                                                       
           datasetId => 'Ensembl',                               
-          id => 'Ensembl.85.GRCh37',                                           
+          id => $set_version,                                           
           info => {                                             
             'assembly.accession' => [                           
               'GCA_000001405.9'                                 
@@ -79,7 +81,7 @@ $base =~ s/\/search//;
 my $id = 'Ensembl';
 my $expected_data2 = {                                     
       datasetId => 'Ensembl',
-      id => 'Ensembl.85.GRCh37',                                           
+      id => $set_version,                                           
       info => {                                             
         'assembly.accession' => [                           
           'GCA_000001405.9'                                 
@@ -106,6 +108,15 @@ my $expected_data2 = {
 my $json2 = json_GET("$base/$id", 'get featureset');
 eq_or_diff($json2, $expected_data2, "Checking the get result from the featureset endpoint");
 
+sub get_set_version{
+
+  my $multi = shift;
+
+  my $core_ad = $multi->get_DBAdaptor('core');
+
+  return "Ensembl."  . $core_ad->get_MetaContainerAdaptor()->schema_version() . ".GRCh37"; 
+
+}
 
 done_testing();
 
