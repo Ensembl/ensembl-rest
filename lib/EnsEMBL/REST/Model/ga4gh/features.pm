@@ -427,7 +427,7 @@ sub fetchSO{
   return ( { id            => $ont->[0]->accession(),
              term          => $ont->[0]->name(), 
              sourceName    => $ont->[0]->ontology(),
-             sourceVersion => undef 
+             sourceVersion => $ont->[0]->ontology_version() 
             });
 }
 
@@ -748,7 +748,7 @@ sub fetch_compliance_data{
     next if exists $data->{featureTypes}->[0]  && ! $data->{required_types}->{ $type};
 
     $n++;
-    push @features, $self->format_gff_feature($parser, $data->{featureSetId}); 
+    push @features, $self->format_gff_feature( $parser, $data->{featureSetId}, $data); 
 
   }
 
@@ -792,28 +792,32 @@ sub format_gff_feature{
   my $self         = shift;
   my $parser       = shift;
   my $featureSetId = shift;
+  my $data         = shift;
 
   my $attribs = $parser->get_attributes();
 
   ## may be nothing in the region
   return unless $attribs->{ID};
 
+  my $feature_type = $parser->get_type();
+  $data->{so}->{$parser->get_type()} =  $self->fetchSO( $parser->get_type()) 
+    unless exists  $data->{so}->{$parser->get_type()} ;
 
   my $strand;
   $parser->get_strand() eq 1 ? $strand = 'POS_STRAND'
                              : $strand = 'NEG_STRAND';
 
-  my $parent = (defined $attribs->{Parent} ? $featureSetId . ":" . $attribs->{Parent} : undef);
+  my $parent = (defined $attribs->{Parent} ? $featureSetId . ":" . $attribs->{Parent} : "");
 
   my $feature = { id            => $featureSetId . ":" . $attribs->{ID},
-                  parentId      => $parent,
-                  childIds      => undef,
+                  parentId      => $parent, 
+                  childIds      => [],
                   featureSetId  => $featureSetId,
                   referenceName => $parser->get_seqname(),
                   start         => $parser->get_start(),
                   end           => $parser->get_end(),
                   strand        => $strand, 
-                  featureType   => $self->fetchSO( $parser->get_type())
+                  featureType   => $data->{so}->{$feature_type}
                };
 
   ## add remaining attribs
