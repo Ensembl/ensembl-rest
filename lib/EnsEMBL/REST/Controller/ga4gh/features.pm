@@ -67,6 +67,10 @@ sub searchFeatures_POST {
   $c->go( 'ReturnError', 'custom', [ ' Cannot find "end" key in your request' ] )
     unless (exists $post_data->{end} && $post_data->{end} =~/\d+/); 
 
+  $c->go( 'ReturnError', 'custom', [ ' End must be greater than start' ] )
+    if (  $post_data->{end} < $post_data->{start});
+
+
   ## set a default page size if not supplied or not a number
   $post_data->{pageSize} = 200 unless (defined  $post_data->{pageSize} && $post_data->{pageSize} =~ /\d+/ );
 
