@@ -34,10 +34,10 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
-my $vep_get = '/vep/homo_sapiens/region/7:86442404-86442404:1/G?content-type=application/json';
+my $vep_get = '/vep/homo_sapiens/region/7:86442404-86442404:1/C?content-type=application/json';
 my $vep_output =
 [{
-  allele_string => "N/G",
+  allele_string => "N/C",
   colocated_variants =>
   [{
     afr_maf => "0.01",
@@ -53,7 +53,8 @@ my $vep_output =
     strand => 1,
   }],
   end => 86442404,
-  id => "temp",
+  id => '7_86442404_N/C',
+  input => '7 86442404 86442404 N/C 1',
   most_severe_consequence => "intron_variant",
   seq_region_name => "7",
   start => 86442404,
@@ -72,7 +73,7 @@ my $vep_output =
       gene_symbol_source => 'HGNC',
       strand => 1,
       transcript_id => 'ENST00000361669',
-      variant_allele => 'G'
+      variant_allele => 'C'
     },
     {
       biotype => 'protein_coding',
@@ -85,7 +86,7 @@ my $vep_output =
       gene_symbol_source => 'HGNC',
       strand => 1,
       transcript_id => 'ENST00000394720',
-      variant_allele => 'G'
+      variant_allele => 'C'
     },
     {
       biotype => 'protein_coding',
@@ -98,7 +99,7 @@ my $vep_output =
       gene_symbol_source => 'HGNC',
       strand => 1,
       transcript_id => 'ENST00000439827',
-      variant_allele => 'G'
+      variant_allele => 'C'
     },
     {
       biotype => 'protein_coding',
@@ -111,7 +112,7 @@ my $vep_output =
       gene_symbol_source => 'HGNC',
       strand => 1,
       transcript_id => 'ENST00000536043',
-      variant_allele => 'G'
+      variant_allele => 'C'
     },
     {
       biotype => 'protein_coding',
@@ -124,124 +125,14 @@ my $vep_output =
       gene_symbol_source => 'HGNC',
       strand => 1,
       transcript_id => 'ENST00000546348',
-      variant_allele => 'G'
+      variant_allele => 'C'
     },
   ]}];
-
-my $vep_output_2 =
-  { data => [
-    {
-      "Consequence" => "intron_variant",
-      "GMAF" => "C:0.0399",
-      "STRAND" => 1,
-      "SYMBOL" => "GRM3",
-      "SYMBOL_SOURCE" => "HGNC",
-      "BIOTYPE" => "protein_coding",
-      "Feature_type" => "Transcript",
-      "Uploaded_variation" => "temp",
-      "Existing_variation" => "rs2299222",
-      "Allele" => "G",
-      "Gene" => "ENSG00000198822",
-      IMPACT => 'MODIFIER',
-      "CDS_position" => "-",
-      "cDNA_position" => "-",
-      "Protein_position" => "-",
-      "Amino_acids" => undef,
-      "Feature" => "ENST00000361669",
-      "Codons" => undef,
-      "Location" => "7:86442404"
-    },
-    {
-      "Consequence" => "intron_variant",
-      "GMAF" => "C:0.0399",
-      "STRAND" => 1,
-      "SYMBOL" => "GRM3",
-      "SYMBOL_SOURCE" => "HGNC",
-      "BIOTYPE" => "protein_coding",
-      "Feature_type" => "Transcript",
-      "Uploaded_variation" => "temp",
-      "Existing_variation" => "rs2299222",
-      "Allele" => "G",
-      "Gene" => "ENSG00000198822",
-      IMPACT => 'MODIFIER',
-      "CDS_position" => "-",
-      "cDNA_position" => "-",
-      "Protein_position" => "-",
-      "Amino_acids" => undef,
-      "Feature" => "ENST00000394720",
-      "Codons" => undef,
-      "Location" => "7:86442404"
-    },
-    {
-      "Consequence" => "intron_variant",
-      "GMAF" => "C:0.0399",
-      "STRAND" => 1,
-      "SYMBOL" => "GRM3",
-      "SYMBOL_SOURCE" => "HGNC",
-      "BIOTYPE" => "protein_coding",
-      "Uploaded_variation" => "temp",
-      "Existing_variation" => "rs2299222",
-      "Allele" => "G",
-      "Gene" => "ENSG00000198822",
-      IMPACT => 'MODIFIER',
-      "CDS_position" => "-",
-      "cDNA_position" => "-",
-      "Protein_position" => "-",
-      "Amino_acids" => undef,
-      "Feature" => "ENST00000439827",
-      "Feature_type" => "Transcript",
-      "Codons" => undef,
-      "Location" => "7:86442404"
-    },
-    {
-      "Consequence" => "intron_variant",
-      "GMAF" => "C:0.0399",
-      "STRAND" => 1,
-      "SYMBOL" => "GRM3",
-      "SYMBOL_SOURCE" => "HGNC",
-      "BIOTYPE" => 'protein_coding',
-      "Feature_type" => "Transcript",
-      "Uploaded_variation" => "temp",
-      "Existing_variation" => "rs2299222",
-      "Allele" => "G",
-      "Gene" => "ENSG00000198822",
-      IMPACT => 'MODIFIER',
-      "CDS_position" => "-",
-      "cDNA_position" => "-",
-      "Protein_position" => "-",
-      "Amino_acids" => undef,
-      "Feature" => "ENST00000536043",
-      "Codons" => undef,
-      "Location" => "7:86442404"
-    },
-    {
-      "Consequence" => "intron_variant",
-      "GMAF" => "C:0.0399",
-      "STRAND" => 1,
-      "SYMBOL" => "GRM3",
-      "SYMBOL_SOURCE" => "HGNC",
-      "BIOTYPE" => "protein_coding",
-      "Feature_type" => "Transcript",
-      "Uploaded_variation" => "temp",
-      "Existing_variation" => "rs2299222",
-      "Allele" => "G",
-      "Gene" => "ENSG00000198822",
-      IMPACT => 'MODIFIER',
-      "CDS_position" => "-",
-      "cDNA_position" => "-",
-      "Protein_position" => "-",
-      "Amino_acids" => undef,
-      "Feature" => "ENST00000546348",
-      "Codons" => undef,
-      "Location" => "7:86442404"
-    },
-  ]};
 
 # Test vep/region
 my $json = json_GET($vep_get,'GET a VEP region');
 eq_or_diff($json, $vep_output, 'Example vep region get message');
-my $json_2 = json_GET("$vep_get;version=2", "GET a VEP region version 2");
-eq_or_diff($json_2, $vep_output_2, "Example vep region in version 2 get message");
+
 
 # test with non-toplevel sequence (should transform to toplevel)
 $vep_get = '/vep/homo_sapiens/region/HSCHR6_CTG1:1000001-1000001:1/G?content-type=application/json';
@@ -267,20 +158,17 @@ $vep_output = [
   }
 ];
 $json = json_GET($vep_get,'GET a VEP region on a non-toplevel sequence');
-eq_or_diff($json_2, $vep_output_2, "VEP non-toplevel get message");
 
 my $vep_post = '/vep/homo_sapiens/region';
-my $vep_post_body = '{ "variants" : ["7  34381884  var1  C  T  . . .",
-                                     "7  86442404  var2  T  C  . . ."]}';
-my $vep_post_body_2 = '{ "version" : 2,  "variants" : ["7  34381884  var1  C  T  . . .",
-                                     "7  86442404  var2  T  C  . . ."]}';
+my $vep_post_body = '{ "variants" : ["7 34381884 var1 C T . . .",
+                                     "7 86442404 var2 T C . . ."]}';
 
 $vep_output =
 [{
      allele_string => 'C/T',
      end => 34381884,
      id => 'var1',
-     input => '7  34381884  var1  C  T  . . .',
+     input => '7 34381884 var1 C T . . .',
      most_severe_consequence => 'downstream_gene_variant',
      seq_region_name => '7',
      assembly_name => 'GRCh37',
@@ -321,7 +209,7 @@ $vep_output =
   }],
   end => 86442404,
   id => "var2",
-  input => '7  86442404  var2  T  C  . . .',
+  input => '7 86442404 var2 T C . . .',
   most_severe_consequence => "intron_variant",
   seq_region_name => "7",
   assembly_name => 'GRCh37',
@@ -397,142 +285,8 @@ $vep_output =
   ]
 }];
 
-$vep_output_2 =
-{
-  data => [
-    {
-      Allele => 'T',
-      Amino_acids => undef,
-      BIOTYPE => "processed_transcript",
-      CDS_position => '-',
-      Codons => undef,
-      Consequence => 'downstream_gene_variant',
-      Existing_variation => '-',
-      "DISTANCE" => 4240,
-      "STRAND" => -1,
-      "SYMBOL" => "NPSR1-AS1",
-      "SYMBOL_SOURCE" => "HGNC",
-      Feature => 'ENST00000419766',
-      Feature_type => 'Transcript',
-      Gene => 'ENSG00000197085',
-       IMPACT => 'MODIFIER',
-      Location => '7:34381884',
-      Protein_position => '-',
-      Uploaded_variation => 'var1',
-      cDNA_position => '-'
-    },
-    {
-      Allele => 'C',
-      Amino_acids => undef,
-      BIOTYPE => "protein_coding",
-      CDS_position => '-',
-      Codons => undef,
-      Consequence => 'intron_variant',
-      Existing_variation => 'rs2299222',
-      GMAF => 'C:0.0399',
-      IMPACT => 'MODIFIER',
-      STRAND => 1,
-      SYMBOL => 'GRM3',
-      SYMBOL_SOURCE => 'HGNC',
-      Feature => 'ENST00000361669',
-      Feature_type => 'Transcript',
-      Gene => 'ENSG00000198822',
-      Location => '7:86442404',
-      Protein_position => '-',
-      Uploaded_variation => 'var2',
-      cDNA_position => '-'
-    },
-    {
-      Allele => 'C',
-      Amino_acids => undef,
-      BIOTYPE => "protein_coding",
-      CDS_position => '-',
-      Codons => undef,
-      Consequence => 'intron_variant',
-      Existing_variation => 'rs2299222',
-      GMAF => 'C:0.0399',
-      IMPACT => 'MODIFIER',
-      STRAND => 1,
-      SYMBOL => 'GRM3',
-      SYMBOL_SOURCE => 'HGNC',
-      Feature => 'ENST00000394720',
-      Feature_type => 'Transcript',
-      Gene => 'ENSG00000198822',
-      Location => '7:86442404',
-      Protein_position => '-',
-      Uploaded_variation => 'var2',
-      cDNA_position => '-'
-    },
-    {
-      Allele => 'C',
-      Amino_acids => undef,
-      BIOTYPE => "protein_coding",
-      CDS_position => '-',
-      Codons => undef,
-      Consequence => 'intron_variant',
-      Existing_variation => 'rs2299222',
-      GMAF => 'C:0.0399',
-      IMPACT => 'MODIFIER',
-      STRAND => 1,
-      SYMBOL => 'GRM3',
-      SYMBOL_SOURCE => 'HGNC',
-      Feature => 'ENST00000439827',
-      Feature_type => 'Transcript',
-      Gene => 'ENSG00000198822',
-      Location => '7:86442404',
-      Protein_position => '-',
-      Uploaded_variation => 'var2',
-      cDNA_position => '-'
-    },
-    {
-      Allele => 'C',
-      Amino_acids => undef,
-      BIOTYPE => "protein_coding",
-      CDS_position => '-',
-      Codons => undef,
-      Consequence => 'intron_variant',
-      Existing_variation => 'rs2299222',
-      GMAF => 'C:0.0399',
-      IMPACT => 'MODIFIER',
-      STRAND => 1,
-      SYMBOL => 'GRM3',
-      SYMBOL_SOURCE => 'HGNC',
-      Feature => 'ENST00000536043',
-      Feature_type => 'Transcript',
-      Gene => 'ENSG00000198822',
-      Location => '7:86442404',
-      Protein_position => '-',
-      Uploaded_variation => 'var2',
-      cDNA_position => '-'
-    },
-    {
-      Allele => 'C',
-      Amino_acids => undef,
-      BIOTYPE => "protein_coding",
-      CDS_position => '-',
-      Codons => undef,
-      Consequence => 'intron_variant',
-      Existing_variation => 'rs2299222',
-      GMAF => 'C:0.0399',
-      IMPACT => 'MODIFIER',
-      STRAND => 1,
-      SYMBOL => 'GRM3',
-      SYMBOL_SOURCE => 'HGNC',
-      Feature => 'ENST00000546348',
-      Feature_type => 'Transcript',
-      Gene => 'ENSG00000198822',
-      Location => '7:86442404',
-      Protein_position => '-',
-      Uploaded_variation => 'var2',
-      cDNA_position => '-'
-    },
-  ]
-};
-
 $json = json_POST($vep_post,$vep_post_body,'POST a selection of regions to the VEP');
 eq_or_diff($json,$vep_output, "VEP region POST");
-$json_2 = json_POST($vep_post, $vep_post_body_2, "POST a selection of regions to the VEP in version 2 format");
-eq_or_diff($json_2, $vep_output_2, "VEP region POST version 2");
 
 
 # test vep/id
@@ -556,6 +310,7 @@ $vep_output =
   }],
   end => 60403074,
   id => 'rs186950277',
+  input => 'rs186950277',
   intergenic_consequences => [
     {
       consequence_terms => [
@@ -579,39 +334,12 @@ $vep_output =
   strand => 1
   }];
 
-$vep_output_2 =
-{
-  data => [
-    {
-      Allele => 'A',
-      Consequence => 'intergenic_variant',
-      Existing_variation => 'rs186950277',
-      GMAF => 'A:0.0014',
-      IMPACT => 'MODIFIER',
-      Location => '8:60403074',
-      Uploaded_variation => 'rs186950277'
-    },
-    {
-      Allele => 'T',
-      Consequence => 'intergenic_variant',
-      Existing_variation => 'rs186950277',
-      GMAF => 'A:0.0014',
-      IMPACT => 'MODIFIER',
-      Location => '8:60403074',
-      Uploaded_variation => 'rs186950277'
-    }
-  ]
-};
-
 $json = json_GET($vep_id_get,'GET consequences for Variation ID');
 eq_or_diff($json, $vep_output, 'VEP id GET');
-$json_2 = json_GET("$vep_id_get;version=2", "GET consequences for variation ID in version 2");
-eq_or_diff($json_2, $vep_output_2, "VEP id GET version 2");
 
 
 my $vep_id_post = '/vep/homo_sapiens/id';
 my $vep_id_body = '{ "ids" : ["rs186950277", "rs17081232" ]}';
-my $vep_id_body_2 = '{ "version" : 2,  "ids" : ["rs186950277", "rs17081232" ]}';
 $vep_output =
 [{
   allele_string => "G/A/T",
@@ -690,43 +418,9 @@ $vep_output =
     strand => 1
   }];
 
-$vep_output_2 =
-{
-  data => [
-    {
-      Allele => 'A',
-      Consequence => 'intergenic_variant',
-      Existing_variation => 'rs17081232',
-      GMAF => 'A:0.2443',
-      IMPACT => 'MODIFIER',
-      Location => '4:32305409',
-      Uploaded_variation => 'rs17081232'
-    },
-    {
-      Allele => 'A',
-      Consequence => 'intergenic_variant',
-      Existing_variation => 'rs186950277',
-      GMAF => 'A:0.0014',
-      IMPACT => 'MODIFIER',
-      Location => '8:60403074',
-      Uploaded_variation => 'rs186950277'
-    },
-    {
-      Allele => 'T',
-      Consequence => 'intergenic_variant',
-      Existing_variation => 'rs186950277',
-      GMAF => 'A:0.0014',
-      IMPACT => 'MODIFIER',
-      Location => '8:60403074',
-      Uploaded_variation => 'rs186950277'
-    }
-  ]
-};
 
 $json = json_POST($vep_id_post,$vep_id_body,'VEP ID list POST');
 eq_or_diff($json, $vep_output, 'VEP id POST');
-$json_2 = json_POST($vep_id_post, $vep_id_body_2, "VEP ID list POST version 2");
-eq_or_diff($json_2, $vep_output_2, "VEP id POST version 2");
 
 
 # test vep/hgvs with a genomic coord
@@ -736,6 +430,7 @@ $vep_output = [{
   assembly_name => 'GRCh37',
   end => 1102327,
   id => '6:g.1102327G>T',
+  input => '6:g.1102327G>T',
   most_severe_consequence => 'missense_variant',
   seq_region_name => '6',
   start => 1102327,
@@ -773,6 +468,7 @@ eq_or_diff($json, $vep_output, 'VEP genomic HGVS GET');
 # test vep/hgvs with a transcript coord
 $vep_hgvs_get = '/vep/homo_sapiens/hgvs/ENST00000314040:c.311G>T?content-type=application/json';
 $vep_output->[0]->{id} = 'ENST00000314040:c.311G>T';
+$vep_output->[0]->{input} = 'ENST00000314040:c.311G>T';
 
 $json = json_GET($vep_hgvs_get,'GET consequences for transcript HGVS notation');
 eq_or_diff($json, $vep_output, 'VEP transcript HGVS GET');
@@ -783,6 +479,7 @@ $vep_post_body = '{ "hgvs_notations" : ["ENST00000314040:c.311G>T"] }';
 $json = json_POST($vep_post,$vep_post_body,'VEP HGVS list POST');
 
 $vep_output->[0]->{input} = "ENST00000314040:c.311G>T";
+$vep_output->[0]->{input} = "ENST00000314040:c.311G>T";
 eq_or_diff($json, $vep_output, 'VEP HGVS POST');
 
 # test using a plugin
@@ -792,6 +489,7 @@ $vep_output = [{
   assembly_name => 'GRCh37',
   end => 1102327,
   id => '6:g.1102327G>T',
+  input => '6:g.1102327G>T',
   most_severe_consequence => 'missense_variant',
   seq_region_name => '6',
   start => 1102327,
