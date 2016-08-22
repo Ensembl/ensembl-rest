@@ -23,8 +23,9 @@ package EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 use Moose;
 extends 'Catalyst::Model';
-
+use Data::Dumper;
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
+use Bio::EnsEMBL::IO::Parser::GFF3Tabix;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
 use Bio::EnsEMBL::Utils::IO qw/gz_slurp/;
 
@@ -74,6 +75,7 @@ sub fetch_all_VariationSets{
   foreach my $vcf_collection( @{$vca->fetch_all} ) {
     $vc_ob{$vcf_collection->id()} = $vcf_collection;
   }
+
   return \%vc_ob;
 }
 
@@ -183,14 +185,70 @@ sub get_meta{
 
 }
 
-sub fetch_featureSet {
+=head fetch_featureSets_by_dataset
+ 
+  extract all available featureSets for a dataset id 
+=cut
+sub fetch_featureSets_by_dataset {
+
+  my $self    = shift;
+  my $dataset = shift;
+
+  my @featureSets;
+
+  if ($dataset =~/Ensembl/){
+
+    ## add default Ensembl Set
+    push @featureSets, $self->fetch_DBfeatureSet();
+    return \@featureSets;
+  }
+  else{
+    ## add features stored in GFF (compliance sets)
+    my $sets = $self->fetch_GFFfeatureSets();
+
+    foreach my $set (@{$sets}){
+      push @featureSets, $set if $set->{datasetId} eq $dataset ;
+    }
+    return \@featureSets;
+  }
+}
+
+
+=head fetch_featureSet_by_id
+ 
+  extract a featureSet by its id 
+=cut
+sub fetch_featureSet_by_id {
+
+  my $self = shift;
+  my $id   = shift;
+
+  ## default Ensembl Set
+  return $self->fetch_DBfeatureSet() if $id =~/Ensembl/ ;
+  
+
+  ## extract featureSets stored in GFF (compliance sets)
+  my $sets =$self->fetch_GFFfeatureSets();
+  foreach my $set (@{$sets}){
+    return $set if $set->{id} eq $id ;
+  }
+
+  ## if nothing found
+  return {};
+}
+
+=head fetch_DBfeatureSet
+ 
+  extract default Ensembl featureSet from current database release
+=cut
+
+sub fetch_DBfeatureSet {
 
   my $self   = shift;
 
   my $species = 'homo_sapiens';
   my $core_ad = $self->context->model('Registry')->get_DBAdaptor($species, 'Core'  );
 
-  my $featureSet;
 
   ## extract required meta data from core db
   my $cmeta_ext_sth = $core_ad->dbc->db_handle->prepare(qq[ select meta_key, meta_value from meta]);
@@ -202,7 +260,8 @@ sub fetch_featureSet {
     $cmeta{$l->[0]} = $l->[1];
   }
 
-  ## default set names/ids
+  ## default ensembl set names/ids
+  my $featureSet;
   $featureSet->{datasetId}      = "Ensembl";
   $featureSet->{id}             = "Ensembl."  . $cmeta{"schema_version"} ."." . $cmeta{"assembly.default"};
   $featureSet->{name}           = "Ensembl_genebuild_" . $cmeta{"genebuild.id"};
@@ -217,6 +276,44 @@ sub fetch_featureSet {
   return $featureSet;
 
 }
+
+=head fetch_GFFfeatureSets
+
+  read featureSet config with locations of GFFs etc
+
+=cut
+sub fetch_GFFfeatureSets{
+
+  my $self    = shift;
+
+  my $json_string = gz_slurp($self->{ga_features_config});
+
+  my $config = JSON->new->decode($json_string) ||
+    Catalyst::Exception->throw(" ERROR: Failed to parse config file $self->{ga_features_config}");
+
+  return $config->{featureSets};
+}
+
+=head read_gff_tabix
+
+  Given a featureSetId return the featureset info & a parser
+  for region searching
+
+=cut
+sub read_gff_tabix{
+
+  my $self    = shift;
+  my $fsid    = shift;
+  
+  my $featureSets = $self->fetch_GFFfeatureSets();
+  foreach my $featureSet (@{$featureSets}){
+    next unless $featureSet->{id} eq $fsid;
+
+    my $parser = Bio::EnsEMBL::IO::Parser::GFF3Tabix->open($featureSet->{filename});
+    return ($featureSet, $parser);
+  }
+}
+
 
 
 1;
