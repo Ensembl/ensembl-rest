@@ -312,6 +312,7 @@ sub read_gff_tabix{
     my $parser = Bio::EnsEMBL::IO::Parser::GFF3Tabix->open($featureSet->{filename});
     return ($featureSet, $parser);
   }
+  return;
 }
 
 
