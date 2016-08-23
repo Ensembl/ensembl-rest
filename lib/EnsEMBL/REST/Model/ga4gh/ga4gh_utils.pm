@@ -23,7 +23,7 @@ package EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 use Moose;
 extends 'Catalyst::Model';
-use Data::Dumper;
+
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
 use Bio::EnsEMBL::IO::Parser::GFF3Tabix;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;

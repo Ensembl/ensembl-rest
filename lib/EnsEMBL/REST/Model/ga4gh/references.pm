@@ -19,7 +19,7 @@ use Moose;
 extends 'Catalyst::Model';
 use Catalyst::Exception;
 use Scalar::Util qw/weaken/;
-use Data::Dumper;
+
 use Try::Tiny;
 with 'Catalyst::Component::InstancePerContext';
 
