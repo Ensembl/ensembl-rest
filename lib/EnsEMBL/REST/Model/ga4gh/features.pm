@@ -734,7 +734,7 @@ sub get_compliance_data{
 
   my ($features, $nextPageToken) = $self->parse_gff_features($data);
 
-  return $features->[0];
+  return $features ? $features->[0] : {};
 
 }
 
@@ -751,7 +751,8 @@ sub parse_gff_features{
 
   my ($featureSet, $parser) = $self->context->model('ga4gh::ga4gh_utils')->read_gff_tabix( $featureSetId );
 
-  return {} unless defined $featureSet;
+  return unless defined $featureSet;
+
 
   my $required;
   my %children;
