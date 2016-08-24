@@ -212,3 +212,5 @@
 1266	\N	patch	patch_84_85_a.sql|schema_version
 1267	\N	patch	patch_84_85_b.sql|remove_duplicated_key
 1268	\N	patch	patch_85_86_a.sql|schema_version
+1269	\N	patch	patch_85_86_b.sql|add dna_align_feature_attrib table
+1270	\N	patch	patch_85_86_c.sql|meta_case_insensitive
