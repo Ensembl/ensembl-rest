@@ -4,3 +4,8 @@
 2484	supercontig	GRCh37	2	default_version	706_154444	3	1	1
 2485	lrg		8	default_version	706_154444	1003	1	1
 2472	chromosome	GRCh37	1	default_version	706_154444	2	1	1
+2482	clone		3	default_version	824_141157	4	1	1
+2483	contig		4	default_version,sequence_level	824_141157	1	1	1
+2484	supercontig	GRCh37	2	default_version	824_141157	3	1	1
+2485	lrg		8	default_version	824_141157	1003	1	1
+2472	chromosome	GRCh37	1	default_version	824_141157	2	1	1
