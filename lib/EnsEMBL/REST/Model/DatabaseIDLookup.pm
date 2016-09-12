@@ -60,6 +60,7 @@ sub find_object_location {
 sub find_prediction_transcript {
   my ($self, $id, $object_type, $db_type, $species) = @_;
   my $reg = $self->context->model('Registry');
+  $db_type = 'core' if !$db_type;
   my $pred_trans_adaptor = $reg->get_adaptor($species, $db_type, $object_type);
   my $obj = $pred_trans_adaptor->fetch_by_stable_id($id);
   return ($species, $object_type, $db_type);
