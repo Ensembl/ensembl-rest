@@ -1,5 +1,6 @@
 [%#
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +17,12 @@ limitations under the License.
 
 <div class='tab-pane' id='curl[% p.value.id %]'>
 <pre class="pre-scrollable prettyprint linenums">[% FILTER html %]
+[% IF p.value.body -%]
+curl '[% p.value.example.host %][% p.value.uri %]' -H 'Content-type:[% p.value.content %]' \
+-H 'Accept:[% p.value.accept %]' -X POST -d '[% p.value.body %]'
+[% ELSE %]
 curl '[% p.value.example.host %][% p.value.uri %]' -H 'Content-type:[% p.value.content %]'
+[% END %]
 [% END -%]
 </pre>
 </div>

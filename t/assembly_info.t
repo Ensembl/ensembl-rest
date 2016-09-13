@@ -1,4 +1,5 @@
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,7 +53,7 @@ is_json_GET(
 
 is_json_GET(
   '/info/assembly/homo_sapiens/6',
-  {assembly_exception_type => 'REF', coordinate_system => 'chromosome', is_chromosome => 1, length => 171115067 },
+  {assembly_exception_type => 'REF', coordinate_system => 'chromosome', is_chromosome => 1, is_circular => 0, length => 171115067, assembly_name => 'GRCh37' },
   'Checking info of region 6 matches expected'
 );
 

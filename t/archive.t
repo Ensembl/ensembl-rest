@@ -1,4 +1,5 @@
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,6 +58,40 @@ $response = {id => $translation_id, latest => "$translation_id.$version", versio
 "MTTEGGPPPAPLRRACSPVPGALQAALMSPPPAAAAAAAAAPETTSSSSSSSSASCASSSSSSNSASAPSAACKSAGGGGAGAGSGGAKKASSGLRRPEKPPYSYIALIVMAIQSSPSKRLTLSEIYQFLQARFPFFRGAYQGWKNSVRHNLSLNECFIKLPKGLGRPGKGHYWTIDPASEFMFEEGSFRRRPRGFRRKCQALKPMYHRVVSGLGFGASLLPQGFDFQAPPSAPLGCHSQGGYGGLDMMPAGYDAGAGAPSHAHPHHHHHHHVPHMSPNPGSTYMASCPVPAGPGGVGAAGGGGGGDYGPDSSSSPVPSSPAMASAIECHSPYTSPAAHWSSPGASPYLKQPPALTPSSNPAASAGLHSSMSSYSLEQSYLHQNAREDLSVGLPRYQHHSTPVCDRKDFVLNFNGISSFHPSASGSYYHHHHQSVCQDIKPCVM", is_current => "", type => "Translation", possible_replacement => [ { score => '0.941244', stable_id => 'ENSP00000259806' }], assembly => "NCBI36"};
 
 is_json_GET("$base/$translation_id", $response, "Return archive for peptide");
+
+my $id_body = qq{
+{ "id" : [
+    "ENST00000429181", "ENSG00000262424"
+  ]
+}
+};
+
+my $id_response = [
+{
+    assembly => 'GRCh37',
+    id => 'ENST00000429181',
+    is_current => '1',
+    latest => 'ENST00000429181.1',
+    peptide => undef,
+    possible_replacement => [],
+    release => "$release",
+    type => 'Transcript',
+    version => '1'
+  },
+  {
+    assembly => 'GRCh37',
+    id => 'ENSG00000262424',
+    is_current => '1',
+    latest => 'ENSG00000262424.2',
+    peptide => undef,
+    possible_replacement => [],
+    release => "$release",
+    type => 'Gene',
+    version => '2'
+  }
+];
+
+is_json_POST("$base", $id_body, $id_response,'Archive ID POST test');
 
 
 done_testing();

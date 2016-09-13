@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,14 +20,17 @@ limitations under the License.
 package EnsEMBL::REST::Model::Variation;
 
 use Moose;
+use Catalyst::Exception qw(throw);
+use Scalar::Util qw/weaken/;
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -36,14 +40,44 @@ sub fetch_variation {
   my $c = $self->context();
   my $species = $c->stash->{species};
 
-  $c->go('ReturnError', 'custom', ["No variation given. Please specify a variation to retrieve from this service"]) if ! $variation_id;
+  Catalyst::Exception->throw("No variation given. Please specify a variation to retrieve from this service") if ! $variation_id;
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
+  $vfa->db->include_failed_variations(1);
+  
+  # use VCF if requested in config
+  my $var_params = $c->config->{'Model::Variation'};
+  if($var_params && $var_params->{use_vcf}) {
+    $vfa->db->use_vcf($var_params->{use_vcf});
+    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $var_params->{vcf_config};
+  }
+  
   my $variation = $vfa->fetch_by_name($variation_id);
   if (!$variation) {
-    $c->go('ReturnError', 'custom', ["$variation_id not found for $species"]);
+    Catalyst::Exception->throw("$variation_id not found for $species");
   }
   return $self->to_hash($variation);
+}
+
+sub fetch_variation_multiple {
+  my ($self, $variation_ids) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
+  $va->db->include_failed_variations(1);
+  
+  # use VCF if requested in config
+  my $var_params = $c->config->{'Model::Variation'};
+  if($var_params && $var_params->{use_vcf}) {
+    $va->db->use_vcf($var_params->{use_vcf});
+    $Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor::CONFIG_FILE = $var_params->{vcf_config};
+  }
+
+  my %return = map {$_->name => $self->to_hash($_)} @{$va->fetch_all_by_name_list($variation_ids || [])};
+
+  return \%return;  
 }
 
 
@@ -52,25 +86,28 @@ sub to_hash {
   my $c = $self->context();
   my $variation_hash;
 
-  $variation_hash->{name} = $variation->name,
-  $variation_hash->{source} = $variation->source_description,
-  $variation_hash->{ambiguity} = $variation->ambig_code,
-  $variation_hash->{synonyms} = $variation->get_all_synonyms,
-  $variation_hash->{ancestral_allele} = $variation->ancestral_allele,
-  $variation_hash->{var_class} = $variation->var_class,
-  $variation_hash->{most_severe_consequence} = $variation->display_consequence,
-  $variation_hash->{MAF} = $variation->minor_allele_frequency,
-  $variation_hash->{evidence} = $variation->get_all_evidence_values();
+  $variation_hash->{name} = $variation->name;
+  $variation_hash->{source} = $variation->source_description;
+  $variation_hash->{ambiguity} = $variation->ambig_code;
+  $variation_hash->{synonyms} = $variation->get_all_synonyms;
+  $variation_hash->{failed} = $variation->failed_description if $variation->is_failed;
+  $variation_hash->{ancestral_allele} = $variation->ancestral_allele;
+  $variation_hash->{var_class} = $variation->var_class;
+  $variation_hash->{most_severe_consequence} = $variation->display_consequence;
+  $variation_hash->{MAF} = $variation->minor_allele_frequency;
+  $variation_hash->{minor_allele} = $variation->minor_allele;
+  $variation_hash->{evidence} = $variation->get_all_evidence_values;
   $variation_hash->{clinical_significance} = $variation->get_all_clinical_significance_states() if @{$variation->get_all_clinical_significance_states()};
-  $variation_hash->{mappings} = $self->VariationFeature($variation);
-  $variation_hash->{populations} = $self->Alleles($variation) if $c->request->param('pops');
-  $variation_hash->{genotypes} = $self->Genotypes($variation) if $c->request->param('genotypes');
-  $variation_hash->{phenotypes} = $self->Phenotypes($variation) if $c->request->param('phenotypes');
+  $variation_hash->{mappings} = $self->get_variationFeature_info($variation);
+  $variation_hash->{populations} = $self->get_allele_info($variation) if $c->request->param('pops');
+  $variation_hash->{genotypes} = $self->get_sampleGenotype_info($variation) if $c->request->param('genotypes');
+  $variation_hash->{phenotypes} = $self->get_phenotype_info($variation) if $c->request->param('phenotypes');
+  $variation_hash->{population_genotypes} = $self->get_populationGenotype_info($variation) if $c->request->param('population_genotypes');
 
   return $variation_hash;
 }
 
-sub VariationFeature {
+sub get_variationFeature_info {
   my ($self, $variation) = @_;
 
   my @mappings;
@@ -91,16 +128,17 @@ sub vf_as_hash {
   $variation_feature->{end} = $vf->seq_region_end;
   $variation_feature->{seq_region_name} = $vf->seq_region_name;
   $variation_feature->{coord_system} = $vf->coord_system_name;
+  $variation_feature->{assembly_name} = $vf->slice->coord_system->version;
   $variation_feature->{allele_string} = $vf->allele_string;
 
   return $variation_feature;
 }
 
-sub Genotypes {
+sub get_sampleGenotype_info {
   my ($self, $variation) = @_;
 
   my @genotypes;
-  my $genotypes = $variation->get_all_IndividualGenotypes;
+  my $genotypes = $variation->get_all_SampleGenotypes;
   foreach my $gen (@$genotypes) {
     push (@genotypes, $self->gen_as_hash($gen));
   }
@@ -112,21 +150,31 @@ sub gen_as_hash {
 
   my $gen_hash;
   $gen_hash->{genotype} = $gen->genotype_string();
-  $gen_hash->{individual} = $gen->individual->name();
-  $gen_hash->{gender} = $gen->individual->gender();
+  $gen_hash->{sample} = $gen->sample->name();
+  $gen_hash->{gender} = $gen->sample->individual->gender();
   $gen_hash->{submission_id} = $gen->subsnp() if $gen->subsnp;
 
   return $gen_hash;
 }
 
-sub Phenotypes {
+sub get_phenotype_info {
   my ($self, $variation) = @_;
 
   my @phenotypes;
   my $phenotypes = $variation->get_all_PhenotypeFeatures;
+
+  my %seen = ();
+
   foreach my $phen (@$phenotypes) {
-    push (@phenotypes, $self->phen_as_hash($phen));
+    my $hash = $self->phen_as_hash($phen);
+    
+    # generate a key from the values to uniquify
+    my $key = join("", sort values %$hash);
+
+    push (@phenotypes, $hash) unless $seen{$key};
+    $seen{$key} = 1;
   }
+
   return \@phenotypes;
 }
 
@@ -135,7 +183,7 @@ sub phen_as_hash {
 
   my $phen_hash;
   $phen_hash->{trait} = $phen->phenotype->description;
-  $phen_hash->{source} = $phen->source;
+  $phen_hash->{source} = $phen->source->name;
   $phen_hash->{study} = $phen->study->external_reference if $phen->study;
   $phen_hash->{genes} = $phen->associated_gene;
   $phen_hash->{variants} = $phen->variation_names;
@@ -151,7 +199,7 @@ sub phen_as_hash {
   return $phen_hash;
 }
 
-sub Alleles {
+sub get_allele_info {
   my ($self, $variation) = @_;
 
   my @populations;
@@ -169,15 +217,119 @@ sub pops_as_hash {
   my ($self, $allele) = @_;
 
   my $population;
-  $population->{frequency} = $allele->frequency();
+  $population->{frequency} = 0 + $allele->frequency(); # Add 0 to treat it as numeric (to avoid quoting)
   $population->{population} = $allele->population->name();
-  $population->{allele_count} = $allele->count();
+  $population->{allele_count} = 0 + $allele->count(); # Add 0 to treat it as numeric (to avoid quoting)
   $population->{allele} = $allele->allele();
   $population->{submission_id} = $allele->subsnp() if $allele->subsnp();
 
   return $population;
 }
 
+## Genotype frequencies in available populations
+sub get_populationGenotype_info {
+  my ($self, $variation) = @_;
+
+  my @formatted_pop_gen;
+  my $pop_gen = $variation->get_all_PopulationGenotypes();
+  foreach my $pg (@$pop_gen) {
+    push (@formatted_pop_gen, $self->popgen_as_hash($pg));
+  }
+
+  return \@formatted_pop_gen;
+}
+ 
+sub popgen_as_hash {
+  my ($self, $pg) = @_;
+ 
+  my $pop_gen;
+
+  $pop_gen->{population} = $pg->population()->name() ;
+  $pop_gen->{genotype}   = $pg->genotype_string() ;
+  $pop_gen->{frequency}  = 0 + $pg->frequency() ; # Add 0 to treat it as numeric (to avoid quoting)
+  $pop_gen->{count}      = 0 + $pg->count(); # Add 0 to treat it as numeric (to avoid quoting)
+  $pop_gen->{subsnp_id}  = $pg->subsnp() if defined $pg->subsnp();
+
+  return $pop_gen;
+}
+
+sub fetch_variation_source_infos {
+  my ($self,$src_filter) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $srca = $c->model('Registry')->get_adaptor($species, 'Variation', 'Source');
+
+  my $sources;  
+  if (defined $src_filter) {
+    my $src = $srca->fetch_by_name($src_filter);
+    if (!$src) {
+      Catalyst::Exception->throw("Variation source '$src_filter' not found for $species");
+    }
+    else {
+      $sources = [$src];
+    }
+  }
+  else {
+    $sources = $srca->fetch_all();
+    if (!$sources) {
+      Catalyst::Exception->throw("Variation sources not found for $species");
+    }
+  }
+
+  my @sources_list;
+  foreach my $source (@{$sources}) {
+    push @sources_list, $self->source_as_hash($source); 
+  }
+  return \@sources_list;
+}
+
+sub source_as_hash {
+  my ($self, $src) = @_;
+
+  my $source;
+
+  $source->{name}           = $src->name() ;
+  $source->{version}        = $src->formatted_version() if defined $src->version;
+  $source->{description}    = $src->description() ;
+  $source->{url}            = $src->url();
+  $source->{type}           = $src->type() if defined $src->type();
+  $source->{somatic_status} = $src->somatic_status() if defined $src->somatic_status;
+  $source->{data_types}     = $src->get_all_data_types() if @{$src->get_all_data_types()};
+
+  return $source;
+}
+
+sub fetch_population_infos {
+  my ($self, $filter) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
+  
+  my $populations;
+  if (defined $filter) {
+    if ($filter eq 'LD') {
+      $populations = $pa->fetch_all_LD_Populations(); 
+    } else {
+      Catalyst::Exception->throw("Unknown filter option '$filter'");
+    }
+  } else {
+    $populations = $pa->fetch_all();
+  }
+  if (!$populations) {
+    Catalyst::Exception->throw("Couldn't fetch populations.");
+  } 
+
+  my @populations_list = ();
+  foreach my $population (@$populations) {
+    push @populations_list, {name => $population->name, description => $population->description, size => $population->size};
+  }
+
+  return \@populations_list;
+}
 
 with 'EnsEMBL::REST::Role::Content';
 

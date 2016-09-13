@@ -1,4 +1,5 @@
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,12 +38,12 @@ Catalyst::Test->import('EnsEMBL::REST');
     {"mappings" => [{
       "original" => {
         "seq_region_name" => "6","strand" => 1,
-        "coordinate_system" => "chromosome","end" => 171115067,
+        "coord_system" => "chromosome","end" => 171115067,
         "start" => 1,"assembly" => "GRCh37"
       },
       "mapped" => {
         "seq_region_name" => "6","strand" => 1,
-        "coordinate_system" => "chromosome","end" => 171115067,
+        "coord_system" => "chromosome","end" => 171115067,
         "start" => 1,"assembly" => "GRCh37"
       }}]},
     'Asserting internal mapping works as expected'
@@ -68,11 +69,11 @@ Catalyst::Test->import('EnsEMBL::REST');
 my $basic_mapping = { mappings => [
   {
     "seq_region_name"=>"6","gap"=>0,"coord_system"=>"chromosome",
-    "strand"=>1,"rank"=>0,"end"=>1101531,"start"=>1101529
+    "strand"=>1,"rank"=>0,"end"=>1101531,"start"=>1101529, "assembly_name" => "GRCh37"
   },
   {
     "seq_region_name"=>"6","gap"=>0,"coord_system"=>"chromosome",
-    "strand"=>1,"rank"=>0,"end"=>1102043,"start"=>1102041
+    "strand"=>1,"rank"=>0,"end"=>1102043,"start"=>1102041, "assembly_name" => "GRCh37"
   }
 ]};
 

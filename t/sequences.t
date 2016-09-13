@@ -1,4 +1,5 @@
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -157,6 +158,25 @@ Catalyst::Test->import('EnsEMBL::REST');
   is(@{$json}, 10, 'Expect 10 CDNAs linked');
 }
 
+# Gene to protein text/plain multiple sequences (with and without param)
+{
+  my $id = 'ENSG00000112699';
+  my $url = "/sequence/id/${id}?type=protein;content-type=text/plain";
+  action_bad_regex(
+    $url,
+    qr/multiple_sequences parameter"}/, 
+    'Error when querying for text/plain sequence with a gene and asking for protein'
+  );
+
+  # Now for the good version. Check we have 2 sequences returned each on their own line
+  my $text = text_GET($url.';multiple_sequences=1', 'Retriving multiple sequences in text/plain');
+  my $fh = IO::String->new($text);
+  my @rows = <$fh>;
+  close $fh;
+  is(scalar(@rows), 2, 'Expect 2 lines of text coming from the service') or diag explain \@rows;
+}
+
+
 # DNA Region; good
 {
   my $region = '6:1080164-1105181';
@@ -230,7 +250,151 @@ FASTA
   is($expanded_fasta, $expanded_expected, 'FASTA formatting with 5 and 3 prime extensions');
 }
 
+{
+  my $url = "/sequence/id/";
+  my $body = q/{ "ids" : [ "ENSP00000370194", "ENSG00000243439" ]}/;
+  my $seq_a = q/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYPRSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQLECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKTIVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELVREMVHADVELMRTNPNA/;
+  my $seq_b = q/GCCAGCCAGGGTGGCAGGTGCCTGTAGTCCCAGCTGCTTGGGAGGCTCAAGGATTGCTTGAACCCAGGAGTTCTGCCCTGCAGTGCGCGGTGCCCATCGGGTGACACCCATCAGGTATCTGCACTAAGTTCAGCATGAAGAGCAGCGGGCCACCAGGCTGCCTAAGAAGGAATGAACCAGCCTGCTTTGGAAACAGAGCAGCTGAAACTCCTGTGCCGATCAGTGGTGGGATCACACCTGTGAGTAGCCACGCCTGCCCAGGCAACACAGACCCTGTCTCTTGCAAAATTAAAAA/;
+  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein"},{"desc" => "chromosome:GRCh37:6:1507557:1507851:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna"}];
+  is_json_POST($url,$body,$response,'Basic POST ID sequence fetch');
 
+}
+{
+  my $url = "/sequence/region/homo_sapiens";
+  my $body = q/{ "regions" : [ "6:1507557:1507851:1", "clearly stupid" ]}/;
+  my $expected = [{id => "chromosome:GRCh37:6:1507557:1507851:1",seq => "GCCAGCCAGGGTGGCAGGTGCCTGTAGTCCCAGCTGCTTGGGAGGCTCAAGGATTGCTTGAACCCAGGAGTTCTGCCCTGCAGTGCGCGGTGCCCATCGGGTGACACCCATCAGGTATCTGCACTAAGTTCAGCATGAAGAGCAGCGGGCCACCAGGCTGCCTAAGAAGGAATGAACCAGCCTGCTTTGGAAACAGAGCAGCTGAAACTCCTGTGCCGATCAGTGGTGGGATCACACCTGTGAGTAGCCACGCCTGCCCAGGCAACACAGACCCTGTCTCTTGCAAAATTAAAAA",molecule =>"dna"}];
+  is_json_POST($url,$body,$expected,'POST one good region request and one bad');
+
+}
+
+# Sub-sequence testing
+{
+  my $id = 'ENSG00000243439';
+  my $url = "/sequence/id/$id?start=10&end=30";
+  my $fasta = fasta_GET($url, 'Getting 20 bp sub-sequence');
+  my $expected = <<'FASTA';
+>ENSG00000243439 chromosome:GRCh37:6:1507566:1507586:1
+GGTGGCAGGTGCCTGTAGTCC
+FASTA
+  is($fasta, $expected, 'Genomic 20bp sub-sequence');
+}
+{
+  my $id = 'ENSG00000243439';
+  my $url = "/sequence/id/$id?end=30";
+  my $fasta = fasta_GET($url, 'Getting genomic sub-sequence without start parameter');
+  my $expected = <<'FASTA';
+>ENSG00000243439 chromosome:GRCh37:6:1507557:1507586:1
+GCCAGCCAGGGTGGCAGGTGCCTGTAGTCC
+FASTA
+  is($fasta, $expected, 'Getting genomic sub-sequence without start parameter');
+}
+{
+  my $id = 'ENST00000314040';
+  my $url = "/sequence/id/$id?start=25000";
+  my $fasta = fasta_GET($url, 'Getting transcript sub-sequence without end parameter');
+  my $expected = <<'FASTA';
+>ENST00000314040 chromosome:GRCh37:6:1105163:1105181:1
+CTGTTGCTTCACACTCCCG
+FASTA
+  is($fasta, $expected, 'Getting transcript sub-sequence without end parameter');
+}
+{
+  my $id = 'ENST00000259806';
+  my $url = "/sequence/id/$id?type=protein&start=200";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript without end parameter');
+  my $expected = <<'FASTA';
+>ENSP00000259806
+SPPPAAAAAAAAAPETTSSSSSSSSASCASSSSSSNSASAPSAACKSAGGGGAGAGSGGA
+KKASSGLRRPEKPPYSYIALIVMAIQSSPSKRLTLSEIYQFLQARFPFFRGAYQGWKNSV
+RHNLSLNECFIKLPKGLGRPGKGHYWTIDPASEFMFEEGSFRRRPRGFRRKCQALKPMYH
+RVVSGLGFGASLLPQGFDFQAPPSAPLGCHSQGGYGGLDMMPAGYDAGAGAPSHAHPHHH
+HHHHVPHMSPNPGSTYMASCPVPAGPGGVGAAGGGGGGDYGPDSSSSPVPSSPAMASAIE
+CHSPYTSPAAHWSSPGASPYLKQPPALTPSSNPAASAGLHSSMSSYSLEQSYLHQNARED
+LSVGLPRYQHHSTPVCDRKDFVLNFNGISSFHPSASGSYYHHHHQSVCQDIKPCVM
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from transcript without end parameter');
+}
+{
+  my $id = 'ENSP00000259806';
+  my $url = "/sequence/id/$id?type=protein&start=10&end=30";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from translation feature with start and end');
+  my $expected = <<'FASTA';
+>ENSP00000259806
+APLRRACSPVPGALQAALMSP
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from translation feature with start and end');
+}
+{
+  my $id = 'ENSP00000259806';
+  my $url = "/sequence/id/$id?type=protein&start=30&end=30";
+  my $fasta = fasta_GET($url, 'Getting single bp protein sub-sequence from translation feature');
+  my $expected = <<'FASTA';
+>ENSP00000259806
+P
+FASTA
+  is($fasta, $expected, 'Getting single bp sub-sequence from translation feature');
+}
+{
+  my $id = 'ENST00000400701';
+  my $url = "/sequence/id/$id?type=protein&end=200";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript without start parameter');
+  my $expected = <<'FASTA';
+>ENSP00000383537
+XSNLKRDVAHLYRGVGSRYIMGSG
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from transcript without start parameter');
+}
+{
+  my $id = 'ENST00000400701';
+  my $url = "/sequence/id/$id?type=protein&start=10&end=10";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript with length 1bp');
+  my $expected = <<'FASTA';
+>ENSP00000383537
+K
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from transcript with length 1bp');
+}
+{
+  my $id = 'ENSG00000112699';
+  my $url = "/sequence/id/$id?type=protein&multiple_sequences=1&start=150000";
+  my $fasta = fasta_GET($url, 'Getting protein sub-sequence from gene, using multiple');
+  my $expected = <<'FASTA';
+>ENSP00000436726
+ISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYP
+RSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQL
+ECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKT
+IVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELV
+REMVHADVELMRTNPNA
+>ENSP00000370194
+ISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYP
+RSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQL
+ECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKT
+IVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELV
+REMVHADVELMRTNPNA
+FASTA
+  is($fasta, $expected, 'Getting protein sub-sequence from gene, using multiple');
+}
+{
+  my $id = 'ENST00000259806';
+  my $url = "/sequence/id/$id?type=protein&end=100";
+  action_check_code($url, 400, 'Return code for out of boundaries parameters should be 400');
+  action_raw_bad_regex($url, qr/not within the sequence/, 'There\'s no protein sequence contained in the genomic boundaries given');
+}
+{
+  my $id = 'ENSG00000243439';
+  my $url = "/sequence/id/$id?start=1000&content-type=application/json";
+  action_check_code($url, 400, 'Return code for out of boundaries parameters should be 400');
+  action_raw_bad_regex($url, qr/not within the sequence/, 'Start of sub-sequence range can not be beyond the sequence length');
+}
+{
+  my $url = "/sequence/id/?start=120&end=150";
+  my $body = q/{ "ids" : [ "ENSP00000370194", "ENSG00000243439" ]}/;
+  my $seq_a = q/LAEYTADVDGVGTLRLLDAVKTCGLINSVKF/;
+  my $seq_b = q/TGCACTAAGTTCAGCATGAAGAGCAGCGGGC/;
+  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein"},{"desc" => "chromosome:GRCh37:6:1507676:1507706:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna"}];
+  is_json_POST($url,$body,$response,'POST ID sequence fetch with sequence trimming');
+
+}
 done_testing();
 
 __DATA__

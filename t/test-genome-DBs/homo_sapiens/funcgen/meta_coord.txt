@@ -1,0 +1,7 @@
+regulatory_feature	2472	94000
+annotated_feature	2472	160421
+probe_feature	2472	1160436
+external_feature	2472	8062
+mirna_target_feature	2472	29
+motif_feature	2472	21
+segmentation_feature	2472	786201

@@ -1,4 +1,4 @@
-1	\N	schema_version	76
+1	\N	schema_version	86
 2	\N	patch	patch_50_51_a.sql|schema_version
 3	\N	patch	patch_50_51_b.sql|protein_feature_hit_name
 4	\N	patch	patch_50_51_c.sql|meta_coord_index
@@ -189,3 +189,28 @@
 1243	\N	patch	patch_75_76_a.sql|schema_version
 1244	\N	patch	patch_75_76_b.sql|allow_null_karyotype
 1245	\N	patch	patch_75_76_c.sql|remove_alternative_splicing
+1246	\N	patch	patch_76_77_a.sql|schema_version
+1247	\N	patch	patch_77_78_a.sql|schema_version
+1248	\N	patch	patch_77_78_b.sql|source_column_increase
+1249	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
+1250	\N	patch	patch_78_79_a.sql|schema_version
+1251	\N	patch	patch_78_79_b.sql|bamcov support
+1252	\N	patch	patch_79_80_a.sql|schema_version
+1253	\N	patch	patch_79_80_b.sql|xref_dbprimary_acc_longer
+1254	\N	patch	patch_79_80_c.sql|seq_region_synonym_longer
+1255	\N	patch	patch_79_80_d.sql|genome_statistics_value_longer
+1256	\N	patch	patch_80_81_a.sql|schema_version
+1257	\N	patch	patch_81_82_a.sql|schema_version
+1258	\N	patch	patch_81_82_b.sql|xref_width
+1259	\N	patch	patch_81_82_c.sql|seq_synonym_key
+1260	\N	patch	patch_82_83_a.sql|schema_version
+1261	\N	patch	patch_83_84_a.sql|schema_version
+1262	\N	patch	patch_83_84_b.sql|xref.version_default
+1263	\N	patch	patch_83_84_c.sql|protein_feature_unique
+1264	\N	patch	patch_83_84_d.sql|longer_synonym
+1265	\N	patch	patch_83_84_e.sql|nullable_versions
+1266	\N	patch	patch_84_85_a.sql|schema_version
+1267	\N	patch	patch_84_85_b.sql|remove_duplicated_key
+1268	\N	patch	patch_85_86_a.sql|schema_version
+1269	\N	patch	patch_85_86_b.sql|add dna_align_feature_attrib table
+1270	\N	patch	patch_85_86_c.sql|meta_case_insensitive

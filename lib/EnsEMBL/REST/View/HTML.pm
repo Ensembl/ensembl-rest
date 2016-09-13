@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,7 +29,7 @@ __PACKAGE__->config(
     TEMPLATE_EXTENSION => '.tt',
     RENDER_DIE => 1,
     WRAPPER => 'wrapper.tt',
-    COMPILE_DIR => File::Spec->catdir(File::Spec->tmpdir(),'ensrest', 'template_cache'),
+    COMPILE_DIR => File::Spec->catdir(File::Spec->tmpdir(), $ENV{USER}, 'ensrest', 'template_cache'),
     STASH => Template::Stash::XS->new(),
 );
 

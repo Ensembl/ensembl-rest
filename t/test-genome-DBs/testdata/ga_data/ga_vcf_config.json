@@ -1,0 +1,40 @@
+{
+  "collections": [
+ {
+      "id": "2",
+      "source_name": "Illumina platinum genomes",
+      "source_url": "http://www.illumina.com/platinumgenomes/",
+      "species": "homo_sapiens",
+      "assembly": "GRCh37",
+      "type": "local",
+      "created": 1419292800000,
+      "updated": 1419292800000,
+      "is_remapped": 1,
+      "filename_template": "test.NA12878_S1r.chr###CHR###.vcf.gz",
+      "chromosomes": [
+         "22"
+      ],
+      "populations": {
+               "65" : "Illumina_platinum_genomes"
+              }
+ },
+    { 
+      "id": "1",
+      "source_name": "1000 Genomes phase1",
+      "source_url": "http://www.1000genomes.org/",
+      "species": "homo_sapiens",
+      "assembly": "GRCh37",
+      "type": "local",
+      "created": 1432745640000,
+      "updated": 1432745640000,
+      "filename_template": "test.chr###CHR###.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz",
+      "chromosomes": [
+            "22" 
+      ],
+      "populations": {"20" : "1000GENOMES:phase_1:AFR",
+                      "21" : "1000GENOMES:phase_1:AMR", 
+                      "22" : "1000GENOMES:phase_1:ASM", 
+                      "23" : "1000GENOMES:phase_1:EUR"}
+    }
+  ]
+}

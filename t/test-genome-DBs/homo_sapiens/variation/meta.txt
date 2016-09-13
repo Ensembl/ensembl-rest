@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	76
+2	\N	schema_version	86
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -44,3 +44,41 @@
 44	\N	patch	patch_75_76_g.sql|update variation and variation_feature to use the same clinical significance terms as ClinVar
 45	\N	patch	patch_75_76_h.sql|Replace the column clinical_significance_attrib_id by clinical_significance in structural_variation
 46	\N	patch	patch_75_76_i.sql|Add tables required for HGVS index creation
+47	\N	patch	patch_76_77_a.sql|schema version
+48	\N	patch	patch_76_77_b.sql|Add new column to Variation table to flag whether variants should be displayed or not
+49	\N	patch	patch_76_77_c.sql|update SO consequence terms
+50	\N	patch	patch_76_77_d.sql|update SO terms in attrib table
+51	\N	patch	patch_76_77_e.sql|add variation_attrib table
+52	\N	patch	patch_76_77_f.sql|Add new variation_set_id column to individual table
+53	\N	patch	patch_76_77_g.sql|Add new column to Variation_feature table to flag whether variants should be displayed or not
+54	\N	patch	patch_77_78_a.sql|schema version
+55	\N	patch	patch_77_78_b.sql|Add a column copy_number for CNV supporting structural variants
+56	\N	patch	patch_77_78_c.sql|Drop the table study_variation
+57	\N	patch	patch_77_78_d.sql|Extend the index type_val_idx in the table attrib
+58	\N	patch	patch_77_78_e.sql|add indexes on father_ and mother_individual_id and population name
+59	\N	patch	patch_77_78_f.sql|Add new column to the transcript_variation table to flag whether variants should be displayed or not
+60	\N	patch	patch_78_79_a.sql|schema version
+61	\N	patch	patch_78_79_b.sql|change the column attrib_type_id by attrib_id in the variation_attrib table
+62	\N	patch	patch_78_79_c.sql|Store more detailed Sift information
+63	\N	patch	patch_79_80_a.sql|schema version
+64	\N	patch	patch_79_80_b.sql|create a unique key for the variation_name column in the table structural_variation
+65	\N	patch	patch_79_80_b.sql|change the column consequence_types in transcript_variation and variation_feature to add protein_altering_variant
+66	\N	patch	patch_80_81_a.sql|schema version
+67	\N	patch	patch_80_81_b.sql|Create new sample table and update individual table. Copy individual data into new sample table.
+68	\N	patch	patch_80_81_c.sql|Update table, column and index names from individual to sample.
+69	\N	patch	patch_81_82_a.sql|schema version
+70	\N	patch	patch_81_82_b.sql|update the description in the failed_description table
+71	\N	patch	patch_81_82_c.sql|new entry in the failed_description table
+72	\N	patch	patch_82_83_a.sql|schema version
+73	\N	patch	patch_82_83_b.sql|Add the evidence ExAC in variation and variation_feature
+74	\N	patch	patch_82_83_c.sql|Drop the column validation_status in variation and variation_feature
+75	\N	patch	patch_83_84_a.sql|schema version
+76	\N	patch	patch_84_85_a.sql|schema version
+77	\N	patch	patch_84_85_b.sql|create sample_synonym
+78	\N	patch	patch_84_85_c.sql|drop column moltype from variation_synonym
+79	\N	patch	patch_84_85_d.sql|Making attrib_id auto_increment
+80	\N	patch	patch_84_85_e.sql|drop the table tagged_variation_feature
+81	\N	patch	patch_84_85_f.sql|add phenotype_ontology_accession
+82	\N	patch	patch_84_85_g.sql|allow the column description to store more text in the source table
+83	\N	patch	patch_85_86_a.sql|schema version
+84	\N	patch	patch_84_85_b.sql|add qualifier & index to phenotype_onology_accession

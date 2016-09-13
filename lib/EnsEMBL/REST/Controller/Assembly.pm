@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -39,9 +40,9 @@ sub info: Chained('species') PathPart('') Args(0) ActionClass('REST') {
   my $assembly_info;
   try {
     $assembly_info = $c->model('Assembly')->fetch_info(); 
-  }
-  catch {
-      $c->go( 'ReturnError', 'from_ensembl', [$_] );
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok( $c, entity => $assembly_info);
 }
@@ -59,7 +60,9 @@ sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
       coordinate_system => $slice->coord_system()->name(),
       assembly_exception_type => $slice->assembly_exception_type(),
       is_chromosome => $slice->is_chromosome(),
+      is_circular => ($slice->is_circular()||0),
       karyotype_band => $bands,
+      assembly_name => $slice->coord_system()->version(),
     });
   } else {
     $self->status_ok( $c, entity => {
@@ -67,6 +70,8 @@ sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
       coordinate_system => $slice->coord_system()->name(),
       assembly_exception_type => $slice->assembly_exception_type(),
       is_chromosome => $slice->is_chromosome(),
+      is_circular => ($slice->is_circular()||0),
+      assembly_name => $slice->coord_system()->version(),
     });
   }
 }

@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,6 +29,20 @@ has 'output'      => ( isa => 'EnsRESTValueList', is => 'ro', required => 1, coe
 has 'params'      => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'examples'    => ( isa => 'HashRef', is => 'ro', required => 0 );
 has 'postmessage' => ( isa => 'HashRef', is => 'ro', required => 0 );
+has 'post_size'   => ( isa => 'Str', is => 'ro', required => 0 );
+has 'slice_length'=> ( isa => 'Str', is => 'ro', required => 0 );
+has 'postformat'  => ( isa => 'Str', is => 'ro', required => 0 );
+
+sub is_post {
+  my ($self) = @_;
+  return scalar(grep {$_ eq 'POST'} @{$self->method()});
+}
+
+sub single_method {
+  my ($self) = @_;
+  return $self->method()->[0] if @{$self->method()};
+  return;
+}
 
 sub has_required_params {
   my ($self) = @_;

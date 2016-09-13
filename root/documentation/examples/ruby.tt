@@ -1,5 +1,6 @@
 [%#
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,21 +21,26 @@ require 'net/http'
 require 'uri'
 
 server='[% p.value.example.host %]'
-get_path = '[% p.value.uri %]'
+path = '[% p.value.uri %]'
 
 url = URI.parse(server)
 http = Net::HTTP.new(url.host, url.port)
 
-request = Net::HTTP::Get.new(get_path, {'Content-Type' => '[% p.value.content %]'})
+[% IF p.value.body -%]
+request = Net::HTTP::Post.new(path, {'Content-Type' => '[% p.value.content %]', 'Accept' => '[% p.value.accept %]'})
+request.body = '[% p.value.body %]'
+[% ELSE -%]
+request = Net::HTTP::Get.new(path, {'Content-Type' => '[% p.value.content %]'})
+[% END %]
 response = http.request(request)
 
-if response.code != "200":
+if response.code != "200"
   puts "Invalid response: #{response.code}"
   puts response.body
   exit
 end
 
-[% IF p.value.content == 'application/json' -%]
+[% IF (p.value.body && p.value.accept == 'application/json') || p.value.content == 'application/json' %]
 require 'rubygems'
 require 'json'
 require 'yaml'

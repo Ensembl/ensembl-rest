@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@ limitations under the License.
 package EnsEMBL::REST::Role::Tree;
 use Moose::Role;
 use namespace::autoclean;
+use Bio::EnsEMBL::Compara::Graph::OrthoXMLWriter;
 use Bio::EnsEMBL::Compara::Graph::GeneTreePhyloXMLWriter;
 use Bio::EnsEMBL::Compara::Graph::GenomicAlignTreePhyloXMLWriter;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
@@ -68,7 +70,6 @@ sub encode_phyloxml {
     }
   } elsif ($c->namespace eq 'genetree') {
     #gene tree
-    $trees->preload();
     push @$roots, $trees;
   }
   $w->write_trees($roots);
@@ -83,15 +84,39 @@ sub encode_phyloxml {
   return $string_handle->string_ref();
 }
 
+
+sub encode_orthoxml {
+  my ($self, $c, $stash_key) = @_;
+
+  $stash_key ||= 'rest';
+  my $string_handle = IO::String->new();
+  my $w;
+
+  # GeneTree parameters
+  $w = Bio::EnsEMBL::Compara::Graph::OrthoXMLWriter->new(
+    -SOURCE => 'Ensembl', -HANDLE => $string_handle
+  );
+
+  my $tree = $c->stash->{$stash_key};
+  $w->write_trees($tree);
+  $w->finish();
+
+  return $string_handle->string_ref();
+}
+
+
 sub encode_nh {
   my ($self, $c, $stash_key) = @_;
   $stash_key ||= 'rest';
   my $gt = $c->stash->{$stash_key};
   my $nh_format = $c->request->param('nh_format') || 'simple';
-  $gt->preload() if ($gt->can('preload'));
   my $root = $gt->root();
   my $str = $root->newick_format($nh_format);
-  $root->release_tree() if ($root->can('release_tree'));
+  if ($gt->can('release_tree')) {
+    $gt->release_tree();
+  } elsif ($root->can('release_tree')) {
+    $root->release_tree();
+  }
   return \$str;
 }
 

@@ -1,4 +1,5 @@
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -75,6 +76,7 @@ my $base = '/overlap/region/homo_sapiens';
   my ($gene) = grep { $_->{feature_type} eq 'gene' } @{$json};
   eq_or_diff_data($gene, {
     id => 'ENSG00000176515',
+    gene_id => 'ENSG00000176515',
     biotype => 'protein_coding',
     description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109  [Source:UniProtKB/TrEMBL;Acc:Q8NAX6]',
     end => 1105181,
@@ -85,6 +87,8 @@ my $base = '/overlap/region/homo_sapiens';
     source => 'ensembl',
     start => 1080164,
     strand => 1,
+    assembly_name => 'GRCh37',
+    version => '1',
   }, 'Checking structure of gene model as expected');
   
   my ($transcript) = grep { $_->{feature_type} eq 'transcript' } @{$json};
@@ -190,13 +194,16 @@ my $base = '/overlap/region/homo_sapiens';
   is(scalar(@{$json}), $expected_count, 'Expected variations at '.$region);
   eq_or_diff_data($json->[0],{
     start => 1001893,
+    assembly_name => 'GRCh37',
+    clinical_significance => [], 
     end => 1001893,
     strand => 1,
     id => 'tmp__',
     consequence_type => 'intergenic_variant',
     feature_type => 'variation',
     seq_region_name => '6',
-    alt_alleles => [ qw/T -/]
+    alleles => [ qw/T -/],
+    source  => 'dbSNP'
   }, 'Checking one variation format');
   
   my $somatic_json = json_GET("$base/$region?feature=somatic_variation", 'Fetching somatic variations at '.$region);
@@ -209,7 +216,16 @@ my $base = '/overlap/region/homo_sapiens';
   #Normal SO querying
   my $intergenic = 'intergenic_variant';
   my $json_so = json_GET("$base/$region?feature=variation;so_term=$intergenic", 'SO term querying with known type');
-  is(scalar(@{$json}), $expected_count, 'Expected '.$intergenic.' variations at '.$region);
+  is(scalar(@{$json_so}), $expected_count, 'Expected '.$intergenic.' variations at '.$region);
+
+  #Query by both SO & set
+  my $set = '1kg_com';
+  my $json_so_set= json_GET("$base/$region?feature=variation;so_term=$intergenic;variant_set=$set", 'SO term & variation set querying');
+  is(scalar(@{$json_so_set}), $expected_count, 'Expected '.$intergenic.' variants in set '. $set .'at '.$region);
+
+  # Error given if set does not exist
+  my $bad_set = 'not_a_set';
+  action_bad_regex( "$base/$region?feature=variation;so_term=$intergenic;variant_set=$bad_set", qr/No VariationSet found/, 'Throw if no set of this name' );
 }
 
 #Query for other objects
@@ -219,6 +235,7 @@ my $base = '/overlap/region/homo_sapiens';
   is(22, scalar(@{$json}), 'Searching for 22 repeats');
   eq_or_diff_data($json->[0], {
     start => 1000732,
+    assembly_name => 'GRCh37',
     end => 1000776,
     strand => 0, # YES DON'T CHANGE THIS; THEY DO NOT HAVE A STRAND
     description => 'dust',
@@ -232,6 +249,7 @@ my $base = '/overlap/region/homo_sapiens';
   my $region = '6:1020000..1030000';
   is_json_GET("$base/$region?feature=simple", [{
     start => 1026863,
+    assembly_name => 'GRCh37',
     end => 1027454,
     strand => -1,
     feature_type => 'simple',
@@ -245,11 +263,89 @@ my $base = '/overlap/region/homo_sapiens';
     [], 'Getting simple_feature no entries with bogus logic_name as JSON');
 }
 
+#Regulatory feature testing
+{
+  my $region = '6:1024250..1025449';
+  is_json_GET("$base/$region?feature=regulatory", [{
+      ID => 'ENSR00001208657',
+      bound_end => 1025449,
+      bound_start => 1024250,
+      description => 'Predicted promoter flanking region',
+      end => 1025449,
+      feature_type => 'regulatory' ,
+      seq_region_name => 6,
+      source => 'Regulatory_Build',
+      start => 1024250,
+      strand  => 0,
+  }], 'Getting regulatory_feature as JSON');
+}
+
+#Motif feature testing
+{
+  my $region = '6:1020000..1030000';
+  is_json_GET("$base/$region?feature=motif", [{
+    start => 1027627,
+    end => 1027634,
+    strand => 1,
+    feature_type => 'motif',
+    score => 0.942,
+    seq_region_name => '6',
+    binding_matrix => 'MA0281.1',
+    motif_feature_type => 'USF1'
+  }], 'Getting motif_feature as JSON');
+}
+
+#Segmentation feature testing
+#Disabled for e85 as we use different ways to access mouse and human segmentation. Activate in e86
+#{
+#  my $region = '6:1020000..1020449';
+#  is_json_GET("$base/$region?feature=segmentation;cell_type=K562", [{
+#    start => 1019450,
+#    end => 1020449,
+#    feature_type => 'segmentation',
+#    seq_region_name => '6',
+#    cell_type => 'K562',
+#    segmentation_feature_type => "Predicted heterochromatin",
+#  }], 'Getting segmentation_feature as JSON');
+#}
+
+#Probe feature testing
+{
+  my $region = '6:1020000..1030000';
+  is_json_GET("$base/$region?feature=array_probe", [{
+    start => 1020569,
+    end => 1020593,
+    feature_type => 'array_probe',
+    seq_region_name => '6',
+    strand => 1,
+    probe_length => '25',
+    array_probe_names => {'HuEx-1_0-st-v2' => '1256969'},
+  }], 'Getting probe_feature as JSON');
+}
+
+#Annotated feature testing
+{
+  my $region = '6:1020000..1030000';
+  is_json_GET("$base/$region?feature=chipseq", [{
+      description =>  'H3K27me3 - K562 enriched sites',
+      end => 1024940,
+      epigenome => 'K562',
+      feature_type => 'chipseq',
+      score =>  '14.340487',
+      seq_region_name => 6,
+      source => 'ccat_histone',
+      start => 1024000,
+      strand => 0,
+      summit  => 1024410,
+  }], 'Getting probe_feature as JSON');
+}
+
 #Misc feature
 {
   my $region = '6:1070000..1080000';
   my $thirty_k_feature = {
     start => 1040974,
+    assembly_name => 'GRCh37',
     end => 1216597,
     strand => 1,
     id => '',
@@ -268,6 +364,7 @@ my $base = '/overlap/region/homo_sapiens';
   is_json_GET("$base/$region?feature=misc", [
   {
     start => 1072318,
+    assembly_name => 'GRCh37',
     end => 1248050,
     strand => 1,
     id => '',
@@ -301,7 +398,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 gene in this region');
   
-  my $gff_line = qq{6\tensembl\tgene\t1080164\t1105181\t.\t+\t.\tID=gene:ENSG00000176515;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];external_name=AL033381.1;logic_name=ensembl};
+  my $gff_line = qq{6\tensembl\tgene\t1080164\t1105181\t.\t+\t.\tID=gene:ENSG00000176515;Name=AL033381.1;assembly_name=GRCh37;biotype=protein_coding;description=Uncharacterized protein%3B cDNA FLJ34594 fis%2C clone KIDNE2009109  [Source:UniProtKB/TrEMBL%3BAcc:Q8NAX6];gene_id=ENSG00000176515;logic_name=ensembl;version=1};
   eq_or_diff($lines[0], $gff_line, 'Expected output gene line from GFF');
 }
 
@@ -311,7 +408,7 @@ action_bad_regex(
   my @lines = filter_gff($gff);
   is(scalar(@lines), 1, '1 GFF line with 1 repeat in this region');
   
-  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079387\t.\t+\t.\tdescription=AluSq};
+  my $gff_line = qq{6\twibble\trepeat_region\t1079386\t1079680\t.\t+\t.\tassembly_name=GRCh37;description=AluSq};
   eq_or_diff($lines[0], $gff_line, 'Expected output repeat feature line from GFF');
 }
 
@@ -325,14 +422,14 @@ sub filter_gff {
 {
   my $region = '6:1078245-1108340';
   my $bed = bed_GET("$base/$region?feature=gene", 'Getting single gene'); 
-  my $expected_bed = qq{chr6\t1080163\t1105181\tENSG00000176515\t0\t+\n};
+  my $expected_bed = qq{chr6\t1080163\t1105181\tENSG00000176515\t1000\t+\n};
   eq_or_diff($bed, $expected_bed, 'Expected output gene line from BED');
 }
 
 {
   my $region = '6:1078245-1108340';
   my $bed = bed_GET("$base/$region?feature=transcript", 'Getting a set of transcripts from both strands');
-  my $expected_bed = qq{chr6\t1080163\t1105181\tENST00000314040\t0\t+\t1101507\t1102415\t0\t3\t66,228,3141,\t0,21140,21877,\n};
+  my $expected_bed = qq{chr6\t1080163\t1105181\tENST00000314040\t1000\t+\t1101507\t1102415\t0,0,0\t3\t66,228,3141,\t0,21140,21877,\tAL033381.1-201\tcmpl\tcmpl\t-1,-1,0,\tprotein_coding\tENSG00000176515\tAL033381.1\tprotein_coding\n};
   eq_or_diff($bed, $expected_bed, 'Expected output transcript line from BED with exons and their offsets');
 }
 
@@ -409,18 +506,18 @@ $base = '/overlap/translation';
   
   is(
     @{json_GET("$base/$id?feature=transcript_variation", 'Ensembl transcript variation')}, 
-    3, "3 variation feature for $id");
+    19, "19 variation feature for $id");
   
   is(
     @{json_GET("$base/$id?feature=transcript_variation;feature=protein_feature", 'Ensembl biotype transcripts')}, 
-    7, "7 features for protein $id");
+    23, "23 features for protein $id");
 
   is(
-    @{json_GET("$base/$id?feature=transcript_variation;so_term=intron_variant", 'Ensembl variation with so term')},
-    3, "3 intron variants for $id");
+    @{json_GET("$base/$id?feature=transcript_variation;so_term=missense_variant", 'Ensembl variation with so term')},
+    10, "10 missense variants for $id");
   is(
     @{json_GET("$base/$id?feature=somatic_transcript_variation", 'Ensembl variation with somatic data')},
-    2, "2 somatic variations overlapping $id");
+    16, "16 somatic variations overlapping $id");
 }
 
 #Check can we get the splice sites and exon boundaries of a translation

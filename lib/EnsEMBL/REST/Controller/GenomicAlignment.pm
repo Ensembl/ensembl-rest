@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -64,9 +65,9 @@ sub get_adaptors :Private {
       genomic_align_tree_adaptor => $gata,
       genomic_align_block_adaptor => $gaba,
     );
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 }
 
@@ -84,6 +85,7 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
     #getting GenomicAlignBlock or GenomicAlignTree alignments
     my $alignments;
     try {
+      my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
       my $slice = $c->model('Lookup')->find_slice($region);
 
       #Check for maximum slice length
@@ -91,7 +93,8 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
 
       $alignments = $c->model('GenomicAlignment')->get_alignment($slice);
     } catch {
-      $c->go('ReturnError', 'from_ensembl', [$_]);
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
     };
 
     #Set aligned option (default 1)
@@ -104,6 +107,7 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
     $c->stash->{"no_branch_lengths"} = (defined $c->request->param('no_branch_lengths')) ? $c->request->param('no_branch_lengths') : 0;
 
     #Never give branch lengths for pairwise, even if requested
+    $c->go("ReturnError", "custom", ["no alignment available for this region"]) if !$alignments;
     my $mlss = $alignments->[0]->method_link_species_set;
     if ($mlss->method->class eq "GenomicAlignBlock.pairwise_alignment") {
       $c->stash->{"no_branch_lengths"} = 0;

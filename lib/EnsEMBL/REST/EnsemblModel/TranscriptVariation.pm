@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,7 +37,9 @@ sub new {
   $self->{residues} = $transcript_variant->pep_allele_string;
   $self->sift($tva->sift_score);
   $self->{polyphen} = $tva->polyphen_score;
+  $self->{parent} = $transcript_variant->transcript->stable_id();
   $self->minor_allele_frequency($proxy_vf->minor_allele_frequency);
+  $self->{clinical_significance} = \@{$proxy_vf->get_all_clinical_significance_states};
   return $self;
 }
 
@@ -101,10 +104,22 @@ sub translation_start {
   return $self->{'translation_start'};
 }
 
+sub parent {
+  my ($self, $parent) = @_;
+  $self->{'parent'} = $parent if defined $parent;
+  return $self->{'parent'};
+}
+
 sub ID {
   my ($self, $id) = @_;
   $self->{'ID'} = $id if defined $id;
   return $self->{'ID'};
+}
+
+sub clinical_significance{
+  my ($self, $clinical_significance) = @_;
+  $self->{clinical_significance} = $clinical_significance if defined $clinical_significance;
+  return $self->{clinical_significance};
 }
 
 sub summary_as_hash {
@@ -120,7 +135,9 @@ sub summary_as_hash {
   $summary->{residues} = $self->residues;
   $summary->{sift} = $self->sift;
   $summary->{polyphen} = $self->polyphen;
+  $summary->{Parent} = $self->parent;
   $summary->{minor_allele_frequency} = $self->minor_allele_frequency;
+  $summary->{clinical_significance} = $self->{clinical_significance} ;
 
   $summary->{seq_region_name} = $summary->{translation};
   return $summary;

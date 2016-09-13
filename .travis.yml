@@ -3,30 +3,46 @@ language: "perl"
 perl:
   - "5.14"
 
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - unzip
+
 env:
   - COVERALLS=false
 
 before_install:
-    - sudo apt-get -y update
-    - sudo apt-get -y install unzip
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-compara.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-variation.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-funcgen.git
-    - wget https://github.com/bioperl/bioperl-live/archive/bioperl-release-1-2-3.zip
-    - unzip bioperl-release-1-2-3.zip
+    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-io.git
+    - git clone -b bioperl-release-1-6-1 --depth 1 https://github.com/bioperl/bioperl-live.git
+    - git clone --branch master --depth 1 https://github.com/samtools/htslib.git
+    - cd htslib
+    - make
+    - export HTSLIB_DIR=$(pwd -P)
+    - cd ..
+    - cd ensembl-variation/C_code/
+    - make
+    - cd ../../
+
 
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
-    - cpanm Catalyst::Runtime Catalyst::Devel
     - cpanm -v --installdeps --with-recommends --notest .
     - cpanm -n Devel::Cover::Report::Coveralls
+    - cpanm Bio::DB::HTS
     - cp travisci/MultiTestDB.conf.travisci t/MultiTestDB.conf
 
 script: "./travisci/harness.sh"
 
 notifications:
   email:
-  on_success: always
-  on_failure: always
+    on_success: always
+    on_failure: always
+  slack:
+    secure: gTcWzQsVHKPxRJ1u0U2l2+QVujmG1uFW44kAO3l46V5Im5uLTOLeM20ykk6ox4kaPHLs5ky7NGzcJmTDLaHBKjI4Sa34l4tJd0lhkv+hKj9TSv5pDDCdUX8v869Nm8LqJKh26HqvVcN7eHFRatLD/tfYvvkaP1rLLhwLLdr7czQ=

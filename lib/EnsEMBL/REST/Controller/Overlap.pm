@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -63,12 +64,13 @@ sub region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   $c->stash()->{region} = $region;
   my $features;
   try {
+    my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
     my $slice = $c->model('Lookup')->find_slice($region);
     $self->assert_slice_length($c, $slice);
     $features = $c->model('Overlap')->fetch_features();
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $features );
 }
@@ -112,7 +114,8 @@ sub id: Chained('/') PathPart('overlap/id') Args(1) ActionClass('REST') {
 
     $features = $c->model('Overlap')->fetch_features($slice);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $features );
 }
@@ -143,7 +146,8 @@ sub translation: Chained('/') PathPart('overlap/translation') Args(1) ActionClas
     my $translation = $c->model('Lookup')->find_object_by_stable_id($id);
     $features = $c->model('Overlap')->fetch_protein_features($translation);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $features );
 }

@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -114,7 +115,7 @@ sub _plain {
   my $stringfh = IO::String->new();
   foreach my $entity (@{$sequences}) {
     print $stringfh $entity->{seq};
-    print "\n" if $count > 1;
+    print $stringfh "\n" if $count > 1;
   }
   return $stringfh->string_ref();
 }

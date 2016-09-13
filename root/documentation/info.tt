@@ -1,5 +1,6 @@
 [%#
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -102,21 +103,21 @@ limitations under the License.
 	<br/>
 [% END %]
 
-[% IF endpoint.method.0 == "POST" %]
-
+[% IF endpoint.is_post %]
+  [% example_post = endpoint.examples.values.first %]
   <h2>Message</h2>
   <table class="table table-condensed table-striped">
     <tbody>
       <tr><td><b>Content-type</b></td><td><b>Format</b></td><td><b>Example</b></td></tr>
-      <tr><td>[% endpoint.postmessage.type %]</td><td>[% endpoint.postmessage.format %]</td><td>[% endpoint.postmessage.body %]</td></tr>
+      <tr><td>[% example_post.content %]</td><td>[% endpoint.postformat %]</td><td>[% example_post.body %]</td></tr>
     </tbody>
   </table>
 
-[% ELSE %]
+[% END %]
 
 <h2>Example Requests</h2>
 
-[% example_types = ['perl', 'python', 'ruby', 'java', 'curl', 'wget'] %]
+[% example_types = ['perl', 'python2', 'python3', 'ruby', 'java', 'curl', 'wget'] %]
 
 [% FOREACH p IN endpoint.examples.pairs %]
 	[% NEXT IF p.value.disable %]
@@ -127,6 +128,9 @@ limitations under the License.
 	<br>
 	<ul class="nav nav-pills">
 	  <li class="active"><a href="#example[% p.value.id %]" data-toggle="tab">Example output</a></li>
+    [% IF endpoint.is_post -%]
+      <li ><a href="#input[% p.value.id %]" data-toggle="tab">Example input</a></li>
+    [% END %]
 		[% FOREACH e IN example_types %]
 		  <li><a href="#[% e %][% p.value.id %]" data-toggle="tab">[% e.ucfirst %]</a></li>
 		[% END %]
@@ -135,22 +139,34 @@ limitations under the License.
 	<div class='tab-pane active' id='example[% p.value.id %]'></div>
     <!-- START FILLING AJAX TAB -->
     <script>
-    $.ajax( {
+    var method = "[% endpoint.single_method %]";
+    var params = {
       url : "[% filtered_uri %]",
-      type : "GET",
+      type : method,
      beforeSend : function () {
-        $("#example[% p.value.id %]").append("<img src='../../static/img/e-loader.gif'>");
+        $("#example[% p.value.id %]").append("<img src='/static/img/e-loader.gif'>");
         return true;
      },
       success : function (resp) {
-     try {
-         var json = JSON.stringify(resp, undefined, 2);
-         $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]json[% END %] + "</code></pre>")
-	 $("#example[% p.value.id %]").each (function (i, block) {
-	      hljs.highlightBlock(block);
-	      $("#example[% p.value.id %]>img").remove();
-	 })
-     } catch (e) {
+
+      // If it has a documentElement we assume it is xml
+      if (resp.documentElement == undefined) {
+         if (typeof (resp) === "string") {
+            $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]resp[% END %] + "</code></pre>");
+    	    $("#example[% p.value.id %]").each (function (i, block) {
+                $("#example[% p.value.id %]>img").remove();
+            })
+
+         } else {
+            var json = JSON.stringify(resp, undefined, 2);
+            $("#example[% p.value.id %]").append("<pre class=\"pre-scrollable\"> <code class=\"json\">" + [% FILTER html %]json[% END %] + "</code></pre>")
+	    $("#example[% p.value.id %]").each (function (i, block) {
+	         hljs.highlightBlock(block);
+	         $("#example[% p.value.id %]>img").remove();
+	    })
+         }
+
+     } else {
          var xmlSerial = new XMLSerializer();
          var xml_str = xmlSerial.serializeToString(resp);
          $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\" class=\"pre-scrollable prettyprint\"></pre>");
@@ -165,15 +181,33 @@ limitations under the License.
          $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\">" + resp.responseText + "</pre>");
          $("#example[% p.value.id %]>img").remove();
       }
-      });
+      };
+
+      if(method === "POST") {
+        params.processData = false;
+        params.data = '[% p.value.body %]';
+        params.contentType = '[% p.value.content %]';
+        params.accept = '[% p.value.accept %]';
+      }
+      $.ajax( params);
     </script>
     <!-- END FILLING AJAX TAB -->
+    [% IF endpoint.is_post %]
+      <div class='tab-pane' id='input[% p.value.id %]'>
+        <pre class="pre-scrollable prettyprint">
+[% p.value.body %]
+        </pre>
+      </div>
+    [% END %]
 
 <!-- PERL EXAMPLE -->
 [% INCLUDE documentation/examples/perl.tt %]
 
-<!-- Python EXAMPLE -->
-[% INCLUDE documentation/examples/python.tt %]
+<!-- Python2 EXAMPLE -->
+[% INCLUDE documentation/examples/python2.tt %]
+
+<!-- Python3 EXAMPLE -->
+[% INCLUDE documentation/examples/python3.tt %]
 
 <!-- RUBY EXAMPLE -->
 [% INCLUDE documentation/examples/ruby.tt %]
@@ -191,8 +225,6 @@ limitations under the License.
 
 [% END %] <!-- End FOREACH on endpoint examplesv -->
 
-[% END %] <!-- End ELSE of POST versus GET -->
-
 </div>
 <div class="span2">
   <h3>Resource Information</h3>
@@ -200,6 +232,12 @@ limitations under the License.
     <tbody>
       <tr><td>Methods</td><td>[% endpoint.method.join(',') %]</td></tr>
       <tr><td>Response formats</td><td>[% endpoint.output.join('<br>') %]</td></tr>
+      [% IF endpoint.post_size() && endpoint.is_post %]
+        <tr><td>Maximum POST size</td><td>[% endpoint.post_size.join('<br>') %]</td></tr>
+      [% END %]
+      [% IF endpoint.slice_length() %]
+        <tr><td>Slice length</td><td>[% endpoint.slice_length.join('<br>') %]</td></tr>
+     [% END %]
     </tbody>
   </table>
 </div>

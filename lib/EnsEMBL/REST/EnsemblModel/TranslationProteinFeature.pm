@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -81,6 +82,7 @@ sub summary_as_hash {
 	my ($self) = @_;
 	my $summary = $self->protein_feature->summary_as_hash();
 	$summary->{seq_region_name} = $self->translation()->stable_id();
+        $summary->{Parent} = $self->translation->transcript->stable_id();
 	return $summary;
 }
 

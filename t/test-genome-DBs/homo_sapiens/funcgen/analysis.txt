@@ -1,0 +1,4 @@
+16	0000-00-00 00:00:00	Regulatory_Build	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL
+70	2014-06-18 13:45:40	JASPAR_v5_0	NULL	5.0	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL
+83	0000-00-00 00:00:00	chromhmm.segway.k562.segway_18	NULL	NULL	NULL	chromHMM/Segway	NULL	NULL	NULL	NULL	NULL	NULL	NULL
+51	2011-04-07 00:00:00	ccat_histone	NULL	NULL	NULL	CCAT	3.0	CCAT	fragmentSize 200 slidingWinSize 150 movingStep 20 isStrandSensitiveMode 0 minCount 10 outputNum 100000 randomSeed 123456 minScore 4.0 bootstrapPass 50	Bio::EnsEMBL::Funcgen::Sequencing::PeakCaller::CCAT	NULL	NULL	NULL       

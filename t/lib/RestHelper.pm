@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +23,7 @@ use strict;
 use warnings;
 use base qw/Exporter/;
 
-our @EXPORT = qw/is_json_GET fasta_GET json_GET json_POST seqxml_GET phyloxml_GET text_GET gff_GET bed_GET xml_GET action_bad action_bad_regex action_bad_post/;
+our @EXPORT = qw/is_json_GET fasta_GET json_GET is_json_POST do_POST json_POST seqxml_GET orthoxml_GET phyloxml_GET text_GET gff_GET nh_GET bed_GET xml_GET action_bad action_check_code action_raw_bad_regex action_bad_regex action_bad_post/;
 
 use Test::More;
 use Test::Differences;
@@ -68,9 +69,22 @@ sub json_POST($$$) {
   return;
 }
 
+sub is_json_POST($$$$) {
+  my ($url, $data, $expected, $msg) = @_;
+  my $json = json_POST($url, $data, $msg);
+  return eq_or_diff_data($json, $expected, "$url | $msg") if $json;
+  return;
+}
+
+
 sub seqxml_GET($$) {
   my ($url, $msg) = @_;
   return xml_GET($url, $msg, 'text/x-seqxml+xml');
+}
+
+sub orthoxml_GET($$) {
+  my ($url, $msg) = @_;
+  return xml_GET($url, $msg, 'text/x-orthoxml+xml');
 }
 
 sub phyloxml_GET($$) {
@@ -94,6 +108,11 @@ sub fasta_GET($$) {
 sub gff_GET($$) {
   my ($url, $msg) = @_;
   return text_GET($url, $msg, 'text/x-gff3');
+}
+
+sub nh_GET($$) {
+  my ($url, $msg) = @_;
+  return text_GET($url, $msg, 'text/x-nh');
 }
 
 sub bed_GET($$) {
@@ -163,12 +182,34 @@ sub do_POST($$) {
   return $resp;
 }
 
+sub action_check_code {
+  my ($url, $code, $msg) = @_;
+  my $resp = do_GET($url);
+  if($resp->code() eq $code) {
+    return pass("$url | $msg");
+  }
+  diag explain "Response code for $url was $code";
+  return fail("$url | $msg");
+}
+
 sub action_bad_regex {
   my ($url, $regex, $msg) = @_;
   my $resp = do_GET($url);
   if($resp->is_success()) {
     return fail("$url | $msg");
   }
+  my $content = $resp->decoded_content();
+  my $ok = like($content, $regex, "$url | $msg");
+  diag explain $content unless $ok;
+  return $ok;
+}
+
+# Because sometimes we want to check the message
+# even if the response code was a failure
+sub action_raw_bad_regex {
+  my ($url, $regex, $msg) = @_;
+  my $resp = do_GET($url);
+
   my $content = $resp->decoded_content();
   my $ok = like($content, $regex, "$url | $msg");
   diag explain $content unless $ok;

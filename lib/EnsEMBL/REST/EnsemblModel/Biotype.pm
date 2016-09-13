@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -74,9 +75,10 @@ sub get_Biotypes {
   my $adaptors = $c->model('Registry')->get_all_adaptors_by_type($species, 'gene');
   foreach my $adaptor (@{$adaptors}) {
     my $dba = $adaptor->db();
+    my $species_id = $dba->species_id();
     my $dbc = $dba->dbc();
     foreach my $object (qw/gene transcript/) {
-      my $sql = "select distinct biotype from $object";
+      my $sql = "select distinct biotype from $object o, seq_region s, coord_system cs where s.seq_region_id = o.seq_region_id and s.coord_system_id = cs.coord_system_id and species_id = $species_id";
       $dbc->sql_helper->execute_no_return(-SQL => $sql, -CALLBACK => sub {
         my ($row) = @_;
         my ($biotype) = @{$row};

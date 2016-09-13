@@ -1,4 +1,5 @@
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +29,7 @@ use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::ApiVersion qw/software_version/;
 use Test::Differences;
+use Data::Dumper;
 
 my $test = Bio::EnsEMBL::Test::MultiTestDB->new();
 my $dba = $test->get_DBAdaptor('core');
@@ -99,9 +101,9 @@ is_json_GET(
 # /info/analysis/:species
 {
   my $analysis_json = json_GET('/info/analysis/homo_sapiens', 'Get analysis hash');
-  cmp_ok(scalar(keys %{$analysis_json}), '==', 32, 'Ensuring we have the right number of analyses available');
+  cmp_ok(scalar(keys %{$analysis_json}), '==', 36, 'Ensuring we have the right number of analyses available');
   my %unique_groups = map { $_, 1 } map { @{$_} } values %{$analysis_json};
-  eq_or_diff_data(\%unique_groups, {core => 1}, 'Checking there is only one group with analyses');
+  eq_or_diff_data(\%unique_groups, {core => 1, funcgen => 1}, 'Checking there is only one group with analyses');
 
   is_json_GET('/info/analysis/wibble', {}, 'Bogus species means empty hash');
 }
@@ -112,13 +114,15 @@ is_json_GET(
   cmp_ok(scalar(@{$external_dbs_json}), '==', 510, 'Ensuring we have the right number of external_dbs available');
   my $expected = [{ name => 'GO', description => undef, release => undef, display_name => 'GO' }];
   is_json_GET('/info/external_dbs/homo_sapiens?filter=GO', $expected, 'Checking GO filtering works');
+  my $xref_external_dbs_json = json_GET('info/external_dbs/homo_sapiens?feature=xref', 'Get the xref external dbs hash');
+  is(scalar(@{$xref_external_dbs_json}), 38, 'Ensuring we have the right number of xref external_dbs available');
 
   action_bad_regex('/info/external_dbs/wibble', qr/Could not fetch adaptor for species .+/, 'Bogus species means error message');
 }
 
 # /info/biotypes/:species
 {
-  my $biotypes_json = json_GET('/info/biotypes/homo_sapiens', 'Get the external dbs hash');
+  my $biotypes_json = json_GET('/info/biotypes/homo_sapiens', 'Get the biotypes hash');
   is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
   cmp_ok(scalar(@{$biotypes_json}), '==', 11, 'Ensuring we have the right number of biotypes');
   my ($protein_coding) = grep { $_->{biotype} eq 'protein_coding' } @{$biotypes_json};
@@ -158,6 +162,63 @@ is_json_GET(
     ],
     'Checking retrieval of ENSEMBL_PROJECTIONS returns 2 group descriptions'
   );
+}
+
+#/info/variation/:species
+{
+  my $variation_json = json_GET('/info/variation/homo_sapiens', 'Get analysis hash');
+  cmp_ok(scalar(@{$variation_json}), '==', 6, 'Ensuring we have the right number of sources available');
+
+  # Check with filter
+  my $expected = 
+    [
+      { 
+        name => 'dbSNP',
+        version => '138',
+        description => 'Variants (including SNPs and indels) imported from dbSNP',
+        url => 'http://www.ncbi.nlm.nih.gov/projects/SNP/',
+        somatic_status => 'mixed',
+        data_types => ['variation']
+      }
+    ];
+  is_json_GET('/info/variation/homo_sapiens?filter=dbSNP', $expected, 'Checking dbSNP source filtering works');
+}
+
+#/info/variation/populations/:species
+{
+  my $json = json_GET('/info/variation/populations/homo_sapiens', 'GET all populations for given species in variation database');
+  cmp_ok(scalar(@{$json}), '==', 42, 'Test that correct number of populations is returned');
+
+  # check with filter
+  my $expected = 
+    [
+      {
+        'name' => 'CSHL-HAPMAP:HapMap-CEU',
+        'description' => 'Utah residents with Northern and Western European ancestry from the CEPH collection.',
+        'size' => '185'
+      },
+      {
+        'name' => 'CSHL-HAPMAP:HapMap-HCB',
+        'description' => '45 unrelated Han Chinese in Beijing, China, representing one of the populations studied in the International HapMap project.',
+        'size' => '48'
+      },
+      {
+        'name' => 'CSHL-HAPMAP:HapMap-JPT',
+        'description' => 'Japanese in Tokyo, Japan.,JPT is one of the 11 populations in HapMap phase 3.',
+        'size' => '93'
+      },
+      {
+        'name' => 'CSHL-HAPMAP:HapMap-YRI',
+        'description' => 'Yoruba in Ibadan, Nigeria.,YRI is one of the 11 populations in HapMap phase 3.',
+        'size' => '185'
+      },
+      {
+        'name' => '1000GENOMES:phase_1_ASW',
+        'description' => 'Americans of African Ancestry in SW USA',
+        'size' => '61'
+      }
+    ];
+  is_json_GET('/info/variation/populations/homo_sapiens?filter=LD', $expected, 'Checking filtering for LD population works');
 }
 
 done_testing();

@@ -1,0 +1,12 @@
+my $VEP_PLUGIN_CONFIG = {
+  "plugins" => [
+
+    # test
+    {
+      "key" => "RestTestPlugin",
+      "params" => [ '@*' ],
+      "available" => 1,
+      "enabled" => 0,
+    },    
+  ]
+};

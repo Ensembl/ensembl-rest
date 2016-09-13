@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -107,6 +108,7 @@ sub _encode {
     my $values = $taxon->get_all_values_for_tag($tag);
     $entity->{tags}->{$tag} = $values;
   }
+  $entity->{tags}->{'name'} = [ $taxon->name() ];
   if(! $ignore_relations) {
     my $parent = $taxon->parent();
     my $children = $taxon->children();

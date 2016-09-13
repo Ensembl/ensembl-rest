@@ -1,0 +1,12 @@
+{
+  "collections": [
+    {
+      "id": "haplotypes",
+      "species": "homo_sapiens",
+      "assembly": "GRCh37",
+      "type": "local",
+      "filename_template": "haplotypes.vcf.gz",
+      "chromosomes": [ "6" ]
+    }
+  ]
+}

@@ -1,0 +1,306 @@
+# This is the default configuration for Ensembl REST applications. Take your own copy
+# and make it available to Catalyst via the ENSEMBL_REST_CONFIG or CATALYST_CONFIG ENV vars.
+
+
+name = EnsEMBL::REST
+default_view = HTML
+
+site_name = Ensembl Rest API
+service_name = Ensembl REST API
+service_logo = /static/img/e-ensembl.png
+service_parent_url = http://www.ensembl.org
+wiki_url = http://github.com/Ensembl/ensembl-rest/wiki
+copyright_footer = <a href='http://www.sanger.ac.uk'>WTSI</a> &amp; <a href='http://www.ebi.ac.uk'>EBI</a>
+
+jsonp=1
+
+<Model::Registry>
+  ###### Database settings. Use if you want to connect to a single database instance. Common options are given below
+  
+  host = ensembldb.ensembl.org
+  port = 3306
+  user = anonymous
+  
+  # host = mysql.ebi.ac.uk
+  # port = 4157
+  # user = anonymous
+ 
+  version = 82
+  verbose = 0
+  
+  ###### Registry file settings
+  
+  # The file to use as a registry file passed into Bio::EnsEMBL::Registry::load_all()
+  # file = reg.pm
+  
+  ###### Bio::EnsEMBL::LookUp settings. Used for the bacteira databases provided by Ensembl Genomes
+
+  # Load lookup from a local file
+  # lookup_file = file.json
+  
+  # Load lookup from a remote URL. Most common option
+  # lookup_url = http://bacteria.ensembl.org/registry.json
+  
+  # Store the local loookup cache in a location other than the default (lookup_cache.json)
+  # lookup_cache_file = lookup_cache.json
+  
+  # Turn off the local lookup cache storage.
+  # lookup_no_cache = 1
+
+  # Turns on per-process connection sharing; experimental feature but is stable. 
+  # Results in 1 connection per db per process rather than 1 connection per DBAdaptor instance per process
+  connection_sharing = 1
+
+  # Control the reconnection timeout (example is set to 10 mintues in ms). Only works when connection_sharing is on
+  reconnect_interval = 600000
+
+  # Control if we close DB connections down once finished with them. If you are not using the 
+  # connection_sharing it is recommened to turn this on to avoid DOS attacks from your web processes
+  disconnect_if_idle = 0
+
+  # Control if we attempt pings and re-connections before queries. Useful for long running connections
+  # if you are using connection_sharing
+  reconnect_when_lost = 1
+
+  # Set to control internal Ensembl API caching. Turn this off if your application is persistent (internal
+  # caches are not shared, will rarely hit and increase your PSGI processes memory footprint)
+  no_caching = 1
+
+  # Trigger a preload of the registry the moment the Model::Registry object is contrstructed. Otherwise we
+  # wait until the 1st request for an adaptor comes in. Use in conjunction with pre-fork PSGI deployments
+  # to stop registry reload issues
+  preload = 0
+  
+</Model::Registry>
+
+<Model::Lookup>
+  # Model to use for ID lookups. Currently defaults to the DatabaseIDLookup which can be stable_ids schema
+  # or a simple DBAdaptor loop lookup
+  # lookup_model = DatabaseIDLookup
+</Model::Lookup>
+
+<Model::Documentation>
+  #Must be an array reference; if you specify only 1 then surround with [] brackets; if you specify more then remove them
+  paths=[root/documentation]
+  #How long examples stay in the backend caches before being expired; default is 1hr in seconds. 
+  #Expire depends on the type of CHI cache configured in Plugin::Cache section
+  # example_expire_time=3600
+  
+  #Used to control the parameters used in examples. Please edit as you see fit for your infrastructure
+  <replacements>
+    gene_stable_id=ENSG00000157764
+    gene_stable_id_2=ENSG00000248378
+    transcript_stable_id=ENST00000288602
+    transcript_stable_id_2=ENST00000513398
+    exon_stable_id=ENSE00001154485
+    translation_stable_id=ENSP00000288602
+
+    vcf=21  26960070  rs116645811 G A . . .
+    vcf2=21  26965148  rs1135638 G A . . .
+    
+    gene_symbol=BRCA2
+    gene_symbol2=BRAF
+    gene_symbol_db=HGNC
+    transcript_symbol_db=PDB
+    
+    prediction_transcript_stable_id=GENSCAN00000000001
+    other_features_transcript_stable_id=CCDS5863.1
+    
+    sequence_region_name=X
+    sequence_region=X:1000000..1000100:1
+    sequence_region_negative=X:1000000..1000100:-1
+    sequence_region_strandless=X:1000000..1000100
+    contig_sequence_region=ABBA01004489.1:1..100
+    contig_coord_system=seqlevel
+    
+    species=homo_sapiens
+    species_common=human
+    
+    taxon=9606
+    taxon_name=Homo sapiens
+    taxon_nameish=Homo%25
+    target_taxon=10090
+    target_ancestral_taxon=9526
+    target_species=cow
+    
+    ontology=GO
+    ontology_term_id=GO:0005667
+    ontology_term_name=transcription factor complex
+    
+    compara=multi
+    compara_method=EPO
+    compara_method_type=GenomicAlign
+    
+    genetree_stable_id=ENSGT00390000003602
+    compara_gene_stable_id=ENSG00000167664
+    
+    from_coord_system=GRCh37
+    to_coord_system=GRCh38
+    
+    cdna_coordinates=100..300
+    cds_coordinates=1..1000
+    translation_coordinates=100..300
+
+    regulation_id=ENSR00001885035
+    
+    variation_region=9:22125503-22125502:1
+    variation_allele=C
+    variation_region_two=1:6524705:6524705
+    variation_allele_two=T
+    variation_region_three=7:100318423-100321323:1
+    variation_allele_three=DUP
+    
+    variation_id=rs56116432
+    variation_id_two=COSM476
+
+    variation_id_three=rs1042779
+
+    ld_population_name=1000GENOMES:phase_3:KHV
+    r2=0.85
+    d_prime=1.0
+    
+    vep_hgvs=AGT:c.803T>C
+    vep_hgvs_two=9:g.22125504G>C
+    vep_hgvs_three=ENST00000003084:c.1431_1433delTTC
+
+    genomic_alignment_species=taeniopygia_guttata
+    genomic_alignment_region=2:106040000-106040050:1
+    genomic_alignment_group=sauropsids
+
+    info_division=ensembl
+  </replacements>
+</Model::Documentation>
+
+<Controller::Archive>
+  max_post_size = 1000
+</Controller::Archive>
+
+<Controller::Lookup>
+  max_post_size = 1000
+</Controller::Lookup>
+
+<Controller::Taxonomy>
+  # specify the registry alias for the database containing ncbi_taxa_node tables (normally a compara schema)
+  # taxonomy = plants
+</Controller::Taxonomy>
+
+<Controller::Ontology>
+  # specify the registry alias for the database containing ontology tables (normally called ontology)
+  # ontology = ontology
+</Controller::Ontology>
+
+<Controller::Sequence>
+  # Set to limit the maximum allowed size of sequence to return from the service. 
+  # This will impact on memory footprint so tread carefully
+  max_slice_length = 1e7
+  max_post_size = 50
+</Controller::Sequence>
+
+<Controller::Overlap>
+  # Set to limit the maximum allowed size of feature slices to return from the service. 
+  # This will impact on memory footprint so tread carefully
+  max_slice_length = 5e6
+</Controller::Overlap>
+
+<Controller::Homology>
+  # Sets the default compara to use when finding the best compara fails. Defaults to multi
+  # default_compara=multi
+</Controller::Homology>
+
+<Controller::Regulatory>
+  # Sets the default regulation to use when finding the best regulation fails. Defaults to multi
+  # default_regulation=multi
+</Controller::Regulatory>
+
+<Controller::GenomicAlignment>
+  # Sets the default compara to use when finding the best compara fails. Defaults to multi
+  # default_compara=multi
+</Controller::GenomicAlignment>
+
+<Controller::Variaton>
+  max_post_size = 1000
+</Controller::Variaton>
+
+<Controller::VEP>
+# Supply a fasta path for Human in order to allow VEP to work locally
+  fasta             = Homo_sapiens.GRCh37.75.dna.toplevel.fa # path to Human toplevel fasta file
+  dir               = # path to vep cache directory
+# Default parameters for running vep
+  cache_region_size = 1000000
+  chunk_size        = 50000
+  whole_genome      = 1
+  compress          = gzip -dc
+  terms             = SO
+  cache             = 1
+  failed            = 0
+  core_type         = core
+  quiet             = 1
+  sift              = b
+  polyphen          = b
+  symbol            = 1
+  regulatory        = 1
+  biotype           = 1
+  rest              = 1
+  check_existing    = 1 # adds some performance penalty, mitigated by tabix-converting the cache (http://www.ensembl.org/info/docs/tools/vep/script/vep_cache.html#convert)
+  fork              = 3
+  max_post_size     = 1000
+  warning_file      = STDERR # controls VEP logging, not Catalyst
+  plugin_config     = # path to plugin config
+  dir_plugins       = # path to VEP_plugins checkout
+</Controller::VEP>
+
+
+<View::GFF3>
+  # Set the default source of a GFF3 record
+  # default_source=.
+</View::GFF3>
+
+<View::HTML>
+  # To configure any templates to your own needs provide new includes 
+  # here and replace the template toolkit file. Pay attention to order 
+  # (1st defined is 1st consulted)
+
+  # INCLUDE_PATH __path_to(alternative/root)__
+  INCLUDE_PATH __path_to(root)__
+</View::HTML>
+
+<Plugin::Cache>
+  <backend>
+    #Default 
+    class = CHI
+    driver = Memory
+    global = 1
+    # Memcache
+    # driver = Memcached
+    # namespace = endpoint_examples
+    # servers = [127.0.0.1:11211]
+    # debug = 0
+    # <l1_cache>
+    #   driver = Memory
+    #   global = 1
+    #   max_size = 126976
+    # </l1_cache>
+  </backend>
+</Plugin::Cache>
+
+<Model::ga4gh::callSet>
+   ga_config = __path_to(ga_vcf_config.json)__
+</Model::ga4gh::callSet>
+
+<Model::ga4gh::variants>
+   ga_config = __path_to(ga_vcf_config.json)__
+</Model::ga4gh::variants>
+
+<Model::ga4gh::variantSet>
+   ga_config = __path_to(ga_vcf_config.json)__
+</Model::ga4gh::variantSet>
+
+<Model::Variation>
+   use_vcf    = 1
+   vcf_config = __path_to(vcf_config.json)__
+</Model::Variation>
+
+<Model::LDFeatureContainer>
+   use_vcf = 1
+   vcf_config = __path_to(vcf_config.json)__
+</Model::LDFeatureContainer>

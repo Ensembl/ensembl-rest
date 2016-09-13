@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,7 +28,8 @@ Plack::Middleware::EnsThrottle
 # Simple in process rate limiting (using a simple hash backend and limiting everything)
 enable 'EnsThrottle::Second',
   max_requests => 10,
-  path => sub { 1 };
+  path => sub { 1 },
+  backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
 
 # Distributed using memcached with whitelists, blacklists and 
 enable 'EnsThrottle::Second',
@@ -44,6 +46,8 @@ enable 'EnsThrottle::Second',
   },
   blacklist => '192.168.2.1', #blacklist a single IP
   whitelist => ['192.168.0.0-192.169.255.255'], #whitelist a range
+  whitelist_hdr => 'X-My-Secret-Token',
+  whitelist_hdr_values => ['loveme'],
   client_id_prefix => 'second', #make the generated key more unique
   message => 'custom rate exceeded message',
   # If specified once limit has been hit add this value to the Retry-After header.
@@ -99,12 +103,13 @@ In all cases they limit up-to their time unit. For example a user is first seen 
 use strict;
 use warnings;
 use parent 'Plack::Middleware';
-use Plack::Util::Accessor qw(max_requests backend path blacklist whitelist client_id_prefix message retry_after_addition);
+use Plack::Util::Accessor qw(max_requests backend path blacklist whitelist whitelist_hdr whitelist_hdr_values client_id_prefix message retry_after_addition);
 use Plack::Util;
 use Carp;
 use Net::CIDR::Lite;
 use Readonly;
 use Plack::Middleware::EnsThrottle::SimpleBackend;
+use Plack::Request;
 
 Readonly::Scalar my $CLIENT_ID_PREFIX => 'throttle';
 Readonly::Scalar my $MESSAGE => 'Too many requests';
@@ -124,13 +129,11 @@ sub prepare_app {
   croak "Cannot continue. No max_requests given" unless $self->max_requests();
   $self->blacklist($self->_populate_cidr($self->blacklist));
   $self->whitelist($self->_populate_cidr($self->whitelist));
+  $self->whitelist_hdr_values($self->_populate_array($self->whitelist_hdr_values));
   my $path = $self->path();
   croak "Cannot continue. No path given" unless $path;
-  croak "path must be an CODE ref" if ref($path) ne 'CODE';
-  if(! $self->backend()) {
-    carp "Memcache unreachable, running without.";
-    $self->backend(Plack::Middleware::EnsThrottle::SimpleBackend->new());
-  }
+  croak "Cannot continue. path must be an CODE ref" if ref($path) ne 'CODE';
+  croak "Cannot continue. No backend given. Please instatiate a MemcachedBackend or SimpleBackend" if ! $self->backend();
   return;
 }
 
@@ -141,6 +144,8 @@ sub call {
   my $res;
   my $remaining_requests = 0;
 
+  my $request = Plack::Request->new($env);
+
   if($self->_throttle_path($env)) {
 
     #If IP was in the blacklist then reject & allow no headers
@@ -150,6 +155,10 @@ sub call {
     }
     #If IP was whitelisted then let through & allow no headers
     elsif($self->_whitelisted($env)) {
+      $res = $self->app->($env);
+      $add_headers = 0;
+    }
+    elsif($self->_whitelisted_hdr($request->headers)) {
       $res = $self->app->($env);
       $add_headers = 0;
     }
@@ -250,6 +259,9 @@ sub _add_throttle_headers {
   Plack::Util::header_set( $headers, 'X-RateLimit-Remaining', $remaining_requests );
   if($retry_after) {
     my $retry_after_addition = $self->retry_after_addition() || $RETRY_AFTER_ADDITION;
+    # Do a ceiling on the reset time to give second resolution, going so high resolution
+    # in exact reset times causes potential breakage depending on the platform's timer resolution
+    $reset_time = ($reset_time == int $reset_time) ? $reset_time : int($reset_time + 1);
     Plack::Util::header_set( $headers, 'Retry-After', $reset_time+$retry_after_addition );
   }
   return $res;
@@ -267,6 +279,20 @@ sub _whitelisted {
   my $list = $self->whitelist();
   return 0 unless $list;
   return $list->find($env->{REMOTE_ADDR});
+}
+
+sub _whitelisted_hdr {
+    my ($self, $headers) = @_;
+
+    my $header = $self->whitelist_hdr();
+    my $values = $self->whitelist_hdr_values();
+    return 0 unless $header && @{$values};
+    # Since this is a special header just for us we're
+    # going to assume there's only one value, to speed
+    # the checking code below
+    my $hdr_value = $headers->header($header);
+    return 0 unless $hdr_value;
+    return grep { $_ eq $hdr_value } @{$values};
 }
 
 sub _client_id {
@@ -290,6 +316,16 @@ sub _populate_cidr {
     $cidr->add_any($_) for @{$input};
   }
   return $cidr;
+}
+
+# Ensure value is an array if a scalar is passed
+sub _populate_array {
+    my ($self, $input) = @_;
+
+    if($input) {
+	$input = (ref($input) eq 'ARRAY') ? $input : [$input];
+    }
+    return $input;
 }
 
 1;

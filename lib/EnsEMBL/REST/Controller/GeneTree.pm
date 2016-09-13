@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,6 +31,7 @@ __PACKAGE__->config(
   map => {
     'text/html'           => [qw/View PhyloXMLHTML/],
     'text/x-phyloxml+xml' => [qw/View PhyloXML/],
+    'text/x-orthoxml+xml' => [qw/View OrthoXML/],
     'text/x-phyloxml'     => [qw/View PhyloXML/], #naughty but needs must
     'text/x-nh'           => [qw/View NHTree/],
     'text/xml'            => [qw/View PhyloXML/],
@@ -47,8 +49,13 @@ sub get_genetree_GET { }
 sub get_genetree : Chained('/') PathPart('genetree/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
   my $s = $c->stash();
-  my $gt = $c->model('Lookup')->find_genetree_by_stable_id($id);
-  $self->_set_genetree($c, $gt);
+  try {
+    my $gt = $c->model('Lookup')->find_genetree_by_stable_id($id);
+    $self->_set_genetree($c, $gt);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
 }
 
 sub get_genetree_by_member_id_GET { }
@@ -56,9 +63,13 @@ sub get_genetree_by_member_id_GET { }
 sub get_genetree_by_member_id : Chained('/') PathPart('genetree/member/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
    
-  my $gt = $c->model('Lookup')->find_genetree_by_member_id($id);
-  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree"]) unless $gt;
-  $self->_set_genetree($c, $gt);
+  try {
+    my $gt = $c->model('Lookup')->find_genetree_by_member_id($id);
+    $self->_set_genetree($c, $gt);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
 }
 
 sub get_genetree_by_symbol_GET { }
@@ -77,27 +88,43 @@ sub get_genetree_by_symbol : Chained('/') PathPart('genetree/member/symbol') Arg
   
   my $stable_id = $genes[0]->stable_id;
   
-  my $gt = $c->model('Lookup')->find_genetree_by_member_id($stable_id);
-  $c->go('ReturnError', 'custom', ["Could not fetch GeneTree for $symbol,$stable_id"]) unless $gt;
-  $self->_set_genetree($c, $gt);
+  try {
+    my $gt = $c->model('Lookup')->find_genetree_by_member_id($stable_id);
+    $self->_set_genetree($c, $gt);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
 }
 
 sub _set_genetree {
   my ($self, $c, $gt) = @_;
 
+  my $prune_species     = $c->request->param('prune_species') ? [$c->request->param('prune_species')] : undef;
+  my $prune_taxons      = $c->request->param('prune_taxon') ? [$c->request->param('prune_taxon')] : undef;
+  my ($subtree_filter)  = $c->request->param('subtree_node_id');
+  my $aligned           = $c->request()->param('aligned') || $c->request()->param('phyloxml_aligned') ? 1 : 0;
+  my $sequence          = $c->request()->param('sequence') || $c->request()->param('phyloxml_sequence') || 'protein';
+  my $cigar_line        = $c->request()->param('cigar_line') ? 1 : 0;
+  my $cdna              = $sequence eq 'cdna' ? 1 : 0;
+  my $no_sequences      = $sequence eq 'none' ? 1 : 0;
+
+  $gt->preload(
+      -PRUNE_SPECIES => $prune_species,
+      -PRUNE_TAXA => $prune_taxons,
+      -PRUNE_SUBTREE => $subtree_filter,
+  );
+
   if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
     # If it wasn't a special format convert GT into a Hash data structure and let the normal serialisation
     # code deal with it.
-    my $aligned = $c->request()->param('aligned') || $c->request()->param('phyloxml_aligned') ? 1 : 0;
-    my $sequence = $c->request()->param('sequence') || $c->request()->param('phyloxml_sequence') || 'protein';
-    my $cdna = $sequence eq 'cdna' ? 1 : 0;
-    my $no_sequences = $sequence eq 'none' ? 1 : 0;
-    $gt->preload();
-    my $hash = Bio::EnsEMBL::Compara::Utils::GeneTreeHash->convert ($gt, -no_sequences => $no_sequences, -aligned => $aligned, -cdna => $cdna, -species_common_name => 0, -exon_boundaries => 0, -gaps => 0, -full_tax_info => 0);
+    my $hash = Bio::EnsEMBL::Compara::Utils::GeneTreeHash->convert ($gt, -no_sequences => $no_sequences, -aligned => $aligned, -cdna => $cdna, -exon_boundaries => 0, -gaps => 0, -cigar_line => $cigar_line);
+    $gt->release_tree();
     return $self->status_ok($c, entity => $hash);
   }
   return $self->status_ok($c, entity => $gt);
 }
+
 
 with 'EnsEMBL::REST::Role::Content';
 

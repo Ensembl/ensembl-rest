@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,16 +20,18 @@ limitations under the License.
 package EnsEMBL::REST::Model::DatabaseIDLookup;
 
 use Moose;
+use Scalar::Util qw/weaken/;
 use namespace::autoclean;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
 
 has 'long_lookup' => (isa => 'Bool', is => 'ro', builder => 'build_long_lookup');
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -57,6 +60,7 @@ sub find_object_location {
 sub find_prediction_transcript {
   my ($self, $id, $object_type, $db_type, $species) = @_;
   my $reg = $self->context->model('Registry');
+  $db_type = 'core' if !$db_type;
   my $pred_trans_adaptor = $reg->get_adaptor($species, $db_type, $object_type);
   my $obj = $pred_trans_adaptor->fetch_by_stable_id($id);
   return ($species, $object_type, $db_type);

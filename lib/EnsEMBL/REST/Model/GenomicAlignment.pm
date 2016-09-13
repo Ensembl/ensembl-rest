@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,12 +21,14 @@ package EnsEMBL::REST::Model::GenomicAlignment;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 
 use Moose;
+use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
 
 # Per instance variables
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 
 my %allowed_values = (
   mask     => { map { $_, 1} qw(soft hard) },
@@ -36,6 +39,7 @@ my %allowed_values = (
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
@@ -46,14 +50,13 @@ sub get_alignment {
 
   #Get method
   my $method = $c->request->parameters->{method} || 'EPO';
-  $c->go('ReturnError', 'custom', ["The method '$method' is not understood by this service"]) unless $allowed_values{method}{$method};
+  Catalyst::Exception->throw("The method '$method' is not understood by this service") unless $allowed_values{method}{$method};
 
   #Get species_set
   my $species_set = $c->request->parameters->{species_set};
 
   #Get species_set_group
   my $species_set_group = $c->request->parameters->{species_set_group};
-  #$c->go('ReturnError', 'custom', ["The species_set '$species_set_group' is not understood by this service"]) unless $allowed_values{species_set_group}{$species_set_group};
 
   #set default species_set_group only if species_set hasn't been set
   unless ($species_set || $species_set_group) {
@@ -62,13 +65,13 @@ sub get_alignment {
 
   #Check that both $species_set and $species_set_group have not been set
   if ($species_set && $species_set_group) {
-    $c->go('ReturnError', 'custom', ["Please define species_set OR species_set_group"]);
+    Catalyst::Exception->throw("Please define species_set OR species_set_group");
   }
 
   #Get masking
   my $mask = $c->request()->param('mask') || q{};
   if ($mask) {
-    $c->go('ReturnError', 'custom', ["'$mask' is not an allowed value for masking"]) unless $allowed_values{mask}{$mask};
+    Catalyst::Exception->throw("'$mask' is not an allowed value for masking") unless $allowed_values{mask}{$mask};
   }
 
   #Get the compara DBAdaptor
@@ -78,12 +81,12 @@ sub get_alignment {
   my $mlss;
   if ($species_set_group) {
     $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_species_set_name($method, $species_set_group);    
-    $c->go('ReturnError', 'custom', ["No method_link_specices_set found for method ${method} and species_set_group ${species_set_group} "]) if ! $mlss;
+    Catalyst::Exception->throw("No method_link_specices_set found for method ${method} and species_set_group ${species_set_group} ") if ! $mlss;
   }
   if ($species_set) {
     $species_set = (ref($species_set) eq 'ARRAY') ? $species_set : [$species_set];
     $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_registry_aliases($method, $species_set);
-    $c->go('ReturnError', 'custom', ["No method_link_specices_set found for method ${method} and species_set " . join ",", @${species_set} ]) if ! $mlss;
+    Catalyst::Exception->throw("No method_link_specices_set found for method ${method} and species_set " . join ",", @${species_set} ) if ! $mlss;
   }
 
   #Get list of species to display

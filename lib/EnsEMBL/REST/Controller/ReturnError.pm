@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,9 +27,10 @@ __PACKAGE__->config(
     'default'   => 'application/json',
     'stash_key' => 'rest',
     'map'       => {
-        'text/x-yaml'      => 'YAML::XS',
-        'application/json' => 'JSON::XS',
-        'text/plain'       => 'Data::Serializer',
+        'text/x-yaml'       => 'YAML::XS',
+        'application/json'  => 'JSON::XS',
+        'text/plain'        => 'JSON::XS',
+        'text/html'         => 'YAML::HTML',
     }
 );
 
@@ -87,7 +89,6 @@ sub no_content_POST { }
 
 sub not_found: Path : Args(0) : ActionClass('REST') {
     my ( $self, $c, $error_msg ) = @_;
-    $c->log->error($error_msg);
     $self->status_not_found($c, message => $error_msg);
 }
 

@@ -1,13 +1,27 @@
-2	OBO_file_date	so.obo/14:11:2012 16:46
-3	OBO_load_date	so.obo/Wed Mar 20 11:32:01 2013
-4	patch	patch_71_72_b.sql|alt_id table
-6	patch	patch_71_72_c.sql|schema_version
-7	patch	patch_71_72_d.sql|patch_version_fix
-8	patch	patch_71_72_e.sql|is_obsolete
-1	schema_type	ontology
-5	schema_version	76
-10	patch	patch_72_73_a.sql|schema_version
-11	patch	patch_72_73_b.sql|meta_species
-13	patch	patch_73_74_a.sql|schema_version
-15	patch	patch_74_75_a.sql|schema_version
-16	patch	patch_75_76_a.sql|schema_version
+2	OBO_file_date	so.obo/14:11:2012 16:46	\N
+3	OBO_load_date	so.obo/Wed Mar 20 11:32:01 2013	\N
+4	patch	patch_71_72_b.sql|alt_id table	\N
+6	patch	patch_71_72_c.sql|schema_version	\N
+7	patch	patch_71_72_d.sql|patch_version_fix	\N
+8	patch	patch_71_72_e.sql|is_obsolete	\N
+1	schema_type	ontology	\N
+5	schema_version	86	\N
+10	patch	patch_72_73_a.sql|schema_version	\N
+11	patch	patch_72_73_b.sql|meta_species	\N
+13	patch	patch_73_74_a.sql|schema_version	\N
+15	patch	patch_74_75_a.sql|schema_version	\N
+16	patch	patch_75_76_a.sql|schema_version	\N
+17	patch	patch_76_77_a.sql|schema_version	\N
+18	patch	patch_77_78_a.sql|schema_version	\N
+19	patch	patch_78_79_a.sql|schema_version	\N
+20	patch	patch_78_79_b.sql|synonym_type	\N
+21	patch	patch_79_80_a.sql|schema_version	\N
+22	patch	patch_80_81_a.sql|schema_version	\N
+23	patch	patch_81_82_a.sql|schema_version	\N
+24	patch	patch_82_83_a.sql|schema_version	\N
+25	patch	patch_83_84_a.sql|schema_version	\N
+26	patch	patch_84_85_a.sql|schema_version	\N
+27	patch	patch_84_85_b.sql|confident_relationship	\N
+28	patch	patch_84_85_c.sql| add synonym dbxref	\N
+29	patch	patch_84_85_d.sql| add ontology data-version	\N
+30	patch	patch_85_86_a.sql|schema_version	\N

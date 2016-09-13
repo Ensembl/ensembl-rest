@@ -28,5 +28,8 @@
       'compara'   => 'Bio::EnsEMBL::Compara::DBSQL::DBAdaptor',
       'stable_ids' => 'Bio::EnsEMBL::DBSQL::DBAdaptor',
     },
+    'homology' => {
+      'compara'   => 'Bio::EnsEMBL::Compara::DBSQL::DBAdaptor',
+    },
   },
 }

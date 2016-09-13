@@ -1,5 +1,6 @@
 #!/bin/bash -ex
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +17,9 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 PORT=5000
+if ["$REST_PORT"]; then
+  PORT=$REST_PORT
+fi
 # This should be the directory name/app name
 APP="perl5/ensembl-rest"
 PIDFILE="$HOME/$APP.pid"
@@ -30,10 +34,11 @@ fi
 APP_HOME=$(cd $SCRIPT_DIR/../../ && pwd)
 
 # Library path work
-for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl; do
+for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl ensembl-io; do
   PERL5LIB=$ENS_GIT_ROOT_DIR/$ensdir/modules:$PERL5LIB
 done
 PERL5LIB=$APP_HOME/../bioperl-live:$PERL5LIB
+PERL5LIB=$APP_HOME/../Bio-HTS/blib/arch:$APP_HOME/../Bio-HTS/blib/lib:$PERL5LIB
 PERL5LIB=$APP_HOME/lib:$PERL5LIB
 export PERL5LIB
 
@@ -51,11 +56,8 @@ RESTART_INTERVAL=1
 TDP_HOME="$HOME/$APP"
 export TDP_HOME
 
-ERROR_LOG="$HOME/$APP.error.log"
-ACCESS_LOG="$HOME/$APP.access.log"
-
 export ENSEMBL_REST_CONFIG=$APP_HOME/configurations/production/ensembl_rest.conf
-STARMAN="starman --backlog $BACKLOG --max-requests $MAXREQUESTS --workers $WORKERS --access-log $ACCESS_LOG --error-log $ERROR_LOG $APP_HOME/configurations/production/ensrest.psgi"
+STARMAN="starman --backlog $BACKLOG --max-requests $MAXREQUESTS --workers $WORKERS $APP_HOME/configurations/production/ensrest.psgi"
 DAEMON="$HOME/perl5/perlbrew/perls/perl-5.14.2/bin/start_server"
 DAEMON_OPTS="--pid-file=$PIDFILE --interval=$RESTART_INTERVAL --status-file=$STATUS --port 0.0.0.0:$PORT -- $STARMAN"
 

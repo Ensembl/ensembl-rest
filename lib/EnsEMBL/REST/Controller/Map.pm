@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,12 +28,12 @@ BEGIN { extends 'Catalyst::Controller::REST'; }
 
 sub region : Chained('/') CaptureArgs(1) PathPart('map') {
   my ( $self, $c, $species) = @_;
-  $c->{stash}->{species} = $species;
+  $c->stash->{species} = $species;
   try {
     $c->stash->{slice_adaptor} = $c->model('Registry')->get_adaptor( $species, 'Core', 'Slice' );
-  }
-  catch {
-    $c->go( 'ReturnError', 'from_ensembl', [$_] ) 
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 }
 
@@ -85,20 +86,20 @@ sub _map_transcript_coords {
   return $self->map_mappings($c, $mapped, $transcript);
 }
 
+## Create a slice object based on the location string provided
+## do not proceed if anything went wrong on the way
 sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
   my ( $self, $c, $old_assembly, $region ) = @_;
-  my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($region);
   $c->log->info($region);
-  my $old_slice = try {
+  try {
+    my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($region);
     my $coord_system = $c->request()->param('coord_system') || 'chromosome';
-    $c->stash->{slice_adaptor}->fetch_by_region($coord_system, $old_sr_name, $old_start, $old_end, $old_strand, $old_assembly);
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+    my $old_slice = $c->stash->{slice_adaptor}->fetch_by_region($coord_system, $old_sr_name, $old_start, $old_end, $old_strand, $old_assembly);
+    $c->stash->{old_slice} = $old_slice;
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
-  $c->go('ReturnError', 'custom', ["No valid region can be decoded from $region"]) unless $old_slice;
-  # Get a slice for the old region (the region in the input file).
-  $c->stash->{old_slice} = $old_slice;
 }
 
 sub mapped_region_data : Chained('get_region_slice') PathPart('') Args(1) ActionClass('REST') {
@@ -122,23 +123,25 @@ sub map_data : Private {
   my $old_strand  = $old_slice->strand()*1;
   my $old_version = $old_slice->coord_system()->version();
 
+  my $target_coord_system = $c->request()->param('target_coord_system') || 'chromosome';
+
   my @decoded_segments;
   try {
-    my $projection = $old_slice->project('chromosome', $c->stash->{target_assembly});
+    my $projection = $old_slice->project($target_coord_system, $c->stash->{target_assembly});
 
     foreach my $segment ( @{$projection} ) {
       my $mapped_slice = $segment->to_Slice;
       my $mapped_data = {
         original => {
-          coordinate_system => $old_cs_name,
+          coord_system => $old_cs_name,
           assembly => $old_version,
           seq_region_name => $old_sr_name,
-          start => ($old_start + $segment->from_start() - 1),
-          end => ($old_start + $segment->from_end() - 1),
+          start => ($old_start + $segment->from_start() - 1) * 1,
+          end => ($old_start + $segment->from_end() - 1) * 1,
           strand => $old_strand,
         },
         mapped => {
-          coordinate_system => $mapped_slice->coord_system->name,
+          coord_system => $mapped_slice->coord_system->name,
           assembly => $mapped_slice->coord_system->version,
           seq_region_name => $mapped_slice->seq_region_name(),
           start => $mapped_slice->start() * 1,
@@ -148,9 +151,9 @@ sub map_data : Private {
       };
       push(@decoded_segments, $mapped_data);
     }
-  }
-  catch {
-    $c->go('ReturnError', 'from_ensembl', [$_]);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   
   $c->stash(mapped_data => \@decoded_segments);
@@ -161,6 +164,7 @@ sub map_mappings {
   my @r;
   my $seq_region_name = $transcript->seq_region_name();
   my $coord_system = $transcript->coord_system_name();
+  my $assembly_name = $transcript->slice->coord_system->version();
   foreach my $m (@{$mapped}) {
     my $strand = 0;
     my $gap = 0;
@@ -171,13 +175,14 @@ sub map_mappings {
       $strand = $m->strand();
     }
     push(@r, {
-      start => $m->start(),
-      end => $m->end(),
+      start => $m->start() * 1,
+      end => $m->end() * 1,
       strand => $strand,
       rank => $m->rank(),
       gap => $gap,
       seq_region_name => $seq_region_name,
       coord_system => $coord_system,
+      assembly_name => $assembly_name,
     });
   }
   return \@r;

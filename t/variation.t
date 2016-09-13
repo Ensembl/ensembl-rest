@@ -1,4 +1,5 @@
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,23 +40,42 @@ my $base = '/variation/homo_sapiens';
   my $id = 'rs142276873';
   my $json = json_GET("$base/$id", 'Variation feature');
   #is(scalar(@$json), 1, '1 variation feature returned');
-  my $expected_variation = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.123049', ambiguity => 'R', var_class => 'SNP', synonyms => [], evidence => ['Multiple_observations','1000Genomes'], ancestral_allele => 'G', most_severe_consequence => 'Intron variant', mappings => [{"location"=>"18:23821095-23821095", "strand" => 1, "start" => 23821095, "end" => 23821095, "seq_region_name" => "18", "coord_system" => "chromosome","allele_string"=>"G/A"}]};
-  eq_or_diff($json, $expected_variation, "Checking the result from the variation endpoint");
+  my $expected_variation_1 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.123049', minor_allele => 'A', ambiguity => 'R', var_class => 'SNP', synonyms => [], evidence => ['Multiple_observations','1000Genomes'], ancestral_allele => 'G', most_severe_consequence => 'intron_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"18:23821095-23821095", "strand" => 1, "start" => 23821095, "end" => 23821095, "seq_region_name" => "18", "coord_system" => "chromosome","allele_string"=>"G/A"}]};
+  eq_or_diff($json, $expected_variation_1, "Checking the result from the variation endpoint");
   
 # Get additional genotype information
   $id = 'rs67521280';
-  $expected_variation = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => undef, ambiguity => undef, var_class => 'indel', synonyms => [], evidence => [], ancestral_allele => undef, most_severe_consequence => 'Intergenic variant', mappings => [{"location"=> "11:6303493-6303493", "strand" => 1, "start" => 6303493, "end" => 6303493, "seq_region_name" => "11", "coord_system" => "chromosome","allele_string"=>"-/GT"}] };
-  my $expected_genotype = { %{$expected_variation}, 
-  genotypes => [{genotype => "GT|GT", gender => "Male", individual => "J. CRAIG VENTER", submission_id => 'ss95559393'}] };
+  my $expected_variation_2 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => undef, minor_allele => undef, failed => 'None of the variant alleles match the reference allele;Mapped position is not compatible with reported alleles', ambiguity => undef, var_class => 'indel', synonyms => [], evidence => [], ancestral_allele => undef, most_severe_consequence => 'intergenic_variant', mappings => [{"assembly_name" => "GRCh37", "location"=> "11:6303493-6303493", "strand" => 1, "start" => 6303493, "end" => 6303493, "seq_region_name" => "11", "coord_system" => "chromosome","allele_string"=>"-/GT"}] };
+  my $expected_genotype = { %{$expected_variation_2}, 
+  genotypes => [{genotype => "GT|GT", gender => "Male", sample => "J. CRAIG VENTER", submission_id => 'ss95559393'}] };
   my $genotype_json = json_GET("$base/$id?genotypes=1", "Genotype info");
   eq_or_diff($genotype_json, $expected_genotype, "Returning genotype information");
 
 
-# Include population information
-  my $expected_pops = { %{$expected_variation},
+# Include population allele frequency information
+  my $expected_pops = { %{$expected_variation_2},
   populations => [{population => "HUMANGENOME_JCVI:J. Craig Venter",frequency => "1",allele => "GT",allele_count => "2", submission_id => 'ss95559393'}]};
   my $pops_json = json_GET("$base/$id?pops=1", "Population info");
   eq_or_diff($pops_json, $expected_pops, "Returning population information");
+
+# Include population_genotype information ( data faked)
+   my $expected_pop_genos = { %{$expected_variation_2},
+   population_genotypes =>[
+ { count => '11',frequency => '0.5',    genotype => 'A|G', population => 'PERLEGEN:AFD_AFR_PANEL',    subsnp_id => 'ss23290311'}, 
+ { count => '5', frequency => '0.227273', genotype => 'A|A',  population => 'PERLEGEN:AFD_AFR_PANEL',  subsnp_id => 'ss23290311'},
+ { count => '6', frequency => '0.272727', genotype => 'G|G',  population => 'PERLEGEN:AFD_AFR_PANEL', subsnp_id => 'ss23290311' },
+ { count => '9', frequency => '0.375', genotype => 'A|G',  population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'},
+ { count => '1', frequency => '0.0416667', genotype => 'A|A', population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'  },
+ { count => '14', frequency => '0.583333',  genotype => 'G|G',  population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'},
+ ]};
+ 
+   my $pop_genos_json = json_GET("$base/$id?population_genotypes=1", "Population_genotype info");
+   eq_or_diff($pop_genos_json, $expected_pop_genos, "Returning population_genotype information");
+
+my $post_data = '{ "ids" : ["rs142276873","rs67521280"]}';
+my $expected_result = { rs142276873 => $expected_variation_1, rs67521280 => $expected_variation_2 };
+
+is_json_POST($base,$post_data,$expected_result,"Try to POST list of variations");
 
 
 

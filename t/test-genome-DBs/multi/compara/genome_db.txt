@@ -1,62 +1,62 @@
-4	31033	takifugu_rubripes	FUGU4	1	2007-11-Ensembl	0	0	\N
-27	51511	ciona_savignyi	CSAV2.0	1	2006-04-Ensembl	0	0	\N
-31	9544	macaca_mulatta	MMUL_1	1	2006-01-Ensembl	0	0	\N
-33	9371	echinops_telfairi	TENREC	1	2006-01-Ensembl	0	0	\N
-36	69293	gasterosteus_aculeatus	BROADS1	1	2006-06-Ensembl	0	0	\N
-37	8090	oryzias_latipes	MEDAKA1	1	2006-05-Ensembl	0	0	\N
-43	9258	ornithorhynchus_anatinus	OANA5	1	2007-01-Ensembl	0	0	\N
-46	13616	monodelphis_domestica	BROADO5	1	2007-02-Ensembl	0	0	\N
-48	37347	tupaia_belangeri	TREESHREW	1	2006-10-Ensembl	0	0	\N
-49	9365	erinaceus_europaeus	HEDGEHOG	1	2006-10-Ensembl	0	0	\N
-55	42254	sorex_araneus	COMMON_SHREW1	1	2007-04-Ensembl	0	0	\N
-58	30608	microcebus_murinus	micMur1	1	2007-07-Ensembl	0	0	\N
-60	9601	pongo_abelii	PPYG2	1	2007-10-Ensembl	0	0	\N
-61	9796	equus_caballus	EquCab2	1	2007-09-Ensembl	0	0	\N
-63	\N	ancestral_sequences		1		0	0	\N
-65	99883	tetraodon_nigroviridis	TETRAODON8	1	2007-11-Ensembl	0	0	\N
-67	9978	ochotona_princeps	pika	1	2008-01-Ensembl	0	0	\N
-69	10141	cavia_porcellus	cavPor3	1	2008-03-Ensembl	0	0	\N
-78	9358	choloepus_hoffmanni	choHof1	1	2008-11-Ensembl	0	0	\N
-79	9813	procavia_capensis	proCap1	1	2008-11-Ensembl	0	0	\N
-80	9739	tursiops_truncatus	turTru1	1	2008-11-Ensembl	0	0	\N
-82	9478	tarsius_syrichta	tarSyr1	1	2008-11-Ensembl	0	0	\N
-83	10020	dipodomys_ordii	dipOrd1	1	2008-11-Ensembl	0	0	\N
-84	30538	vicugna_pacos	vicPac1	1	2008-11-Ensembl	0	0	\N
-85	132908	pteropus_vampyrus	pteVam1	1	2008-11-Ensembl	0	0	\N
-86	9361	dasypus_novemcinctus	dasNov2	1	2008-11-Ensembl	0	0	\N
-87	59729	taeniopygia_guttata	taeGut3.2.4	1	2008-08-Ensembl	0	0	\N
-90	9606	homo_sapiens	GRCh37	1	2010-07-Ensembl	0	0	\N
-91	9315	macropus_eugenii	Meug_1.0	1	2009-02-Ensembl	0	0	\N
-98	9785	loxodonta_africana	loxAfr3	1	2009-07-Ensembl	0	0	\N
-105	7227	drosophila_melanogaster	BDGP5	1	2012-04-FlyBase	0	0	\N
-108	9986	oryctolagus_cuniculus	oryCun2	1	2009-11-Ensembl	0	0	\N
-109	9646	ailuropoda_melanoleuca	ailMel1	1	2010-01-Ensembl	0	0	\N
-110	7955	danio_rerio	Zv9	1	2010-06-Ensembl	0	0	\N
-111	28377	anolis_carolinensis	AnoCar2.0	1	2010-09-Ensembl	0	0	\N
-112	9103	meleagris_gallopavo	UMD2	1	2010-09-Ensembl	0	0	\N
-115	61853	nomascus_leucogenys	Nleu1.0	1	2010-10-Ensembl	0	0	\N
-116	8364	xenopus_tropicalis	JGI_4.2	1	2010-09-Ensembl	0	0	\N
-117	9483	callithrix_jacchus	C_jacchus3.2.1	1	2010-02-Ensembl	0	0	\N
-118	59463	myotis_lucifugus	Myoluc2.0	1	2010-12-Ensembl	0	0	\N
-120	7757	petromyzon_marinus	Pmarinus_7.0	1	2011-02-Ensembl	0	0	\N
-121	9305	sarcophilus_harrisii	DEVIL7.0	1	2011-03-Ensembl	0	0	\N
-122	9913	bos_taurus	UMD3.1	1	2011-04-Ensembl	0	0	\N
-123	9595	gorilla_gorilla	gorGor3.1	1	2009-08-Ensembl	0	0	\N
-124	30611	otolemur_garnettii	OtoGar3	1	2011-06-Ensembl	0	0	\N
-125	9598	pan_troglodytes	CHIMP2.1.4	1	2011-05-Ensembl	0	0	\N
-126	8049	gadus_morhua	gadMor1	1	2010-01-Ensembl	0	0	\N
-127	4932	saccharomyces_cerevisiae	EF4	1	2011-09-SGD	0	0	\N
-128	7719	ciona_intestinalis	KH	1	2011-08-Ensembl	0	0	\N
-129	7897	latimeria_chalumnae	LatCha1	1	2011-09-Ensembl	0	0	\N
-130	8128	oreochromis_niloticus	Orenil1.0	1	2011-05-Ensembl	0	0	\N
-131	43179	ictidomys_tridecemlineatus	spetri2	1	2011-12-Ensembl	0	0	\N
-132	9823	sus_scrofa	Sscrofa10.2	1	2011-09-Ensembl	0	0	\N
-134	10090	mus_musculus	GRCm38	1	2012-01-Ensembl	0	0	\N
-135	9615	canis_familiaris	CanFam3.1	1	2011-11-Ensembl	0	0	\N
-136	13735	pelodiscus_sinensis	PelSin_1.0	1	2011-11-Ensembl	0	0	\N
-137	8083	xiphophorus_maculatus	Xipmac4.4.2	1	2012-01-Ensembl	0	0	\N
-138	9669	mustela_putorius_furo	MusPutFur1.0	1	2012-04-Ensembl	0	0	\N
-139	9685	felis_catus	Felis_catus_6.2	1	2011-12-Ensembl	0	0	\N
-140	10116	rattus_norvegicus	Rnor_5.0	1	2012-04-Ensembl	0	0	\N
-142	9031	gallus_gallus	Galgal4	1	2011-12-Ensembl	0	0	\N
-143	6239	caenorhabditis_elegans	WBcel235	1	2012-12-WormBase	0	0	\N
+4	31033	takifugu_rubripes	FUGU4	2007-11-Ensembl	0	0	\N	\N	80	\N
+27	51511	ciona_savignyi	CSAV2.0	2006-04-Ensembl	0	0	\N	\N	80	\N
+31	9544	macaca_mulatta	MMUL_1	2006-01-Ensembl	0	0	\N	\N	80	\N
+33	9371	echinops_telfairi	TENREC	2006-01-Ensembl	0	0	\N	\N	80	\N
+36	69293	gasterosteus_aculeatus	BROADS1	2006-06-Ensembl	0	0	\N	\N	80	\N
+37	8090	oryzias_latipes	MEDAKA1	2006-05-Ensembl	0	0	\N	\N	80	\N
+43	9258	ornithorhynchus_anatinus	OANA5	2007-01-Ensembl	0	0	\N	\N	80	\N
+46	13616	monodelphis_domestica	BROADO5	2007-02-Ensembl	0	0	\N	\N	80	\N
+48	37347	tupaia_belangeri	TREESHREW	2006-10-Ensembl	0	0	\N	\N	80	\N
+49	9365	erinaceus_europaeus	HEDGEHOG	2006-10-Ensembl	0	0	\N	\N	80	\N
+55	42254	sorex_araneus	COMMON_SHREW1	2007-04-Ensembl	0	0	\N	\N	80	\N
+58	30608	microcebus_murinus	micMur1	2007-07-Ensembl	0	0	\N	\N	80	\N
+60	9601	pongo_abelii	PPYG2	2007-10-Ensembl	0	0	\N	\N	80	\N
+61	9796	equus_caballus	EquCab2	2007-09-Ensembl	0	0	\N	\N	80	\N
+63	\N	ancestral_sequences			0	0	\N	\N	80	\N
+65	99883	tetraodon_nigroviridis	TETRAODON8	2007-11-Ensembl	0	0	\N	\N	80	\N
+67	9978	ochotona_princeps	pika	2008-01-Ensembl	0	0	\N	\N	80	\N
+69	10141	cavia_porcellus	cavPor3	2008-03-Ensembl	0	0	\N	\N	80	\N
+78	9358	choloepus_hoffmanni	choHof1	2008-11-Ensembl	0	0	\N	\N	80	\N
+79	9813	procavia_capensis	proCap1	2008-11-Ensembl	0	0	\N	\N	80	\N
+80	9739	tursiops_truncatus	turTru1	2008-11-Ensembl	0	0	\N	\N	80	\N
+82	9478	tarsius_syrichta	tarSyr1	2008-11-Ensembl	0	0	\N	\N	80	\N
+83	10020	dipodomys_ordii	dipOrd1	2008-11-Ensembl	0	0	\N	\N	80	\N
+84	30538	vicugna_pacos	vicPac1	2008-11-Ensembl	0	0	\N	\N	80	\N
+85	132908	pteropus_vampyrus	pteVam1	2008-11-Ensembl	0	0	\N	\N	80	\N
+86	9361	dasypus_novemcinctus	dasNov2	2008-11-Ensembl	0	0	\N	\N	80	\N
+87	59729	taeniopygia_guttata	taeGut3.2.4	2008-08-Ensembl	0	0	\N	\N	80	\N
+90	9606	homo_sapiens	GRCh37	2010-07-Ensembl	0	0	\N	\N	80	\N
+91	9315	macropus_eugenii	Meug_1.0	2009-02-Ensembl	0	0	\N	\N	80	\N
+98	9785	loxodonta_africana	loxAfr3	2009-07-Ensembl	0	0	\N	\N	80	\N
+105	7227	drosophila_melanogaster	BDGP5	2012-04-FlyBase	0	0	\N	\N	80	\N
+108	9986	oryctolagus_cuniculus	oryCun2	2009-11-Ensembl	0	0	\N	\N	80	\N
+109	9646	ailuropoda_melanoleuca	ailMel1	2010-01-Ensembl	0	0	\N	\N	80	\N
+110	7955	danio_rerio	Zv9	2010-06-Ensembl	0	0	\N	\N	80	\N
+111	28377	anolis_carolinensis	AnoCar2.0	2010-09-Ensembl	0	0	\N	\N	80	\N
+112	9103	meleagris_gallopavo	UMD2	2010-09-Ensembl	0	0	\N	\N	80	\N
+115	61853	nomascus_leucogenys	Nleu1.0	2010-10-Ensembl	0	0	\N	\N	80	\N
+116	8364	xenopus_tropicalis	JGI_4.2	2010-09-Ensembl	0	0	\N	\N	80	\N
+117	9483	callithrix_jacchus	C_jacchus3.2.1	2010-02-Ensembl	0	0	\N	\N	80	\N
+118	59463	myotis_lucifugus	Myoluc2.0	2010-12-Ensembl	0	0	\N	\N	80	\N
+120	7757	petromyzon_marinus	Pmarinus_7.0	2011-02-Ensembl	0	0	\N	\N	80	\N
+121	9305	sarcophilus_harrisii	DEVIL7.0	2011-03-Ensembl	0	0	\N	\N	80	\N
+122	9913	bos_taurus	UMD3.1	2011-04-Ensembl	0	0	\N	\N	80	\N
+123	9595	gorilla_gorilla	gorGor3.1	2009-08-Ensembl	0	0	\N	\N	80	\N
+124	30611	otolemur_garnettii	OtoGar3	2011-06-Ensembl	0	0	\N	\N	80	\N
+125	9598	pan_troglodytes	CHIMP2.1.4	2011-05-Ensembl	0	0	\N	\N	80	\N
+126	8049	gadus_morhua	gadMor1	2010-01-Ensembl	0	0	\N	\N	80	\N
+127	4932	saccharomyces_cerevisiae	EF4	2011-09-SGD	0	0	\N	\N	80	\N
+128	7719	ciona_intestinalis	KH	2011-08-Ensembl	0	0	\N	\N	80	\N
+129	7897	latimeria_chalumnae	LatCha1	2011-09-Ensembl	0	0	\N	\N	80	\N
+130	8128	oreochromis_niloticus	Orenil1.0	2011-05-Ensembl	0	0	\N	\N	80	\N
+131	43179	ictidomys_tridecemlineatus	spetri2	2011-12-Ensembl	0	0	\N	\N	80	\N
+132	9823	sus_scrofa	Sscrofa10.2	2011-09-Ensembl	0	0	\N	\N	80	\N
+134	10090	mus_musculus	GRCm38	2012-01-Ensembl	0	0	\N	\N	80	\N
+135	9615	canis_familiaris	CanFam3.1	2011-11-Ensembl	0	0	\N	\N	80	\N
+136	13735	pelodiscus_sinensis	PelSin_1.0	2011-11-Ensembl	0	0	\N	\N	80	\N
+137	8083	xiphophorus_maculatus	Xipmac4.4.2	2012-01-Ensembl	0	0	\N	\N	80	\N
+138	9669	mustela_putorius_furo	MusPutFur1.0	2012-04-Ensembl	0	0	\N	\N	80	\N
+139	9685	felis_catus	Felis_catus_6.2	2011-12-Ensembl	0	0	\N	\N	80	\N
+140	10116	rattus_norvegicus	Rnor_5.0	2012-04-Ensembl	0	0	\N	\N	80	\N
+142	9031	gallus_gallus	Galgal4	2011-12-Ensembl	0	0	\N	\N	80	\N
+143	6239	caenorhabditis_elegans	WBcel235	2012-12-WormBase	0	0	\N	\N	80	\N

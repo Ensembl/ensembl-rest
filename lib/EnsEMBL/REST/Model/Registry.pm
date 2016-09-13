@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -67,6 +68,9 @@ has 'reconnect_when_lost' => ( is => 'ro', isa => 'Bool' );
 has 'no_caching' => ( is => 'ro', isa => 'Bool' );
 has 'connection_sharing' => ( is => 'ro', isa => 'Bool' );
 has 'no_version_check' => ( is => 'ro', isa => 'Bool' );
+
+# Preload settings
+has 'preload' => ( is => 'ro', isa => 'Bool', default => 1 );
 
 has 'compara_cache' => ( is => 'ro', isa => 'HashRef[Str]', lazy => 1, default => sub { {} });
 
@@ -268,12 +272,10 @@ sub _build_species_info {
   #Aliases is backwards i.e. alias -> species
   my %alias_lookup;
   while (my ($alias, $species) = each %{ $Bio::EnsEMBL::Registry::registry_register{_ALIAS} }) {
-    if($alias ne $species) {
       push(@{$alias_lookup{$species}}, $alias); # iterate through the alias,species pairs & reverse
-    }
   }
   
-  my @all_dbadaptors = @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
+  my @all_dbadaptors = grep {$_->dbc->dbname ne 'ncbi_taxonomy'} @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
   my @core_dbadaptors;
   my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup);
   my %processed_db;
@@ -283,7 +285,7 @@ sub _build_species_info {
     my $species_lc = ($species);
     push(@{$groups_lookup{$species_lc}}, $group);
     
-    if($group eq 'core') {
+    if($group eq 'core' && $species !~ /Ancestral/) {
       push(@core_dbadaptors, $dba);
       my $dbc = $dba->dbc();
       my $db_key = sprintf(
@@ -294,10 +296,10 @@ sub _build_species_info {
       if(! exists $processed_db{$db_key}) {
         my $mc = $dba->get_MetaContainer();
         my $schema_version = $mc->get_schema_version() * 1;
-        $release_lookup{$species} = $schema_version;
         
-        if(!$dba->is_multispecies()) {
+        if(!$dba->is_multispecies() && $species !~ /Ancestral/) {
           my $csa = $dba->get_CoordSystemAdaptor();
+          $release_lookup{$species} = $schema_version;
           $division_lookup{$species} = $mc->get_division() || 'Ensembl';
           $common_lookup{$species} = $mc->get_common_name();
           $taxon_lookup{$species} = $mc->get_taxonomy_id();
@@ -323,6 +325,7 @@ sub _build_species_info {
               $division_lookup{$row->[0]} = $row->[1];
               $display_lookup{$row->[0]} = $row->[2];
               $taxon_lookup{$row->[0]} = $row->[3];
+              $release_lookup{$row->[0]} = $schema_version;
               return;
             }
           );
@@ -362,10 +365,18 @@ sub _build_species_info {
   foreach my $dba (@core_dbadaptors) {
     my $species = $dba->species();
     my $species_lc = ($species);
+    my $aliases_to_skip = {
+        $species => 1,
+    };
+    if ($assembly_lookup{$species}) {   # Species like "Ancestral sequences" are not in %assembly_lookup
+        # Automatically added by the Compara API when the Compara objects are preloaded.
+        $aliases_to_skip->{ lc "$species $assembly_lookup{$species}" } = 1;
+    }
+    my $good_aliases = [grep {!$aliases_to_skip->{$_}} @{$alias_lookup{$species} || []}];
     my $info = {
       name => $species,
       release => $release_lookup{$species},
-      aliases => $alias_lookup{$species} || [],
+      aliases => $good_aliases,
       groups  => $groups_lookup{$species},
       division => $division_lookup{$species},
       common_name => $common_lookup{$species},
@@ -404,7 +415,7 @@ sub get_compara_name_for_species {
     my $mc = $self->get_adaptor($species, 'core', 'metacontainer');
     my $compara_group = 'multi';
     my $division = $mc->single_value_by_key('species.division');
-    if($division) {
+    if($division and $division ne 'Ensembl') {
       $division =~ s/^Ensembl//;
       $compara_group = lc($division);
     }
@@ -474,7 +485,20 @@ sub get_alias {
   return;
 }
 
-__PACKAGE__->meta->make_immutable;
+after 'BUILD' => sub {
+  my ($self) = @_;
+  if($self->preload()) {
+    my $log = $self->log();
+    $log->info('Triggering preload of the registry');
+    $self->_registry();
+    $_->get_MethodLinkSpeciesSetAdaptor()->fetch_all() for @{ $self->get_all_DBAdaptors('compara') };
+    $self->_build_species_info();
+    $log->info('Done');
+  }
+  return;
+};
+
+__PACKAGE__->meta->make_immutable();
 
 1;
 

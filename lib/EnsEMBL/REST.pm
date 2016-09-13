@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,6 +31,8 @@ The EnsEMBL Group - http://www.ensembl.org/Help/Contact
 
 package EnsEMBL::REST;
 use Moose;
+use HTML::Entities;
+use URI::Escape qw{ uri_escape_utf8 };
 use namespace::autoclean;
 use Log::Log4perl::Catalyst;
 use EnsEMBL::REST::Types;
@@ -61,7 +64,7 @@ use Catalyst qw/
 /;
 
 
-our $VERSION = '3.0.0';
+our $VERSION = '4.6';
 
 # Configure the application.
 #
@@ -95,6 +98,10 @@ else {
 }
 __PACKAGE__->setup();
 
+__PACKAGE__->config->{'custom-error-message'}->{'view-name'}         = 'TT';
+__PACKAGE__->config->{'custom-error-message'}->{'error-template'}    = 'error.tt';
+
+
 #HACK but it works
 sub turn_on_config_serialisers {
   my ($class, $package) = @_;
@@ -106,7 +113,8 @@ sub turn_on_config_serialisers {
     );
   }
 
-  if($class->config->{html}) {
+## Only add a default for text/html if it is not already set by the controller
+  if(!$package->config->{map}->{'text/html'}) {
     $package->config(default => 'text/html');
     $package->config(
       map => {
@@ -117,5 +125,43 @@ sub turn_on_config_serialisers {
 
   return;
 }
+
+
+## Intercept default error page
+## Page not found is dealt with in Root.pm, this deals with mistyped urls and replaces the default 'Please come back later' page
+sub finalize_error {
+  my $c = shift;
+  my $config = $c->config->{'custom-error-message'};
+  
+  # in debug mode return the original "page" 
+  if ( $c->debug ) {
+    $c->maybe::next::method;
+    return;
+  }
+  
+  # create error string out of error array
+  my $error = join '<br/> ', map { encode_entities($_) } @{ $c->error };
+  $error ||= 'No output';
+
+  # render the template
+  my $action_name = $c->action->reverse;
+  $c->stash->{'finalize_error'} = $action_name.': '.$error;
+  $c->response->content_type(
+    $config->{'content-type'} || 'text/html; charset=utf-8' );
+  my $view_name = $config->{'view-name'} || 'TT';
+  eval {
+    $c->response->body($c->view($view_name)->render($c,
+      $config->{'error-template'} || 'error.tt' ));
+  };
+  if ($@) {
+    $c->log->error($@);
+    $c->maybe::next::method;
+  }
+  
+  my $response_status = $config->{'response-status'};
+  $response_status = 500 if not defined $response_status;
+  $c->response->status($response_status);
+}
+
 
 1;

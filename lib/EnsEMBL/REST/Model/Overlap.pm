@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,9 +21,9 @@ package EnsEMBL::REST::Model::Overlap;
 
 use Moose;
 extends 'Catalyst::Model';
-
-use EnsEMBL::REST::EnsemblModel::ExonTranscript;
-use EnsEMBL::REST::EnsemblModel::CDS;
+use Catalyst::Exception;
+use Scalar::Util qw/weaken/;
+use Bio::EnsEMBL::Feature;
 use EnsEMBL::REST::EnsemblModel::TranscriptVariation;
 use EnsEMBL::REST::EnsemblModel::TranslationSpliceSiteOverlap;
 use EnsEMBL::REST::EnsemblModel::TranslationExon;
@@ -33,7 +34,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory  motif chipseq array_probe band/
   };
 });
 
@@ -43,25 +44,27 @@ has 'allowed_translation_features' => ( isa => 'HashRef', is => 'ro', lazy => 1,
   };
 });
 
-with 'Catalyst::Component::InstancePerContext';
+has 'context' => (is => 'ro', weak_ref => 1);
 
-has 'context' => (is => 'ro');
+with 'Catalyst::Component::InstancePerContext', 'EnsEMBL::REST::Role::Content';
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, %$self, @args });
 }
 
 sub fetch_features {
   my ($self) = @_;
-  
+
   my $c = $self->context();
   my $is_gff3 = $self->is_content_type($c, 'text/x-gff3');
   my $is_bed = $self->is_content_type($c, 'text/x-bed');
-  
+  my $species = $c->stash->{species};
+
   my $allowed_features = $self->allowed_features();
   my $feature = $c->request->parameters->{feature};
-  $c->go('ReturnError', 'custom', ["No feature given. Please specify a feature to retrieve from this service"]) if ! $feature;
+  Catalyst::Exception->throw("No feature given. Please specify a feature to retrieve from this service") if ! $feature;
   my @features = map {lc($_)} ((ref($feature) eq 'ARRAY') ? @{$feature} : ($feature));
 
   # normalise cdna & cds since they're the same for bed. the processed_feature_types hash will deal with this
@@ -72,15 +75,19 @@ sub fetch_features {
 
   # record when we've processed a feature type already
   my %processed_feature_types;
-  
+
   my $slice = $c->stash()->{slice};
+  my $vfa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
+  if ($vfa) {
+    $vfa->db->include_failed_variations(0);
+  }
   my @final_features;
   foreach my $feature_type (@features) {
     next if exists $processed_feature_types{$feature_type};
     next if $feature_type eq 'none';
     my $allowed = $allowed_features->{$feature_type};
-    $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
-    # my $objects = $self->$feature_type($slice);
+
+    Catalyst::Exception->throw("The feature type $feature_type is not understood") if ! $allowed;
     my $load_exons = ($feature_type eq 'transcript' && $is_bed) ? 1 : 0;
     my $objects = $self->_trim_features($self->$feature_type($slice, $load_exons));
     if($is_gff3 || $is_bed) {
@@ -91,7 +98,7 @@ sub fetch_features {
     }
     $processed_feature_types{$feature_type} = 1;
   }
-  
+
   return \@final_features;
 }
 
@@ -120,7 +127,7 @@ sub fetch_protein_features {
     next if exists $processed_feature_types{$feature_type};
     $feature_type = lc($feature_type);
     my $allowed = $allowed_features->{$feature_type};
-    $c->go('ReturnError', 'custom', ["The feature type $feature_type is not understood"]) if ! $allowed;
+    Catalyst::Exception->throw("The feature type $feature_type is not understood") if ! $allowed;
     my $objects = $self->$feature_type($translation);
     if($is_gff3 || $is_bed) {
       push(@final_features, @{$objects});
@@ -147,7 +154,7 @@ sub fetch_feature {
 }
 
 #Have to do this to force JSON encoding to encode numerics as numerics
-my @KNOWN_NUMERICS = qw( start end strand );
+my @KNOWN_NUMERICS = qw( start end strand version );
 
 sub to_hash {
   my ($self, $features, $feature_type) = @_;
@@ -158,20 +165,31 @@ sub to_hash {
       my $v = $hash->{$key};
       $hash->{$key} = ($v*1) if defined $v;
     }
+    if ($hash->{Name}) {
+      $hash->{external_name} = $hash->{Name};
+      delete $hash->{Name};
+    }
     $hash->{feature_type} = $feature_type;
     push(@hashed, $hash);
   }
   return \@hashed;
 }
 
+sub band {
+  my ($self, $slice) = @_;
+  if ($slice->is_chromosome) {
+    return $slice->get_all_KaryotypeBands();
+  } else {
+    return;
+  }
+}
+
 sub gene {
   my ($self, $slice) = @_;
   my $c = $self->context();
-  my ($dbtype, $load_transcripts, $source, $biotype) = 
+  my ($dbtype, $load_transcripts, $source, $biotype) =
     (undef, undef, $c->request->parameters->{source}, $c->request->parameters->{biotype});
   return $slice->get_all_Genes($self->_get_logic_dbtype(), $load_transcripts, $source, $biotype);
-  # my $genes = $slice->get_all_Genes($self->_get_logic_dbtype(), $load_transcripts, $source, $biotype);
-  # return [ grep { $self->_trim_feature($_) } ] @{$genes};
 }
 
 sub transcript {
@@ -189,13 +207,25 @@ sub transcript {
 sub cds {
   my ($self, $slice, $load_exons) = @_;
   my $transcripts = $self->transcript($slice, 0);
-  return EnsEMBL::REST::EnsemblModel::CDS->new_from_Transcripts($transcripts);
+  my @cds;
+  foreach my $transcript (@$transcripts) {
+    push (@cds, @{ $transcript->get_all_CDS });
+  }
+  return \@cds;
 }
 
 sub exon {
   my ($self, $slice) = @_;
-  my $exons = $slice->get_all_Exons();
-  return EnsEMBL::REST::EnsemblModel::ExonTranscript->build_all_from_Exons($exons);
+  my $transcripts = $self->transcript($slice, 0);
+  my @exons;
+  foreach my $transcript (@$transcripts) {
+    foreach my $exon (@{ $transcript->get_all_ExonTranscripts}) {
+      if (($slice->start < $exon->seq_region_start && $exon->seq_region_start < $slice->end) || ($slice->start < $exon->seq_region_end && $exon->seq_region_end < $slice->end)) {
+        push (@exons, $exon);
+      }
+    }
+  }
+  return \@exons;
 }
 
 sub repeat {
@@ -220,6 +250,11 @@ sub transcript_variation {
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+
+  my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
+  my $vfs = $transcript->feature_Slice->get_all_VariationFeatures();
+  $c->stash->{_cached_vfs} = $vfs;
+
   my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
     $transcript_variants = $tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms);
@@ -239,12 +274,21 @@ sub somatic_transcript_variation {
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+
+  my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
+  my $vfs = $transcript->feature_Slice->get_all_somatic_VariationFeatures();
+  $c->stash->{_cached_vfs} = $vfs;
+
   my $so_terms = $self->_get_SO_terms();
   if (scalar(@{$so_terms}) > 0) {
-    $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms);
-  } 
+    # HACK FOR DATA BUG IN VARIATION DB
+    $transcript_variants = [@{$tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript], $so_terms)}, @{$tva->fetch_all_by_Transcripts_SO_terms([$transcript], $so_terms)}];
+    # $transcript_variants = $tva->fetch_all_somatic_by_Transcripts_SO_terms([$transcript]);
+  }
   else {
-    $transcript_variants = $tva->fetch_all_somatic_by_Transcripts([$transcript]);
+    # HACK FOR DATA BUG IN VARIATION DB
+    $transcript_variants = [@{$tva->fetch_all_somatic_by_Transcripts([$transcript])}, @{$tva->fetch_all_by_Transcripts([$transcript])}];
+    # $transcript_variants = $tva->fetch_all_somatic_by_Transcripts([$transcript]);
   }
   return $self->_filter_transcript_variation($transcript_variants);
 }
@@ -252,10 +296,19 @@ sub somatic_transcript_variation {
 sub _filter_transcript_variation {
   my ($self, $transcript_variants) = @_;
   my $type = $self->context->request->parameters->{type};
+  my %cached_vfs = map {$_->dbID => $_} @{$self->context->stash->{_cached_vfs} || []};
   my @vfs;
+
   foreach my $tv (@{$transcript_variants}) {
+    # filter out up/downstream TVs
+    next unless $tv->cds_start || $tv->cds_end;
+
     if ($type && $tv->display_consequence !~ /$type/) { next ; }
-    my $vf = $tv->variation_feature;
+
+    my $vf = $cached_vfs{$tv->{_variation_feature_id}};
+    next unless $vf;
+    $tv->variation_feature($vf);
+
     my $blessed_vf = EnsEMBL::REST::EnsemblModel::TranscriptVariation->new_from_variation_feature($vf, $tv);
     push(@vfs, $blessed_vf);
   }
@@ -274,7 +327,18 @@ sub translation_exon {
 
 sub variation {
   my ($self, $slice) = @_;
-  return $slice->get_all_VariationFeatures($self->_get_SO_terms());
+
+  my $c = $self->context();
+
+  if( $c->request->parameters->{variant_set}){
+
+    my $set = $self->_get_VariationSet();
+    my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
+    return $vfa->fetch_all_by_Slice_VariationSet_SO_terms($slice, $set, $self->_get_SO_terms());
+  }
+  else{
+    return $slice->get_all_VariationFeatures($self->_get_SO_terms());
+  }
 }
 
 sub structural_variation {
@@ -306,20 +370,109 @@ sub constrained {
   my $species_set = $c->request->parameters->{species_set} || 'mammals';
   my $compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
   my $mlssa = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'MethodLinkSpeciesSet');
-  $c->go('ReturnError', 'custom', ["No adaptor found for compara Multi and adaptor MethodLinkSpeciesSet"]) if ! $mlssa;
+  Catalyst::Exception->throw("No adaptor found for compara Multi and adaptor MethodLinkSpeciesSet") if ! $mlssa;
   my $method_list = $mlssa->fetch_by_method_link_type_species_set_name('GERP_CONSTRAINED_ELEMENT', $species_set);
   my $cea = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'ConstrainedElement');
-  $c->go('ReturnError', 'custom', ["No adaptor found for compara Multi and adaptor ConstrainedElement"]) if ! $cea;
+  Catalyst::Exception->throw("No adaptor found for compara Multi and adaptor ConstrainedElement") if ! $cea;
   return $cea->fetch_all_by_MethodLinkSpeciesSet_Slice($method_list, $slice);
 }
 
+
 sub regulatory {
   my ($self, $slice) = @_;
-  my $c = $self->context();
+  my $c          = $self->context();
+  my $species    = $c->stash->{species};
+  my $rfa = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature');
+  my $rfs = $rfa->fetch_all_by_Slice($slice);
+  return($rfs);
+}
+
+# Removed for e85 as we currently use different methods for different species
+# Regulation will streamline it for e86 and reintroduce
+
+#sub segmentation {
+#  my $self       = shift;
+#  my $slice      = shift;
+#  my $c          = $self->context();
+#  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
+#  my $species    = $c->stash->{species};
+#  my @fsets = ();
+#
+#  if(scalar @ctypes > 0){
+#    foreach my $ctype_name (@ctypes) {
+#      push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('Segmentation:'.$ctype_name)
+#        || Catalyst::Exception->throw("No $species segmentation FeatureSet available with name: Segmentation:$ctype_name");
+#    }
+#  }
+#  else{
+#    Catalyst::Exception->throw("Must provide a cell_type parameter for a segmentation overlap query");
+#  }
+#
+#  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'SegmentationFeature')->fetch_all_by_Slice_FeatureSets($slice, \@fsets);
+#}
+
+
+sub motif {
+  my $self    = shift;
+  my $slice   = shift;
+  my $c       = $self->context;
   my $species = $c->stash->{species};
-  my $rfa = $c->model('Registry')->get_adaptor( $species, 'funcgen', 'regulatoryfeature');
-  $c->go('ReturnError', 'custom', ["No adaptor found for species $species, object regulatoryfeature and db funcgen"]) if ! $rfa;
-  return $rfa->fetch_all_by_Slice($slice);
+  my $mfa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'motiffeature') ||
+   Catalyst::Exception->throw("No adaptor found for species $species, object MotifFeature and DB funcgen");
+  return $mfa->fetch_all_by_Slice($slice);
+}
+
+sub chipseq {
+  my $self    = shift;
+  my $slice   = shift;
+  my $c       = $self->context;
+  my $species = $c->stash->{species};
+  my $params = {constraints => {}};
+
+  my @ctype_names = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
+  if (scalar @ctype_names > 0) {
+    my $cta        = $c->model('Registry')->get_adaptor($species, 'funcgen', 'celltype') ||
+     Catalyst::Exception->throw("No adaptor found for species $species, object CellType and DB funcgen");
+    my @ctypes     = map {$cta->fetch_by_name($_)} @ctype_names;
+    $params->{constraints}->{cell_types} = \@ctypes;
+  }
+
+  my @antibodies  = map { lc($_) } @{wrap_array($c->request->parameters->{antibody})};
+  if (scalar @antibodies > 0) {
+    my $fta        = $c->model('Registry')->get_adaptor($species, 'funcgen', 'featuretype');
+    my @ftypes     = ();
+    foreach my $antibody (@antibodies) {
+      push @ftypes, @{$fta->fetch_all_by_name($antibody)};
+      print scalar @ftypes . "\n";
+    }
+    $params->{constraints}->{feature_types} = \@ftypes;
+  }
+
+  my $afa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'annotatedfeature');
+  my $constraint = $afa->compose_constraint_query($params);
+  my $afeats     = $afa->fetch_all_by_Slice_constraint($slice, $constraint);
+  $afa->reset_true_tables;
+  return $afeats;
+}
+
+sub array_probe {
+  my $self    = shift;
+  my $slice   = shift;
+  my $c       = $self->context;
+  my $species = $c->stash->{species};
+  my @array_names  = map {lc($_)} @{wrap_array($c->request->parameters->{array})};
+  my $pfa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'probefeature') ||
+   Catalyst::Exception->throw("No adaptor found for species $species, object ProbeFeature and DB funcgen");
+
+  if (scalar @array_names > 0) {
+    my $aa      = $c->model('Registry')->get_adaptor($species, 'funcgen', 'array') ||
+     Catalyst::Exception->throw("No adaptor found for species $species, object Array and DB funcgen");
+    my @arrays  = map {$aa->fetch_by_name_vendor($_) } @array_names;
+    return $pfa->fetch_all_by_Slice_Arrays($slice, \@arrays);
+  }
+  else {
+    return $pfa->fetch_all_by_Slice($slice);
+  }
 }
 
 sub simple {
@@ -337,23 +490,24 @@ sub misc {
   return $slice->get_all_MiscFeatures($misc_set, $db_type);
 }
 
+
 sub _get_SO_terms {
   my ($self) = @_;
   my $c = $self->context();
   my $so_term = $c->request->parameters->{so_term};
-  my $terms = (! defined $so_term)  ? [] 
-                                    : (ref($so_term) eq 'ARRAY') 
-                                    ? $so_term 
+  my $terms = (! defined $so_term)  ? []
+                                    : (ref($so_term) eq 'ARRAY')
+                                    ? $so_term
                                     : [$so_term];
   my @final_terms;
   foreach my $term (@{$terms}) {
     if($term =~ /^SO\:/) {
       my $ontology_term = $c->model('Lookup')->ontology_accession_to_OntologyTerm($term);
       if(!$ontology_term) {
-        $c->go('ReturnError', 'custom', ["The SO accession '${term}' could not be found in our ontology database"]);
+        Catalyst::Exception->throw("The SO accession '${term}' could not be found in our ontology database");
       }
       if ($ontology_term->is_obsolete) {
-        $c->go('ReturnError', 'custom', ["The SO accession '${term}' is obsolete"]);
+        Catalyst::Exception->throw("The SO accession '${term}' is obsolete");
       }
       push(@final_terms, $ontology_term->name());
     }
@@ -362,6 +516,23 @@ sub _get_SO_terms {
     }
   }
   return \@final_terms;
+}
+
+## look up variation set by short name
+sub _get_VariationSet{
+  my ($self) = @_;
+
+  my $c =  $self->context;
+  my $short_set_name = $c->request->parameters->{variant_set};
+
+  ## check set exists
+  my $vsa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationset');
+  my $set = $vsa->fetch_by_short_name($short_set_name);
+
+  if(!ref($set) || !$set->isa('Bio::EnsEMBL::Variation::VariationSet')) {
+    Catalyst::Exception->throw("No VariationSet found with short name: $short_set_name");
+  }
+  return $set;
 }
 
 sub _get_logic_dbtype {
@@ -375,31 +546,31 @@ sub _get_logic_dbtype {
 sub _trim_features {
   my ($self, $features) = @_;
   my $c = $self->context();
-  my ($trim_upstream, $trim_downstream) = 
-    ($c->request->parameters->{trim_upstream}, 
+  my ($trim_upstream, $trim_downstream) =
+    ($c->request->parameters->{trim_upstream},
      $c->request->parameters->{trim_downstream});
 
   # skip if not interested in trimming
   return $features
     unless $trim_upstream or $trim_downstream;
- 
+
   my $filtered_features;
   my $slice = $c->stash()->{slice};
-  my ($sstart, $send, $strand) = 
+  my ($sstart, $send, $strand) =
     ($slice->start, $slice->end, $slice->strand);
   my $circular = $slice->is_circular();
 
   foreach my $feature (@{$features}) {
     my $trim = 0;
-    my ($start, $end) = 
+    my ($start, $end) =
       ($feature->seq_region_start,
        $feature->seq_region_end);
 
     # customosised checks in case of
     # circular chrmosomes
-    next if $circular and 
-      $self->has_to_be_trimmed_in_circ_chr($feature, 
-					   $trim_upstream, 
+    next if $circular and
+      $self->has_to_be_trimmed_in_circ_chr($feature,
+					   $trim_upstream,
 					   $trim_downstream);
 
     if ($trim_upstream and $trim_downstream) {
@@ -420,7 +591,7 @@ sub _trim_features {
 
     push @{$filtered_features}, $feature;
   }
-  
+
   return $filtered_features;
 }
 
@@ -429,18 +600,18 @@ sub _has_to_be_trimmed_in_circ_chr {
 
   my $slice = $self->context()->stash()->{slice};
 
-  my ($sstart, $send, $strand) = 
+  my ($sstart, $send, $strand) =
     ($slice->start, $slice->end, $slice->strand);
   my $seq_region_len = $slice->seq_region_length();
 
-  my ($seq_region_start, $seq_region_end) = 
+  my ($seq_region_start, $seq_region_end) =
     ($feature->seq_region_start,
      $feature->seq_region_end);
 
   my $trim = 0;
   my ($start, $end);
 
-  if ($strand == 1) { # Positive strand		
+  if ($strand == 1) { # Positive strand
     $start = $seq_region_start - $sstart + 1;
     $end   = $seq_region_end - $sstart + 1;
 
@@ -453,7 +624,7 @@ sub _has_to_be_trimmed_in_circ_chr {
 
       if ($start > $end) {
 	# Looking at a feature overlapping the chromsome origin.
-	if ($end > $sstart) { 
+	if ($end > $sstart) {
 	  # Looking at the region in the beginning of the chromosome.
 	  $start -= $seq_region_len;
 	}
@@ -469,7 +640,7 @@ sub _has_to_be_trimmed_in_circ_chr {
 	}
       }
     }
-    
+
   } else { # Negative strand
     $start = $send - $seq_region_end + 1;
     $end = $send - $seq_region_start + 1;
@@ -478,7 +649,7 @@ sub _has_to_be_trimmed_in_circ_chr {
       if ($sstart > $send) { # slice spans origin or replication
 	if ($seq_region_start >= $sstart) {
 	  $end += $seq_region_len;
-	  $start += $seq_region_len 
+	  $start += $seq_region_len
 	    if $seq_region_end > $sstart;
 
 	} elsif ($seq_region_start <= $send) {
@@ -526,11 +697,24 @@ sub _has_to_be_trimmed_in_circ_chr {
       $trim = 1 if $start < $0;
     }
   }
-  
+
   return $trim;
 }
 
-with 'EnsEMBL::REST::Role::Content';
+no warnings 'redefine';
+
+sub Bio::EnsEMBL::Feature::summary_as_hash {
+  my $self = shift;
+  my %summary;
+  $summary{'id'} = $self->display_id;
+  $summary{'version'} = $self->version() if $self->version();
+  $summary{'start'} = $self->seq_region_start;
+  $summary{'end'} = $self->seq_region_end;
+  $summary{'strand'} = $self->strand;
+  $summary{'seq_region_name'} = $self->seq_region_name;
+  $summary{'assembly_name'} = $self->slice->coord_system->version() if $self->slice();
+  return \%summary;
+}
 
 __PACKAGE__->meta->make_immutable;
 

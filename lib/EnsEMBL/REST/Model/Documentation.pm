@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,6 +31,7 @@ use Hash::Merge qw/merge/;
 use Log::Log4perl;
 use JSON;
 use YAML qw//;
+use Scalar::Util qw/weaken/;
 use EnsEMBL::REST::EnsemblModel::Endpoint;
 
 extends 'Catalyst::Model';
@@ -40,6 +42,7 @@ has '_parent' => (is => 'ro', weak_ref => 1);
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
+  weaken($c);
   return $self->new({ context => $c, _parent => $self, %$self, @args });
 }
 
@@ -70,6 +73,10 @@ sub merged_config {
       while(my ($k, $v) = each %{$conf_hash}) {
         $conf_hash->{$k}->{key} = $k;
         $v->{id} = $k;
+        my $config_name = 'Controller::' . $conf_hash->{$k}->{group};
+        my $controller_config = EnsEMBL::REST->config()->{$config_name};
+        $v->{post_size} = $controller_config->{max_post_size} if defined $controller_config->{max_post_size};
+        $v->{slice_length} = $controller_config->{max_slice_length} if defined $controller_config->{max_slice_length};
       }
       $merged_cfg = merge($conf_hash, $merged_cfg);
     }
@@ -107,17 +114,19 @@ sub enrich {
       }
     }
 
+    my $endpoint_obj = EnsEMBL::REST::EnsemblModel::Endpoint->new(%{$endpoint});
+
     #Build each output example
-    foreach my $id ( keys %{ $endpoint->{examples} } ) {
-        my $eg = $endpoint->{examples}->{$id};
+    foreach my $id ( keys %{ $endpoint_obj->{examples} } ) {
+        my $eg = $endpoint_obj->{examples}->{$id};
         next if $eg->{enriched};
         next if $eg->{disable};
         $eg->{id}  = $id;
-        $self->_request_example($endpoint, $eg);
+        $self->_request_example($endpoint_obj, $eg);
         $eg->{enriched} = 1;
     }
 
-    return EnsEMBL::REST::EnsemblModel::Endpoint->new(%{$endpoint});
+    return $endpoint_obj;
 }
 
 sub _request_example {
@@ -131,9 +140,11 @@ sub _request_example {
   $eg->{uri} = $path . ( join '/', @{$capture} );
   my $param_string = $self->_hash_to_params($params);
   $eg->{true_root_uri} = $eg->{uri};
-  $eg->{uri} = $eg->{uri} .'?'. $param_string;
+  if(! $endpoint->is_post()) {
+    $eg->{uri} = $eg->{uri} .'?'. $param_string;
+  }
 
-  my ($example_host, $example_uri) = $self->_url($eg, $c);
+  my ($example_host, $example_uri) = $self->_url($endpoint, $eg, $c);
   $eg->{example}->{host} = $example_host;
   $eg->{example}->{uri} = $example_uri;
 
@@ -180,15 +191,17 @@ sub _find_conf {
 }
 
 sub _url {
-  my ($self, $eg) = @_;
+  my ($self, $endpoint, $eg) = @_;
   my $c = $self->context();
   my $host = $c->req->base;
   $host =~ s/\/$//;
   my $uri = $eg->{true_root_uri};
-  my $req_params = $eg->{params} || {};
-  $req_params->{'content-type'} = $eg->{content};
-  my $params = $self->_hash_to_params($req_params);
-  $uri .= '?'.$params;
+  if(! $endpoint->is_post()) {
+    my $req_params = $eg->{params} || {};
+    $req_params->{'content-type'} = $eg->{content};
+    my $params = $self->_hash_to_params($req_params);
+    $uri .= '?'.$params;
+  }
   return ($host, $uri);
 }
 
