@@ -36,6 +36,11 @@ APP_HOME=$(cd $SCRIPT_DIR/../../ && pwd)
 # Library path work
 for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl ensembl-io ensembl-hdf5; do
   PERL5LIB=$ENS_GIT_ROOT_DIR/$ensdir/modules:$PERL5LIB
+  if [ ! -d "$ensdir" ];
+  then
+    echo "One of your paths does not exist: "
+    echo "ERROR: $ensdir "
+  fi
 done
 PERL5LIB=$APP_HOME/../bioperl-live:$PERL5LIB
 PERL5LIB=$APP_HOME/../Bio-HTS/blib/arch:$APP_HOME/../Bio-HTS/blib/lib:$PERL5LIB
