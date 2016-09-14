@@ -77,9 +77,7 @@ has '_eqtl_adaptors' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_
 
 has 'compara_cache' => ( is => 'ro', isa => 'HashRef[Str]', lazy => 1, default => sub { {} });
 
-has '_registry' => ( is => 'ro', lazy => 1, builder => '_load_registry');
-
-sub _load_registry {
+has '_registry' => ( is => 'ro', lazy => 1, default => sub {
   my ($self) = @_;
   my $log = $self->log();
   $log->info('Loading the registry model object');
@@ -126,7 +124,7 @@ sub _load_registry {
   $self->_set_connection_policies($class);
   return $class;
 
-}
+});
 has '_lookup' => ( is => 'rw', lazy => 1, builder => '_build_lookup');
 
 has '_species_info' => ( isa => 'ArrayRef', is => 'ro', lazy => 1, builder => '_build_species_info' );
