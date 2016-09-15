@@ -82,3 +82,5 @@
 82	\N	patch	patch_84_85_g.sql|allow the column description to store more text in the source table
 83	\N	patch	patch_85_86_a.sql|schema version
 84	\N	patch	patch_84_85_b.sql|add qualifier & index to phenotype_onology_accession
+85	\N	patch	patch_85_86_b.sql|add qualifier & index to phenotype_onology_accession
+86	\N	patch	patch_85_86_c.sql|add index on study.external_reference
