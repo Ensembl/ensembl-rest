@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -357,6 +358,20 @@ sub get_id_POST {
   $self->_give_POST_to_VEP($c,\@ids,$config);
 }
 
+
+sub get_hgvs_POST {
+  my ($self, $c) = @_;
+
+  my $post_data = $c->req->data;
+  my $config = $self->_include_user_params($c,$post_data);
+  unless (exists $post_data->{hgvs_notations}) {
+    $c->go( 'ReturnError', 'custom', [ ' Cannot find "hgvs_notations" key in your POST. Please check the format of your message against the documentation' ] );
+  }
+  my @hgvs = @{$post_data->{hgvs_notations}};
+  $self->assert_post_size($c,\@hgvs);
+  $self->_give_POST_to_VEP($c,\@hgvs,$config);
+}
+
 # Cribbed from Utils::VEP
 # Turns a series of parameters into a VariationFeature object
 sub _build_vf {
@@ -437,9 +452,30 @@ sub _new_slice_seq {
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
   # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/hgvs ccds numbers domains canonical protein xref_refseq version/);
+  my @valid_keys = (qw/
+    hgvs
+    ccds
+    numbers
+    domains
+    canonical
+    protein
+    xref_refseq
+    version
+    refseq
+    merged
+    all_refseq
+  /);
   
   my %vep_params = %{ $c->config->{'Controller::VEP'} };
+
+  # refseq or merged?
+  if($user_config->{refseq} && $vep_params{refseq_dir}) {
+    $vep_params{dir} = $vep_params{refseq_dir};
+  }
+  elsif($user_config->{merged} && $vep_params{merged_dir}) {
+    $vep_params{dir} = $vep_params{merged_dir};
+  }
+
   read_cache_info(\%vep_params);
   # $c->log->debug("Before ".Dumper \%vep_params);
   # Values in user_config come from POST body while request_params() contains config from url

@@ -1,0 +1,23 @@
+# CACHE UPDATED 2015-12-04 12:22:04
+species	homo_sapiens
+assembly	GRCh37
+host	ens-staging-grch37
+port	3306
+user	ensro
+build	all
+regulatory	1
+sift	b
+polyphen	b
+source_sift	sift5.2.2
+source_polyphen	2.2.2
+source_COSMIC	71
+source_ESP	20141103
+source_gencode	GENCODE 19
+source_HGMD-PUBLIC	20152
+source_genebuild	2011-04
+source_regbuild	13
+source_ClinVar	201507
+source_dbSNP	144
+source_assembly	GRCh37.p13
+cell_types	HeLa-S3,GM06990,U2OS,CD4,IMR90,HL-60,HepG2,Lymphoblastoid,CD133,CD36,K562,GM12878,HUVEC,NHEK,H1ESC,MultiCell,K562b,NH-A,HSMM,HMEC,A549,AG04449,AG04450,AG09309,AG09319,AG10803,Caco-2,Chorion,CMK,GM10847,GM12801,GM12864,GM12865,GM12872,GM12873,GM12874,GM12875,GM12891,GM12892,GM15510,GM18505,GM18507,GM18526,GM18951,GM19099,GM19193,GM19238,GM19239,GM19240,H7ESC,H9ESC,HAEpiC,HCF,HCM,HCPEpiC,HCT116,HEEpiC,HEK293b,HEK293,HepG2b,HGF,HIPEpiC,HNPCEpiC,HRCEpiC,HRE,HRPEpiC,Jurkat,LHSR,MCF7,Medullo,Melano,NB4,NHBE,NHDF-neo,NHLF,NT2-D1,Panc1,PanIslets,PFSK1,SAEC,SKMC,SKNMC,SKNSHRA,Th1,Th2,WERIRB1,RPTEC,ProgFib,HSMMtube,Osteobl,MCF10A-Er-Src,HPAEpiC,Fibrobl,GM12878-XiMat,BJ,NHDF-AD,Monocytes-CD14+,DND-41
+variation_cols	variation_name,failed,somatic,start,end,allele_string,strand,minor_allele,minor_allele_freq,clin_sig,phenotype_or_disease,pubmed,AFR,AMR,EAS,EUR,SAS,AA,EA,ExAC,ExAC_AFR,ExAC_AMR,ExAC_Adj,ExAC_EAS,ExAC_FIN,ExAC_NFE,ExAC_OTH,ExAC_SAS

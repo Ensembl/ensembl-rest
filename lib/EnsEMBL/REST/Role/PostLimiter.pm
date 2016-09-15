@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,7 +51,7 @@ sub assert_post_size {
   my $post_size = scalar @$list;
 
   if($post_size > $max_size) {
-    my $msg = "POST message too large. You have submitted $post_size elements but a limit of $max_size in place. Request smaller regions of sequence";
+    my $msg = "POST message too large. You have submitted $post_size elements but a limit of $max_size is in place. Request smaller regions or lists of IDs";
     $c->go('ReturnError', 'custom', [qq{$msg}]);
   }
   return;

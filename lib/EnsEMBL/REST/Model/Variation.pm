@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -216,9 +217,9 @@ sub pops_as_hash {
   my ($self, $allele) = @_;
 
   my $population;
-  $population->{frequency} = $allele->frequency();
+  $population->{frequency} = 0 + $allele->frequency(); # Add 0 to treat it as numeric (to avoid quoting)
   $population->{population} = $allele->population->name();
-  $population->{allele_count} = $allele->count();
+  $population->{allele_count} = 0 + $allele->count(); # Add 0 to treat it as numeric (to avoid quoting)
   $population->{allele} = $allele->allele();
   $population->{submission_id} = $allele->subsnp() if $allele->subsnp();
 
@@ -245,8 +246,8 @@ sub popgen_as_hash {
 
   $pop_gen->{population} = $pg->population()->name() ;
   $pop_gen->{genotype}   = $pg->genotype_string() ;
-  $pop_gen->{frequency}  = $pg->frequency() ;
-  $pop_gen->{count}      = $pg->count();
+  $pop_gen->{frequency}  = 0 + $pg->frequency() ; # Add 0 to treat it as numeric (to avoid quoting)
+  $pop_gen->{count}      = 0 + $pg->count(); # Add 0 to treat it as numeric (to avoid quoting)
   $pop_gen->{subsnp_id}  = $pg->subsnp() if defined $pg->subsnp();
 
   return $pop_gen;

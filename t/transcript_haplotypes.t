@@ -1,4 +1,5 @@
-# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +39,7 @@ my ($th_get, $json, $expected_output);
 
 $th_get = '/transcript_haplotypes/homo_sapiens/ENST00000314040';
 $json = json_GET($th_get, 'GET transcript haplotypes for ENST00000314040');
-my $expected_output = {
+$expected_output = {
   'total_population_counts' => { _all => 4 },
   'protein_haplotypes' => [
     {

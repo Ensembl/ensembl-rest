@@ -1,0 +1,1385 @@
+31033	Fugu rubripes	genbank synonym
+31033	Sphaeroides rubripes	synonym
+31033	Takifugu rubripes	scientific name
+31033	Takifugu rubripes (Temminck & Schlegel, 1850)	synonym
+31033	Tetraodon rubripes	synonym
+31033	tiger puffer	common name
+31033	torafugu	genbank common name
+31033	Fugu	ensembl alias name
+31032	Fugu	synonym
+31032	Takifugu	scientific name
+31031	Tetraodontidae	scientific name
+31031	puffer fishes	common name
+31031	puffers	genbank common name
+31031	Puffers	ensembl alias name
+31031	69.8	ensembl timetree mya
+32517	Tetradontoidea	scientific name
+31028	Tetraodontoidei	scientific name
+31022	Tetraodontiformes	scientific name
+1489922	Eupercaria	scientific name
+1489922	Percomorpharia	synonym
+1489922	Teleost fishes	ensembl alias name
+1489922	124.9	ensembl timetree mya
+1489872	Percomorpha	includes
+1489872	Percomorphaceae	scientific name
+1489872	Teleost fishes	ensembl alias name
+1489872	125.0	ensembl timetree mya
+123369	Euacanthomorpha	synonym
+123369	Euacanthomorphacea	scientific name
+123368	Acanthomorpha	synonym
+123368	Acanthomorphata	scientific name
+123368	Teleost fishes	ensembl alias name
+123368	165.0	ensembl timetree mya
+123367	Ctenosquamata	scientific name
+123366	Eurypterygia	scientific name
+123366	Eurypterygii	synonym
+123365	Neoteleostei	scientific name
+1489388	Euteleosteomorpha	scientific name
+186625	Clupeocephala	scientific name
+186625	Teleost fishes	ensembl alias name
+186625	265.5	ensembl timetree mya
+1489341	Osteoglossocephalai	scientific name
+32443	Teleostei	scientific name
+32443	teleost fishes	genbank common name
+41665	Neopterygi	synonym
+41665	Neopterygii	scientific name
+41665	Ray-finned fishes	ensembl alias name
+41665	333.8	ensembl timetree mya
+186623	Actinopteri	scientific name
+7898	Actinopterygi	synonym
+7898	Actinopterygii	scientific name
+7898	Osteichthyes	in-part
+7898	bony fishes	blast name
+7898	fish	common name
+7898	fishes	common name
+7898	ray-finned fishes	genbank common name
+7898	fish	ensembl web display
+7898	lightblue1	genetree_bgcolour
+7898	royalblue4	genetree_fgcolour
+7898	default	genetree_display
+117571	Euteleostomi	scientific name
+117571	bony vertebrates	genbank common name
+117571	40673	merged_taxon_id
+117571	Bony vertebrates	ensembl alias name
+117571	441	ensembl timetree mya
+117570	Teleostomi	scientific name
+7776	Gnathostomata	scientific name
+7776	jawed vertebrates	genbank common name
+7742	Vertebrata	scientific name
+7742	Vertebrata Cuvier, 1812	authority
+7742	vertebrates	genbank common name
+7742	vertebrates	blast name
+7742	Vertebrates	ensembl alias name
+7742	535.7	ensembl timetree mya
+7742	vertebrates	ensembl web display
+7742	ffe0f0	genetree_bgcolour
+7742	tomato3	genetree_fgcolour
+7742	default	genetree_display
+89593	Craniata	scientific name
+7711	Chordata	scientific name
+7711	chordates	genbank common name
+7711	chordates	blast name
+7711	Chordates	ensembl alias name
+7711	722.5	ensembl timetree mya
+33511	Deuterostomia	scientific name
+33511	deuterostomes	common name
+33213	Bilateria	scientific name
+33213	Bilateral animals	ensembl alias name
+33213	937.5	ensembl timetree mya
+6072	Eumetazoa	scientific name
+33208	Animalia	synonym
+33208	Metazoa	scientific name
+33208	animals	blast name
+33208	metazoans	genbank common name
+33208	multicellular animals	common name
+33154	Fungi/Metazoa group	synonym
+33154	Opisthokonta	scientific name
+33154	Opisthokonta Cavalier-Smith 1987	authority
+33154	opisthokonts	synonym
+33154	Animals and Fungi	ensembl alias name
+33154	1215.8	ensembl timetree mya
+2759	Eucarya	synonym
+2759	Eucaryotae	synonym
+2759	Eukarya	synonym
+2759	Eukaryota	scientific name
+2759	Eukaryotae	synonym
+2759	eucaryotes	genbank common name
+2759	eukaryotes	common name
+2759	eukaryotes	blast name
+131567	biota	synonym
+131567	cellular organisms	scientific name
+1	all	synonym
+1	root	scientific name
+1	2016-01-11 14:24:48	import date
+51511	Ciona savignyi	scientific name
+51511	Ciona savignyi Herdman, 1882	authority
+51511	Pacific transparent sea squirt	genbank common name
+51511	transparent tunicate	common name
+51511	C.savignyi	ensembl alias name
+7718	Ciona	scientific name
+7718	Ciona sea squirts	ensembl alias name
+7718	100	ensembl timetree mya
+7717	Cionidae	scientific name
+7716	Phlebobranchia	scientific name
+183770	Enterogona	scientific name
+7713	Ascidiacea	scientific name
+7713	sea squirts	genbank common name
+7712	Tunicata	scientific name
+7712	Urochordata	synonym
+7712	tunicates	genbank common name
+7712	tunicates	blast name
+9544	Macaca mulatta	scientific name
+9544	Macaca mulatta (Zimmermann, 1780)	authority
+9544	Rhesus monkey	genbank common name
+9544	rhesus macaque	common name
+9544	rhesus macaques	common name
+9544	rhesus monkeys	common name
+9544	36502	merged_taxon_id
+9544	Macaque	ensembl alias name
+9539	Macaca	scientific name
+9539	macaque	common name
+9539	macaques	genbank common name
+9528	Cercopithecinae	scientific name
+9528	Old World monkeys	ensembl alias name
+9528	11.1	ensembl timetree mya
+9527	Cercopithecidae	scientific name
+9527	Old World monkeys	genbank common name
+9527	monkey	common name
+9527	monkeys	common name
+314294	Cercopithecoidea	scientific name
+9526	Catarrhini	scientific name
+9526	Apes and Old World monkeys	ensembl alias name
+9526	29.0	ensembl timetree mya
+314293	Anthropoidea	synonym
+314293	Simiiformes	scientific name
+314293	Simians	ensembl alias name
+314293	42.6	ensembl timetree mya
+376913	Haplorrhini	scientific name
+376913	Dry-nosed primates	ensembl alias name
+376913	65.2	ensembl timetree mya
+9443	Primata	synonym
+9443	Primates	scientific name
+9443	Primates Linnaeus, 1758	authority
+9443	primate	equivalent name
+9443	primates	blast name
+9443	Primates	ensembl alias name
+9443	74.0	ensembl timetree mya
+9443	primates	ensembl web display
+9443	f0f0ff	genetree_bgcolour
+9443	000050	genetree_fgcolour
+9443	default	genetree_display
+314146	Euarchontoglires	scientific name
+314146	Primates and Rodents	ensembl alias name
+314146	92.3	ensembl timetree mya
+1437010	Boreoeutheria	scientific name
+1437010	Boreotheria	synonym
+1437010	Placental mammals	ensembl alias name
+1437010	100	ensembl timetree mya
+9347	Eutheria	scientific name
+9347	Placentalia	synonym
+9347	eutherian mammals	common name
+9347	placental mammals	common name
+9347	placentals	genbank common name
+9347	placentals	blast name
+9347	Placental mammals	ensembl alias name
+9347	104.2	ensembl timetree mya
+32525	Theria	scientific name
+32525	Theria Parker & Haswell, 1897	authority
+32525	Marsupials and Placental mammals	ensembl alias name
+32525	162.6	ensembl timetree mya
+40674	Mammalia	scientific name
+40674	mammals	genbank common name
+40674	mammals	blast name
+40674	Mammals	ensembl alias name
+40674	167.4	ensembl timetree mya
+40674	mammals	ensembl web display
+40674	d0fad0	genetree_bgcolour
+40674	005000	genetree_fgcolour
+40674	default	genetree_display
+32524	Amniota	scientific name
+32524	amniotes	genbank common name
+32524	Amniotes	ensembl alias name
+32524	296.0	ensembl timetree mya
+32523	Tetrapoda	scientific name
+32523	tetrapods	genbank common name
+32523	Tetrapods	ensembl alias name
+32523	371.2	ensembl timetree mya
+1338369	Dipnotetrapodomorpha	scientific name
+8287	Sarcopterygii	scientific name
+8287	Lobe-finned fish	ensembl alias name
+8287	414.9	ensembl timetree mya
+9371	Echinops telfairi	scientific name
+9371	Echinops telfairi Martin, 1838	authority
+9371	Echinops telfairii	synonym
+9371	lesser hedgehog tenrec	common name
+9371	small Madagascar hedgehog	genbank common name
+9371	Tenrec	ensembl alias name
+9370	Echinops	scientific name
+9370	Echinops Martin, 1838	synonym
+176113	Tenrecinae	scientific name
+9369	Tenrecidae	scientific name
+9369	tenrecs	genbank common name
+311790	Afrotheria	scientific name
+311790	African mammals	ensembl alias name
+311790	81.8	ensembl timetree mya
+69293	Gasterosteus aculeatus	scientific name
+69293	Gasterosteus aculeatus Linnaeus, 1758	synonym
+69293	three spined stickleback	common name
+69293	three-spined stickleback	genbank common name
+69293	Stickleback	ensembl alias name
+69292	Gasterosteus	scientific name
+69291	Gasterosteidae	scientific name
+69291	sticklebacks & tubesnouts	genbank common name
+1490020	Gasterosteales	scientific name
+1490020	Gasterosteiformes	synonym
+1490020	129911	merged_taxon_id
+8100	Cottimorpha	synonym
+8100	Cottioidei	scientific name
+8100	Cottoidei	synonym
+8111	Perciformes	scientific name
+8111	Scorpaeniformes	synonym
+8111	Serraniformes	synonym
+8111	8091	merged_taxon_id
+8090	Japanese medaka	genbank common name
+8090	Japanese rice fish	common name
+8090	Orizias latipes	misspelling
+8090	Oryzias latipes	scientific name
+8090	Oryzias latipes (Temminck & Schlegel, 1846)	authority
+8090	Poecilia latipes	synonym
+8090	Poecilia latipes Temminck & Schlegel, 1846	authority
+8090	medaka	common name
+8090	Medaka	ensembl alias name
+8089	Orizias	misspelling
+8089	Oryzias	scientific name
+8089	Xenopoecilus	synonym
+8089	123687	merged_taxon_id
+8088	Oryziatinae	synonym
+8088	Oryziinae	scientific name
+8088	medakas	genbank common name
+8088	ricefishes	common name
+47757	Adrianichthyidae	scientific name
+28781	Adrianichthyoidei	scientific name
+76071	Beloniformes	scientific name
+1489913	Atherinomorpha	synonym
+1489913	Atherinomorphae	scientific name
+1489913	32456	merged_taxon_id
+1489913	Silverside fishes	ensembl alias name
+1489913	100	ensembl timetree mya
+1489908	Ovalentaria	scientific name
+1489908	Stiassnyiformes	synonym
+1489908	Teleost fishes	ensembl alias name
+1489908	103.8	ensembl timetree mya
+9258	Ornithorhynchus anatinus	scientific name
+9258	Ornythorhynchus anatinus	misspelling
+9258	duck-billed platypus	common name
+9258	duckbill platypus	common name
+9258	platypus	genbank common name
+9258	Platypus	ensembl alias name
+9257	Ornithorhynchus	scientific name
+9257	Ornythorhynchus	misspelling
+9256	Ornithorhynchidae	scientific name
+9255	Monotremata	scientific name
+9255	egg-laying mammals	genbank common name
+9255	monotremes	blast name
+9254	Prototheria	scientific name
+13616	Monodelphis domestica	scientific name
+13616	Monodelphis domesticus	misspelling
+13616	gray short-tailed opossum	genbank common name
+13616	Opossum	ensembl alias name
+13615	Monodelphis	scientific name
+13615	Monodelphis Burnett, 1830	authority
+13615	short-tailed opossums	genbank common name
+126287	Didelphinae	scientific name
+9265	American opossums	common name
+9265	Didelphidae	scientific name
+9265	opossums	genbank common name
+38605	Didelphimorphia	scientific name
+9263	Metatheria	synonym
+9263	Marsupialia	scientific name
+9263	marsupials	genbank common name
+9263	marsupials	blast name
+9263	Marsupials	ensembl alias name
+9263	86.4	ensembl timetree mya
+37347	Tupaia belangeri	scientific name
+37347	Tupaia belangeri (Wagner, 1841)	authority
+37347	Tupaia belangri	misspelling
+37347	Tupaia glis belangeri	synonym
+37347	common tree shrew	common name
+37347	northern tree shrew	genbank common name
+37347	9396	merged_taxon_id
+37347	Tree Shrew	ensembl alias name
+9394	Tupaia	scientific name
+9394	Tupaia Raffles, 1821	authority
+9393	Tupaiidae	scientific name
+9393	tree shrews	genbank common name
+9392	Scandentia	scientific name
+9392	tree shrews	genbank common name
+9365	Erinaceous europaeus	misspelling
+9365	Erinaceus europaeus	scientific name
+9365	Erinaceus europaeus Linnaeus, 1758	authority
+9365	Erinaceus europeus	misspelling
+9365	European hedgehog	common name
+9365	common hedgehog	common name
+9365	western European hedgehog	genbank common name
+9365	Hedgehog	ensembl alias name
+9364	Erinaceus	scientific name
+9364	Erinaceus Linnaeus, 1758	authority
+30577	Erinaceinae	scientific name
+30577	Erinaceinae G. Fischer, 1814	authority
+30577	spiny hedgehogs	genbank common name
+9363	Erinaceidae	scientific name
+9363	Erinaceidae G. Fischer, 1814	authority
+9363	hedgehogs	genbank common name
+9362	Insectivora	scientific name
+9362	Soricomorpha	synonym
+9362	hedgehogs, shrews, moles and others	genbank common name
+9362	insectivores	blast name
+9362	Insectivore mammals	ensembl alias name
+9362	65.9	ensembl timetree mya
+314145	Laurasiatheria	scientific name
+314145	Laurasiatherian mammals	ensembl alias name
+314145	91.7	ensembl timetree mya
+314145	laurasiatheria	ensembl web display
+314145	d0fafa	genetree_bgcolour
+314145	005050	genetree_fgcolour
+314145	default	genetree_display
+42254	Eurasian shrew	common name
+42254	European shrew	genbank common name
+42254	Sorex araneus	scientific name
+42254	Sorex araneus Linnaeus, 1758	authority
+42254	Shrew	ensembl alias name
+9379	Sorex	scientific name
+9379	Sorex Linnaeus, 1758	authority
+183663	Soricinae	scientific name
+183663	red-toothed shrews	genbank common name
+9376	Soricidae	scientific name
+9376	shrews	genbank common name
+30608	Microcebus murinus	scientific name
+30608	gray mouse lemur	genbank common name
+30608	grey mouse lemur	common name
+30608	Mouse Lemur	ensembl alias name
+13149	Microcebus	scientific name
+13149	Microcebus E. Geoffroy, 1834	authority
+30615	Cheirogaleidae	scientific name
+30615	Cheirogaleidae Gray, 1873	authority
+30615	dwarf and mouse lemurs	genbank common name
+376915	Lemuriformes	scientific name
+376915	Lemuriformes Gray, 1821	authority
+376911	Strepsirhini	synonym
+376911	Strepsirrhini	scientific name
+376911	Strepsirrhini E. Geoffroy Saint-Hilaire, 1812	authority
+376911	prosimians	common name
+376911	9444	merged_taxon_id
+376911	Wet nose lemurs	ensembl alias name
+376911	57.9	ensembl timetree mya
+9601	Orang-utan	common name
+9601	Orangutan	common name
+9601	Pongo abelii	scientific name
+9601	Pongo pygmaeus abeli	synonym
+9601	Pongo pygmaeus abelii	synonym
+9601	Sumatran orangutan	genbank common name
+9601	orang utan	common name
+9601	Orangutan	ensembl alias name
+9599	Pongo	scientific name
+607660	Ponginae	scientific name
+9604	Hominidae	scientific name
+9604	Hominidae Gray, 1825	authority
+9604	Pongidae	synonym
+9604	great apes	genbank common name
+9604	Great apes	ensembl alias name
+9604	15.7	ensembl timetree mya
+314295	Hominoidea	scientific name
+314295	ape	common name
+314295	apes	genbank common name
+314295	Apes	ensembl alias name
+314295	20.4	ensembl timetree mya
+9796	Equus caballus	scientific name
+9796	Equus caballus Linnaeus, 1758	authority
+9796	Equus ferus caballus	synonym
+9796	Equus przewalskii f. caballus	synonym
+9796	Equus przewalskii forma caballus	synonym
+9796	domestic horse	common name
+9796	equine	common name
+9796	horse	genbank common name
+9796	Horse	ensembl alias name
+35510	Equus	scientific name
+35510	Equus subg. Equus	synonym
+9789	Equus	scientific name
+9788	Equidae	scientific name
+9788	horses	genbank common name
+9787	Perissodactyla	scientific name
+9787	odd-toed ungulates	genbank common name
+9787	odd-toed ungulates	blast name
+99883	Tetraodon nigroviridis	scientific name
+99883	Tetraodon nigroviridis Marion de Proce, 1822	synonym
+99883	spotted green pufferfish	genbank common name
+99883	Tetraodon	ensembl alias name
+47144	Tetraodon	scientific name
+47144	Tetraodon Linnaeus 1758	authority
+9978	American pika	genbank common name
+9978	Ochotona princeps	scientific name
+9978	southern American pika	common name
+9978	Pika	ensembl alias name
+9977	Ochotona	scientific name
+9977	Ochotona Link, 1795	authority
+9976	Ochotonidae	scientific name
+9976	Ochotonidae Thomas, 1897	authority
+9976	pikas	genbank common name
+9975	Lagomorpha	scientific name
+9975	Lagomorpha Brandt, 1855	authority
+9975	rabbits & hares	blast name
+9975	Rabbits and Pikas	ensembl alias name
+9975	51.2	ensembl timetree mya
+314147	Glires	scientific name
+314147	Rodents and rabbits	genbank common name
+314147	Rodents and Rabbits	ensembl alias name
+314147	86.9	ensembl timetree mya
+314147	glires	ensembl web display
+314147	fff0e0	genetree_bgcolour
+314147	403000	genetree_fgcolour
+314147	default	genetree_display
+10141	Cavia aperea porcellus	synonym
+10141	Cavia cobaya	synonym
+10141	Cavia cobya	misnomer
+10141	Cavia porcellus	scientific name
+10141	domestic guinea pig	genbank common name
+10141	guinea pig	common name
+10141	84274	merged_taxon_id
+10141	Guinea Pig	ensembl alias name
+10140	Cavia	scientific name
+10140	guinea pigs	genbank common name
+10140	guinea-pigs	common name
+10139	Caviidae	scientific name
+10139	cavies	genbank common name
+33550	Hystricognathi	scientific name
+33550	Hystricomorpha	synonym
+9989	Rodentia	scientific name
+9989	rodent	authority
+9989	rodents	genbank common name
+9989	rodents	blast name
+9989	Rodents	ensembl alias name
+9989	77.9	ensembl timetree mya
+9358	Choloepus hoffmanni	scientific name
+9358	Hoffmann's two-fingered sloth	genbank common name
+9358	Hoffmann's two-toed sloth	common name
+9358	Sloth	ensembl alias name
+9357	Choloepus	scientific name
+227508	Megalonychidae	scientific name
+227508	two-toed sloths	genbank common name
+948953	Folivora	scientific name
+948950	Pilosa	scientific name
+9348	Edentata	in-part
+9348	Xenarthra	scientific name
+9348	Xenarthran mammals	ensembl alias name
+9348	64.50	ensembl timetree mya
+9813	Cape hyrax	common name
+9813	Cape rock hyrax	genbank common name
+9813	Procavia capensis	scientific name
+9813	large-toothed rock hyrax	common name
+9813	rock dassie	common name
+9813	rock hyrax	common name
+9813	Hyrax	ensembl alias name
+9812	Procavia	scientific name
+9811	Procaviidae	scientific name
+9811	conies	common name
+9811	dassies	common name
+9811	hyraxes	genbank common name
+9810	Hyracoidea	scientific name
+9810	rock rabbits/dassies	genbank common name
+9739	Atlantic bottle-nosed dolphin	common name
+9739	Tursiops truncatus	scientific name
+9739	Tursiops truncatus Gervais, 1855	authority
+9739	bottle-nosed dolphin	common name
+9739	bottlenosed dolphin	genbank common name
+9739	Dolphin	ensembl alias name
+9738	Tursiops	scientific name
+9726	Delphinidae	scientific name
+9726	dolphins	in-part
+9726	marine dolphins	genbank common name
+9722	Odontoceti	scientific name
+9722	tooth whales	genbank common name
+9721	Cetacea	scientific name
+9721	whale	common name
+9721	whales	genbank common name
+9721	whales & dolphins	blast name
+9721	whales, dolphins, and porpoises	common name
+91561	Cetartiodactyla	scientific name
+91561	even-toed ungulates	blast name
+91561	whales, hippos, ruminants, pigs, camels etc.	genbank common name
+91561	Cetaceans and Even-toed ungulates	ensembl alias name
+91561	63.4	ensembl timetree mya
+9478	Philippine tarsier	genbank common name
+9478	Tarsius syrichta	scientific name
+9478	Tarsius syrichta (Linnaeus, 1758)	authority
+9478	Tarsier	ensembl alias name
+9476	Tarsius	scientific name
+9476	Tarsius Storr, 1780	authority
+9476	tarsier	common name
+9475	Tarsiidae	scientific name
+9475	tarsiers	genbank common name
+376912	Tarsiiformes	scientific name
+10020	Dipodomys ordii	scientific name
+10020	Ord's kangaroo rat	genbank common name
+10020	Kangaroo rat	ensembl alias name
+10016	Dipodomys	scientific name
+10016	Dipodomys Gray, 1841	authority
+10016	kangaroo rats	genbank common name
+38662	Dipodomyinae	scientific name
+10015	Heteromyidae	scientific name
+33553	Myomorpha	includes
+33553	Sciurognathi	scientific name
+33553	Sciuromorpha	includes
+33553	9990	merged_taxon_id
+33553	10024	merged_taxon_id
+33553	Squirrels and Old World rodents	ensembl alias name
+33553	74.5	ensembl timetree mya
+30538	Lama guanicoe pacos	synonym
+30538	Lama pacos	synonym
+30538	Vicugna pacos	scientific name
+30538	alpaca	genbank common name
+30538	Alpaca	ensembl alias name
+30539	Vicugna	scientific name
+9835	Camelidae	scientific name
+9834	Artiodactyla	in-part
+9834	Tylopoda	scientific name
+132908	Pteropus vampyrus	scientific name
+132908	large flying fox	genbank common name
+132908	Megabat	ensembl alias name
+9401	Pteropus	scientific name
+77225	Pteropodinae	scientific name
+9398	Old World fruit bats	common name
+9398	Pteropodidae	scientific name
+9398	flying foxes	genbank common name
+30559	Megachiroptera	scientific name
+9397	Chiroptera	scientific name
+9397	bats	genbank common name
+9397	bats	blast name
+9397	Bats	ensembl alias name
+9397	60.0	ensembl timetree mya
+59729	Poephila guttata	synonym
+59729	Taeniopygia guttata	scientific name
+59729	Taeniopygia guttata (Vieillot, 1817)	authority
+59729	Taenopygia guttata	synonym
+59729	zebra finch	genbank common name
+59729	40587	merged_taxon_id
+59729	72052	merged_taxon_id
+59729	Zebra Finch	ensembl alias name
+59728	Taeniopygia	scientific name
+59728	Taenopygia	synonym
+59728	72051	merged_taxon_id
+40155	Estrildinae	scientific name
+37611	Estrildidae	scientific name
+175121	Passeroidea	scientific name
+9126	Passeriformes	scientific name
+9126	Perching birds	ensembl alias name
+9126	39.2	ensembl timetree mya
+8825	Neognathae	scientific name
+8825	Birds	ensembl alias name
+8825	104.2	ensembl timetree mya
+8782	Aves	scientific name
+8782	birds	genbank common name
+8782	birds	blast name
+436492	Coelurosauria	scientific name
+436491	Theropoda	scientific name
+436489	Saurischia	scientific name
+436486	Dinosauria	scientific name
+8492	Archosauria	scientific name
+1329799	Archelosauria	scientific name
+1329799	Archelosauria Crawfort et al. 2014	authority
+1329799	Archosauria-Testudines	synonym
+1329799	Testudines + Archosauria group	synonym
+1329799	Birds and turtles	ensembl alias name
+1329799	244.2	ensembl timetree mya
+32561	Diapsida	synonym
+32561	Sauria	scientific name
+32561	diapsids	genbank common name
+32561	Reptiles and birds	ensembl alias name
+32561	276.0	ensembl timetree mya
+8457	Sauropsida	scientific name
+8457	sauropsids	genbank common name
+8457	sauropsids	ensembl web display
+8457	lemonchiffon	genetree_bgcolour
+8457	yellow4	genetree_fgcolour
+8457	default	genetree_display
+9315	Macropus eugenii	scientific name
+9315	tammar wallaby	genbank common name
+9315	Wallaby	ensembl alias name
+9312	Macropus	scientific name
+9307	Macropodidae	scientific name
+38609	Diprotodontia	scientific name
+9785	African bush elephant	common name
+9785	African savanna elephant	genbank common name
+9785	African savannah elephant	common name
+9785	Loxodonta africana	scientific name
+9785	Loxodonta africana africana	synonym
+9785	elephant	in-part
+9785	99489	merged_taxon_id
+9785	Elephant	ensembl alias name
+9784	African Elephant	common name
+9784	African elephants	common name
+9784	Loxodonta	scientific name
+9780	Elephantidae	scientific name
+9780	elephants	genbank common name
+9779	Proboscidea	scientific name
+9779	elephants	genbank common name
+9986	European rabbit	common name
+9986	Japanese white rabbit	common name
+9986	Lepus cuniculus	misnomer
+9986	New Zealand rabbit	includes
+9986	Oryctolagus cuniculus	scientific name
+9986	domestic rabbit	common name
+9986	rabbit	genbank common name
+9986	rabbits	common name
+9986	9985	merged_taxon_id
+9986	34833	merged_taxon_id
+9986	Rabbit	ensembl alias name
+9984	Oryctolagus	scientific name
+9979	Leporidae	scientific name
+9979	Leporidae Fischer, 1817	authority
+9979	rabbits and hares	genbank common name
+9646	Ailuropoda melanoleuca	scientific name
+9646	Ailuropoda melanoleuca (David, 1869)	authority
+9646	Ailuropoda melanoleura	misspelling
+9646	giant panda	genbank common name
+9646	Panda	ensembl alias name
+9645	Ailuropoda	scientific name
+9632	Ursidae	scientific name
+9632	bears	genbank common name
+379584	Caniformia	scientific name
+379584	Caniforms	ensembl alias name
+379584	45.0	ensembl timetree mya
+33554	Carnivora	scientific name
+33554	carnivores	genbank common name
+33554	carnivores	blast name
+33554	Carnivores	ensembl alias name
+33554	55.1	ensembl timetree mya
+28377	Anolis carolinensis	scientific name
+28377	Anolis carolinensis (Voigt, 1832)	authority
+28377	Carolina anole	common name
+28377	green anole	genbank common name
+28377	Anole Lizard	ensembl alias name
+28376	Anolis	scientific name
+28376	Chamaelinorops	includes
+28376	Norops	in-part
+28376	75277	merged_taxon_id
+28376	323564	merged_taxon_id
+81957	Anolinae	misnomer
+81957	Polychrinae	synonym
+81957	Polychrotidae	synonym
+81957	Polychrotinae	scientific name
+81957	42423	merged_taxon_id
+81957	43613	merged_taxon_id
+8515	Iguanidae	scientific name
+8515	iguanid lizards	genbank common name
+8511	Iguania	scientific name
+8511	Lacertilia	in-part
+8511	iguanian lizards	genbank common name
+1329911	Toxicofera	scientific name
+1329911	Toxicofera Vidal & Hedges 2009	authority
+1329912	Episquamata	scientific name
+1329950	Unidentata	scientific name
+1329961	Bifurcata	scientific name
+1329961	split-tongued squamates	genbank common name
+8509	Squamata	scientific name
+8509	squamates	genbank common name
+8504	Lepidosauria	scientific name
+8504	Reptilia	in-part
+8504	lepidosaurs	genbank common name
+8504	lizards	blast name
+8504	reptiles	in-part
+9103	Meleagris gallopavo	scientific name
+9103	Meleagris gallopavo Linnaeus, 1758	authority
+9103	common turkey	common name
+9103	turkey	genbank common name
+9103	wild turkey	common name
+9103	Turkey	ensembl alias name
+9102	Meleagris	scientific name
+466552	Meleagridinae	scientific name
+9005	Meleagrididae	includes
+9005	Phasianidae	scientific name
+9005	turkeys	common name
+9005	9099	merged_taxon_id
+9005	Turkeys	ensembl alias name
+9005	44.6	ensembl timetree mya
+8976	Craciformes	includes
+8976	Galliformes	scientific name
+8976	fowls	genbank common name
+1549675	Galloanserae	scientific name
+1549675	Galloanseri	synonym
+1549675	ducks, geese, chickens, fowl, quail, currasows and allies	equivalent name
+1549675	Fowls	ensembl alias name
+1549675	81.2	ensembl timetree mya
+61853	Hylobates concolor leucogenys	synonym
+61853	Hylobates concolor leucogyneus	synonym
+61853	Hylobates leucogenys	synonym
+61853	Hylobates leucogenys Ogilby, 1840	synonym
+61853	Hylobates leucogenys leucogenys	synonym
+61853	Nomascus leucogenys	scientific name
+61853	Nomascus leucogenys leucogenys	synonym
+61853	Nomascus leukogenys	synonym
+61853	White-cheeked Gibbon	common name
+61853	northern white-cheeked gibbon	genbank common name
+61853	9585	merged_taxon_id
+61853	101280	merged_taxon_id
+61853	164929	merged_taxon_id
+61853	Gibbon	ensembl alias name
+325165	Nomascus	scientific name
+9577	Hylobatidae	scientific name
+9577	gibbons	genbank common name
+9577	lesser apes	common name
+8364	Silurana (Xenopus) tropicalis	misspelling
+8364	Silurana tropicalis	synonym
+8364	Silurana tropicalis Gray, 1864	authority
+8364	Xenopus tropicalis	scientific name
+8364	Xenopus laevis tropicalis	synonym
+8364	Xenopus (Silurana) tropicalis	synonym
+8364	Xenopus tropicalis (Gray, 1864)	authority
+8364	western clawed frog	genbank common name
+8364	X.tropicalis	ensembl alias name
+8363	Silurana	scientific name
+8363	Xenopus tropicalis group	synonym
+8353	Xenopus	scientific name
+8360	Siluraninae	synonym
+8360	Xenopodinae	scientific name
+8352	Pipidae	scientific name
+8352	pipid frogs	common name
+8352	tongueless frogs	genbank common name
+30319	Pipoidea	scientific name
+8342	Anura	scientific name
+8342	Salientia	synonym
+8342	anurans	common name
+8342	frogs	common name
+8342	frogs & toads	blast name
+8342	frogs and toads	genbank common name
+41666	Batrachia	scientific name
+8292	Amphibia	scientific name
+8292	Lissamphibia	includes
+8292	amphibians	genbank common name
+8292	amphibians	blast name
+9483	Callithrix jacchus	scientific name
+9483	Callithrix jacchus jacchus	synonym
+9483	common marmoset	common name
+9483	white ear-tufted marmoset	common name
+9483	white-tufted-ear marmoset	genbank common name
+9483	9484	merged_taxon_id
+9483	Marmoset	ensembl alias name
+9481	Callithrix	scientific name
+9481	Cebuella	synonym
+9481	Mico	includes
+9481	9492	merged_taxon_id
+9480	Callithricidae	synonym
+9480	Callitrichidae	synonym
+9480	Callitrichinae	scientific name
+9480	marmosets and tamarins	genbank common name
+9498	Cebidae	scientific name
+9479	New World monkeys	genbank common name
+9479	Platyrrhini	scientific name
+9479	monkey	common name
+9479	monkeys	common name
+59463	Myotis lucifugus	scientific name
+59463	Myotis occultus	synonym
+59463	little brown bat	genbank common name
+59463	Microbat	ensembl alias name
+9434	Myotis	scientific name
+9431	Vespertilionidae	scientific name
+9431	common bats	genbank common name
+9431	vespertilionid bats	common name
+30560	Microchiroptera	scientific name
+7757	Petromyzon marinus	scientific name
+7757	marine lamprey	common name
+7757	sea lamprey	genbank common name
+7757	Lamprey	ensembl alias name
+7756	Petromyzon	scientific name
+7746	Petromyzonidae	misspelling
+7746	Petromyzontidae	scientific name
+7746	lampreys	genbank common name
+7745	Petromyzoniformes	synonym
+7745	Petromyzontiformes	scientific name
+7745	lampreys	blast name
+117569	Agnatha	in-part
+117569	Cephalaspidomorphi	in-part
+117569	Hyperoartia	scientific name
+117569	Monorhina	in-part
+117569	fish	common name
+117569	fishes	common name
+1476529	Agnatha	synonym
+1476529	Cyclostomata	scientific name
+1476529	jawless vertebrates	genbank common name
+9305	Sarcophilus harrisii	scientific name
+9305	Sarcophilus laniarius	synonym
+9305	Tasmanian devil	genbank common name
+9305	Tasmanian devil	ensembl alias name
+9304	Sarcophilus	scientific name
+9277	Dasyuridae	scientific name
+38608	Dasyuromorphia	scientific name
+9913	Bos Tauurus	misspelling
+9913	Bos bovis	synonym
+9913	Bos primigenius taurus	synonym
+9913	Bos taurus	scientific name
+9913	Bos taurus Linnaeus, 1758	authority
+9913	Bovidae sp. Adi Nefas	includes
+9913	bovine	common name
+9913	cattle	genbank common name
+9913	cow	common name
+9913	domestic cattle	common name
+9913	domestic cow	common name
+9913	272461	merged_taxon_id
+9913	Cow	ensembl alias name
+9903	Bos	scientific name
+9903	oxen, cattle	genbank common name
+27592	Bovinae	scientific name
+9895	Bovidae	scientific name
+9895	Bovids	ensembl alias name
+9895	30.1	ensembl timetree mya
+35500	Pecora	scientific name
+9845	Artiodactyla	in-part
+9845	Ruminantia	scientific name
+9595	Gorilla gorilla gorilla	scientific name
+9595	lowland gorilla	common name
+9595	western lowland gorilla	genbank common name
+9595	Gorilla	ensembl alias name
+9593	Gorilla gorilla	scientific name
+9593	Gorilla gorilla (Savage, 1847)	authority
+9593	Troglodytes gorilla	synonym
+9593	gorilla	common name
+9593	western gorilla	genbank common name
+9592	Gorilla	scientific name
+9592	Gorilla I. Geoffroy, 1852	authority
+207598	Homininae	scientific name
+207598	Homo/Pan/Gorilla group	synonym
+207598	Hominines	ensembl alias name
+207598	8.8	ensembl timetree mya
+30611	Galago garnetti	synonym
+30611	Galago garnettii	synonym
+30611	Otolemur garnetti	misspelling
+30611	Otolemur garnettii	scientific name
+30611	Otolemur garnettii (Ogilby, 1838)	authority
+30611	small-eared galago	genbank common name
+30611	Bushbaby	ensembl alias name
+30610	Otolemur	scientific name
+30610	greater bushbabies	genbank common name
+40297	Galagidae	scientific name
+40297	Galagonidae	synonym
+40297	galagos	genbank common name
+376917	Lorisiformes	scientific name
+9598	Chimpansee troglodytes	misspelling
+9598	Pan troglodytes	scientific name
+9598	chimpanzee	genbank common name
+9598	Chimpanzee	ensembl alias name
+9596	Pan	scientific name
+9596	Pan sp. WO2005014654	includes
+9596	Pan sp. WO2007026120	includes
+9596	chimpanzees	genbank common name
+9596	317028	merged_taxon_id
+9596	445518	merged_taxon_id
+8049	Atlantic cod	genbank common name
+8049	Gadus morhua	scientific name
+8049	Gadus morhua Linnaeus, 1758	authority
+8049	Cod	ensembl alias name
+8048	Gadus	scientific name
+8048	Theragra	synonym
+8048	48549	merged_taxon_id
+8045	Gadidae	scientific name
+8045	Ranicipitidae	synonym
+8045	cods	genbank common name
+8045	tadpole cod	common name
+8045	185742	merged_taxon_id
+1489845	Gadoidei	scientific name
+8043	Gadiformes	scientific name
+1489843	Gadariae	scientific name
+1489841	Zeiogadaria	scientific name
+1489841	Zeiogadiformes	synonym
+1489838	Paracanthomorphacea	scientific name
+4932	ATCC 18824	type material
+4932	CBS 1171	type material
+4932	Candida robusta	anamorph
+4932	NRRL Y-12632	type material
+4932	Saccaromyces cerevisiae	misspelling
+4932	Saccharomyces capensis	synonym
+4932	Saccharomyces cerevisiae	scientific name
+4932	Saccharomyces italicus	synonym
+4932	Saccharomyces oviformis	synonym
+4932	Saccharomyces uvarum var. melibiosus	synonym
+4932	Saccharomyes cerevisiae	misspelling
+4932	Sccharomyces cerevisiae	misspelling
+4932	baker's yeast	genbank common name
+4932	brewer's yeast	common name
+4932	lager beer yeast	common name
+4932	yeast	common name
+4932	S.cerevisiae	ensembl alias name
+4930	Pachytichospora	synonym
+4930	Saccharomyces	scientific name
+4930	36915	merged_taxon_id
+4893	Eremotheciaceae	includes
+4893	Saccharomycetaceae	scientific name
+4893	44280	merged_taxon_id
+4893	221665	merged_taxon_id
+4892	Endomycetales	synonym
+4892	Saccharomycetales	scientific name
+4892	budding yeasts	genbank common name
+4891	Hemiascomycetes	synonym
+4891	Saccharomycetes	scientific name
+147537	Saccharomycotina	scientific name
+147537	true yeasts	genbank common name
+716545	saccharomyceta	scientific name
+4890	Ascomycota	scientific name
+4890	ascomycetes	genbank common name
+4890	ascomycetes	blast name
+4890	sac fungi	common name
+451864	Dikarya	scientific name
+4751	Fungi	scientific name
+4751	fungi	blast name
+4751	fungi	genbank common name
+7719	Ascidia intestinalis	synonym
+7719	Ciona intestinalis	scientific name
+7719	Ciona intestinalis (Linnaeus, 1767)	authority
+7719	sea vase	common name
+7719	vase tunicate	genbank common name
+7719	yellow sea squirt	common name
+7719	C.intestinalis	ensembl alias name
+7897	Latimeria chalumnae	scientific name
+7897	coelacanth	genbank common name
+7897	Coelacanth	ensembl alias name
+7896	Latimeria	scientific name
+7895	Coelacanthidae	scientific name
+7895	Latimeriidae	includes
+7895	coelacanths	genbank common name
+7894	Coelacanthiformes	scientific name
+7894	Osteichthyes	in-part
+7894	coelacanths	blast name
+7894	lobe-finned fishes	common name
+118072	Actinistia	synonym
+118072	Choanichthyes	in-part
+118072	Coelacanthimorpha	scientific name
+118072	Crossopterygii	in-part
+118072	fish	common name
+118072	fishes	common name
+118072	lobe-finned fishes	common name
+8128	Nile tilapia	genbank common name
+8128	Oreochromis nilonica	misspelling
+8128	Oreochromis nilotica	synonym
+8128	Oreochromis niloticus	scientific name
+8128	Oreochromis niloticus (Linnaeus, 1758)	authority
+8128	Tilapia nilotica	synonym
+8128	61227	merged_taxon_id
+8128	Tilapia	ensembl alias name
+8139	Nyasalapia	synonym
+8139	Oreochromis	scientific name
+8139	160744	merged_taxon_id
+1315725	Oreochromini	scientific name
+318546	Pseudocrenilabrinae	scientific name
+319095	African cichlids	scientific name
+8113	Cichlidae	scientific name
+8113	cichlids	genbank common name
+1489911	Cichliformes	scientific name
+1489910	Cichlomorphae	scientific name
+43179	Citellus tridecemlineatus	synonym
+43179	Ictidomys tridecemlineatus	scientific name
+43179	Spermophilus tridecemlineatus	synonym
+43179	Spermophilus tridecemlineatus (Mitchill, 1821)	authority
+43179	thirteen-lined ground squirrel	genbank common name
+43179	Squirrel	ensembl alias name
+1141640	Ictidomys	scientific name
+1141640	Ictidomys J. A. Allen, 1877	authority
+1141640	lined ground squirrels	genbank common name
+337730	Marmotini	scientific name
+337730	Marmotini Pocock, 1923	authority
+337726	Xerinae	scientific name
+55153	Sciuridae	scientific name
+9823	Sus scrofa	scientific name
+9823	Sus scrofa Linnaeus, 1758	authority
+9823	Sus scrofus	misspelling
+9823	pig	genbank common name
+9823	pigs	common name
+9823	swine	common name
+9823	wild boar	common name
+9823	Pig	ensembl alias name
+9822	Sus	scientific name
+9821	Suidae	scientific name
+9821	boars	common name
+9821	pigs	genbank common name
+9821	39423	merged_taxon_id
+35497	Artiodactyla	in-part
+35497	Suiformes	in-part
+35497	Suina	scientific name
+10090	LK3 transgenic mice	includes
+10090	Mus muscaris	misnomer
+10090	Mus musculus	scientific name
+10090	Mus musculus Linnaeus, 1758	authority
+10090	Mus sp. 129SV	includes
+10090	house mouse	genbank common name
+10090	mice C57BL/6xCBA/CaJ hybrid	misspelling
+10090	mouse	common name
+10090	nude mice	includes
+10090	transgenic mice	includes
+10090	85055	merged_taxon_id
+10090	Mouse	ensembl alias name
+862507	Mus	scientific name
+10088	Mus	scientific name
+10088	mice	common name
+10088	mouse	common name
+39107	Murinae	scientific name
+39107	Otomyinae	includes
+39107	109679	merged_taxon_id
+39107	Old World rodents	ensembl alias name
+39107	25.4	ensembl timetree mya
+10066	Muridae	scientific name
+337687	Muroidea	scientific name
+9615	Canis canis	synonym
+9615	Canis domesticus	synonym
+9615	Canis familiaris	synonym
+9615	Canis lupus familiaris	scientific name
+9615	beagle dog	includes
+9615	beagle dogs	includes
+9615	dog	genbank common name
+9615	dogs	common name
+9615	Dog	ensembl alias name
+9612	Canis lupus	scientific name
+9612	Canis lupus Linnaeus, 1758	authority
+9612	gray wolf	genbank common name
+9612	grey wolf	common name
+9611	Canis	scientific name
+9608	Canidae	scientific name
+9608	dog, coyote, wolf, fox	genbank common name
+13735	Chinese soft-shelled turtle	genbank common name
+13735	Chinese softshell turtle	common name
+13735	Pelodiscus sinensis	scientific name
+13735	Pelodiscus sinensis (Wiegmann, 1835) Cox et al. 1998	authority
+13735	Torionyx sinensis	misspelling
+13735	Trionyx sinensis	synonym
+13735	Trionyx sinensis Wiegmann 1835	authority
+13735	Chinese softshell turtle	ensembl alias name
+204969	Pelodiscus	scientific name
+34907	Trionychidae	scientific name
+34907	soft-shelled turtles	genbank common name
+1579275	Trionychia	scientific name
+1579275	Trionychoidea	synonym
+1579275	Tryonychia	synonym
+1579275	34905	merged_taxon_id
+8464	Cryptodira	scientific name
+8464	Cryptodira Cope 1868	authority
+8464	hidden-necked turtles	genbank common name
+8459	Anapsida	synonym
+8459	Reptilia	in-part
+8459	Testudinata	synonym
+8459	Testudines	scientific name
+8459	Testudines Batsch 1788	authority
+8459	anapsid reptiles	common name
+8459	reptiles	in-part
+8459	turtles	genbank common name
+8459	turtles	blast name
+8083	Platypoecilus maculatus	synonym
+8083	Platypoecilus maculatus Guenther, 1866	authority
+8083	Xiphophorus maculatus	scientific name
+8083	Xiphophorus maculatus (Guenther, 1866)	authority
+8083	southern platyfish	genbank common name
+8083	Platyfish	ensembl alias name
+8082	Xiphophorus	scientific name
+586240	Poeciliinae	scientific name
+586240	Live-bearing aquarium fishes	ensembl alias name
+586240	40	ensembl timetree mya
+8079	Poeciliidae	scientific name
+8079	livebearers	genbank common name
+8087	Cyprinodontoidei	scientific name
+28738	Cyprinodontiformes	scientific name
+9669	Mustela furo	synonym
+9669	Mustela putoris furo	misspelling
+9669	Mustela putorius furo	scientific name
+9669	Mustela putorius furo Linnaeus, 1758	authority
+9669	black ferret	common name
+9669	domestic ferret	genbank common name
+9669	ferret	common name
+9669	77150	merged_taxon_id
+9669	Ferret	ensembl alias name
+9668	European polecat	genbank common name
+9668	Mustela putoris	misspelling
+9668	Mustela putorius	scientific name
+9668	Mustela putorius Linnaeus, 1758	authority
+9668	Putorius putorius	synonym
+9665	Mustela	scientific name
+169418	Mustelinae	scientific name
+9655	Mustelidae	scientific name
+9655	weasel, mink, badger, martens and others	genbank common name
+9685	Felis catus	scientific name
+9685	Felis catus Linnaeus, 1758	authority
+9685	Felis domesticus	synonym
+9685	Felis silvestris catus	synonym
+9685	Korat cats	includes
+9685	cat	common name
+9685	cats	common name
+9685	domestic cat	genbank common name
+9685	36475	merged_taxon_id
+9685	Cat	ensembl alias name
+9682	Felis	scientific name
+338152	Felinae	scientific name
+9681	Felidae	scientific name
+9681	cat family	genbank common name
+379583	Feliformia	scientific name
+9031	Gallus domesticus	misnomer
+9031	Gallus gallus	scientific name
+9031	Gallus gallus domesticus	misnomer
+9031	bantam	common name
+9031	chicken	genbank common name
+9031	chickens	common name
+9031	dwarf Leghorn chickens	includes
+9031	red junglefowl	includes
+9031	Chicken	ensembl alias name
+9030	Gallus	scientific name
+9072	Phasianinae	scientific name
+6239	Caenorhabditis elegans	scientific name
+6239	Caenorhabditis elegans (Maupas, 1900)	authority
+6239	Rhabditis elegans	synonym
+6239	Rhabditis elegans Maupas, 1900	authority
+6239	roundworm	common name
+6239	C.elegans	ensembl alias name
+6237	Caenorhabditis	scientific name
+55885	Peloderinae	scientific name
+6243	Rhabditidae	scientific name
+6243	54603	merged_taxon_id
+55879	Rhabditoidea	scientific name
+6236	Rhabditida	scientific name
+6236	33251	merged_taxon_id
+119089	Adenophorea	synonym
+119089	Chromadorea	scientific name
+119089	27837	merged_taxon_id
+6231	Nemata	synonym
+6231	Nematoda	scientific name
+6231	nematode	common name
+6231	nematodes	common name
+6231	nematodes	blast name
+6231	roundworm	common name
+6231	roundworms	genbank common name
+1206794	Ecdysozoa	scientific name
+1206794	Arthropods and nematodes	ensembl alias name
+1206794	936.5	ensembl timetree mya
+33317	Protostomia	scientific name
+8839	Anas boschas	synonym
+8839	Anas domesticus	synonym
+8839	Anas platyrhynchos	scientific name
+8839	Anas platyrhynchos Linnaeus 1758	authority
+8839	Anas platyrhynchos f. domestica	synonym
+8839	Anas platyrhynchus	misspelling
+8839	Beijing ducks	includes
+8839	Pekin duck	includes
+8839	Peking duck	includes
+8839	domestic duck	includes
+8839	duck	common name
+8839	mallard	genbank common name
+8839	mallard duck	common name
+8839	mallard ducks	common name
+8839	36478	merged_taxon_id
+8839	98961	merged_taxon_id
+8839	Duck	ensembl alias name
+8835	Anas	scientific name
+8835	ducks	genbank common name
+8830	Anatidae	scientific name
+8830	waterfowl	genbank common name
+8826	Anseriformes	scientific name
+59894	Ficedula albicollis	scientific name
+59894	Ficedula albicollis (Temminck, 1815)	authority
+59894	collared flycatcher	genbank common name
+59894	Flycatcher	ensembl alias name
+36292	Ficedula	scientific name
+36291	Muscicapidae	scientific name
+36291	Old World flycatchers	genbank common name
+7994	Astyanax mexicanus	scientific name
+7994	Astyanax mexicanus (De Filippi, 1853)	synonym
+7994	Mexican tetra	genbank common name
+7994	blind cave fish	common name
+7994	Cave fish	ensembl alias name
+7993	Astyanax	scientific name
+883878	Astyanax clade	scientific name
+533331	Characidae incertae sedis	scientific name
+7992	Characidae	scientific name
+7992	characins	genbank common name
+1489739	Characoidei	scientific name
+7991	Characiformes	scientific name
+186628	Characiphysae	scientific name
+186628	Characiphysi	synonym
+186628	Siluriphysi	synonym
+186628	186629	merged_taxon_id
+186626	Otophysa	scientific name
+186626	Otophysi	synonym
+186626	Teleost fishes	ensembl alias name
+186626	152.9	ensembl timetree mya
+32519	Ostariophysi	scientific name
+186634	Ostarioclupeomorpha	synonym
+186634	Otocephala	synonym
+186634	Otomorpha	scientific name
+9940	Ovis ammon aries	synonym
+9940	Ovis aries	scientific name
+9940	Ovis aries Linnaeus, 1758	authority
+9940	Ovis orientalis aries	synonym
+9940	Ovis ovis	synonym
+9940	domestic sheep	common name
+9940	lambs	common name
+9940	sheep	genbank common name
+9940	wild sheep	common name
+9940	9936	merged_taxon_id
+9940	Sheep	ensembl alias name
+9935	Ovis	scientific name
+9963	Caprinae	scientific name
+7918	Lepisosteus oculatus	scientific name
+7918	Lepisosteus oculatus Winchell, 1864	authority
+7918	spotted gar	genbank common name
+7918	Spotted gar	ensembl alias name
+7916	Lepisosteous	misspelling
+7916	Lepisosteus	scientific name
+7915	Lepisosteidae	scientific name
+7915	gars	genbank common name
+7914	Lepisosteiformes	synonym
+7914	Semionotiformes	scientific name
+1489100	Holostei	scientific name
+9361	Dasypus novemcinctus	scientific name
+9361	nine-banded armadillo	genbank common name
+9361	Armadillo	ensembl alias name
+9360	Dasypus	scientific name
+9359	Dasypodidae	scientific name
+9359	armadillo	common name
+9359	armadillos	genbank common name
+948951	Cingulata	scientific name
+9606	Homo sapiens	scientific name
+9606	Homo sapiens Linnaeus, 1758	authority
+9606	human	genbank common name
+9606	man	common name
+9606	Human	ensembl alias name
+9605	Homo	scientific name
+9605	Homo Linnaeus, 1758	authority
+9555	Anubis baboon	synonym
+9555	Doguera baboon	common name
+9555	Kenya baboon	common name
+9555	Papio anubis	scientific name
+9555	Papio anubis (Lesson, 1827)	authority
+9555	Papio cynocephalus anubis	synonym
+9555	Papio doguera	synonym
+9555	Papio hamadryas anubis	synonym
+9555	Papio hamadryas doguera	synonym
+9555	baboon	common name
+9555	olive baboon	genbank common name
+9555	9563	merged_taxon_id
+9555	Olive baboon	ensembl alias name
+9554	Papio	scientific name
+9554	Papio Erxleben, 1777	authority
+9554	baboons	genbank common name
+48698	Amazon molly	genbank common name
+48698	Limia formosa	synonym
+48698	Limia formosa Girard, 1859	authority
+48698	Mollienesia formosa	synonym
+48698	Poecilia formosa	scientific name
+48698	Poecilia formosa (Girard, 1859)	authority
+48698	Amazon molly	ensembl alias name
+8080	Poecilia	scientific name
+60711	Cercopithecus aethiops sabaeus	synonym
+60711	Cercopithecus sabaeus	genbank synonym
+60711	Cercopithecus sabeus	synonym
+60711	Chlorocebus aethiops sabaeus	synonym
+60711	Chlorocebus aethiops sabeus	synonym
+60711	Chlorocebus sabaeus	scientific name
+60711	Chlorocebus sabaeus (Linnaeus, 1776)	authority
+60711	Chlorocebus sabeus	synonym
+60711	green monkey	genbank common name
+60711	37765	merged_taxon_id
+60711	Vervet/AGM	ensembl alias name
+392815	Chlorocebus	scientific name
+7955	Brachidanio rerio	misspelling
+7955	Brachydanio rerio	synonym
+7955	Brachydanio rerio frankei	synonym
+7955	Cyprinus rerio	synonym
+7955	Cyprinus rerio Hamilton, 1822	synonym
+7955	Danio frankei	synonym
+7955	Danio rerio	scientific name
+7955	Danio rerio (Hamilton, 1822)	synonym
+7955	Danio rerio frankei	synonym
+7955	leopard danio	common name
+7955	zebra danio	common name
+7955	zebra fish	common name
+7955	zebrafish	genbank common name
+7955	27702	merged_taxon_id
+7955	37966	merged_taxon_id
+7955	Zebrafish	ensembl alias name
+7954	Brachydanio	synonym
+7954	Celestichthys	synonym
+7954	Danio	scientific name
+7954	46777	merged_taxon_id
+7954	487617	merged_taxon_id
+7953	Cyprinidae	scientific name
+30727	Cyprinoidea	scientific name
+30727	Cyprinoidei	synonym
+7952	Cypriniformes	scientific name
+186627	Cypriniphysae	scientific name
+186627	Cypriniphysi	synonym
+10116	Buffalo rat	includes
+10116	Gunn rats	misnomer
+10116	Norway rat	genbank common name
+10116	Rattus PC12 clone IS	includes
+10116	Rattus norvegicus	scientific name
+10116	Rattus norvegicus8	misspelling
+10116	Rattus norwegicus	misspelling
+10116	Rattus rattiscus	misnomer
+10116	Rattus sp. strain Wistar	equivalent name
+10116	Sprague-Dawley rat	includes
+10116	Wistar rats	includes
+10116	brown rat	common name
+10116	laboratory rat	includes
+10116	rat	common name
+10116	rats	common name
+10116	zitter rats	includes
+10116	36465	merged_taxon_id
+10116	Rat	ensembl alias name
+10114	Rattus	scientific name
+10114	rat	common name
+10114	rats	common name
+7227	Drosophila melangaster	misspelling
+7227	Drosophila melanogaster	scientific name
+7227	Drosophila melanogaster Meigen, 1830	authority
+7227	Sophophora melanogaster	synonym
+7227	Sophophora melanogaster (Meigen, 1830)	authority
+7227	fruit fly	genbank common name
+7227	Fruitfly	ensembl alias name
+32351	melanogaster subgroup	scientific name
+32346	melanogaster group	scientific name
+32341	Sophophora	scientific name
+7215	Drosophila	scientific name
+7215	Drosophila Fallen, 1823	authority
+7215	fruit flies	genbank common name
+7215	fruit fly	common name
+7215	7326	merged_taxon_id
+186285	Drosophiliti	scientific name
+46879	Drosophilina	scientific name
+46877	Drosophilini	scientific name
+43845	Drosophilinae	scientific name
+7214	Drosophilidae	scientific name
+7214	pomace flies	genbank common name
+43746	Ephydroidea	scientific name
+43741	Acalyptratae	scientific name
+43738	Schizophora	scientific name
+480117	Cyclorrhapha	scientific name
+480118	Eremoneura	scientific name
+43733	Asilomorpha	synonym
+43733	Muscomorpha	scientific name
+43733	43732	merged_taxon_id
+7203	Brachycera	scientific name
+7147	Diptera	scientific name
+7147	flies	genbank common name
+7147	flies	blast name
+33392	Endopterygota	scientific name
+33392	Holometabola	synonym
+33340	Neoptera	scientific name
+7496	Pterygota	scientific name
+7496	winged insects	genbank common name
+85512	Dicondylia	scientific name
+50557	Insecta	scientific name
+50557	true insects	genbank common name
+6960	Atelocerata	in-part
+6960	Hexapoda	scientific name
+6960	Tracheata	in-part
+6960	Uniramia	in-part
+6960	insects	genbank common name
+6960	insects	blast name
+197562	Pancrustacea	scientific name
+197563	Mandibulata	scientific name
+197563	mandibulates	common name
+6656	Arthropoda	scientific name
+6656	arthropods	genbank common name
+6656	arthropods	blast name
+88770	Panarthropoda	scientific name

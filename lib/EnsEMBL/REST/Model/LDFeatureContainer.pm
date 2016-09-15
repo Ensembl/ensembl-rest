@@ -1,4 +1,5 @@
-# Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,10 +58,11 @@ sub fetch_LDFeatureContainer_variation_name {
   }
   my $variation = $va->fetch_by_name($variation_name);
   Catalyst::Exception->throw("Could not fetch variation object for id: $variation_name.") if ! $variation;
-  my $vfs = $variation->get_all_VariationFeatures();
-  Catalyst::Exception->throw("Variant maps more than once to the genome.") if (scalar @$vfs > 1);
-  Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @$vfs == 0);
-  my $vf = $vfs->[0];
+  my @vfs = grep { $_->slice->is_reference } @{$variation->get_all_VariationFeatures()};
+
+  Catalyst::Exception->throw("Variant maps more than once to the genome.") if (scalar @vfs > 1);
+  Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @vfs == 0);
+  my $vf = $vfs[0];
 
   my $population_name = $c->request->param('population_name');
   if ($population_name) {

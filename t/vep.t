@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -776,6 +777,13 @@ $vep_output->[0]->{id} = 'ENST00000314040:c.311G>T';
 $json = json_GET($vep_hgvs_get,'GET consequences for transcript HGVS notation');
 eq_or_diff($json, $vep_output, 'VEP transcript HGVS GET');
 
+# test VEP hgvs post
+$vep_post = '/vep/homo_sapiens/hgvs';
+$vep_post_body = '{ "hgvs_notations" : ["ENST00000314040:c.311G>T"] }';
+$json = json_POST($vep_post,$vep_post_body,'VEP HGVS list POST');
+
+$vep_output->[0]->{input} = "ENST00000314040:c.311G>T";
+eq_or_diff($json, $vep_output, 'VEP HGVS POST');
 
 # test using a plugin
 my $vep_plugin_get = '/vep/homo_sapiens/hgvs/6:g.1102327G>T?content-type=application/json&RestTestPlugin=Hello';
@@ -818,6 +826,21 @@ $vep_output = [{
 
 $json = json_GET($vep_plugin_get,'GET consequences with test plugin');
 eq_or_diff($json, $vep_output, 'VEP plugin test');
+
+# test using refseq cache
+my $vep_refseq_get = '/vep/homo_sapiens/region/7:34097707-34097707:1/C?content-type=application/json&refseq=1';
+$json = json_GET($vep_refseq_get,'GET consequences with refseq cache');
+
+is_deeply(
+  {map {$_->{transcript_id} => 1} @{$json->[0]->{transcript_consequences}}},
+  {
+    'NM_133468.4' => 1,
+    'XM_005249632.1' => 1,
+    'XM_005249633.1' => 1,
+    'XM_005249634.1' => 1,
+  },
+  'refseq transcripts'
+);
 
 my $body = '{ "blurb" : "stink" }';
 # Test malformed messages

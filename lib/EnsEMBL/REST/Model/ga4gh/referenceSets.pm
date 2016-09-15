@@ -1,5 +1,6 @@
 =head1 LICENSE
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -19,12 +20,12 @@ extends 'Catalyst::Model';
 use Catalyst::Exception;
 use Scalar::Util qw/weaken/;
 use Try::Tiny;
-use Data::Dumper;
+
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 with 'Catalyst::Component::InstancePerContext';
 
-has 'context' => (is => 'ro');
+has 'context' => (is => 'ro', weak_ref => 1);
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 
@@ -38,10 +39,13 @@ sub build_per_context_instance {
 sub searchReferenceSet {
   
   my $self = shift;
+  my $data = shift; 
 
-  #$c->log->debug(Dumper $elf->context()->req->data);
+  return ({ referenceSets => [],
+            nextPageToken => $data->{pageToken} }) if $data->{pageSize} < 1; ;
 
-  my ( $referenceSets, $nextPageToken)  =  $self->fetchData( $self->context()->req->data );
+
+  my ( $referenceSets, $nextPageToken)  =  $self->fetchData( $data );
 
   return ({ referenceSets => $referenceSets,
             nextPageToken => $nextPageToken });
@@ -115,8 +119,8 @@ sub fetchData{
                                          &&  $data->{assemblyId}  ne $refset_hash->{id};
 
 
-    ## paging - only return requested page size
-    if (defined $data->{pageSize} && $data->{pageSize} ne '' && $count == $data->{pageSize}){
+    ## paging - only return requested page size for POST requests
+    if (defined $data->{pageSize} && $count == $data->{pageSize}){
       $nextPageToken = $n;
       last;
     }

@@ -5,9 +5,11 @@
 name = EnsEMBL::REST
 default_view = HTML
 
+site_name = Ensembl Rest API
 service_name = Ensembl REST API
 service_logo = /static/img/e-ensembl.png
 service_parent_url = http://www.ensembl.org
+wiki_url = http://github.com/Ensembl/ensembl-rest/wiki
 copyright_footer = <a href='http://www.sanger.ac.uk'>WTSI</a> &amp; <a href='http://www.ebi.ac.uk'>EBI</a>
 
 jsonp=1

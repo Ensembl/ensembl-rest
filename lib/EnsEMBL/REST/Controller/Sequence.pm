@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -227,6 +228,9 @@ sub _process_feature {
       # It's a protein that's been requested so we have to translate
       # the coordinates first
       $self->_translate_coordinates($c, $object) if($c->stash()->{dosubseq});
+    }
+    elsif($type eq 'genomic') {
+      $slice = $object->feature_Slice();
     }
   }
   elsif($object->isa('Bio::EnsEMBL::Transcript')) {

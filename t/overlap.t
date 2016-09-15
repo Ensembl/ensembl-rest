@@ -1,4 +1,5 @@
-# Copyright [1999-2016] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [2016] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -201,7 +202,8 @@ my $base = '/overlap/region/homo_sapiens';
     consequence_type => 'intergenic_variant',
     feature_type => 'variation',
     seq_region_name => '6',
-    alleles => [ qw/T -/]
+    alleles => [ qw/T -/],
+    source  => 'dbSNP'
   }, 'Checking one variation format');
   
   my $somatic_json = json_GET("$base/$region?feature=somatic_variation", 'Fetching somatic variations at '.$region);
@@ -263,19 +265,18 @@ my $base = '/overlap/region/homo_sapiens';
 
 #Regulatory feature testing
 {
-  my $region = '6:1020000..1025449';
+  my $region = '6:1024250..1025449';
   is_json_GET("$base/$region?feature=regulatory", [{
-    start => 1024250,
-    end => 1025449,
-    bound_start => 1024250,
-    bound_end => 1025449,
-    seq_region_name => '6',
-    strand => 0,
-    feature_type => 'regulatory',
-    ID => 'ENSR00001208657',
-    activity => 1,
-    description => "Predicted promoter flanking region",
-    cell_type => "MultiCell",
+      ID => 'ENSR00001208657',
+      bound_end => 1025449,
+      bound_start => 1024250,
+      description => 'Predicted promoter flanking region',
+      end => 1025449,
+      feature_type => 'regulatory' ,
+      seq_region_name => 6,
+      source => 'Regulatory_Build',
+      start => 1024250,
+      strand  => 0,
   }], 'Getting regulatory_feature as JSON');
 }
 
@@ -295,17 +296,18 @@ my $base = '/overlap/region/homo_sapiens';
 }
 
 #Segmentation feature testing
-{
-  my $region = '6:1020000..1020449';
-  is_json_GET("$base/$region?feature=segmentation;cell_type=K562", [{
-    start => 1019450,
-    end => 1020449,
-    feature_type => 'segmentation',
-    seq_region_name => '6',
-    cell_type => 'K562',
-    segmentation_feature_type => "Predicted heterochromatin",
-  }], 'Getting segmentation_feature as JSON');
-}
+#Disabled for e85 as we use different ways to access mouse and human segmentation. Activate in e86
+#{
+#  my $region = '6:1020000..1020449';
+#  is_json_GET("$base/$region?feature=segmentation;cell_type=K562", [{
+#    start => 1019450,
+#    end => 1020449,
+#    feature_type => 'segmentation',
+#    seq_region_name => '6',
+#    cell_type => 'K562',
+#    segmentation_feature_type => "Predicted heterochromatin",
+#  }], 'Getting segmentation_feature as JSON');
+#}
 
 #Probe feature testing
 {
@@ -325,13 +327,16 @@ my $base = '/overlap/region/homo_sapiens';
 {
   my $region = '6:1020000..1030000';
   is_json_GET("$base/$region?feature=chipseq", [{
-    start => 1024000,
-    end => 1024940,
-    feature_type => 'chipseq',
-    seq_region_name => '6',
-    strand => 0,
-    chipseq_feature_type => 'H3K27me3',
-    cell_type => 'K562'
+      description =>  'H3K27me3 - K562 enriched sites',
+      end => 1024940,
+      epigenome => 'K562',
+      feature_type => 'chipseq',
+      score =>  '14.340487',
+      seq_region_name => 6,
+      source => 'ccat_histone',
+      start => 1024000,
+      strand => 0,
+      summit  => 1024410,
   }], 'Getting probe_feature as JSON');
 }
 

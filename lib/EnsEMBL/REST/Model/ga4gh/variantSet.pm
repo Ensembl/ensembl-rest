@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2014] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@ package EnsEMBL::REST::Model::ga4gh::variantSet;
 
 use Moose;
 extends 'Catalyst::Model';
-use Data::Dumper;
+
 use Scalar::Util qw/weaken/;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;
 use Bio::EnsEMBL::IO::Parser::VCF4Tabix;
@@ -50,13 +51,17 @@ sub fetch_variantSets {
 
   my ($self, $data ) = @_;
 
+ return ({ "variantSets"   => [],
+           "nextPageToken" => $data->{pageToken}
+          }) if $data->{pageSize} < 1;
+
+
   ## extract required variant sets
   my ($variantSets, $newPageToken ) = $self->fetch_sets($data);
 
-  my $ret = { variantSets => $variantSets};
-  $ret->{pageToken} = $newPageToken  if defined $newPageToken ;
+  return ( { variantSets   => $variantSets,
+             nextPageToken => $newPageToken});
 
-  return $ret;
 }
 
 =head fetch_sets
@@ -97,9 +102,9 @@ sub fetch_sets{
     next if defined $data->{datasetId} && $data->{datasetId} ne ''
       &&  $datasetId ne $data->{datasetId} ; 
 
-    ## set next token and stop storing if page size reached
+    ## set next token and stop storing if page size reached if pageSize defined (ie POST request)
     if (defined $data->{pageSize} &&  $n == $data->{pageSize}){
-      $newPageToken = $varset_id if defined $data->{pageSize} && $n == $data->{pageSize};
+      $newPageToken = $varset_id;
       last;
     }
 
@@ -182,6 +187,9 @@ sub getVariantSet{
 
   my ($self, $id ) = @_; 
 
+  ## default current set for variant annotations
+  return $self->getEnsemblSet($id) if $id =~ /Ensembl/;
+
   ## extract required variant set 
   my ($variantSets, $newPageToken ) = $self->fetch_sets( {req_variantset => $id} );
 
@@ -190,6 +198,35 @@ sub getVariantSet{
   return $variantSets->[0];
 }
 
+sub getEnsemblSet{
+
+  my $self = shift;
+  my $id   = shift;
+
+  my $species = 'homo_sapiens';
+  my $core_ad = $self->context->model('Registry')->get_DBAdaptor($species, 'Core'  );
+
+  ## extract required meta data from core db
+  my $cmeta_ext_sth = $core_ad->dbc->db_handle->prepare(qq[ select meta_key, meta_value from meta]);
+  $cmeta_ext_sth->execute();
+  my $core_meta = $cmeta_ext_sth->fetchall_arrayref();
+
+  my %cmeta;
+  foreach my $l(@{$core_meta}){
+    $cmeta{$l->[0]} = $l->[1];
+  }
+
+  my $current_set = 'Ensembl.' . $cmeta{schema_version} . '.'. $cmeta{"assembly.default"};
+  return undef unless $id eq $current_set;
+
+  return  { id             => $current_set,
+            datasetId      => 'Ensembl',
+            metadata       => [],
+            referenceSetId => $cmeta{"assembly.default"},
+            name           => $current_set
+          };
+
+}
 sub sort_num{
   $a<=>$b;
 }

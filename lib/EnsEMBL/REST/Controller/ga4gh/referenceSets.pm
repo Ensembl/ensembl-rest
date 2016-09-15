@@ -1,6 +1,7 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -44,9 +45,13 @@ sub searchReferenceSets_POST {
   my ( $self, $c ) = @_;
 
   my $referenceSets;
+  my $post_data = $c->req->data ;
+
+  ## set a default page size if not supplied or not a number
+  $post_data->{pageSize} = 10 unless (defined  $post_data->{pageSize} && $post_data->{pageSize} =~ /\d+/);
 
   try {
-    $referenceSets = $c->model('ga4gh::referenceSets')->searchReferenceSet( $c->req->data );
+    $referenceSets = $c->model('ga4gh::referenceSets')->searchReferenceSet( $post_data );
   } catch {
     $c->go('ReturnError', 'from_ensembl', [$_]);
   };

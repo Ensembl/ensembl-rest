@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	84
+2	\N	schema_version	86
 3	\N	patch	patch_65_66_a.sql|schema_version
 4	\N	patch	patch_65_66_b.sql|fix_external_db_id
 5	\N	patch	patch_65_66_c.sql|reorder_unmapped_obj_index
@@ -141,3 +141,8 @@
 390	\N	patch	patch_83_84_c.sql|protein_feature_unique
 391	\N	patch	patch_83_84_d.sql|longer_synonym
 392	\N	patch	patch_83_84_e.sql|nullable_versions
+393	\N	patch	patch_84_85_a.sql|schema_version
+394	\N	patch	patch_84_85_b.sql|remove_duplicated_key
+395	\N	patch	patch_85_86_a.sql|schema_version
+396	\N	patch	patch_85_86_b.sql|add dna_align_feature_attrib table
+397	\N	patch	patch_85_86_c.sql|meta_case_insensitive
