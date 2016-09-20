@@ -60,6 +60,7 @@ RESTART_INTERVAL=1
 # This is only relevant if using Catalyst
 TDP_HOME="$HOME/$APP"
 export TDP_HOME
+export PROGRESSIVE_CACTUS_DIR="$HOME/src/progressiveCactus/"
 
 export ENSEMBL_REST_CONFIG=$APP_HOME/configurations/production/ensembl_rest.conf
 STARMAN="starman --backlog $BACKLOG --max-requests $MAXREQUESTS --workers $WORKERS $APP_HOME/configurations/production/ensrest.psgi"
