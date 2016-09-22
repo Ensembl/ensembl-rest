@@ -309,7 +309,6 @@ sub find_and_locate_object {
   
   my $expand = $c->request->param('expand');
   if ($expand) {
-    my $type;
     if ($input_type eq 'gene') {
       $features->{'Transcript'} = $self->Transcript($features->{id}, $species, $db_type);
     } elsif ($input_type eq 'transcript') {
