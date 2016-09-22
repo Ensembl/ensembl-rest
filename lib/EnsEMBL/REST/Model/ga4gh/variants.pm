@@ -30,7 +30,7 @@ use Bio::EnsEMBL::Variation::VariationFeature;
 use Bio::EnsEMBL::Variation::DBSQL::VariationFeatureAdaptor;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
-use Data::Dumper;
+
 with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro', weak_ref => 1);

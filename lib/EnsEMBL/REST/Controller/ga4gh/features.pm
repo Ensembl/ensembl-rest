@@ -56,22 +56,27 @@ sub searchFeatures_POST {
 
   ## required by spec, so check early
   $c->go( 'ReturnError', 'custom', [ ' Cannot find "parentId" or "featureSetId" key in your request' ] )
-    unless exists $post_data->{parentId} || exists $post_data->{featureSetId};
+    unless ((exists $post_data->{parentId}  && $post_data->{parentId} =~/\w+/) || 
+            (exists $post_data->{featureSetId} && $post_data->{featureSetId} =~/\w+/)) ;
 
   $c->go( 'ReturnError', 'custom', [ ' Cannot find "referenceName" key in your request' ] )
-    unless exists $post_data->{referenceName};
+    unless ( exists $post_data->{referenceName} && $post_data->{referenceName} =~/\w+/);
 
   $c->go( 'ReturnError', 'custom', [ ' Cannot find "start" key in your request' ] )
-    unless exists $post_data->{start};
+    unless ( exists $post_data->{start} && $post_data->{start} =~/\d+/);
 
   $c->go( 'ReturnError', 'custom', [ ' Cannot find "end" key in your request' ] )
-    unless exists $post_data->{end};
+    unless (exists $post_data->{end} && $post_data->{end} =~/\d+/); 
+
+  $c->go( 'ReturnError', 'custom', [ ' End must be greater than start' ] )
+    if (  $post_data->{end} < $post_data->{start});
+
 
   ## set a default page size if not supplied or not a number
-  $post_data->{pageSize} = 50 unless (defined  $post_data->{pageSize} && $post_data->{pageSize} =~ /\d+/ );
+  $post_data->{pageSize} = 200 unless (defined  $post_data->{pageSize} && $post_data->{pageSize} =~ /\d+/ );
 
   ## set a maximum page size 
-  $post_data->{pageSize} =  1000 if $post_data->{pageSize} > 1000; 
+  $post_data->{pageSize} =  200 if $post_data->{pageSize} > 1000; 
 
   my $features;
 

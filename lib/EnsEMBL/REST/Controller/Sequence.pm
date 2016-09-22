@@ -229,6 +229,9 @@ sub _process_feature {
       # the coordinates first
       $self->_translate_coordinates($c, $object) if($c->stash()->{dosubseq});
     }
+    elsif($type eq 'genomic') {
+      $slice = $object->feature_Slice();
+    }
   }
   elsif($object->isa('Bio::EnsEMBL::Transcript')) {
     if($type eq 'cdna') {

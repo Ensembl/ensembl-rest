@@ -51,12 +51,14 @@ my $expected_data1 = {
   features => [                                 
     {                                           
       attributes => {                           
+        vals => { 
         biotype => ['protein_coding'],            
         created => ['1209467861'],                
         source  => ['ensembl'],
         external_name => ['AL033381.1-201'],
         updated => ['1209467861'],        
         version => ['1']
+       }
       },                                        
       childIds => [ 
         'ENSE00001271861.1', 
@@ -86,13 +88,15 @@ my $expected_data2 = {
   features => [
     {                                           
       attributes => {                           
+       vals => {
         biotype => ['snoRNA'],                    
         created => ['1268996515'],
         source => ['ensembl'],
         external_name => ['snoU13.72-201'],              
         updated => ['1268996515'],                
         structure => ['1:103	.18(3.2(4.2(5.5)5.7(8.2(.(6.3)3.)3.).2)8.3)4.2)3'],
-        version => ['1']                          
+        version => ['1']
+       }                          
       },
       childIds => [ 
           'ENSE00001808595.1'
@@ -120,14 +124,16 @@ my $expected_data2 = {
 my $expected_data3 = {                                      
 features => [                        
   {                                  
-    attributes => {                  
+    attributes => {
+     vals => {               
       'gene gc' => ['44.14'],          
       biotype => ['protein_coding'],   
       created => ['1209467861'],       
       external_name => ['AL033381.1'],              
       source => ['ensembl'],  
       updated => ['1209467861'],       
-      version => ['1']                 
+      version => ['1'] 
+     }                
     },                               
     childIds => [                    
       'ENST00000314040.1'            
@@ -141,7 +147,7 @@ features => [
       term => 'gene'                 
     },                               
     id => 'ENSG00000176515.1',       
-    parentId => undef,               
+    parentId => '',               
     referenceName => '6',            
     start => 1080163,                
     strand => 'NEG_STRAND'           
@@ -181,6 +187,7 @@ my $json4 = json_GET("$base/$id", 'get transcript');
 
 my $expected_data4 =  {                                           
       attributes => {                           
+       vals => {
         biotype => ['antisense'],                 
         created => ['1321005463'],                
         author  => ['Havana'],
@@ -189,6 +196,7 @@ my $expected_data4 =  {
         source => ['havana'],      
         updated => ['1321005463'],                
         version => ['1']                          
+       }
       },
       childIds => [
        'ENSE00002577443.1'
