@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	85
+2	\N	schema_version	86
 3	\N	patch	patch_75_76_a.sql|schema_version
 4	\N	patch	patch_75_76_b.sql|result/feature_set.experiment_id & experiment/input_subset.display_url/archive_id
 5	\N	patch	patch_75_76_c.sql|cell_type.display_label
@@ -51,3 +51,8 @@
 626	\N	patch	patch_84_85_z.sql|Move segmentation entries from result_set table into the new segmentation_file table.
 627	\N	patch	patch_84_85_za.sql|Move entries provided by external sources from the result_set table into the new external_feature_file table.
 628	\N	patch	patch_84_85_zb.sql|Bugfix, the primary key was wrongly named.
+629	\N	patch	patch_85_86_a.sql|schema_version
+630	\N	patch	patch_85_86_b.sql|Drop tables epigenome_lineage and lineage
+631	\N	patch	patch_85_86_c.sql|Add production name column to feature_type table
+632	\N	patch	patch_85_86_d.sql|Add new columns to input_subset table to accommodate paired-end data
+633	\N	patch	patch_85_86_e.sql|Add QC tables

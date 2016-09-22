@@ -21,7 +21,7 @@ package EnsEMBL::REST::Model::ga4gh::callSet;
 
 use Moose;
 extends 'Catalyst::Model';
-use Data::Dumper;
+
 
 use Scalar::Util qw/weaken/;
 use Bio::EnsEMBL::Variation::DBSQL::VCFCollectionAdaptor;

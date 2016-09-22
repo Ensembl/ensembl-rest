@@ -13,3 +13,5 @@
 14	\N	patch	patch_85_86_a.sql|schema_version
 15	\N	patch	patch_85_86_b.sql|species_tree_root.species_tree
 16	\N	patch	patch_85_86_c.sql|gene_tree_root.species_tree_root_id
+17	\N	patch	patch_85_86_d.sql|homology.high_confidence
+18	\N	patch	patch_85_86_e.sql|gene_member_hom_stats
