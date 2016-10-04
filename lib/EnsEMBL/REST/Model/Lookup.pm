@@ -107,8 +107,9 @@ sub find_genetree_by_member_id {
   }
   Catalyst::Exception->throw("Could not fetch a $object_type object for ID $id") unless $member;
 
+  my $clusterset_id = $c->request->parameters->{clusterset_id};
   my $gta = $dba->get_GeneTreeAdaptor;
-  my $gt = $gta->fetch_default_for_Member($member);
+  my $gt = $gta->fetch_default_for_Member($member, $clusterset_id);
   Catalyst::Exception->throw("No GeneTree found for $object_type ID $id") unless $gt;
   return $gt;
 }
