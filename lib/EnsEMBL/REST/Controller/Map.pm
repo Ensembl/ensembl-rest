@@ -23,7 +23,6 @@ use namespace::autoclean;
 use Try::Tiny;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
-use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
