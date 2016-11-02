@@ -54,6 +54,31 @@ has 'replacements' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub 
 
 has 'paths' => ( is => 'ro', isa => 'ArrayRef' );
 
+# Overwrite the default behaviours of Hash::Merge described here:
+#   http://search.cpan.org/~rehsack/Hash-Merge-0.200/lib/Hash/Merge.pm#BUILT-IN_BEHAVIORS
+# Merge only between hash and hash. In other cases, replace the value by the "LEFT_PRECEDENT" method.
+# This will allow overwritting of configuration items that have either scalar or array values.
+    
+Hash::Merge::specify_behavior (
+  {
+    'SCALAR' => {
+      'SCALAR' => sub { $_[0] },
+      'ARRAY'  => sub { $_[0] },
+      'HASH'   => sub { $_[0] },
+    },
+    'ARRAY' => {
+      'SCALAR' => sub { $_[0] },
+      'ARRAY'  => sub { $_[0] },
+      'HASH'   => sub { $_[0] }, 
+    },
+    'HASH' => {
+      'SCALAR' => sub { $_[0] },
+      'ARRAY'  => sub { $_[0] },
+      'HASH'   => sub { Hash::Merge::_merge_hashes( $_[0], $_[1] ) }, 
+    },
+  }
+);
+
 sub merged_config {
   my ($self) = @_;
   my $merged_cfg = $self->_merged_config();

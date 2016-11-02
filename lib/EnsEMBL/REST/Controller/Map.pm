@@ -27,18 +27,6 @@ use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
-sub region : Chained('/') CaptureArgs(1) PathPart('map') {
-  my ( $self, $c, $species) = @_;
-  $c->stash->{species} = $species;
-  try {
-    $c->stash->{slice_adaptor} = $c->model('Registry')->get_adaptor( $species, 'Core', 'Slice' );
-  } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', [qq{$_}]);
-  };
-}
-
-
 sub translation_GET {  }
 
 sub translation: Chained('/') Args(2) PathPart('map/translation') ActionClass('REST') {
@@ -99,22 +87,28 @@ sub _map_transcript_coords {
 
 ## Create a slice object based on the location string provided
 ## do not proceed if anything went wrong on the way
-sub get_region_slice : Chained("region") PathPart("") CaptureArgs(2) {
-  my ( $self, $c, $old_assembly, $region ) = @_;
+sub mapped_region_data : Chained("/") PathPart("map") ActionClass('REST') {
+  my ( $self, $c, $species, $old_assembly, $region, $target_assembly) = @_;
+  $c->stash->{species} = $species;
+  try {
+    $c->stash->{slice_adaptor} = $c->model('Registry')->get_adaptor( $species, 'Core', 'Slice' );
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
   $c->log->info($region);
   try {
     my ($old_sr_name, $old_start, $old_end, $old_strand) = $c->model('Lookup')->decode_region($region);
     my $coord_system = $c->request()->param('coord_system') || 'chromosome';
     my $old_slice = $c->stash->{slice_adaptor}->fetch_by_region($coord_system, $old_sr_name, $old_start, $old_end, $old_strand, $old_assembly);
+    if (!defined $old_slice) {
+      $c->go('ReturnError', 'custom', [qq{'No slice found for $old_sr_name on coord_system $coord_system and assembly $old_assembly'}]);
+    }
     $c->stash->{old_slice} = $old_slice;
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
-}
-
-sub mapped_region_data : Chained('get_region_slice') PathPart('') Args(1) ActionClass('REST') {
-  my ( $self, $c, $target_assembly ) = @_;
   $c->stash->{target_assembly} = $target_assembly;
 }
 

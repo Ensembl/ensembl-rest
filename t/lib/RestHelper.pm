@@ -35,7 +35,6 @@ use HTTP::Request;
 sub is_json_GET($$$) {
   my ($url, $expected, $msg) = @_;
   my $json = json_GET($url, $msg);
-  warn $json;
   return eq_or_diff_data($json, $expected, "$url | $msg") if $json;
   return;
 }
