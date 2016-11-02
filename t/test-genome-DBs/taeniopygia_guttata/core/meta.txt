@@ -1,4 +1,4 @@
-1	\N	schema_version	86
+1	\N	schema_version	87
 2	\N	patch	patch_50_51_a.sql|schema_version
 3	\N	patch	patch_50_51_b.sql|protein_feature_hit_name
 4	\N	patch	patch_50_51_c.sql|meta_coord_index
@@ -214,3 +214,6 @@
 1268	\N	patch	patch_85_86_a.sql|schema_version
 1269	\N	patch	patch_85_86_b.sql|add dna_align_feature_attrib table
 1270	\N	patch	patch_85_86_c.sql|meta_case_insensitive
+1271	\N	patch	patch_86_87_a.sql|schema_version
+1272	\N	patch	patch_86_87_b.sql|meta_value_NOT_NULL
+1273	\N	patch	patch_86_87_c.sql|datetime_default_NULL

@@ -1,6 +1,6 @@
-19	RegulatoryFeature	Regulatory Feature	16	Regulatory Feature	SO:0005836	regulatory_region
-179363	Promoter Flanking Region	Regulatory Feature	16	Predicted promoter flanking region	SO:0001952	promoter_flanking_region
-178980	USF1	Transcription Factor	70	USF1 Transcription Factor Binding	SO:0000235	TF_binding_site
-179460	Predicted heterochromatin	Segmentation State	83	Predicted heterochromatin	NULL	\N
-179033	SegmentationState	Segmentation State	83	Regulatory genome segment	NULL	NULL
-11	H3K27me3	Histone	0	Histone 3 Lysine 27 Tri-Methylation	SO:0001709	H3K27_trimethylation_site
+19	RegulatoryFeature	Regulatory Feature	16	Regulatory Feature	SO:0005836	regulatory_region	\N
+179363	Promoter Flanking Region	Regulatory Feature	16	Predicted promoter flanking region	SO:0001952	promoter_flanking_region	\N
+178980	USF1	Transcription Factor	70	USF1 Transcription Factor Binding	SO:0000235	TF_binding_site	\N
+179460	Predicted heterochromatin	Segmentation State	83	Predicted heterochromatin	NULL	\N	\N
+179033	SegmentationState	Segmentation State	83	Regulatory genome segment	NULL	NULL	\N
+11	H3K27me3	Histone	0	Histone 3 Lysine 27 Tri-Methylation	SO:0001709	H3K27_trimethylation_site	\N

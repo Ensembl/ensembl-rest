@@ -178,7 +178,8 @@ limitations under the License.
       }
       },
       error : function (resp, msg) {
-         $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\">" + resp.responseText + "</pre>");
+         $("#example[% p.value.id %]").append("<pre id=\"pre[% p.value.id %]\"></pre>");
+         $("#pre[% p.value.id %]").text(resp.responseText);
          $("#example[% p.value.id %]>img").remove();
       }
       };

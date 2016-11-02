@@ -168,7 +168,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=85 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=88 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -485,7 +485,8 @@ CREATE TABLE `study` (
   `external_reference` varchar(255) DEFAULT NULL,
   `study_type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`study_id`),
-  KEY `source_idx` (`source_id`)
+  KEY `source_idx` (`source_id`),
+  KEY `external_reference_idx` (`external_reference`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4480 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `submitter_handle` (
