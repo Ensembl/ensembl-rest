@@ -299,11 +299,17 @@ sub find_and_locate_object {
   my $object_type = $captures[1];
   my $db_type = $captures[2];
   my $features = $self->features_as_hash($id, $species, $object_type, $db_type);
-
+  my $input_type = lc($features->{object_type});
+  
+  #include phenotypes for genes
+  my $phenotypes = $c->request->param('phenotypes');
+  if($phenotypes && $input_type eq 'gene'){
+    #fetch the gene phenotype info
+    $features->{'phenotypes'} = $self->phenotypes($features->{id});
+  }
+  
   my $expand = $c->request->param('expand');
   if ($expand) {
-    my $type;
-    my $input_type = lc($features->{object_type});
     if ($input_type eq 'gene') {
       $features->{'Transcript'} = $self->Transcript($features->{id}, $species, $db_type);
     } elsif ($input_type eq 'transcript') {
@@ -528,6 +534,13 @@ sub ontology_accession_to_OntologyTerm {
   my $c = $self->context();
   my $term_adaptor = $c->model('Registry')->get_ontology_term_adaptor();
   return $term_adaptor->fetch_by_accession($accession, 1);
+}
+
+sub phenotypes {
+  my ($self, $id) = @_;
+  my $c = $self->context();
+  my $phenotypes = $c->model('Variation')->get_gene_phenotype_info($id);
+  return $phenotypes;
 }
 
 __PACKAGE__->meta->make_immutable;

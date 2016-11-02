@@ -178,6 +178,28 @@ sub get_phenotype_info {
   return \@phenotypes;
 }
 
+sub get_gene_phenotype_info {
+  my ($self, $id) = @_;
+  
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my @phenotypes;  
+  my $pfa = $c->model('Registry')->get_adaptor($species, 'variation', 'phenotypefeature');
+  my @pfs = @{$pfa->fetch_all_by_object_id($id, 'Gene')};
+
+  my %seen = ();
+
+  foreach my $phen (@pfs) {
+    my $hash = $self->phen_as_hash($phen);
+    my $key = join("", sort values %$hash);
+    push (@phenotypes, $hash) unless $seen{$key};
+    $seen{$key} = 1;
+  }
+
+  return \@phenotypes;
+}
+
 sub phen_as_hash {
   my ($self, $phen) = @_;
 
