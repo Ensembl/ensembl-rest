@@ -1,0 +1,2 @@
+57633	NULL	NULL	positive regulation of transcription from RNA polymerase II promoter
+58138	NULL	NULL	soft palate development

@@ -1,5 +1,5 @@
 1775	1	xref.timestamp	2012-09-03 21:14:58
-1	\N	schema_version	86
+1	\N	schema_version	87
 2	\N	patch	patch_52_53_a.sql|schema_version
 3	\N	patch	patch_52_53_b.sql|external_db_type_enum
 4	\N	patch	patch_52_53_c.sql|identity_xref_rename
@@ -215,3 +215,6 @@
 1827	\N	patch	patch_85_86_a.sql|schema_version
 1828	\N	patch	patch_85_86_b.sql|add dna_align_feature_attrib table
 1829	\N	patch	patch_85_86_c.sql|meta_case_insensitive
+1830	\N	patch	patch_86_87_a.sql|schema_version
+1831	\N	patch	patch_86_87_b.sql|meta_value_NOT_NULL
+1832	\N	patch	patch_86_87_c.sql|datetime_default_NULL
