@@ -104,4 +104,79 @@ my $basic_mapping = { mappings => [
   );
 }
 
+# The following tests are for objects with different types but the same stable id.     
+#cDNA mapping
+{
+  is_json_GET(
+    '/map/cdna/CCDS10020.1/100..300',
+    { mappings => [
+      {
+        "assembly_name"=>"GRCh37","end"=>28081775,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28081648
+      },
+      {
+        "assembly_name"=>"GRCh37","end"=>28032163,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28032091
+      }
+    ]},
+    'Mapping transcript cDNA to multi-region position to genome for CCDS10020.1'
+  );
+}
+
+#CDS mapping
+{
+  is_json_GET(
+    '/map/cds/CCDS10020.1/100..300',
+    { "mappings" => [
+      {
+        "assembly_name"=>"GRCh37","end"=>28081775,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28081648
+      },
+      {
+        "assembly_name"=>"GRCh37","end"=>28032163,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28032091
+      }
+    ]},
+    'Mapping transcript CDS to multi-region position to genome for CCDS10020.1'
+  );
+}
+
+#protein mapping
+{
+  is_json_GET(
+    '/map/translation/CCDS10020.1/100..300',
+    { "mappings" => [
+      {
+        "assembly_name"=>"GRCh37","end"=>28032093,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28032065
+      },
+      {
+        "assembly_name"=>"GRCh37","end"=>28028059,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28027871
+      },
+      {
+        "assembly_name"=>"GRCh37","end"=>28024902,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28024845
+      },
+      {
+        "assembly_name"=>"GRCh37","end"=>28022573,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28022501
+      },
+      {
+        "assembly_name"=>"GRCh37","end"=>28018557,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28018397
+      },
+      {
+        "assembly_name"=>"GRCh37","end"=>28016186,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28016104
+      },
+      {
+        "assembly_name"=>"GRCh37","end"=>28014929,"seq_region_name"=>"15","gap"=>0,
+        "strand"=>-1,"coord_system"=>"chromosome","rank"=>0,"start"=>28014920
+      }
+    ]},
+    'Mapping protein to multi-region position to genome for CCDS10020.1'
+  );
+}
+
 done_testing();

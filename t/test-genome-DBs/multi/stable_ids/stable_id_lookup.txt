@@ -218,3 +218,6 @@ ENST00000572027	61	core	Transcript
 ENST00000572688	61	core	Transcript
 ENST00000574069	61	core	Transcript
 ENST00000576892	61	core	Transcript
+CCDS10020.1	61	core	Gene
+CCDS10020.1	61	core	Transcript
+CCDS10020.1	61	core	Translation
