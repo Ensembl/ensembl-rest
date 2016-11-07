@@ -104,6 +104,41 @@ my $basic_mapping = { mappings => [
   );
 }
 
+my $basic_mapping_cdna_including_original_region = { mappings => [
+  {'original' => {'gap' => 0,'strand' => 1,'coord_system' => 'cdna','rank' => 0,'start' => 292,'end' => 294},
+   'mapped' => {'assembly_name' => 'GRCh37','end' => 1101531,'seq_region_name' => '6','gap' => 0, 'strand' => 1,'coord_system' => 'chromosome','rank' => 0,'start' => 1101529}
+  },
+  {'original' => {'gap' => 0,'strand' => 1,'coord_system' => 'cdna','rank' => 0,'start' => 295,'end' => 297},
+   'mapped' => {'assembly_name' => 'GRCh37','end' => 1102043,'seq_region_name' => '6','gap' => 0,'strand' => 1,'coord_system' => 'chromosome','rank' => 0,'start' => 1102041}
+  }
+  ]};
+#cDNA mapping with include_original_region option
+{
+  is_json_GET(
+    '/map/cdna/ENST00000314040/292..297?include_original_region=1',
+    $basic_mapping_cdna_including_original_region,
+    'Mapping transcript cDNA to multi-region position to genome with include_original_region option'
+  );
+}
+
+my $basic_mapping_cds_including_original_region = {mappings => [
+  {'original' => {'gap' => 0,'strand' => 1,'coord_system' => 'cds','rank' => 0,'start' => 22,'end' => 24},
+   'mapped' => {'assembly_name' => 'GRCh37','end' => 1101531,'seq_region_name' => '6','gap' => 0,'strand' => 1,'coord_system' => 'chromosome','rank' => 0,'start' => 1101529}
+  },
+  {'original' => {'gap' => 0,'strand' => 1,'coord_system' => 'cds','rank' => 0,'start' => 25,'end' => 27},
+   'mapped' => {  'assembly_name' => 'GRCh37','end' => 1102043,'seq_region_name' => '6','gap' => 0,'strand' => 1,'coord_system' => 'chromosome','rank' => 0,'start' => 1102041}
+  }
+  ]};
+
+#CDS mapping with include_original_region option
+{
+  is_json_GET(
+    '/map/cds/ENST00000314040/22..27?include_original_region=1',
+    $basic_mapping_cds_including_original_region,
+    'Mapping transcript CDS to multi-region position to genome with include_original_region option'
+  );
+}
+
 # The following tests are for objects with different types but the same stable id.     
 #cDNA mapping
 {

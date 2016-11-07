@@ -308,6 +308,32 @@ sub count_leaves {
 
 is(count_leaves($json->{tree}), 69, 'Got all the leaves');
 
+sub find_leaf {
+    my ($node, $leaf_name) = @_;
+    if (exists $node->{children}) {
+        return map {find_leaf($_, $leaf_name)} @{$node->{children}};
+    } elsif ($node->{id}->{accession} eq $leaf_name) {
+        return ($node,);
+    } else {
+        return (),
+    }
+}
+
+my $json1 = json_GET(
+    '/genetree/member/id/ENSG00000176515?compara=homology&clusterset_id=default',
+    'Gene-tree (ncRNA) by ID. Explicitly require the default clusterset_id',
+);
+is(count_leaves($json1->{tree}), 69, 'Got all the leaves');
+my ($human_leaf) = find_leaf($json1->{'tree'}, 'ENSG00000176515');
+is($human_leaf->{'branch_length'}, '0.1', 'Got the right branch-length');
+
+my $json2 = json_GET(
+    '/genetree/member/id/ENSG00000176515?compara=homology&clusterset_id=ss_it_s16',
+    'Gene-tree (ncRNA) by ID. Alternative clusterset_id',
+);
+is(count_leaves($json2->{tree}), 69, 'Got all the leaves');
+($human_leaf) = find_leaf($json2->{'tree'}, 'ENSG00000176515');
+is($human_leaf->{'branch_length'}, '2.11826733883463e-06', 'Got the right branch-length');
 
 
 my $restricted_ENSGT00390000003602 = {
