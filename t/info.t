@@ -101,7 +101,7 @@ is_json_GET(
 # /info/analysis/:species
 {
   my $analysis_json = json_GET('/info/analysis/homo_sapiens', 'Get analysis hash');
-  cmp_ok(scalar(keys %{$analysis_json}), '==', 36, 'Ensuring we have the right number of analyses available');
+  cmp_ok(scalar(keys %{$analysis_json}), '==', 37, 'Ensuring we have the right number of analyses available');
   my %unique_groups = map { $_, 1 } map { @{$_} } values %{$analysis_json};
   eq_or_diff_data(\%unique_groups, {core => 1, funcgen => 1}, 'Checking there is only one group with analyses');
 
@@ -124,7 +124,7 @@ is_json_GET(
 {
   my $biotypes_json = json_GET('/info/biotypes/homo_sapiens', 'Get the biotypes hash');
   is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
-  cmp_ok(scalar(@{$biotypes_json}), '==', 11, 'Ensuring we have the right number of biotypes');
+  cmp_ok(scalar(@{$biotypes_json}), '==', 12, 'Ensuring we have the right number of biotypes');
   my ($protein_coding) = grep { $_->{biotype} eq 'protein_coding' } @{$biotypes_json};
   my $expected = { biotype => 'protein_coding', groups => ['core'], objects => ['gene', 'transcript']};
   eq_or_diff_data($protein_coding, $expected, 'Checking internal contents of biotype hash as expected');

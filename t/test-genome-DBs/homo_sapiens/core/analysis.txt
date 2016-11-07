@@ -30,3 +30,4 @@
 8304	2011-02-15 17:06:42	firstef	firstef	\N	\N	firstef	\N	\N	-repeatmasked	FirstEF	\N	firstef	exon
 8305	2011-02-15 17:06:42	cpg	cpg	\N	\N	cpg	\N	cpg	\N	CPG	\N	cpg	cpg_island
 8306	2011-02-15 17:06:42	eponine	Eponine	\N	\N	eponine-scan	1	/vol/software/linux-x86_64/jdk1.6.0_01/bin/java	-epojar => /usr/local/ensembl/lib/eponine-scan.jar, -threshold => 0.999	EponineTSS	\N	Eponine	TSS
+8359	2014-06-25 16:43:11	ccds_import	\N	24042014	\N	\N	\N	\N	\N	\N	\N	\N	\N
