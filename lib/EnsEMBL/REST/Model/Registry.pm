@@ -306,14 +306,10 @@ sub get_species {
   my $info = $self->_species_info();
   #have to force numerification again. It got lost ... somewhere
   #filter by division (e.g.: ensembl)
-  if($division){
-  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{division}) eq lc($division) } @{$info}];
-  }
+  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{division}) eq lc($division) } @{$info}] if $division;
 
   #filter by strain_collection (e.g.: mouse)
-  if ($strain_collection){
-  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{strain_collection}) eq lc($strain_collection) } @{$info}];
-  }
+  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{strain_collection}) eq lc($strain_collection) } @{$info}] if $strain_collection;
 
   #flag to show or hide strain info. Avoid the urge to delete the key-value pair from hash, it will have some unwanted consequence.
   if($hide_strain_info > 0){
