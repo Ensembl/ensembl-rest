@@ -218,3 +218,5 @@
 1830	\N	patch	patch_86_87_a.sql|schema_version
 1831	\N	patch	patch_86_87_b.sql|meta_value_NOT_NULL
 1832	\N	patch	patch_86_87_c.sql|datetime_default_NULL
+1833	1	species.strain	test_strain
+1834	1	species.strain_collection	human

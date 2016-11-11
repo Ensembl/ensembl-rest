@@ -227,6 +227,7 @@ sub _intern_db_connections {
   return;
 }
 
+
 sub _build_lookup {
   my ($self) = @_;
 
@@ -301,11 +302,34 @@ sub get_species_and_object_type {
 }
 
 sub get_species {
-  my ($self, $division) = @_;
+  my ($self, $division, $strain_collection, $hide_strain_info) = @_;
   my $info = $self->_species_info();
   #have to force numerification again. It got lost ... somewhere
-  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} @{$info} ] unless $division;
+  #filter by division (e.g.: ensembl)
+  if($division){
   return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{division}) eq lc($division) } @{$info}];
+  }
+
+  #filter by strain_collection (e.g.: mouse)
+  if ($strain_collection){
+  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{strain_collection}) eq lc($strain_collection) } @{$info}];
+  }
+
+  #flag to show or hide strain info. Avoid the urge to delete the key-value pair from hash, it will have some unwanted consequence.
+  if($hide_strain_info > 0){
+    my @hidden_keys = qw(strain strain_collection);
+    my $new_info_list = [];
+    foreach my $inf(@{$info}){
+    my $new_info_hash = {};
+      foreach my $key(keys $inf){
+        $new_info_hash->{$key} = $inf->{$key} unless $key ~~ @hidden_keys;
+      }
+    push ($new_info_list, $new_info_hash);
+    }
+    return $new_info_list;
+  }
+
+  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} @{$info} ];
 }
 
 sub _build_species_info {
@@ -321,7 +345,7 @@ sub _build_species_info {
 
   my @all_dbadaptors = grep {$_->dbc->dbname ne 'ncbi_taxonomy'} @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
   my @core_dbadaptors;
-  my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup);
+  my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup, %strain_lookup, %strain_collection_lookup);
   my %processed_db;
   while(my $dba = shift @all_dbadaptors) {
     my $species = $dba->species();
@@ -350,26 +374,34 @@ sub _build_species_info {
           $display_lookup{$species} = $mc->get_display_name();
           $assembly_lookup{$species} = $csa->get_default_version();
           $accession_lookup{$species} = $mc->single_value_by_key('assembly.accession');
-        }
+          $strain_lookup{$species} = $mc->single_value_by_key('species.strain');
+          $strain_collection_lookup{$species} = $mc->single_value_by_key('species.strain_collection');
+         }
         else {
           $dbc->sql_helper->execute_no_return(
             -SQL => q/select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value
-		from meta m1, meta m2, meta m3, meta m4
+		from meta m1, meta m2, meta m3, meta m4, meta m5, meta m6
 		where
 		m1.species_id = m2.species_id
 		and m1.species_id = m3.species_id
 		and m1.species_id = m4.species_id
+		and m1.species_id = m5.species_id
+		and m1.species_id = m6.species_id
 		and m1.meta_key = ?
 		and m2.meta_key = ?
 		and m3.meta_key = ?
-		and m4.meta_key = ?/,
-            -PARAMS => ['species.production_name', 'species.division', 'species.display_name', 'species.taxonomy_id'],
+		and m4.meta_key = ?
+		and m5.meta_key = ?
+		and m6.meta_key = ?/,
+            -PARAMS => ['species.production_name', 'species.division', 'species.display_name', 'species.taxonomy_id', 'species.strain', 'species.strain_collection'],
             -CALLBACK => sub {
               my ($row) = @_;
               $division_lookup{$row->[0]} = $row->[1];
               $display_lookup{$row->[0]} = $row->[2];
               $taxon_lookup{$row->[0]} = $row->[3];
               $release_lookup{$row->[0]} = $schema_version;
+              $strain_lookup{$row->[0]} = $row->[4];
+              $strain_collection_lookup{$row->[0]} = $row->[5];
               return;
             }
           );
@@ -427,7 +459,9 @@ sub _build_species_info {
       display_name => $display_lookup{$species},
       taxon_id => $taxon_lookup{$species},
       accession => $accession_lookup{$species},
-      assembly => $assembly_lookup{$species}
+      assembly => $assembly_lookup{$species},
+      strain => $strain_lookup{$species},
+      strain_collection => $strain_collection_lookup{$species},
     };
     push(@species, $info);
   }

@@ -95,7 +95,10 @@ sub species : Local : ActionClass('REST') :Args(0) { }
 sub species_GET :Local :Args(0) {
   my ($self, $c) = @_;
   my $division = $c->request->param('division');
-  $self->status_ok($c, entity => { species => $c->model('Registry')->get_species($division)});
+  my $strain_collection = $c->request->param('strain_collection');
+  my $hide_strain_info = $c->request->param('hide_strain_info');
+  $hide_strain_info = $hide_strain_info || 0;
+  $self->status_ok($c, entity => { species => $c->model('Registry')->get_species($division, $strain_collection, $hide_strain_info)});
   return;
 }
 
