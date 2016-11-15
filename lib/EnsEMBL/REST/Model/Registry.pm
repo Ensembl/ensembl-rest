@@ -311,7 +311,7 @@ sub get_species {
   #filter by strain_collection (e.g.: mouse)
   return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{strain_collection}) eq lc($strain_collection) } @{$info}] if $strain_collection;
 
-  #flag to show or hide strain info. Avoid the urge to delete the key-value pair from hash, it will have some unwanted consequence.
+  #flag to show or hide strain info
   if($hide_strain_info > 0){
     my @hidden_keys = qw(strain strain_collection);
     my $new_info_list = [];
