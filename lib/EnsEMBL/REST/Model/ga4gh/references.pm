@@ -140,7 +140,7 @@ sub format_sequence{
   $ref{sourceAccessions} = $seq->{sourceAccessions}; 
   $ref{isPrimary}        = $seq->{isPrimary};
 
-  $ref{ncbiTaxonId}      = 9609; 
+  $ref{ncbiTaxonId}      = 9606; 
   $ref{isDerived}        = 'true'; ##ambiguity codes have been changed to Ns
   $ref{sourceDivergence} = undef;
 
