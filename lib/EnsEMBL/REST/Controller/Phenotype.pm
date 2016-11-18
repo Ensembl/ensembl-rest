@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package EnsEMBL::REST::Controller::Phenotype;
-use Data::Dumper;
+
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
