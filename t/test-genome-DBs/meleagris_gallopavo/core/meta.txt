@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	85
+2	\N	schema_version	87
 3	\N	patch	patch_59_60_a.sql|schema_version
 4	\N	patch	patch_59_60_b.sql|rename_go_xref_table
 5	\N	patch	patch_59_60_c.sql|QC_fixes
@@ -167,3 +167,9 @@
 1043	\N	patch	patch_83_84_e.sql|nullable_versions
 1044	\N	patch	patch_84_85_a.sql|schema_version
 1045	\N	patch	patch_84_85_b.sql|remove_duplicated_key
+1046	\N	patch	patch_85_86_a.sql|schema_version
+1047	\N	patch	patch_85_86_b.sql|add dna_align_feature_attrib table
+1048	\N	patch	patch_85_86_c.sql|meta_case_insensitive
+1049	\N	patch	patch_86_87_a.sql|schema_version
+1050	\N	patch	patch_86_87_b.sql|meta_value_NOT_NULL
+1051	\N	patch	patch_86_87_c.sql|datetime_default_NULL

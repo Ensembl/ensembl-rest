@@ -777,6 +777,13 @@ $vep_output->[0]->{id} = 'ENST00000314040:c.311G>T';
 $json = json_GET($vep_hgvs_get,'GET consequences for transcript HGVS notation');
 eq_or_diff($json, $vep_output, 'VEP transcript HGVS GET');
 
+# test VEP hgvs post
+$vep_post = '/vep/homo_sapiens/hgvs';
+$vep_post_body = '{ "hgvs_notations" : ["ENST00000314040:c.311G>T"] }';
+$json = json_POST($vep_post,$vep_post_body,'VEP HGVS list POST');
+
+$vep_output->[0]->{input} = "ENST00000314040:c.311G>T";
+eq_or_diff($json, $vep_output, 'VEP HGVS POST');
 
 # test using a plugin
 my $vep_plugin_get = '/vep/homo_sapiens/hgvs/6:g.1102327G>T?content-type=application/json&RestTestPlugin=Hello';

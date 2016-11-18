@@ -36,6 +36,7 @@ my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
+my $set_version = get_set_version($dba);
 
 my $base = '/ga4gh/features';
 
@@ -50,12 +51,14 @@ my $expected_data1 = {
   features => [                                 
     {                                           
       attributes => {                           
+        vals => { 
         biotype => ['protein_coding'],            
         created => ['1209467861'],                
         source  => ['ensembl'],
         external_name => ['AL033381.1-201'],
         updated => ['1209467861'],        
         version => ['1']
+       }
       },                                        
       childIds => [ 
         'ENSE00001271861.1', 
@@ -64,7 +67,7 @@ my $expected_data1 = {
         'ENSP00000320396.1' 
       ],
       parentId => 'ENSG00000176515.1',
-      featureSetId => 'Ensembl.85.GRCh37',  
+      featureSetId => $set_version,  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
@@ -85,18 +88,20 @@ my $expected_data2 = {
   features => [
     {                                           
       attributes => {                           
+       vals => {
         biotype => ['snoRNA'],                    
         created => ['1268996515'],
         source => ['ensembl'],
         external_name => ['snoU13.72-201'],              
         updated => ['1268996515'],                
         structure => ['1:103	.18(3.2(4.2(5.5)5.7(8.2(.(6.3)3.)3.).2)8.3)4.2)3'],
-        version => ['1']                          
+        version => ['1']
+       }                          
       },
       childIds => [ 
           'ENSE00001808595.1'
       ],                           
-      featureSetId => 'Ensembl.85.GRCh37',  
+      featureSetId => $set_version,  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
@@ -119,20 +124,22 @@ my $expected_data2 = {
 my $expected_data3 = {                                      
 features => [                        
   {                                  
-    attributes => {                  
+    attributes => {
+     vals => {               
       'gene gc' => ['44.14'],          
       biotype => ['protein_coding'],   
       created => ['1209467861'],       
       external_name => ['AL033381.1'],              
       source => ['ensembl'],  
       updated => ['1209467861'],       
-      version => ['1']                 
+      version => ['1'] 
+     }                
     },                               
     childIds => [                    
       'ENST00000314040.1'            
     ],                               
     end => 1105181,                  
-    featureSetId => 'Ensembl.85.GRCh37',     
+    featureSetId => $set_version,     
     featureType => {                 
       id => 'SO:0000704',            
       sourceName => 'SO',            
@@ -140,7 +147,7 @@ features => [
       term => 'gene'                 
     },                               
     id => 'ENSG00000176515.1',       
-    parentId => undef,               
+    parentId => '',               
     referenceName => '6',            
     start => 1080163,                
     strand => 'NEG_STRAND'           
@@ -180,6 +187,7 @@ my $json4 = json_GET("$base/$id", 'get transcript');
 
 my $expected_data4 =  {                                           
       attributes => {                           
+       vals => {
         biotype => ['antisense'],                 
         created => ['1321005463'],                
         author  => ['Havana'],
@@ -188,11 +196,12 @@ my $expected_data4 =  {
         source => ['havana'],      
         updated => ['1321005463'],                
         version => ['1']                          
+       }
       },
       childIds => [
        'ENSE00002577443.1'
       ],                          
-      featureSetId => 'Ensembl.85.GRCh37',  
+      featureSetId => $set_version,  
       featureType => {                          
         id => 'SO:0000673',                     
         term => 'transcript',                   
@@ -209,6 +218,14 @@ my $expected_data4 =  {
 
 eq_or_diff($json4, $expected_data4, "Checking the get result from the sequence annotation endpoint");
 
+sub get_set_version{
+
+  my $multi = shift;
+
+  my $core_ad = $multi->get_DBAdaptor('core');
+
+  return "Ensembl."  . $core_ad->get_MetaContainerAdaptor()->schema_version() . ".GRCh37"; 
+}
 
 
 done_testing();

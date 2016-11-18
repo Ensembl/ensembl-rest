@@ -20,7 +20,7 @@ extends 'Catalyst::Model';
 use Catalyst::Exception;
 use Scalar::Util qw/weaken/;
 use Try::Tiny;
-use Data::Dumper;
+
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 
 with 'Catalyst::Component::InstancePerContext';

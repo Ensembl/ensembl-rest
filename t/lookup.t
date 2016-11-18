@@ -61,6 +61,15 @@ my $expanded_response = {
                 };
 is_json_GET("/lookup/id/$basic_id?expand=1;format=condensed", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
 
+my $id_with_phenotype = 'ENSG00000137273';
+my $phenotype_response = {
+	object_type => 'Gene', db_type => 'core', species => 'homo_sapiens', id => $id_with_phenotype,
+	phenotypes => [
+    {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'soft palate development',variants => undef},
+    {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'positive regulation of transcription from RNA polymerase II promoter', variants => undef}
+   ],};
+is_json_GET("/lookup/id/$id_with_phenotype?phenotypes=1;format=condensed", $phenotype_response, 'Get of a known gene ID with phenotypes option will return phenotypes as well');
+
 my $utr_response = {
   %{$condensed_response},
   Transcript => [

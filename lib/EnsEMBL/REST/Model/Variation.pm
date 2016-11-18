@@ -178,6 +178,28 @@ sub get_phenotype_info {
   return \@phenotypes;
 }
 
+sub get_gene_phenotype_info {
+  my ($self, $id) = @_;
+  
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my @phenotypes;  
+  my $pfa = $c->model('Registry')->get_adaptor($species, 'variation', 'phenotypefeature');
+  my @pfs = @{$pfa->fetch_all_by_object_id($id, 'Gene')};
+
+  my %seen = ();
+
+  foreach my $phen (@pfs) {
+    my $hash = $self->phen_as_hash($phen);
+    my $key = join("", sort values %$hash);
+    push (@phenotypes, $hash) unless $seen{$key};
+    $seen{$key} = 1;
+  }
+
+  return \@phenotypes;
+}
+
 sub phen_as_hash {
   my ($self, $phen) = @_;
 
@@ -217,9 +239,9 @@ sub pops_as_hash {
   my ($self, $allele) = @_;
 
   my $population;
-  $population->{frequency} = $allele->frequency();
+  $population->{frequency} = 0 + $allele->frequency(); # Add 0 to treat it as numeric (to avoid quoting)
   $population->{population} = $allele->population->name();
-  $population->{allele_count} = $allele->count();
+  $population->{allele_count} = 0 + $allele->count(); # Add 0 to treat it as numeric (to avoid quoting)
   $population->{allele} = $allele->allele();
   $population->{submission_id} = $allele->subsnp() if $allele->subsnp();
 
@@ -246,8 +268,8 @@ sub popgen_as_hash {
 
   $pop_gen->{population} = $pg->population()->name() ;
   $pop_gen->{genotype}   = $pg->genotype_string() ;
-  $pop_gen->{frequency}  = $pg->frequency() ;
-  $pop_gen->{count}      = $pg->count();
+  $pop_gen->{frequency}  = 0 + $pg->frequency() ; # Add 0 to treat it as numeric (to avoid quoting)
+  $pop_gen->{count}      = 0 + $pg->count(); # Add 0 to treat it as numeric (to avoid quoting)
   $pop_gen->{subsnp_id}  = $pg->subsnp() if defined $pg->subsnp();
 
   return $pop_gen;
