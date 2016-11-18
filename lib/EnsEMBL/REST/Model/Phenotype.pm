@@ -18,7 +18,7 @@ limitations under the License.
 =cut
 
 package EnsEMBL::REST::Model::Phenotype;
-use Data::Dumper;
+
 use Moose;
 use Catalyst::Exception qw(throw);
 use Scalar::Util qw/weaken/;
@@ -46,15 +46,13 @@ sub fetch_by_accession  {
 
 
   if( $self->context->request->param('include_children') ){
-warn "getting children\n";
+
     my $parentterm = $ont_ad->fetch_by_accession($accession );
     my $childterms = $ont_ad->fetch_all_by_parent_term($parentterm);
     foreach my $childterm (@{$childterms}){
       @phenotype_features = (@phenotype_features, @{$self->fetch_features($species, $childterm->accession)}  );
     }
   }
-
-#print "\nReturning: " ; print Dumper @phenotype_features;
 
   return \@phenotype_features;
 }
@@ -78,11 +76,9 @@ sub fetch_by_term {
   my $terms   = $ont_ad->fetch_all_by_name( $name );
 
   foreach my $term (@{$terms}){
-warn "Seeking term " . $term->accession() ." for $name\n";
     @phenotype_features = (@phenotype_features, @{$self->fetch_by_accession($species, $term->accession())} );
   }
 
-  warn "returning " . scalar @phenotype_features . " phenotype_features\n";
   return \@phenotype_features;
 }
 
@@ -103,7 +99,7 @@ sub fetch_features{
 
   my $phenfeat_ad = $self->context->model('Registry')->get_adaptor($species,'variation', 'phenotypefeature');
 
-  my $pfs = $phenfeat_ad->fetch_all_by_phenotype_accession_source($accession, $self->context->request->param('source'));
+  my $pfs = $phenfeat_ad->fetch_all_by_phenotype_accession_type_source($accession, 'is', $self->context->request->param('source'));
 
   my @phenotype_features;
   foreach my $pf(@{$pfs}){
@@ -127,7 +123,7 @@ sub fetch_features{
 
     push @phenotype_features, $record;                             
   }
-  warn "returning " . scalar @phenotype_features . " phenotype_features for $accession\n";
+
   return \@phenotype_features;
 }
 
