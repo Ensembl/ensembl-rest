@@ -32,7 +32,7 @@ has 'context' => (is => 'ro', weak_ref => 1);
 
 my %allowed_values = (
   mask     => { map { $_, 1} qw(soft hard) },
-  method   => { map { $_, 1} qw(EPO EPO_LOW_COVERAGE PECAN LASTZ_NET BLASTZ_NET TRANSLATED_BLAT_NET) },
+  method   => { map { $_, 1} qw(EPO EPO_LOW_COVERAGE PECAN LASTZ_NET BLASTZ_NET TRANSLATED_BLAT_NET CACTUS_HAL) },
   overlaps => { map { $_, 1} qw(none all restrict) },
 #  species_set_group => { map { $_, 1} qw(mammals amniotes fish birds) },
 );
