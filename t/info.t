@@ -70,7 +70,9 @@ is_json_GET(
     return $info_species;
   };
 
-  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $schema_version, assembly => 'GRCh37'} ]};
+  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $schema_version, assembly => 'GRCh37', strain => 'test_strain', strain_collection => 'human'} ]};
+  my $expected_hide_strain_info = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $schema_version, assembly => 'GRCh37'} ]};
+  my $expected_empty_list = {species => [ ]};
 
   eq_or_diff_data(
     $get_species->('/info/species', 'Checking only DBA available is the test DBA'), $expected, 
@@ -84,6 +86,15 @@ is_json_GET(
   eq_or_diff_data(
     $get_species->('/info/species?division=EnsEMBL', q{Output is same as /info/species if specified 'EnsEMBL' division}), $expected, 
     "/info/species?division=EnsEMBL | Output is same as /info/species if specified 'EnsEMBL' division");
+  eq_or_diff_data(
+    $get_species->('/info/species?hide_strain_info=1', q{Output do not have strain and strain_collection info}), $expected_hide_strain_info,
+    "/info/species?hide_strain_info=1 | Output do not have strain and strain_collection info");
+  eq_or_diff_data(
+    $get_species->('/info/species?strain_collection=human', q{Output is same as /info/species if specified 'human' strain_collection}), $expected,
+    "/info/species?strain_collection=human | Output is same as /info/species if specified 'human' strain_collection");
+  eq_or_diff_data(
+    $get_species->('/info/species?strain_collection=bogus', q{Output is empty list for unknown collection }), $expected_empty_list,
+    "/info/species?hide_strain_info=1 | Output is empty list");
 
   is_json_GET('/info/species?division=wibble', { species => [] }, 'Bogus division results in no results');
 }
