@@ -50,6 +50,7 @@ export PERL5LIB
 . $HOME/perl5/perlbrew/etc/bashrc
 
 export ENS_REST_LOG4PERL=$APP_HOME'/configurations/production/log4perl.conf'
+export PROGRESSIVE_CACTUS_DIR=${HOME}/src/progressiveCactus/
 
 # Server settings for starman
 WORKERS=10
