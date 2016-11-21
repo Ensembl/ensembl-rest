@@ -65,7 +65,7 @@ my $expected_data_single =  {
       sourceAccessions => [
         "NC_000022.10"
       ],
-      ncbiTaxonId => 9609,
+      ncbiTaxonId => 9606,
       length => 51304566,
       sourceDivergence => undef,
       isDerived => "true",
@@ -85,7 +85,7 @@ my $expected_data2 =  {
       length => 135006516,                               
       md5checksum => '98c59049a2df285c76ffb1c6db8f8b96', 
       name => '11',                                      
-      ncbiTaxonId => 9609,                               
+      ncbiTaxonId => 9606,                               
       sourceAccessions => [                              
         'NC_000011.9'                                    
       ],                                                 
@@ -99,7 +99,7 @@ my $expected_data2 =  {
       length => 48129895,                                 
       md5checksum => '2979a6085bfe28e3ad6f552f361ed74d',  
       name => '21',                                       
-      ncbiTaxonId => 9609,                                
+      ncbiTaxonId => 9606,                                
       sourceAccessions => [                               
         'NC_000021.8'                                     
       ],                                                  
@@ -119,7 +119,7 @@ my $expected_data3 =  {
       length => 159138663,                                                                                             
       md5checksum => '618366e953d6aaad97dbe4777c29375e',                                                               
       name => '7',                                                                                                     
-      ncbiTaxonId => 9609,                                                                                             
+      ncbiTaxonId => 9606,                                                                                             
       sourceAccessions => [                                                                                            
         'NC_000007.13'                                                                                                 
       ],                                                                                                               
@@ -133,7 +133,7 @@ my $expected_data3 =  {
       length => 59373566,                                                                                              
       md5checksum => '1fa3474750af0948bdf97d5a0ee52e51',                                                               
       name => 'Y',                                                                                                     
-      ncbiTaxonId => 9609,                                                                                             
+      ncbiTaxonId => 9606,                                                                                             
       sourceAccessions => [                                                                                            
         'NC_000024.9'                                                                                                  
       ],                                                                                                               
@@ -177,7 +177,7 @@ my $expected_get_data =  {
       sourceAccessions => [
         "NC_000022.10"
       ],
-      ncbiTaxonId => 9609,
+      ncbiTaxonId => 9606,
       length => 51304566,
       sourceDivergence => undef,
       isDerived => "true",
