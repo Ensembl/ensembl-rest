@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	86
+2	\N	schema_version	87
 3	\N	patch	patch_75_76_a.sql|schema_version
 4	\N	patch	patch_75_76_b.sql|result/feature_set.experiment_id & experiment/input_subset.display_url/archive_id
 5	\N	patch	patch_75_76_c.sql|cell_type.display_label
@@ -56,3 +56,8 @@
 631	\N	patch	patch_85_86_c.sql|Add production name column to feature_type table
 632	\N	patch	patch_85_86_d.sql|Add new columns to input_subset table to accommodate paired-end data
 633	\N	patch	patch_85_86_e.sql|Add QC tables
+634	\N	patch	patch_86_87_a.sql|schema_version
+635	\N	patch	patch_86_87_b.sql|Change data type of certain columns to facilitate foreing key constraints
+636	\N	patch	patch_86_87_c.sql|Remove obsolete coloumns from external_feature_file
+637	\N	patch	patch_86_87_d.sql|Add 'unknown' as a valid gender in the epigenome table
+638	\N	patch	patch_86_87_e.sql|Increase data_set.name length
