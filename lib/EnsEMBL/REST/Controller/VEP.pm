@@ -247,6 +247,7 @@ sub get_consequences {
   my $runner = Bio::EnsEMBL::VEP::Runner->new($config);
   $runner->registry($c->model('Registry')->_registry());
   $runner->{plugins} = $config->{plugins};
+
   my $consequences = $runner->run_rest($vfs);
   
   # restore default distances, may have been altered by a plugin
@@ -255,6 +256,10 @@ sub get_consequences {
     $Bio::EnsEMBL::Variation::Utils::VariationEffect::UPSTREAM_DISTANCE   = $UPSTREAM_DISTANCE_BAK;
     $Bio::EnsEMBL::Variation::Utils::VariationEffect::DOWNSTREAM_DISTANCE = $DOWNSTREAM_DISTANCE_BAK;
   }
+
+  # catch and report errors/warnings
+  my $warnings = $runner->warnings();
+  $c->go('ReturnError', 'custom', [map {$_->{msg}} @$warnings]) if !@$consequences && @$warnings;
 
   return $consequences;
 }
