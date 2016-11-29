@@ -23,7 +23,7 @@ use Moose::Role;
 use EnsEMBL::REST;
 
 has '_active' => (
-  isa     => 'Int',
+  isa     => 'Bool',
   is      => 'ro',
   builder => '_load_active_flag',
   lazy    => 1,
