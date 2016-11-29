@@ -19,6 +19,7 @@ limitations under the License.
 
 package EnsEMBL::REST::Controller::Stats;
 use Moose;
+use Try::Tiny;
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
@@ -42,7 +43,13 @@ sub species_GET {
     my ($self, $c, $species) = @_;
 
     # Go to the model for stats and ask for this specie's data
-    my $genome = $c->model('Stats')->species_stats($species);
+    my $genome;
+    try {
+	$genome = $c->model('Stats')->species_stats($species);
+    } catch {
+	$c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+	$c->go('ReturnError', 'custom', [qq{Please check your parameters}]);
+    };
 
     # Send back the stats we've received
     $self->status_ok( $c, entity => $genome );
