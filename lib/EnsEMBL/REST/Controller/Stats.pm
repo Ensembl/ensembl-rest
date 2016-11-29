@@ -33,7 +33,7 @@ sub species : Path('species') : ActionClass('REST') :Args(1) {
 
     # Check if the controller is active, return an error if we're turned off
     if(! $self->controller_active()) {
-	$c->go('ReturnError', 'custom', [qq{This endpoint is not currently active}] );
+       $c->go('ReturnError', 'custom', [qq{This endpoint is not currently active}] );
     }
 
     return;
