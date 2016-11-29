@@ -27,15 +27,19 @@ with 'EnsEMBL::REST::Role::Active';
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
-sub species : Path('species') : ActionClass('REST') :Args(1) {}
-
-sub species_GET {
+sub species : Path('species') : ActionClass('REST') :Args(1) {
     my ($self, $c, $species) = @_;
 
     # Check if the controller is active, return an error if we're turned off
     if(! $self->controller_active()) {
 	$c->go('ReturnError', 'custom', [qq{This endpoint is not currently active}] );
     }
+
+    return;
+}
+
+sub species_GET {
+    my ($self, $c, $species) = @_;
 
     # Go to the model for stats and ask for this specie's data
     my $genome = $c->model('Stats')->species_stats($species);
