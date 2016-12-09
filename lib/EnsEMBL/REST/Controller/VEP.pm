@@ -246,7 +246,7 @@ sub get_consequences {
 
   my $runner = Bio::EnsEMBL::VEP::Runner->new($config);
   $runner->registry($c->model('Registry')->_registry());
-  $runner->{plugins} = $config->{plugins};
+  $runner->{plugins} = $config->{plugins} || [];
 
   my $consequences = $runner->run_rest($vfs);
   
@@ -371,9 +371,9 @@ sub _configure_plugins {
 
   # get config from file
   my $plugin_config_file = $vep_config->{plugin_config};
-  return unless $plugin_config_file && -e $plugin_config_file;
+  return [] unless $plugin_config_file && -e $plugin_config_file;
 
-  open IN, $plugin_config_file or return;
+  open IN, $plugin_config_file or return [];
   my @content = <IN>;
   close IN;
   
