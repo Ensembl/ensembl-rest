@@ -21,7 +21,7 @@ require 'net/http'
 require 'uri'
 
 server='[% p.value.example.host %]'
-path = '[% p.value.uri %]'
+path = '[% p.value.uri | url %]'
 
 url = URI.parse(server)
 http = Net::HTTP.new(url.host, url.port)
