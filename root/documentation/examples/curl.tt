@@ -18,10 +18,10 @@ limitations under the License.
 <div class='tab-pane' id='curl[% p.value.id %]'>
 <pre class="pre-scrollable prettyprint linenums">[% FILTER html %]
 [% IF p.value.body -%]
-curl '[% p.value.example.host %][% p.value.uri %]' -H 'Content-type:[% p.value.content %]' \
+curl '[% p.value.example.host %][% p.value.uri | url %]' -H 'Content-type:[% p.value.content %]' \
 -H 'Accept:[% p.value.accept %]' -X POST -d '[% p.value.body %]'
 [% ELSE %]
-curl '[% p.value.example.host %][% p.value.uri %]' -H 'Content-type:[% p.value.content %]'
+curl '[% p.value.example.host %][% p.value.uri | url %]' -H 'Content-type:[% p.value.content %]'
 [% END %]
 [% END -%]
 </pre>

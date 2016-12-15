@@ -33,7 +33,7 @@ public class EnsemblRest {
 
   public static void main(String[] args) throws Exception {
     String server = "[% p.value.example.host %]";
-    String ext = "[% p.value.uri %]";
+    String ext = "[% p.value.uri | url %]";
     URL url = new URL(server + ext);
 
     URLConnection connection = url.openConnection();
