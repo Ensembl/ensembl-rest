@@ -36,18 +36,6 @@ BEGIN {
   extends 'Catalyst::Controller::REST';
 }
 
-has 'fasta_db' => (
-  isa => 'Bio::DB::HTS::Faidx',
-  is => 'ro',
-  lazy => 1,
-  builder => '_find_fasta_cache',
-);
-
-has 'fasta' => (
-  isa =>'Str',
-  is =>'ro'
-);
-
 with 'EnsEMBL::REST::Role::PostLimiter';
 
 our $UPSTREAM_DISTANCE_BAK;
@@ -103,22 +91,10 @@ sub get_region_POST {
 
 sub _give_POST_to_VEP {
   my ($self,$c,$data,$config) = @_;
-  try {
-    
-    # Overwrite Slice->seq method to use a local disk cache when using Human
-    my $consequences;
-    if ($c->stash->{species} eq 'homo_sapiens' && defined($config->{fasta})) {
-      $c->log->debug('Farming human out to Bio::DB::HTS::Faidx');
-      no warnings 'redefine';
-      local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
-      $consequences = $self->get_consequences($c, $config, join("\n", @$data));
-    } else {
-      $c->log->debug('Query Ensembl database');
-      $config->{species} = $c->stash->{species}; # override VEP default for human
-      $consequences = $self->get_consequences($c, $config, join("\n", @$data));
-    }
+  try {    
+    $config->{species} = $c->stash->{species}; # override VEP default for human
+    my $consequences = $self->get_consequences($c, $config, join("\n", @$data));
     $c->stash->{consequences} = $consequences;
-
     $self->status_ok( $c, entity => $consequences );
   } catch {
     $c->log->fatal(qw{Problem Getting Consequences});
@@ -293,29 +269,6 @@ sub get_hgvs_POST {
   $self->assert_post_size($c,\@hgvs);
   $self->_give_POST_to_VEP($c,\@hgvs,$config);
 }
-
-sub _find_fasta_cache {
-  my $self = shift;
-  
-  my $fasta_db = Bio::DB::HTS::Faidx->new($self->fasta);
-  
-  return $fasta_db;
-}
-
-sub _new_slice_seq {
-  # replacement seq method to read from FASTA DB
-  my $self = shift;
-  my $fasta_db = $self->fasta_db;
-  return sub {
-    my $self = shift;
-    my $location_string = $self->seq_region_name.":".$self->start."-".$self->end ;
-    my ($seq, $length) = $fasta_db->get_sequence($location_string);
-    $seq ||= 'N' x $self->length();
-    reverse_comp( \$seq ) if $self->strand < 0;
-    # default to a string of Ns if we couldn't get sequence
-    return $seq;
-  };
-};
 
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
