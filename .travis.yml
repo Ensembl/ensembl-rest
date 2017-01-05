@@ -37,7 +37,6 @@ install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --with-recommends --notest .
     - cpanm -n Devel::Cover::Report::Coveralls
-    - cpanm Bio::DB::HTS
     - cpanm DBD::SQLite
     - cp travisci/MultiTestDB.conf.travisci t/MultiTestDB.conf
 

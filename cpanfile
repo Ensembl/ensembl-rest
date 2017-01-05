@@ -30,6 +30,7 @@ requires 'Readonly::XS';
 # Transient dependencies from Ensembl
 requires 'Parse::RecDescent';
 requires 'XML::Writer';
+requires 'Bio::DB::HTS';
 
 # ENSEMBL IS NOT EXPLICITLY REQUIRED; PLEASE INSTALL ALL ENSEMBL MODULES AS NORMAL
 # recommends 'Bio::EnsEMBL::DBSQL::DBAdaptor';
