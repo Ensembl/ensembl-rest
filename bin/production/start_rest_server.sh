@@ -68,6 +68,14 @@ export PROGRESSIVE_CACTUS_DIR="$HOME/src/progressiveCactus/"
 export ENSEMBL_REST_CONFIG=$APP_HOME/configurations/production/ensembl_rest.conf
 STARMAN="starman --backlog $BACKLOG --max-requests $MAXREQUESTS --workers $WORKERS $APP_HOME/configurations/production/ensrest.psgi"
 DAEMON="$HOME/perl5/perlbrew/perls/perl-5.14.2/bin/start_server"
+# Maintain existing Embassy configuration for now, only
+# go for the system start_server if we can't find the one we
+# know and love. Flip this around as we get closer to deploying
+# on EBI hardware
+if [ ! -f "$DAEMON" ]
+then
+    DAEMON=$(which start_server)
+fi
 DAEMON_OPTS="--pid-file=$PIDFILE --interval=$RESTART_INTERVAL --status-file=$STATUS --port 0.0.0.0:$PORT -- $STARMAN"
 
 cd $APP_HOME
