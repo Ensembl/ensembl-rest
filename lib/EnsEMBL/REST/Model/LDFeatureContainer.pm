@@ -34,8 +34,7 @@ sub build_per_context_instance {
 }
 
 sub fetch_LDFeatureContainer_variation_name {
-  my ($self, $variation_name) = @_;
-  Catalyst::Exception->throw("No variation given. Please specify a variation to retrieve from this service") if ! $variation_name;
+  my ($self, $variation_name, $population_name) = @_;
   my $c = $self->context();
   my $species = $c->stash->{species};
 
@@ -64,27 +63,23 @@ sub fetch_LDFeatureContainer_variation_name {
   Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @vfs == 0);
   my $vf = $vfs[0];
 
-  my $population_name = $c->request->param('population_name');
-  if ($population_name) {
-    my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
-    my $population = $pa->fetch_by_name($population_name);
-    if (!$population) {
-      Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
-    }
-    my $ldfc;
-    try {
-      $ldfc = $ldfca->fetch_by_VariationFeature($vf, $population);
-    } catch {
-      Catalyst::Exception->throw("Something went wrong while fetching from LDFeatureContainerAdaptor");
-    };
-    return $self->to_array($ldfc)
+  my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
+  my $population = $pa->fetch_by_name($population_name);
+  if (!$population) {
+    Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
   }
-  my $ldfc = $ldfca->fetch_by_VariationFeature($vf);
-  return $self->to_array($ldfc);
+  my $ldfc;
+  try {
+    $ldfc = $ldfca->fetch_by_VariationFeature($vf, $population);
+  } catch {
+    $c->log->error("LD endpoint for $variation_name $population_name $window_size caused an error: $_");
+    Catalyst::Exception->throw("LD computation for $variation_name $population_name $window_size caused an error.");
+  };
+  return $self->to_array($ldfc)
 }
 
 sub fetch_LDFeatureContainer_slice {
-  my ($self, $slice) = @_;
+  my ($self, $slice, $population_name) = @_;
   Catalyst::Exception->throw("No region given. Please specify a region to retrieve from this service.") if ! $slice;
   Catalyst::Exception->throw("Specified region is too large. Maximum allowed size for region is 500KB.") if ($slice->length > 500_000);
   my $c = $self->context();
@@ -99,23 +94,22 @@ sub fetch_LDFeatureContainer_slice {
     $ldfca->db->vcf_root_dir($ld_config->{dir}) if (defined $ld_config->{dir});
   }
 
-  my $population_name = $c->request->param('population_name');
-  if ($population_name) {
-    my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
-    my $population = $pa->fetch_by_name($population_name);
-    if (!$population) {
-      Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
-    }
-    my $ldfc;
-    try {
-      $ldfc = $ldfca->fetch_by_Slice($slice, $population);
-    } catch {
-      Catalyst::Exception->throw("Something went wrong while fetching from LDFeatureContainerAdaptor");
-    };
-    return $self->to_array($ldfc)
+  my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
+  my $population = $pa->fetch_by_name($population_name);
+  if (!$population) {
+    Catalyst::Exception->throw("Could not fetch population object for population name: $population_name");
   }
-  my $ldfc = $ldfca->fetch_by_Slice($slice);
-  return $self->to_array($ldfc);
+  my $ldfc;
+  try {
+    $ldfc = $ldfca->fetch_by_Slice($slice, $population);
+  } catch {
+    my $chrom = $slice->seq_region_name; 
+    my $start = $slice->start;
+    my $end = $slice->end;
+    $c->log->error("LD endpoint for region $chrom:$start-$end $population_name caused an error: $_");
+    Catalyst::Exception->throw("LD computaion for region $chrom:$start-$end $population_name caused an error.");
+  };
+  return $self->to_array($ldfc)
 }
 
 sub fetch_LDFeatureContainer_pairwise {
@@ -134,14 +128,14 @@ sub fetch_LDFeatureContainer_pairwise {
     $ldfca->db->vcf_root_dir($ld_config->{dir}) if (defined $ld_config->{dir});
   }
 
-  my @vfs = ();
+  my @vfs_pair = ();
   foreach my $variation_name ($variation_name1, $variation_name2) {
     my $variation = $va->fetch_by_name($variation_name);
     Catalyst::Exception->throw("Could not fetch variation object for id: $variation_name.") if ! $variation;
-    my $vfs = $variation->get_all_VariationFeatures();
-    Catalyst::Exception->throw("Variant maps more than once to the genome.") if (scalar @$vfs > 1);
-    Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @$vfs == 0);
-    push @vfs, $vfs->[0];
+    my @vfs = grep { $_->slice->is_reference } @{$variation->get_all_VariationFeatures()};
+    Catalyst::Exception->throw("Variant maps more than once to the genome.") if (scalar @vfs > 1);
+    Catalyst::Exception->throw("Could not retrieve a variation feature.") if (scalar @vfs == 0);
+    push @vfs_pair, $vfs[0];
   }
 
   my $population_name = $c->request->param('population_name');
@@ -152,9 +146,10 @@ sub fetch_LDFeatureContainer_pairwise {
     }
     my $ldfc;
     try {
-      $ldfc = $ldfca->fetch_by_VariationFeatures(\@vfs, $population);
+      $ldfc = $ldfca->fetch_by_VariationFeatures(\@vfs_pair, $population);
     } catch {
-      Catalyst::Exception->throw("Something went wrong while fetching from LDFeatureContainerAdaptor");
+      $c->log->error("LD endpoint for pairwise $variation_name1 $variation_name2 $population_name caused an error: $_");
+      Catalyst::Exception->throw("LD computation for $variation_name1 $variation_name2 $population_name caused an error.");
     };
     return $self->to_array($ldfc)
   }
@@ -162,7 +157,15 @@ sub fetch_LDFeatureContainer_pairwise {
   my $ld_populations = $pa->fetch_all_LD_Populations;
   my @ldfcs = ();
   foreach my $population (@$ld_populations) {
-    my $ldfc = $ldfca->fetch_by_VariationFeatures(\@vfs, $population);
+    my $ldfc;
+    try {
+      $ldfc = $ldfca->fetch_by_VariationFeatures(\@vfs_pair, $population);
+    } catch {
+      $c->log->error("LD endpoint for pairwise $variation_name1 $variation_name2 $population_name caused an error: $_");
+      my $population_name = $population->name;
+      Catalyst::Exception->throw("LD computation for $variation_name1 $variation_name2 $population_name caused an error.");
+    };
+
     my $array = $self->to_array($ldfc);
     push @ldfcs, @$array;
   }

@@ -63,10 +63,9 @@ $expected_output =
 ];
 
 $ld_get = '/ld/homo_sapiens/rs1333047';
-$json = json_GET($ld_get, 'GET LD data for variant');
-eq_or_diff($json, $expected_output, "Example variant");
+action_bad($ld_get, 'A population name is required for this endpoint. Use GET /info/variation/populations/:species?filter=LD to retrieve a list of all populations with LD data.');
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW';
+$ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW';
 $json = json_GET($ld_get, 'GET LD data for variant and population');
 eq_or_diff($json, $expected_output, "Example variant and population");
 
@@ -81,29 +80,29 @@ $expected_output =
   },
 ];
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0';
+$ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW?d_prime=1.0';
 $json = json_GET($ld_get, 'GET LD data for variant, population and d_prime');
 eq_or_diff($json, $expected_output, "Example variant, population and d_prime");
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=500';
+$ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW?d_prime=1.0;window_size=500';
 $json = json_GET($ld_get, 'GET LD data for variant, population, d_prime and window_size');
 eq_or_diff($json, $expected_output, "Example variant, population, d_prime and window_size");
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=499.123';
+$ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW?d_prime=1.0;window_size=499.123';
 $json = json_GET($ld_get, 'GET LD data for variant, population, d_prime and window_size');
 eq_or_diff($json, $expected_output, "Example variant, population, d_prime and window_size");
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=0';
+$ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW?d_prime=1.0;window_size=0';
 $json = json_GET($ld_get, 'GET LD data for variant, population, d_prime and window_size');
 eq_or_diff($json, $expected_output, "Example variant, population, d_prime and window_size");
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=500kb';
+$ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW?d_prime=1.0;window_size=500kb';
 action_bad($ld_get, 'window_size needs to be a value bewteen 0 and 1000');
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=2000';
+$ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW?d_prime=1.0;window_size=2000';
 action_bad($ld_get, 'window_size needs to be a value bewteen 0 and 1000');
 
-$ld_get = '/ld/homo_sapiens/rs1333047?population_name=1000GENOMES:phase_1_ASW;d_prime=1.0;window_size=-2000';
+$ld_get = '/ld/homo_sapiens/rs1333047/population_name=1000GENOMES:phase_1_ASW?d_prime=1.0;window_size=-2000';
 action_bad($ld_get, 'window_size needs to be a value bewteen 0 and 1000');
 
 # tests for ld/:species/region endpoint
@@ -133,7 +132,7 @@ $expected_output =
   }
 ];
 
-my $ld_region_get = '/ld/homo_sapiens/region/9:22125265..22125505?population_name=1000GENOMES:phase_1_ASW';
+my $ld_region_get = '/ld/homo_sapiens/region/9:22125265..22125505/1000GENOMES:phase_1_ASW';
 $json = json_GET($ld_region_get, 'GET LD data for region and population');
 eq_or_diff($json, $expected_output, "Example region, population");
 
@@ -148,11 +147,11 @@ $expected_output =
   },
 ];
 
-$ld_region_get = '/ld/homo_sapiens/region/9:22125265..22125505?population_name=1000GENOMES:phase_1_ASW;r2=0.5';
+$ld_region_get = '/ld/homo_sapiens/region/9:22125265..22125505/1000GENOMES:phase_1_ASW?r2=0.5';
 $json = json_GET($ld_region_get, 'GET LD data for region and population, r2');
 eq_or_diff($json, $expected_output, "Example region, population, r2");
 
-$ld_region_get = '/ld/homo_sapiens/region/9:22125265..23125505?population_name=1000GENOMES:phase_1_ASW;r2=0.5';
+$ld_region_get = '/ld/homo_sapiens/region/9:22125265..23125505/1000GENOMES:phase_1_ASW?r2=0.5';
 action_bad($ld_region_get, 'Specified region is too large');
 
 # tests for ld/:species/pairwise
