@@ -1,5 +1,5 @@
 1775	1	xref.timestamp	2012-09-03 21:14:58
-1	\N	schema_version	87
+1	\N	schema_version	88
 2	\N	patch	patch_52_53_a.sql|schema_version
 3	\N	patch	patch_52_53_b.sql|external_db_type_enum
 4	\N	patch	patch_52_53_c.sql|identity_xref_rename
@@ -220,3 +220,4 @@
 1832	\N	patch	patch_86_87_c.sql|datetime_default_NULL
 1833	1	species.strain	test_strain
 1834	1	species.strain_collection	human
+1835	\N	patch	patch_87_88_a.sql|schema_version
