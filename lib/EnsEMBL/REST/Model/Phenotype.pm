@@ -152,8 +152,8 @@ sub fetch_features_by_region {
 
   foreach my $pf(@{$pfs}){
 
-    my $object_id = $pf->object_id; 
-    my $phe_id    = $pf->{_phenotype_id};
+    my $object_id = $pf->object_id(); 
+    my $phe_id    = $pf->phenotype_id();
     my $phe_desc  = $pf->phenotype_description();
     my $ontology_accessions = $pf->get_all_ontology_accessions();
 
