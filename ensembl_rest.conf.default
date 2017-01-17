@@ -95,6 +95,7 @@ jsonp=1
   <replacements>
     gene_stable_id=ENSG00000157764
     gene_stable_id_2=ENSG00000248378
+    family_stable_id=PTHR15573
     transcript_stable_id=ENST00000288602
     transcript_stable_id_2=ENST00000513398
     exon_stable_id=ENSE00001154485
