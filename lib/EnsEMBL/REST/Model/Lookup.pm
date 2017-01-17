@@ -40,6 +40,95 @@ sub build_per_context_instance {
   return $self->new({ context => $c, %$self, @args });
 }
 
+sub find_cafe_by_genetree {
+  my ($self, $gt) = @_;
+  my $c = $self->context();
+  my $reg = $c->model('Registry');
+
+  my ($species, $object_type, $db_type) = ('multi','CAFEGeneFamily','compara');
+  my $cafa = $reg->get_adaptor($species, $db_type, $object_type);
+  Catalyst::Exception->throw("No adaptor found for ID $gt->stable_id(), species $species, object $object_type and db $db_type") unless $cafa;
+  
+  my $cafe_object = $cafa->fetch_by_GeneTree($gt);
+  return $cafe_object;
+  
+}
+
+sub find_family_by_stable_id {
+  my ($self, $id) = @_;
+  my $fam;
+  my $c = $self->context();
+  my $compara_name = $c->request->parameters->{compara};
+  my $reg = $c->model('Registry');
+
+  #Force search to use compara as the DB type
+  $c->request->parameters->{db_type} = 'compara' if ! $c->request->parameters->{db_type};
+  $c->request->parameters->{object_type} = 'family' if ! $c->request->parameters->{object_type};
+  #Try to do a lookup if the ID DB is there
+  my $lookup = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
+  if($lookup) {
+    my ($species, $object_type, $db_type) = $self->find_object_location($id);
+    if($species) {
+      my $fama = $reg->get_adaptor($species, $db_type, $object_type);
+      Catalyst::Exception->throw("No adaptor found for ID $id, species $species, object $object_type and db $db_type") unless $fama;
+      $fam = $fama->fetch_by_stable_id($id);
+    }
+  }
+    #If we haven't got one then do a linear search
+  if(! $fam) {
+    my $comparas = $c->model('Registry')->get_all_DBAdaptors('compara', $compara_name);
+    foreach my $c (@{$comparas}) {
+      my $fama = $c->get_FamilyAdaptor();
+      $fam = $fama->fetch_by_stable_id($id);
+      last if $fam;
+    }
+  }
+  return $fam if $fam;
+  Catalyst::Exception->throw("No Family found for ID $id");
+
+}
+
+sub find_family_by_member_id {
+  my ($self,$id) = @_;
+  my $c = $self->context();
+  my $compara_name = $c->request->parameters->{compara};
+  my $reg = $c->model('Registry');
+
+  my ($species, $object_type, $db_type) = $self->find_object_location($id);
+
+  # The rest of the method should treat all the possible $object_type and
+  # $db_type, and output the relevant error messages
+  Catalyst::Exception->throw("Unable to find given object: $id") unless $species;
+  Catalyst::Exception->throw("'$id' is not an Ensembl Core object, and thus does not have a gene-tree.") if $db_type ne 'core';
+
+  my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
+  my $fama = $dba->get_FamilyAdaptor;
+
+  my $member;
+  my $fam;
+  if ($object_type eq 'Gene') {
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($id);
+    Catalyst::Exception->throw("Could not fetch a $object_type object for ID $id") unless $member;
+    $fam = $fama->fetch_all_by_GeneMember($member);
+  } elsif ($object_type eq 'Transcript') {
+    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id($id);
+    Catalyst::Exception->throw("Could not fetch a $object_type object for ID $id") unless $member;
+    $fam = $fama->fetch_by_SeqMember($member);
+  } elsif ($object_type eq 'Translation') {
+    my $translation_adaptor = $reg->get_adaptor($species, $db_type, 'Translation');
+    my $translation = $translation_adaptor->fetch_by_stable_id($id);
+    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id($translation->stable_id);
+    $fam = $fama->fetch_by_SeqMember($member);
+  } elsif ($object_type eq 'Exon') {
+    my $gene_adaptor = $reg->get_adaptor($species, $db_type, 'Gene');
+    my $gene = $gene_adaptor->fetch_by_exon_stable_id($id);
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($gene->stable_id);
+    $fam = $fama->fetch_all_by_GeneMember($member);
+  }
+  Catalyst::Exception->throw("No Family found for $object_type ID $id") unless $fam;
+  return $fam;
+}
+
 sub find_genetree_by_stable_id {
   my ($self, $id) = @_;
   my $gt;
@@ -52,6 +141,7 @@ sub find_genetree_by_stable_id {
 
   #Try to do a lookup if the ID DB is there
   my $lookup = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
+
   if($lookup) {
     my ($species, $object_type, $db_type) = $self->find_object_location($id);
     if($species) {
@@ -60,12 +150,12 @@ sub find_genetree_by_stable_id {
       $gt = $gta->fetch_by_stable_id($id);
     }
   }
-
   #If we haven't got one then do a linear search
   if(! $gt) {
     my $comparas = $c->model('Registry')->get_all_DBAdaptors('compara', $compara_name);
+
     foreach my $c (@{$comparas}) {
-      my $gta = $c->get_GeneTreeAdaptor();
+      my $gta = $c->get_GeneTreeAdaptor();      
       $gt = $gta->fetch_by_stable_id($id);
       last if $gt;
     }
