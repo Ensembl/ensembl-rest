@@ -40,7 +40,7 @@ sub fetch_LDFeatureContainer_variation_name {
 
   my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
   my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
-
+  my $vf_attribs = $c->request->param('attribs');
   my $window_size = $c->request->param('window_size') || 500; # default is 500KB
   Catalyst::Exception->throw("window_size needs to be a value between 0 and 500.") if (!looks_like_number($window_size));
   Catalyst::Exception->throw("window_size needs to be a value between 0 and 500.") if ($window_size > 500);
@@ -75,7 +75,7 @@ sub fetch_LDFeatureContainer_variation_name {
     $c->log->error("LD endpoint for $variation_name $population_name $window_size caused an error: $_");
     Catalyst::Exception->throw("LD computation for $variation_name $population_name $window_size caused an error.");
   };
-  return $self->to_array($ldfc)
+  return $self->to_array($ldfc, $vf_attribs);
 }
 
 sub fetch_LDFeatureContainer_slice {
@@ -173,21 +173,19 @@ sub fetch_LDFeatureContainer_pairwise {
 }
 
 sub to_array {
-  my ($self, $LDFC, $population) = @_;
+  my ($self, $LDFC, $vf_attribs) = @_;
   my $c = $self->context();
   my $species = $c->stash->{species};
   my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
   my $population_id2name = {};
-  if ($population) {
-    $population_id2name->{$population->dbID} = $population->name;
-  }
   my $d_prime = $c->request->param('d_prime');
   my $r2 = $c->request->param('r2');
   my @LDFC_array = ();
 
   # we pass 1 to get_all_ld_values() so that it doesn't lazy load
   # VariationFeature objects - we only need the name here anyway
-  foreach my $ld_hash (@{$LDFC->get_all_ld_values(1)}) {
+  my $no_vf_attribs = ($vf_attribs) ? 0 : 1;  
+  foreach my $ld_hash (@{$LDFC->get_all_ld_values($no_vf_attribs)}) {
     my $hash = {};
     $hash->{d_prime} = $ld_hash->{d_prime};
     next if ($d_prime && $hash->{d_prime} < $d_prime);
@@ -195,6 +193,21 @@ sub to_array {
     next if ($r2 && $hash->{r2} < $r2);
 
     # fallback for tests as travis uses the release branch
+    if ($vf_attribs) {
+     my $vf1 = $ld_hash->{variation1};
+     my $vf2 = $ld_hash->{variation2};
+     $hash->{v1_chr} = $vf1->seq_region_name;
+     $hash->{v1_start} = $vf1->seq_region_start;
+     $hash->{v1_end} = $vf1->seq_region_end; 
+     $hash->{v1_strand} = $vf1->seq_region_strand;
+     $hash->{v1_consequence} = $vf1->display_consequence;
+     $hash->{v2_chr} = $vf2->seq_region_name;
+     $hash->{v2_start} = $vf2->seq_region_start;
+     $hash->{v2_end} = $vf2->seq_region_end; 
+     $hash->{v2_strand} = $vf2->seq_region_strand;
+     $hash->{v2_consequence} = $vf2->display_consequence;
+    }
+
     $hash->{variation1} = $ld_hash->{variation_name1} || $ld_hash->{variation1}->variation_name; 
     $hash->{variation2} = $ld_hash->{variation_name2} || $ld_hash->{variation2}->variation_name; 
     my $population_id = $ld_hash->{population_id};
