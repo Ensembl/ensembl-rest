@@ -69,6 +69,64 @@ $ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW';
 $json = json_GET($ld_get, 'GET LD data for variant and population');
 eq_or_diff($json, $expected_output, "Example variant and population");
 
+$expected_output = [
+  {
+    d_prime => '0.999871',
+    population_name => '1000GENOMES:phase_1_ASW',
+    r2 => '0.050071',
+    v1_chr => 9,
+    v1_consequence => 'downstream_gene_variant',
+    v1_end => 22124504,
+    v1_start => 22124504,
+    v1_strand => 1,
+    v2_chr => 9,
+    v2_consequence => 'downstream_gene_variant',
+    v2_end => 22125503,
+    v2_start => 22125503,
+    v2_strand => 1,
+    variation1 => 'rs1333047',
+    variation2 => 'rs1333049'
+  },
+  {
+    d_prime => '0.999996',
+    population_name => '1000GENOMES:phase_1_ASW',
+    r2 => '0.063754',
+    v1_chr => 9,
+    v1_consequence => 'downstream_gene_variant',
+    v1_end => 22124504,
+    v1_start => 22124504,
+    v1_strand => 1,
+    v2_chr => 9,
+    v2_consequence => 'downstream_gene_variant',
+    v2_end => 22125032,
+    v2_start => 22125032,
+    v2_strand => 1,
+    variation1 => 'rs1333047',
+    variation2 => 'rs72655407'
+  },
+  {
+    d_prime => '1.000000',
+    population_name => '1000GENOMES:phase_1_ASW',
+    r2 => '1.000000',
+    v1_chr => 9,
+    v1_consequence => 'downstream_gene_variant',
+    v1_end => 22124504,
+    v1_start => 22124504,
+    v1_strand => 1,
+    v2_chr => 9,
+    v2_consequence => 'downstream_gene_variant',
+    v2_end => 22124744,
+    v2_start => 22124744,
+    v2_strand => 1,
+    variation1 => 'rs1333047',
+    variation2 => 'rs4977575'
+  },
+];
+
+$ld_get = '/ld/homo_sapiens/rs1333047/1000GENOMES:phase_1_ASW?attribs=1';
+$json = json_GET($ld_get, 'GET LD data for variant and population');
+eq_or_diff($json, $expected_output, "Example variant, population, return location and consequence attribs");
+
 $expected_output =
 [
   {
