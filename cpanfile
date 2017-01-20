@@ -50,6 +50,7 @@ recommends 'Template::Stash::XS';
 recommends 'DateTime';
 recommends 'Server::Starter';
 recommends 'Log::Dispatch::FileRotate';
+recommends 'Net::Server::SS::PreFork';
 
 #Test requirements
 test_requires 'Test::More';
