@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016-2017] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -78,6 +78,45 @@ sub term: Chained('/') PathPart('phenotype/term') Args(2) ActionClass('REST') {
 
   $self->status_ok($c, entity => $phenotype_features );
 }
+
+
+
+=pod
+
+/phenotype/region/Homo_sapiens/X:1000000-2000000?feature_type=Variation;
+
+feature_type = The type of feature associated with phenotype to retrieve (Variation/StructuralVariation/Gene/QTL).
+only_phenotypes = Only returns associated phenotype description and mapped ontology accessions for a lighter output.
+
+application/json
+text/x-gff3
+
+=cut
+
+has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e7);
+
+sub region_GET {}
+
+sub region: Chained('/') PathPart('phenotype/region') Args(2) ActionClass('REST') {
+  my ($self, $c, $species, $region) = @_;
+
+   $c->stash()->{species} = $species; # Needed to be populated for the 'Lookup' service
+
+  my $features;
+
+  try {
+    my ($sr_name) = $c->model('Lookup')->decode_region( $region, 1, 1 );
+    my $slice = $c->model('Lookup')->find_slice($region);
+    $self->assert_slice_length($c, $slice);
+    $features = $c->model('Phenotype')->fetch_features_by_region($species, $slice);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $features );
+}
+
+with 'EnsEMBL::REST::Role::SliceLength';
 
 
 __PACKAGE__->meta->make_immutable;

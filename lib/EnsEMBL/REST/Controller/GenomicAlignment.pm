@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016-2017] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ require EnsEMBL::REST;
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
 has 'default_compara' => ( is => 'ro', isa => 'Str', default => 'multi' );
+has 'compara_base_dir_location' => ( is => 'ro', isa => 'Str' );
 has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e6);
 
 __PACKAGE__->config(
@@ -56,6 +57,8 @@ sub get_adaptors :Private {
     my $asa = $compara_dba->get_AlignSliceAdaptor();
     my $gata = $compara_dba->get_GenomicAlignTreeAdaptor();
     my $gaba = $compara_dba->get_GenomicAlignBlockAdaptor();
+
+    $mlssa->base_dir_location($self->compara_base_dir_location());
     
     $c->stash(
       compara_dba => $compara_dba,

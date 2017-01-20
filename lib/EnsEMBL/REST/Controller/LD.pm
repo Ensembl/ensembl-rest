@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016] EMBL-European Bioinformatics Institute
+Copyright [2016-2017] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,10 +36,12 @@ sub species: Chained('/') PathPart('ld') CaptureArgs(1) {
 sub id: Chained('species') PathPart('') ActionClass('REST') {}
 
 sub id_GET {
-  my ($self, $c, $id) = @_;
+  my ($self, $c, $id, $population_name) = @_;
+  unless ($id) {$c->go('ReturnError', 'custom', ["A variant identifier is required for this endpoint."]);}
+  unless ($population_name) {$c->go('ReturnError', 'custom', ["A population name is required for this endpoint. Use GET /info/variation/populations/:species?filter=LD to retrieve a list of all populations with LD data."]);}
   my $LDFeatureContainer;
   try {
-    $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_variation_name($id);
+    $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_variation_name($id, $population_name);
   } catch {
     $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
     $c->go('ReturnError', 'custom', [qq{$_}]);
@@ -50,11 +52,12 @@ sub id_GET {
 sub region: Chained('species') PathPart('region') ActionClass('REST') {}
 
 sub region_GET {
-  my ($self, $c, $region) = @_;
+  my ($self, $c, $region, $population_name) = @_;
+  unless ($population_name) {$c->go('ReturnError', 'custom', ["A population name is required for this endpoint. Use GET /info/variation/populations/:species?filter=LD to retrieve a list of all populations with LD data."]);}
   my $LDFeatureContainer;
   my $slice = $c->model('Lookup')->find_slice($region);
   try {
-    $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_slice($slice);
+    $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_slice($slice, $population_name);
   } catch {
     $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
     $c->go('ReturnError', 'custom', [qq{$_}]);

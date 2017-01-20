@@ -1,4 +1,4 @@
-73	\N	schema_version	87
+77	\N	schema_version	88
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -61,3 +61,5 @@
 72	\N	patch	patch_85_86_e.sql|gene_member_hom_stats
 74	\N	patch	patch_86_87_a.sql|schema_version
 75	\N	patch	patch_86_87_b.sql|gene_member_qc
+76	\N	patch	patch_86_87_c.sql|msa_stats_to_stn_tag
+78	\N	patch	patch_87_88_a.sql|schema_version

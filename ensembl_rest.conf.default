@@ -220,6 +220,8 @@ jsonp=1
 <Controller::GenomicAlignment>
   # Sets the default compara to use when finding the best compara fails. Defaults to multi
   # default_compara=multi
+  # Sets the base location of data-files (usually contains multi/hal_files/*.hal)
+  # compara_base_dir_location = /path/to/data/
 </Controller::GenomicAlignment>
 
 <Controller::Variaton>
