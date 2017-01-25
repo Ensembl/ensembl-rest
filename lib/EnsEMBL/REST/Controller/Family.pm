@@ -23,7 +23,6 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 use Bio::EnsEMBL::Compara::Utils::FamilyHash;
-use Data::Dumper;
 
 require EnsEMBL::REST;
 

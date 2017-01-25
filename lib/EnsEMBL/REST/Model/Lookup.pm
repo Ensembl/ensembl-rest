@@ -43,13 +43,13 @@ sub build_per_context_instance {
 sub find_cafe_by_genetree {
   my ($self, $gt) = @_;
   my $c = $self->context();
+  my $compara_name = $c->request->parameters->{compara};
   my $reg = $c->model('Registry');
 
-  my ($species, $object_type, $db_type) = ('multi','CAFEGeneFamily','compara');
-  my $cafa = $reg->get_adaptor($species, $db_type, $object_type);
-  Catalyst::Exception->throw("No adaptor found for ID $gt->stable_id(), species $species, object $object_type and db $db_type") unless $cafa;
-  
+  my $cafa = $gt->adaptor->db()->get_CAFEGeneFamilyAdaptor();
+  Catalyst::Exception->throw("No get_CAFEGeneFamily adaptor found ") unless $cafa;
   my $cafe_object = $cafa->fetch_by_GeneTree($gt);
+
   return $cafe_object;
   
 }
@@ -60,7 +60,7 @@ sub find_family_by_stable_id {
   my $c = $self->context();
   my $compara_name = $c->request->parameters->{compara};
   my $reg = $c->model('Registry');
-
+  
   #Force search to use compara as the DB type
   $c->request->parameters->{db_type} = 'compara' if ! $c->request->parameters->{db_type};
   $c->request->parameters->{object_type} = 'family' if ! $c->request->parameters->{object_type};
@@ -74,7 +74,7 @@ sub find_family_by_stable_id {
       $fam = $fama->fetch_by_stable_id($id);
     }
   }
-    #If we haven't got one then do a linear search
+  #If we haven't got one then do a linear search
   if(! $fam) {
     my $comparas = $c->model('Registry')->get_all_DBAdaptors('compara', $compara_name);
     foreach my $c (@{$comparas}) {
@@ -103,7 +103,6 @@ sub find_family_by_member_id {
 
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
   my $fama = $dba->get_FamilyAdaptor;
-
   my $member;
   my $fam;
   if ($object_type eq 'Gene') {
@@ -171,7 +170,6 @@ sub find_genetree_by_member_id {
   my $reg = $c->model('Registry');
 
   my ($species, $object_type, $db_type) = $self->find_object_location($id);
-
   # The rest of the method should treat all the possible $object_type and
   # $db_type, and output the relevant error messages
   Catalyst::Exception->throw("Unable to find given object: $id") unless $species;
