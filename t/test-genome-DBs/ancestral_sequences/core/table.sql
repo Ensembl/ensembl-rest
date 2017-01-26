@@ -477,7 +477,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=833 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=835 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -702,7 +702,7 @@ CREATE TABLE `repeat_feature` (
 
 CREATE TABLE `seq_region` (
   `seq_region_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(40) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `coord_system_id` int(10) unsigned NOT NULL,
   `length` int(10) unsigned NOT NULL,
   PRIMARY KEY (`seq_region_id`),

@@ -221,3 +221,4 @@
 1833	1	species.strain	test_strain
 1834	1	species.strain_collection	human
 1835	\N	patch	patch_87_88_a.sql|schema_version
+1836	\N	patch	patch_87_88_b.sql|seq_region_name_255

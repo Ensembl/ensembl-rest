@@ -62,3 +62,4 @@
 637	\N	patch	patch_86_87_d.sql|Add 'unknown' as a valid gender in the epigenome table
 638	\N	patch	patch_86_87_e.sql|Increase data_set.name length
 639	\N	patch	patch_87_88_a.sql|schema_version
+640	\N	patch	patch_87_88_b.sql|seq_region_name_255

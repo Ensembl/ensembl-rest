@@ -168,7 +168,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=88 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=90 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -205,7 +205,7 @@ CREATE TABLE `phenotype` (
   UNIQUE KEY `desc_idx` (`description`),
   KEY `stable_idx` (`stable_id`),
   KEY `name_idx` (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=58139 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `phenotype_feature` (
   `phenotype_feature_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -225,7 +225,7 @@ CREATE TABLE `phenotype_feature` (
   KEY `type_idx` (`type`),
   KEY `pos_idx` (`seq_region_id`,`seq_region_start`,`seq_region_end`),
   KEY `source_idx` (`source_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=6758521 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `phenotype_feature_attrib` (
   `phenotype_feature_id` int(11) unsigned NOT NULL,
@@ -383,7 +383,7 @@ CREATE TABLE `sample_synonym` (
 
 CREATE TABLE `seq_region` (
   `seq_region_id` int(10) unsigned NOT NULL,
-  `name` varchar(40) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `coord_system_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`seq_region_id`),
   UNIQUE KEY `name_cs_idx` (`name`,`coord_system_id`),
@@ -400,7 +400,7 @@ CREATE TABLE `source` (
   `somatic_status` enum('germline','somatic','mixed') DEFAULT 'germline',
   `data_types` set('variation','variation_synonym','structural_variation','phenotype_feature','study') DEFAULT NULL,
   PRIMARY KEY (`source_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `strain_gtype_poly` (
   `variation_id` int(10) unsigned NOT NULL,
@@ -487,7 +487,7 @@ CREATE TABLE `study` (
   PRIMARY KEY (`study_id`),
   KEY `source_idx` (`source_id`),
   KEY `external_reference_idx` (`external_reference`)
-) ENGINE=MyISAM AUTO_INCREMENT=4480 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=4481 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `submitter_handle` (
   `handle_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
