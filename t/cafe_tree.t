@@ -46,70 +46,94 @@ my $cafe_species_tree = {
   'tree' => {
     'n_members' => 1,
     'lambda' => '0.00211524',
-    'name' => 'Euteleostomi',
     'p_value_lim' => '0.01',
+    'name' => 'Euteleostomi',
+    'tax' => {
+      'scientific_name' => 'Euteleostomi',
+      'common_name' => 'Bony vertebrates',
+      'id' => 117571,
+      'timetree_mya' => '441'
+    },
     'children' => [
       {
         'n_members' => 1,
         'lambda' => '0.00211524',
-        'name' => 'Amniota',
         'p_value_lim' => '0.01',
+        'name' => 'Amniota',
+        'tax' => {
+          'scientific_name' => 'Amniota',
+          'common_name' => 'Amniotes',
+          'id' => 32524,
+          'timetree_mya' => '296.0'
+        },
         'children' => [
           {
             'n_members' => 1,
             'lambda' => '0.00211524',
-            'name' => 'Euarchontoglires',
             'p_value_lim' => '0.01',
+            'name' => 'Euarchontoglires',
+            'tax' => {
+              'scientific_name' => 'Euarchontoglires',
+              'common_name' => 'Primates and Rodents',
+              'id' => 314146,
+              'timetree_mya' => '92.3'
+            },
             'children' => [
               {
                 'n_members' => 1,
                 'lambda' => '0.00211524',
-                'name' => 'Simiiformes',
                 'p_value_lim' => '0.01',
+                'name' => 'Simiiformes',
+                'tax' => {
+                  'scientific_name' => 'Simiiformes',
+                  'common_name' => 'Simians',
+                  'id' => 314293,
+                  'timetree_mya' => '42.6'
+                },
                 'children' => [
                   {
                     'n_members' => 2,
                     'lambda' => '0.00211524',
-                    'name' => 'Homininae',
                     'p_value_lim' => '0.01',
+                    'name' => 'Homininae',
+                    'tax' => {
+                      'scientific_name' => 'Homininae',
+                      'common_name' => 'Hominines',
+                      'id' => 207598,
+                      'timetree_mya' => '8.8'
+                    },
                     'children' => [
                       {
                         'n_members' => 2,
                         'lambda' => '0.00211524',
-                        'name' => 'pan.troglodytes',
-                        'p_value_lim' => '0.01',
                         'pvalue' => 1,
-                        'id' => 40102216,
+                        'p_value_lim' => '0.01',
+                        'name' => 'pan.troglodytes',
                         'tax' => {
-                          'alias_name' => 'Chimpanzee',
                           'scientific_name' => 'Pan troglodytes',
+                          'common_name' => 'Chimpanzee',
                           'production_name' => 'pan_troglodytes',
-                          'timetree_mya' => 0,
-                          'id' => 9598
-                        }
+                          'id' => 9598,
+                          'timetree_mya' => 0
+                        },
+                        'id' => 40102216
                       },
                       {
                         'n_members' => 2,
                         'lambda' => '0.00211524',
-                        'name' => 'homo.sapiens',
-                        'p_value_lim' => '0.01',
                         'pvalue' => 1,
-                        'id' => 40102217,
+                        'p_value_lim' => '0.01',
+                        'name' => 'homo.sapiens',
                         'tax' => {
-                          'alias_name' => 'Human',
                           'scientific_name' => 'Homo sapiens',
+                          'common_name' => 'Human',
                           'production_name' => 'homo_sapiens',
-                          'timetree_mya' => 0,
-                          'id' => 9606
-                        }
+                          'id' => 9606,
+                          'timetree_mya' => 0
+                        },
+                        'id' => 40102217
                       }
                     ],
-                    'tax' => {
-                      'alias_name' => 'Hominines',
-                      'scientific_name' => 'Homininae',
-                      'timetree_mya' => '8.8',
-                      'id' => 207598
-                    },
                     'is_expansion' => 1,
                     'pvalue' => 1,
                     'id' => 40102215
@@ -117,101 +141,77 @@ my $cafe_species_tree = {
                   {
                     'n_members' => 1,
                     'lambda' => '0.00211524',
-                    'name' => 'callithrix.jacchus',
-                    'p_value_lim' => '0.01',
                     'pvalue' => 1,
-                    'id' => 40102218,
+                    'p_value_lim' => '0.01',
+                    'name' => 'callithrix.jacchus',
                     'tax' => {
-                      'alias_name' => 'Marmoset',
                       'scientific_name' => 'Callithrix jacchus',
+                      'common_name' => 'Marmoset',
                       'production_name' => 'callithrix_jacchus',
-                      'timetree_mya' => 0,
-                      'id' => 9483
-                    }
+                      'id' => 9483,
+                      'timetree_mya' => 0
+                    },
+                    'id' => 40102218
                   }
                 ],
-                'tax' => {
-                  'alias_name' => 'Simians',
-                  'scientific_name' => 'Simiiformes',
-                  'timetree_mya' => '42.6',
-                  'id' => 314293
-                },
                 'pvalue' => 1,
                 'id' => 40102214
               },
               {
                 'n_members' => 1,
                 'lambda' => '0.00211524',
-                'name' => 'mus.musculus',
-                'p_value_lim' => '0.01',
                 'pvalue' => 1,
-                'id' => 40102219,
+                'p_value_lim' => '0.01',
+                'name' => 'mus.musculus',
                 'tax' => {
-                  'alias_name' => 'Mouse',
                   'scientific_name' => 'Mus musculus',
+                  'common_name' => 'Mouse',
                   'production_name' => 'mus_musculus',
-                  'timetree_mya' => 0,
-                  'id' => 10090
-                }
+                  'id' => 10090,
+                  'timetree_mya' => 0
+                },
+                'id' => 40102219
               }
             ],
-            'tax' => {
-              'alias_name' => 'Primates and Rodents',
-              'scientific_name' => 'Euarchontoglires',
-              'timetree_mya' => '92.3',
-              'id' => 314146
-            },
             'pvalue' => 1,
             'id' => 40102213
           },
           {
             'n_members' => 1,
             'lambda' => '0.00211524',
-            'name' => 'taeniopygia.guttata',
-            'p_value_lim' => '0.01',
             'pvalue' => 1,
-            'id' => 40102212,
+            'p_value_lim' => '0.01',
+            'name' => 'taeniopygia.guttata',
             'tax' => {
-              'alias_name' => 'Zebra Finch',
               'scientific_name' => 'Taeniopygia guttata',
+              'common_name' => 'Zebra Finch',
               'production_name' => 'taeniopygia_guttata',
-              'timetree_mya' => 0,
-              'id' => 59729
-            }
+              'id' => 59729,
+              'timetree_mya' => 0
+            },
+            'id' => 40102212
           }
         ],
-        'tax' => {
-          'alias_name' => 'Amniotes',
-          'scientific_name' => 'Amniota',
-          'timetree_mya' => '296.0',
-          'id' => 32524
-        },
         'pvalue' => 1,
         'id' => 40102211
       },
       {
         'n_members' => 3,
         'lambda' => '0.00211524',
-        'name' => 'danio.rerio',
         'p_value_lim' => '0.01',
+        'name' => 'danio.rerio',
         'tax' => {
-          'alias_name' => 'Zebrafish',
           'scientific_name' => 'Danio rerio',
+          'common_name' => 'Zebrafish',
           'production_name' => 'danio_rerio',
-          'timetree_mya' => 0,
-          'id' => 7955
+          'id' => 7955,
+          'timetree_mya' => 0
         },
         'is_expansion' => 1,
         'pvalue' => 1,
         'id' => 40102220
       }
     ],
-    'tax' => {
-      'alias_name' => 'Bony vertebrates',
-      'scientific_name' => 'Euteleostomi',
-      'timetree_mya' => '441',
-      'id' => 117571
-    },
     'pvalue' => '0.5',
     'id' => 40102210
   },
