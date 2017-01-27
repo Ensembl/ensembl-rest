@@ -31,7 +31,6 @@ use Bio::EnsEMBL::Test::MultiTestDB;
 use Test::XML::Simple;
 use Test::XPath;
 use List::Util qw(sum);
-use Data::Dumper;
 
 my $human = Bio::EnsEMBL::Test::MultiTestDB->new("homo_sapiens");
 my $mult  = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
@@ -90,10 +89,8 @@ my $cafe_species_tree = {
                   'id' => 314293,
                   'timetree_mya' => '42.6'
                 },
-                'children' => [
-                  {
-                    'n_members' => 2,
-                    'lambda' => '0.00211524',
+                'name' => 'Simiiformes',
+                'p_value_lim' => '0.01',
                     'p_value_lim' => '0.01',
                     'name' => 'Homininae',
                     'tax' => {
