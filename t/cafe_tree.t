@@ -89,8 +89,10 @@ my $cafe_species_tree = {
                   'id' => 314293,
                   'timetree_mya' => '42.6'
                 },
-                'name' => 'Simiiformes',
-                'p_value_lim' => '0.01',
+                'children' => [
+                  {
+                    'n_members' => 2,
+                    'lambda' => '0.00211524',
                     'p_value_lim' => '0.01',
                     'name' => 'Homininae',
                     'tax' => {

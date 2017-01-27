@@ -7,7 +7,7 @@ CREATE TABLE `archive_id_lookup` (
   KEY `archive_id_db_type` (`archive_id`,`db_type`,`object_type`),
   KEY `archive_id_object_type` (`archive_id`,`object_type`),
   KEY `species_idx` (`species_id`)
-) ENGINE=MyISAM ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
 CREATE TABLE `meta` (
   `meta_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -37,5 +37,5 @@ CREATE TABLE `stable_id_lookup` (
   KEY `stable_id_db_type` (`stable_id`,`db_type`,`object_type`),
   KEY `stable_id_object_type` (`stable_id`,`object_type`),
   KEY `species_idx` (`species_id`)
-) ENGINE=MyISAM ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 ;
 
