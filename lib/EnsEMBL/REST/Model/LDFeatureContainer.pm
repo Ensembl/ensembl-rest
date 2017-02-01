@@ -200,7 +200,7 @@ sub to_array {
      $hash->{start} = $vf->seq_region_start;
      $hash->{end} = $vf->seq_region_end; 
      $hash->{strand} = $vf->seq_region_strand;
-     $hash->{consequence} = $vf->display_consequence;
+     $hash->{consequence_type} = $vf->display_consequence;
      $hash->{variation} = $ld_hash->{variation_name2} || $ld_hash->{variation2}->variation_name; 
     } else {
       $hash->{variation1} = $ld_hash->{variation_name1} || $ld_hash->{variation1}->variation_name; 
