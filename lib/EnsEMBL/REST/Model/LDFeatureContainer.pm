@@ -194,22 +194,18 @@ sub to_array {
 
     # fallback for tests as travis uses the release branch
     if ($vf_attribs) {
-     my $vf1 = $ld_hash->{variation1};
-     my $vf2 = $ld_hash->{variation2};
-     $hash->{v1_chr} = $vf1->seq_region_name;
-     $hash->{v1_start} = $vf1->seq_region_start;
-     $hash->{v1_end} = $vf1->seq_region_end; 
-     $hash->{v1_strand} = $vf1->seq_region_strand;
-     $hash->{v1_consequence} = $vf1->display_consequence;
-     $hash->{v2_chr} = $vf2->seq_region_name;
-     $hash->{v2_start} = $vf2->seq_region_start;
-     $hash->{v2_end} = $vf2->seq_region_end; 
-     $hash->{v2_strand} = $vf2->seq_region_strand;
-     $hash->{v2_consequence} = $vf2->display_consequence;
+     # only return attribs for variation2 which is used for computing LD stats with the input variation: variation1
+     my $vf = $ld_hash->{variation2};
+     $hash->{chr} = $vf->seq_region_name;
+     $hash->{start} = $vf->seq_region_start;
+     $hash->{end} = $vf->seq_region_end; 
+     $hash->{strand} = $vf->seq_region_strand;
+     $hash->{consequence_type} = $vf->display_consequence;
+     $hash->{variation} = $ld_hash->{variation_name2} || $ld_hash->{variation2}->variation_name; 
+    } else {
+      $hash->{variation1} = $ld_hash->{variation_name1} || $ld_hash->{variation1}->variation_name; 
+      $hash->{variation2} = $ld_hash->{variation_name2} || $ld_hash->{variation2}->variation_name; 
     }
-
-    $hash->{variation1} = $ld_hash->{variation_name1} || $ld_hash->{variation1}->variation_name; 
-    $hash->{variation2} = $ld_hash->{variation_name2} || $ld_hash->{variation2}->variation_name; 
     my $population_id = $ld_hash->{population_id};
     my $population_name = $population_id2name->{$population_id};
     if (!$population_name) {
