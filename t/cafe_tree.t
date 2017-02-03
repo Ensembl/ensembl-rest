@@ -41,7 +41,7 @@ my ($json, $xml, $nh);
 
 
 my $cafe_species_tree = {
-  'pvalue_avg' => '0.8370',
+  'pvalue_avg' => '0.837',
   'tree' => {
     'n_members' => 1,
     'lambda' => '0.00211524',
@@ -246,7 +246,7 @@ $nh = nh_GET(
     'Gene-tree (ncRNA) by ID',
 );
 
-my $nh_simple = '(((((pan.troglodytes_2_1.0000,homo.sapiens_2_1.0000)Homininae_2_1.0000,callithrix.jacchus_1_1.0000)Simiiformes_1_1.0000,mus.musculus_1_1.0000)Euarchontoglires_1_1.0000,taeniopygia.guttata_1_1.0000)Amniota_1_1.0000,danio.rerio_3_1.0000)Euteleostomi_1_0.5000;';
+my $nh_simple = '(((((pan.troglodytes_2_1,homo.sapiens_2_1)Homininae_2_1,callithrix.jacchus_1_1)Simiiformes_1_1,mus.musculus_1_1)Euarchontoglires_1_1,taeniopygia.guttata_1_1)Amniota_1_1,danio.rerio_3_1)Euteleostomi_1_0.5;';
 is($nh, $nh_simple, 'Got the correct newick');
 
 done_testing();
