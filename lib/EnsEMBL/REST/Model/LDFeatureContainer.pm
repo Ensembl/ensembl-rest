@@ -201,6 +201,7 @@ sub to_array {
      $hash->{end} = $vf->seq_region_end; 
      $hash->{strand} = $vf->seq_region_strand;
      $hash->{consequence_type} = $vf->display_consequence;
+     $hash->{clinical_significance} = $vf->get_all_clinical_significance_states;
      $hash->{variation} = $ld_hash->{variation_name2} || $ld_hash->{variation2}->variation_name; 
     } else {
       $hash->{variation1} = $ld_hash->{variation_name1} || $ld_hash->{variation1}->variation_name; 
