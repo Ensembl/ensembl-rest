@@ -41,7 +41,9 @@ our $DOWNSTREAM_DISTANCE_BAK;
 # /vep/:species
 sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
-  $c->stash->{species} = $c->model('Registry')->get_alias($species);
+  my $reg = $c->model('Registry');
+  $c->stash->{species} = $reg->get_alias($species);
+  $c->stash->{assembly} = $reg->get_adaptor($species, 'core', 'coordsystem')->fetch_all->[0]->version;
   $c->stash->{has_variation} = $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation');
   $c->log->debug('Working with species '.$species);
 }
@@ -267,18 +269,40 @@ sub get_hgvs_POST {
 
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
+
   # This list stops users altering more crucial variables.
   my @valid_keys = (qw/
-    hgvs
-    ccds
-    numbers
-    domains
-    canonical
-    protein
-    xref_refseq
+    gencode_basic
     refseq
     merged
     all_refseq
+
+    failed
+    variant_class
+    minimal
+
+    everything
+    appris
+    canonical
+    ccds
+    domains
+    hgvs
+    numbers
+    protein
+    tsl
+    uniprot
+    xref_refseq
+    phyloP
+    phastCons
+
+    pick
+    pick_allele
+    per_gene
+    pick_allele_gene
+    flag_pick
+    flag_pick_allele
+    flag_pick_allele_gene
+    pick_order
   /);
   
   my %vep_params = %{ $c->config->{'Controller::VEP'} };
@@ -286,6 +310,16 @@ sub _include_user_params {
   # stash species
   $vep_params{species} = $c->stash->{species};
 
+  # set ucsc_assembly param
+  my %assembly_map = (
+    'GRCh38' => 'hg38',
+    'GRCh37' => 'hg19'
+  );
+  if(my $mapped = $assembly_map{$c->stash->{assembly}}) {
+    $vep_params{ucsc_assembly} = $mapped;
+  }
+
+  # copy in params from URL
   map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
   
   # we currently only have cache for human
