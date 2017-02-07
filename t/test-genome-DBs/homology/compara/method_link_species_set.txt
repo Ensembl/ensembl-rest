@@ -1949,3 +1949,4 @@
 27785	201	33747	O.lat-C.jac orthologues	ensembl		63	\N
 23850	201	31872	O.lat-D.ord orthologues	ensembl		53	\N
 28103	201	33928	O.lat-B.tau orthologues	ensembl		64	\N
+30049	301	36207	default families	ensembl		86	\N

@@ -31,10 +31,11 @@ use Test::JSON;
 use Test::XML::Simple;
 use JSON;
 use HTTP::Request;
-
+#use Data::Dumper;
 sub is_json_GET($$$) {
   my ($url, $expected, $msg) = @_;
   my $json = json_GET($url, $msg);
+#  print Dumper($json);
   return eq_or_diff_data($json, $expected, "$url | $msg") if $json;
   return;
 }

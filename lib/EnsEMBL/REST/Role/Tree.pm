@@ -109,9 +109,16 @@ sub encode_nh {
   my ($self, $c, $stash_key) = @_;
   $stash_key ||= 'rest';
   my $gt = $c->stash->{$stash_key};
-  my $nh_format = $c->request->param('nh_format') || 'simple';
+  my $nh_format;
+  $nh_format = $c->request->param('nh_format') || 'simple';
   my $root = $gt->root();
-  my $str = $root->newick_format($nh_format);
+  my $str;
+  if ($root->isa('Bio::EnsEMBL::Compara::CAFEGeneFamilyNode')) {
+    $str = $root->newick_format('ryo','%{n_}%{"_"N}%{"_"P}');
+  }
+  else { 
+    $str = $root->newick_format($nh_format);
+  }
   if ($gt->can('release_tree')) {
     $gt->release_tree();
   } elsif ($root->can('release_tree')) {

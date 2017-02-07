@@ -67,3 +67,7 @@
 154	7955	danio_rerio	GRCz10	2014-09-Ensembl	1	1	\N	\N	Zebrafish	\N	80	\N
 155	10116	rattus_norvegicus	Rnor_6.0	2014-09-Ensembl	1	1	\N	\N	Rat	\N	80	\N
 156	7227	drosophila_melanogaster	BDGP6	2014-05-FlyBase	1	1	\N	\N	Fruitfly	\N	79	\N
+174	10096	mus_spretus_spreteij	SPRET_EiJ_v1	2016-07	1	1	\N	\N	\N	\N	86	\N
+159	30608	microcebus_murinus	Mmur_2.0	2016-06-Ensembl	0	1	\N	\N	Mouse Lemur	\N	86	\N
+158	9544	macaca_mulatta	Mmul_8.0.1	2016-06-Ensembl	1	1	\N	\N	Macaque	\N	86	\N
+157	9031	gallus_gallus	Gallus_gallus-5.0	2016-06-Ensembl	1	1	\N	\N	Chicken	\N	86	\N

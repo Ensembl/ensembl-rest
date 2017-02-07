@@ -1,0 +1,3 @@
+30049	uniprot_version	UniProt Knowledgebase Release 2016_07 consists of:\
+UniProtKB/Swiss-Prot Release 2016_07 of 06-Jul-2016\
+UniProtKB/TrEMBL Release 2016_07 of 06-Jul-2016

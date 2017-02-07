@@ -105,7 +105,7 @@ CREATE TABLE `family` (
   UNIQUE KEY `stable_id` (`stable_id`),
   KEY `method_link_species_set_id` (`method_link_species_set_id`),
   KEY `description` (`description`(255))
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=2611 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `family_member` (
   `family_id` int(10) unsigned NOT NULL,
@@ -296,7 +296,7 @@ CREATE TABLE `genome_db` (
   PRIMARY KEY (`genome_db_id`),
   UNIQUE KEY `name` (`name`,`assembly`,`genome_component`),
   KEY `taxon_id` (`taxon_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=157 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=175 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `genomic_align` (
   `genomic_align_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -434,7 +434,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=41 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -588,7 +588,7 @@ CREATE TABLE `species_set_header` (
   `first_release` smallint(6) DEFAULT NULL,
   `last_release` smallint(6) DEFAULT NULL,
   PRIMARY KEY (`species_set_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=36174 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=36208 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `species_set_tag` (
   `species_set_id` int(10) unsigned NOT NULL,
