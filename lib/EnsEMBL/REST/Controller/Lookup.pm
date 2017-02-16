@@ -66,6 +66,7 @@ sub id_POST {
   my $post_data = $c->req->data;
   my $id_list = $post_data->{'ids'};
   $self->assert_post_size($c,$id_list);
+  $self->_include_user_params($c,$post_data);
   my $feature_hash;
   try {
     $feature_hash = $c->model('Lookup')->find_and_locate_list($id_list);
@@ -107,6 +108,7 @@ sub symbol_POST {
   }
   my $symbol_list = $post_data->{'symbols'};
   $self->assert_post_size($c,$symbol_list);
+  $self->_include_user_params($c,$post_data);
   my $feature_hash;
   try {
     $feature_hash = $c->model('Lookup')->find_genes_by_symbol_list($symbol_list);
@@ -115,6 +117,25 @@ sub symbol_POST {
   #   $c->go('ReturnError','custom', [qq{$_}]);
   # };
   $self->status_ok( $c, entity => $feature_hash);
+}
+
+sub _include_user_params {
+  my ($self,$c,$user_config) = @_;
+  # This list stops users altering more crucial variables.
+  my @valid_keys = (qw/
+    db_type
+    expand
+    format
+    phenotypes
+    species
+    utr
+  /);
+
+  foreach my $key (keys %$user_config) {
+    if ($key ~~ @valid_keys) {
+      $c->request->params->{$key} = $user_config->{$key};
+    }
+  }
 }
 
 __PACKAGE__->meta->make_immutable;
