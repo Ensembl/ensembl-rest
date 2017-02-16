@@ -82,6 +82,8 @@ jsonp=1
   # Model to use for ID lookups. Currently defaults to the DatabaseIDLookup which can be stable_ids schema
   # or a simple DBAdaptor loop lookup
   # lookup_model = DatabaseIDLookup
+  # Disable completely long lookups
+  # no_long_lookup = 1
 </Model::Lookup>
 
 <Model::Documentation>

@@ -31,6 +31,8 @@ with 'Catalyst::Component::InstancePerContext';
 # Config
 has 'lookup_model' => ( is => 'ro', isa => 'Str', required => 1, default => 'DatabaseIDLookup' );
 
+has 'no_long_lookup' => (is => 'ro', isa => 'Bool');
+
 # Per instance variables
 has 'context' => (is => 'ro', weak_ref => 1);
 
@@ -309,7 +311,8 @@ sub find_objects_by_symbol {
 
 
 sub find_object_location {
-  my ($self, $id, $no_long_lookup) = @_;
+  my ($self, $id) = @_;
+  my $no_long_lookup = $self->no_long_lookup();
   my $c = $self->context();
   my $r = $c->request;
   my $log = $c->log();
@@ -330,7 +333,7 @@ sub find_object_location {
     my $lookup = $c->model($model_name);
     @captures = $lookup->find_object_location($id, $object_type, $db_type, $species, $use_archive);
     #Check if we any conntent or if the 1st element was false (both mean force a long lookup)
-    unless (@captures && $captures[0]) {
+    unless ((@captures && $captures[0]) || $no_long_lookup) {
       $c->log()->debug('Using long database lookup');
       @captures = $c->model('LongDatabaseIDLookup')->find_object_location($id, $object_type, $db_type, $species);
     }
@@ -379,10 +382,10 @@ sub fetch_archive_by_id {
 }
 
 sub find_and_locate_object {
-  my ($self, $id, $no_long_lookup) = @_;
+  my ($self, $id) = @_;
   my $c = $self->context();
 
-  my @captures = $self->find_object_location($id, $no_long_lookup);
+  my @captures = $self->find_object_location($id);
   my $species = $captures[0];
   my $object_type = $captures[1];
   my $db_type = $captures[2];
@@ -411,13 +414,13 @@ sub find_and_locate_object {
 }
 
 sub find_and_locate_list {
-  my ($self, $id_list, $no_long_lookup) = @_;
+  my ($self, $id_list) = @_;
   my $c = $self->context();
   my %combined_list;
   while (my $id = shift @$id_list) {
     my $objs;
     try {
-      $objs = find_and_locate_object($self,$id,$no_long_lookup);
+      $objs = find_and_locate_object($self,$id);
     }
     catch {
       $c->log->debug("No object found for ID $id");
