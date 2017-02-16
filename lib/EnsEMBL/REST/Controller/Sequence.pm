@@ -78,6 +78,7 @@ sub id_POST {
   my $post_data = $c->req->data;
   my $id_list = $post_data->{'ids'};
   $self->assert_post_size($c,$id_list);
+  $self->_include_user_params($c,$post_data);
 
   my @errors;
   $c->request->params->{'multiple_sequences'} = 1;
@@ -115,6 +116,7 @@ sub region_POST {
   my $regions = $post_data->{'regions'};
   $self->assert_post_size($c,$regions);
   $c->request->params->{'multiple_sequences'} = 1; # required by _write to allow multiple hits.
+  $self->_include_user_params($c,$post_data);
   my @errors;
   foreach my $reg (@$regions) {
     $c->log->debug($reg);
@@ -490,6 +492,27 @@ sub _write {
   }
   else {
     $self->status_ok($c, entity => $data->[0]);
+  }
+}
+
+sub _include_user_params {
+  my ($self,$c,$user_config) = @_;
+  # This list stops users altering more crucial variables.
+  my @valid_keys = (qw/
+    multiple_sequences
+    start
+    end
+    type
+    expand_5prime
+    expand_3prime
+    mask_feature
+    mask
+  /);
+
+  foreach my $key (keys %$user_config) {
+    if ($key ~~ @valid_keys) {
+      $c->request->params->{$key} = $user_config->{$key};
+    }
   }
 }
 
