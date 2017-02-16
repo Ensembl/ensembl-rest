@@ -47,7 +47,6 @@ sub id: Chained('/') PathPart('archive/id') ActionClass('REST') {
 sub id_GET {
   my ($self, $c, $id) = @_;
   try {
-    $c->model('Lookup')->fetch_archive_by_id($id);
     $self->_get_archive($c, $id);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
