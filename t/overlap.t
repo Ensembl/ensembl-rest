@@ -263,6 +263,22 @@ my $base = '/overlap/region/homo_sapiens';
     [], 'Getting simple_feature no entries with bogus logic_name as JSON');
 }
 
+#Band information testing
+{
+  my $region = '6:1020000..1030000';
+  is_json_GET("$base/$region?feature=band", [{
+    start => 1026863,
+    assembly_name => 'GRCh37',
+    end => 1027454,
+    strand => 0,
+    feature_type => 'band',
+    id => 'q11.21',
+    stain => 'gneg',
+    seq_region_name => '6',
+  }], 'Getting band as JSON');
+
+}
+
 #Regulatory feature testing
 {
   my $region = '6:1024250..1025449';

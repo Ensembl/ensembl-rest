@@ -6,3 +6,4 @@ protein_align_feature	2	9143
 repeat_feature	2	50000
 simple_feature	2	17502
 misc_feature	2	216723
+karyotype	2	216723
