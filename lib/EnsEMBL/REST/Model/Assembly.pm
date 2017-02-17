@@ -40,8 +40,10 @@ sub fetch_info {
 
   my $gc = $c->model('Registry')->get_adaptor($species, 'core', 'GenomeContainer');
   my $csa = $c->model('Registry')->get_adaptor($species, 'core', 'CoordSystem');
+  my $kba = $c->model('Registry')->get_adaptor($species, 'core', 'KaryotypeBand');
   my %assembly_info;
-  $assembly_info{top_level_region} = $self->get_slice_info($gc, 'toplevel');
+  my $has_karyotype = @{ $kba->fetch_all };
+  $assembly_info{top_level_region} = $self->get_slice_info($gc, 'toplevel', $has_karyotype);
   $assembly_info{karyotype} = $self->get_slice_names($gc, 'karyotype');
   $assembly_info{assembly_name} = $gc->get_assembly_name;
   $assembly_info{assembly_date} = $gc->get_assembly_date;
@@ -57,15 +59,23 @@ sub fetch_info {
 }
 
 sub get_slice_info {
-  my ($self, $gc, $type) = @_;
+  my ($self, $gc, $type, $has_karyotype) = @_;
   
   my $method = "get_" . $type;
   my $slices = $gc->$method;
+  my $c = $self->context();
+  my $include_bands = $c->request->param('bands') || 0;
   my @toplevels;
   my $toplevels;
   
-  foreach my $slice (@$slices) {
-    push @toplevels, $self->features_as_hash($slice);
+  if ($has_karyotype && $include_bands) {
+    foreach my $slice (@$slices) {
+      push @toplevels, $self->features_karyotype_as_hash($slice);
+    }
+  } else {
+    foreach my $slice (@$slices) {
+      push @toplevels, $self->features_as_hash($slice);
+    }
   }
   return \@toplevels;
 }
@@ -87,15 +97,20 @@ sub get_karyotype_info {
 
 sub features_as_hash {
   my ($self, $slice) = @_;
-  my $c = $self->context();
-  my $include_bands = $c->request->param('bands') || 0;
-  my ($features, $bands);
+  my $features;
   $features->{coord_system} = $slice->coord_system_name();
   $features->{name} = $slice->seq_region_name();
   $features->{length} = $slice->length();
+  return $features;
+}
+
+sub features_karyotype_as_hash {
+  my ($self, $slice) = @_;
+  my $features = $self->features_as_hash($slice);
+  my $bands;
   # Only look for bands if slice is a chromosome
   # Reduces performance issues
-  if ($include_bands && $slice->is_chromosome) {
+  if ($slice->is_chromosome) {
     $bands = $self->get_karyotype_info($slice);
     if (scalar(@$bands) > 0) {
       $features->{bands} = $bands;
