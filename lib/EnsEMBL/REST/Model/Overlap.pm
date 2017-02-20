@@ -252,7 +252,7 @@ sub transcript_variation {
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
-  my $vfs = $transcript->feature_Slice->get_all_VariationFeatures();
+  my $vfs = $vfa->fetch_all_by_Slice($transcript->feature_Slice);
   $c->stash->{_cached_vfs} = $vfs;
 
   my $so_terms = $self->_get_SO_terms();
@@ -276,7 +276,7 @@ sub somatic_transcript_variation {
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
-  my $vfs = $transcript->feature_Slice->get_all_somatic_VariationFeatures();
+  my $vfs = $vfa->fetch_all_somatic_by_Slice($transcript->feature_Slice);
   $c->stash->{_cached_vfs} = $vfs;
 
   my $so_terms = $self->_get_SO_terms();
@@ -329,15 +329,14 @@ sub variation {
   my ($self, $slice) = @_;
 
   my $c = $self->context();
+  my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
 
   if( $c->request->parameters->{variant_set}){
-
     my $set = $self->_get_VariationSet();
-    my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
-    return $vfa->fetch_all_by_Slice_VariationSet_SO_terms($slice, $set, $self->_get_SO_terms());
+    return $vfa->fetch_all_by_Slice_VariationSet_SO_terms($slice, $set, $self->_get_SO_terms);
   }
   else{
-    return $slice->get_all_VariationFeatures($self->_get_SO_terms());
+    return $vfa->fetch_all_by_Slice_SO_terms($slice, $self->_get_SO_terms);
   }
 }
 
@@ -346,7 +345,9 @@ sub structural_variation {
   my @so_terms = $self->_get_SO_terms();
   my ($source, $include_evidence, $somatic) = (undef)x3;
   my $sv_class = (@so_terms) ? $so_terms[0] : ();
-  return $slice->get_all_StructuralVariationFeatures($source, $include_evidence, $somatic, $sv_class);
+  my $c = $self->context();
+  my $svfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'structuralvariationfeature');
+  return $svfa->fetch_all_by_Slice_SO_term($slice, $sv_class);
 }
 
 sub somatic_variation {
@@ -358,10 +359,12 @@ sub somatic_variation {
 
 sub somatic_structural_variation {
   my ($self, $slice) = @_;
-  my @so_terms = $self->_get_SO_terms();
-  my ($source, $include_evidence, $somatic) = (undef)x3;
-  my ($sv_class) = @so_terms;
-  return $slice->get_all_somatic_StructuralVariationFeatures($source, $include_evidence, $somatic, $sv_class);
+  # my @so_terms = $self->_get_SO_terms();
+  # my ($source, $include_evidence, $somatic) = (undef)x3;
+  # my ($sv_class) = @so_terms;
+  my $c = $self->context();
+  my $svfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'structuralvariationfeature');
+  return $svfa->fetch_all_somatic_by_Slice($slice);
 }
 
 sub constrained {
