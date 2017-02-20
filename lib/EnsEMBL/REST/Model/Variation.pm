@@ -192,7 +192,7 @@ sub get_gene_phenotype_info {
 
   foreach my $phen (@pfs) {
     my $hash = $self->phen_as_hash($phen);
-    my $key = join("", sort values %$hash);
+    my $key = join("", sort grep {$_} values %$hash);
     push (@phenotypes, $hash) unless $seen{$key};
     $seen{$key} = 1;
   }
