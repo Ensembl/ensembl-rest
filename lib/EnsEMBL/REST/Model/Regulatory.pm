@@ -35,28 +35,155 @@ sub build_per_context_instance {
   return $self->new({ context => $c, %$self, @args });
 }
 
-sub fetch_regulatory {
-  my $self    = shift;
-  my $regf_id = shift ||
-   Catalyst::Exception->throw("No regulatory feature stable ID given. Please specify an stable ID to retrieve from this service");
+sub fetch_regulatory_feature {
+  my ($self, $rf_id) = @_;
 
   my $c          = $self->context;
   my $species    = $c->stash->{species};
 
   my $rf_a = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature');
-  my $rf = $rf_a->fetch_by_stable_id($regf_id);
+  my $rf = $rf_a->fetch_by_stable_id($rf_id);
   if(! defined $rf) {
-    Catalyst::Exception->throw("$regf_id not found for $species");
+    Catalyst::Exception->throw("$rf_id not found for $species");
   }
-  my $sum = $rf->summary_as_hash();
-  return([$sum]);
+  my $result = $rf->summary_as_hash();
+
+  my $activity = $c->request->param('activity');
+  if($activity == 1) {
+    my $array = []; 
+    for my $ra(@{$rf->regulatory_activity}) {
+      my $string = $ra->epigenome->name . ':' . $ra->activity;
+      push(@$array, $string);
+    }
+    $result ->{activity} = $array;
+  }
+
+  return([$result]);
 
 }
 
-#If required look at Variation::to_hash for example of enriched hash
-#and additional data types that can be embedded
+
+sub fetch_all_epigenomes {
+  my $self    = shift;
+  my $c          = $self->context;
+  my $species    = $c->stash->{species};
 
 
+  my $regulatory_build_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'RegulatoryBuild');
+  my $regulatory_build         = $regulatory_build_adaptor->fetch_current_regulatory_build;
+  my $epigenomes_in_regulatory_build = $regulatory_build->get_all_Epigenomes;
+
+
+  my @array = sort  map {  $_->display_label } @$epigenomes_in_regulatory_build;
+  
+
+  return(\@array);
+
+}
+
+sub list_all_microarrays{
+  my $self    = shift;
+  my $motif   = shift;
+  
+  my $c       = $self->context;
+  my $species = $c->stash->{species};
+
+  my $array_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Array');
+  
+  my $arrays = $array_adaptor->fetch_all;
+	my $result = [];
+
+	foreach my $array (@$arrays) {
+		my $data = {};
+		$data->{Array}       = $array->name;
+		$data->{Type}        = $array->type;
+		$data->{Vendor}      = $array->vendor;
+    $data->{Description} = $array->description;
+    $data->{Format}      = $array->format;
+    # Very Slow!
+    #$data->{ProbeCount}  = $array->probe_count;
+		push(@{$result}, $data);
+	}
+  
+  return($result);
+
+}
+
+sub get_probe_info {
+  my $self       = shift;
+  my $probe_name = shift;
+
+  if(! defined $probe_name){
+   Catalyst::Exception->throw("No probe name given. Please specify one to retrieve from this service");
+  }
+
+  my $c       = $self->context;
+  my $species = $c->stash->{species};
+  my $microarray = $c->stash->{microarray};
+  
+  my $probe_adaptor         = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Probe');
+  my $probe_feature_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'ProbeFeature');
+  # Fetch probe
+  my $probe = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray, $probe_name );
+  my $probe_features = $probe_feature_adaptor->fetch_all_by_Probe($probe);
+
+  my $result = [];
+  for my $pf (@$probe_features) {
+    my $features = {};
+    $features->{Name}            = $microarray ;
+    $features->{Description}     = $pf->probe->description;
+    $features->{Location}        = $pf->seqname;
+    $features->{start}           = $pf->start;
+    $features->{end}             = $pf->end;
+    $features->{seq_region_name} = $pf->seq_region_name;
+
+
+    my $flag_transcript = $c->request->param('transcript');
+    my $flag_gene       = $c->request->param('gene');
+    
+    # Linked transcripts
+    if($flag_transcript == 1){
+      my $transript_mappings = $pf->get_all_Transcript_DBEntries();
+      my $transcripts = [];
+      for my $tm (@$transript_mappings) {
+        my $hash = {};
+        $hash->{display_id} = $tm->display_id();
+        $hash->{details}    = $tm->linkage_annotation();
+        # Add gene information
+        if($flag_gene == 1){
+          my $tr_a = $c->model('Registry')->get_adaptor( $species, 'Core', 'Transcript');
+          my $transcript = $tr_a->fetch_by_stable_id($tm->display_id);
+         $hash->{gene}->{stable_id}     = $transcript->get_Gene()->stable_id();
+         $hash->{gene}->{external_name} = $transcript->get_Gene()->external_name();
+        }
+
+        push(@$transcripts, $hash)
+      }
+      $features->{transcripts} = $transcripts;
+    }
+    push(@$result, $features);
+  }
+  return($result);
+}
+
+sub get_microarray_info {
+  my ($self,  $vendor) = @_;
+  
+  my $c       = $self->context;
+  my $species = $c->stash->{species};  
+  my $name    = $c->stash->{microarray};
+  my $array_a = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Array');
+  my $array = $array_a->fetch_by_name_vendor($name, $vendor);
+  
+  my $result = {};
+  $result->{name} = $array->name;
+  $result->{format} = $array->format;
+  $result->{type} = $array->type;
+  $result->{class} = $array->class;
+
+  return($result);
+
+}
 
 with 'EnsEMBL::REST::Role::Content';
 
