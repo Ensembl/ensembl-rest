@@ -50,12 +50,11 @@ sub fetch_regulatory_feature {
 
   my $activity = $c->request->param('activity');
   if($activity == 1) {
-    my $array = []; 
+    my $data; 
     for my $ra(@{$rf->regulatory_activity}) {
-      my $string = $ra->epigenome->name . ':' . $ra->activity;
-      push(@$array, $string);
+      $data->{$ra->epigenome->production_name} = $ra->activity;
     }
-    $result ->{activity} = $array;
+    $result ->{activity} = $data;
   }
 
   return([$result]);
@@ -76,13 +75,11 @@ sub fetch_all_epigenomes {
   my $result = [];
   for my $eg (@$epigenomes) {
     my $data = {};
-    $data->{efo_id}             = $eg->efo_id;
+#    $data->{efo_id}             = $eg->efo_id;
     $data->{gender}             = $eg->gender;
-    $data->{name}               = $eg->name;
-    $data->{tissue}             = $eg->tissue;
-    $data->{production_name}    = $eg->production_name;
-    $data->{display_label}      = $eg->display_label;
-    $data->{ontology_accession} = $eg->ontology_accession;
+    $data->{name}               = $eg->production_name;
+    #$data->{production_name}    = $eg->production_name;
+    $data->{scientific_name}      = $eg->display_label;
     push(@$result, $data);
   }
 
@@ -157,7 +154,7 @@ sub get_probe_info {
       for my $tm (@$transript_mappings) {
         my $hash = {};
         $hash->{display_id} = $tm->display_id();
-        $hash->{details}    = $tm->linkage_annotation();
+        $hash->{description}    = $tm->linkage_annotation();
         # Add gene information
         if($flag_gene == 1){
           my $tr_a = $c->model('Registry')->get_adaptor( $species, 'Core', 'Transcript');
@@ -169,19 +166,20 @@ sub get_probe_info {
       }
       $features->{transcripts} = $transcripts;
     }
-    my $flag_all_matches = $c->request->param('all_matches');
-    if($flag_all_matches == 1){
-      my $probe_features = $probe_feature_adaptor->fetch_all_by_Probe($probe);
-      my $matches = [];
-      for my $probe_feature (@$probe_features) {
-        my $hash = {};
-        $hash->{start}           = $probe_feature->start();
-        $hash->{end}             = $probe_feature->end();
-        $hash->{seq_region_name} = $probe_feature->seq_region_name();
-        push(@$matches, $hash);
-      }
-      $features->{all_matches} = $matches;
-    }
+
+#    my $flag_all_matches = $c->request->param('all_matches');
+#    if($flag_all_matches == 1){
+#      my $probe_features = $probe_feature_adaptor->fetch_all_by_Probe($probe);
+#      my $matches = [];
+#      for my $probe_feature (@$probe_features) {
+#        my $hash = {};
+#        $hash->{start}           = $probe_feature->start();
+#        $hash->{end}             = $probe_feature->end();
+#        $hash->{seq_region_name} = $probe_feature->seq_region_name();
+#        push(@$matches, $hash);
+#      }
+#      $features->{probe_feature} = $matches;
+#    }
     push(@$result, $features);
   }
   return($result);
