@@ -325,7 +325,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=641 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=642 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -450,6 +450,7 @@ CREATE TABLE `regulatory_build` (
   `feature_type_id` int(4) unsigned NOT NULL,
   `analysis_id` smallint(5) unsigned NOT NULL,
   `is_current` tinyint(1) NOT NULL DEFAULT '0',
+  `sample_regulatory_feature_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`regulatory_build_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 

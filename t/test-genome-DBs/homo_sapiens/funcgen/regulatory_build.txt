@@ -1,1 +1,1 @@
-1	The Ensembl Regulatory Build	14	2016-6	2016-6	19	16	1
+1	The Ensembl Regulatory Build	14	2016-6	2016-6	19	16	1	1
