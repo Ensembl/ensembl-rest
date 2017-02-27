@@ -94,22 +94,22 @@ sub list_all_microarrays{
   my $species = $c->stash->{species};
 
   my $array_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Array');
-  
-  my $arrays = $array_adaptor->fetch_all;
-	my $result = [];
 
-	foreach my $array (@$arrays) {
-		my $data = {};
-		$data->{array}       = $array->name;
-		$data->{type}        = $array->type;
-		$data->{vendor}      = $array->vendor;
+  my $arrays = $array_adaptor->fetch_all;
+  my $result = [];
+
+  foreach my $array (@$arrays) {
+    my $data = {};
+    $data->{array}       = $array->name;
+    $data->{type}        = $array->type;
+    $data->{vendor}      = $array->vendor;
     $data->{description} = $array->description;
     $data->{format}      = $array->format;
-    # Very Slow!
-    #$data->{ProbeCount}  = $array->probe_count;
-		push(@{$result}, $data);
-	}
-  
+# Very Slow!
+#$data->{ProbeCount}  = $array->probe_count;
+    push(@{$result}, $data);
+  }
+
   return($result);
 
 }

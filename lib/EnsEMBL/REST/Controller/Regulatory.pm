@@ -45,7 +45,7 @@ sub species: Chained('/') PathPart('regulatory/species') CaptureArgs(1) {
 
   unless (defined $species) { $c->go('ReturnError', 'custom', [qq{Species must be provided as part of the URL.}])} 
   $c->stash(species => $species);
-  $c->log->debug(Dumper "S: $species");
+#  $c->log->debug(Dumper "S: $species");
 }
 
 
