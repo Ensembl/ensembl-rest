@@ -69,16 +69,24 @@ sub fetch_all_epigenomes {
   my $species    = $c->stash->{species};
 
 
-  my $regulatory_build_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'RegulatoryBuild');
-  my $regulatory_build         = $regulatory_build_adaptor->fetch_current_regulatory_build;
-  my $epigenomes_in_regulatory_build = $regulatory_build->get_all_Epigenomes;
+  my $reg_build_a = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'RegulatoryBuild');
+  my $reg_build   = $reg_build_a->fetch_current_regulatory_build;
+  my $epigenomes  = $reg_build->get_all_Epigenomes;
 
+  my $result = [];
+  for my $eg (@$epigenomes) {
+    my $data = {};
+    $data->{efo_id}             = $eg->efo_id;
+    $data->{gender}             = $eg->gender;
+    $data->{name}               = $eg->name;
+    $data->{tissue}             = $eg->tissue;
+    $data->{production_name}    = $eg->production_name;
+    $data->{display_label}      = $eg->display_label;
+    $data->{ontology_accession} = $eg->ontology_accession;
+    push(@$result, $data);
+  }
 
-  my @array = sort  map {  $_->display_label } @$epigenomes_in_regulatory_build;
-  
-
-  return(\@array);
-
+  return($result);
 }
 
 sub list_all_microarrays{
@@ -95,11 +103,11 @@ sub list_all_microarrays{
 
 	foreach my $array (@$arrays) {
 		my $data = {};
-		$data->{Array}       = $array->name;
-		$data->{Type}        = $array->type;
-		$data->{Vendor}      = $array->vendor;
-    $data->{Description} = $array->description;
-    $data->{Format}      = $array->format;
+		$data->{array}       = $array->name;
+		$data->{type}        = $array->type;
+		$data->{vendor}      = $array->vendor;
+    $data->{description} = $array->description;
+    $data->{format}      = $array->format;
     # Very Slow!
     #$data->{ProbeCount}  = $array->probe_count;
 		push(@{$result}, $data);
@@ -130,9 +138,10 @@ sub get_probe_info {
   my $result = [];
   for my $pf (@$probe_features) {
     my $features = {};
-    $features->{Name}            = $microarray ;
-    $features->{Description}     = $pf->probe->description;
-    $features->{Location}        = $pf->seqname;
+    $features->{name}            = $microarray ;
+    $features->{description}     = $pf->probe->description;
+    # Attaches whole chromosome
+#    $features->{Location}        = $pf->seqname;
     $features->{start}           = $pf->start;
     $features->{end}             = $pf->end;
     $features->{seq_region_name} = $pf->seq_region_name;
@@ -156,10 +165,22 @@ sub get_probe_info {
          $hash->{gene}->{stable_id}     = $transcript->get_Gene()->stable_id();
          $hash->{gene}->{external_name} = $transcript->get_Gene()->external_name();
         }
-
         push(@$transcripts, $hash)
       }
       $features->{transcripts} = $transcripts;
+    }
+    my $flag_all_matches = $c->request->param('all_matches');
+    if($flag_all_matches == 1){
+      my $probe_features = $probe_feature_adaptor->fetch_all_by_Probe($probe);
+      my $matches = [];
+      for my $probe_feature (@$probe_features) {
+        my $hash = {};
+        $hash->{start}           = $probe_feature->start();
+        $hash->{end}             = $probe_feature->end();
+        $hash->{seq_region_name} = $probe_feature->seq_region_name();
+        push(@$matches, $hash);
+      }
+      $features->{all_matches} = $matches;
     }
     push(@$result, $features);
   }
