@@ -61,12 +61,10 @@ sub fetch_regulatory_feature {
 
 }
 
-
 sub fetch_all_epigenomes {
   my $self    = shift;
   my $c          = $self->context;
   my $species    = $c->stash->{species};
-
 
   my $reg_build_a = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'RegulatoryBuild');
   my $reg_build   = $reg_build_a->fetch_current_regulatory_build;
@@ -75,20 +73,17 @@ sub fetch_all_epigenomes {
   my $result = [];
   for my $eg (@$epigenomes) {
     my $data = {};
-#    $data->{efo_id}             = $eg->efo_id;
-    $data->{gender}             = $eg->gender;
-    $data->{name}               = $eg->production_name;
-    #$data->{production_name}    = $eg->production_name;
-    $data->{scientific_name}      = $eg->display_label;
+    $data->{gender}          = $eg->gender;
+    $data->{epigenome}       = $eg->efo_accession;
+    $data->{name}            = $eg->production_name;
+    $data->{scientific_name} = $eg->display_label;
     push(@$result, $data);
   }
-
   return($result);
 }
 
 sub list_all_microarrays{
-  my $self    = shift;
-  my $motif   = shift;
+  my ($self, $motif) = @_;
   
   my $c       = $self->context;
   my $species = $c->stash->{species};
@@ -105,8 +100,8 @@ sub list_all_microarrays{
     $data->{vendor}      = $array->vendor;
     $data->{description} = $array->description;
     $data->{format}      = $array->format;
-# Very Slow!
-#$data->{ProbeCount}  = $array->probe_count;
+    # Very Slow!
+    #$data->{ProbeCount}  = $array->probe_count;
     push(@{$result}, $data);
   }
 
@@ -137,8 +132,8 @@ sub get_probe_info {
     my $features = {};
     $features->{name}            = $microarray ;
     $features->{description}     = $pf->probe->description;
-    # Attaches whole chromosome
-#    $features->{Location}        = $pf->seqname;
+    # Attaches whole chromosome instead of feature
+    # $features->{Location}        = $pf->seqname;
     $features->{start}           = $pf->start;
     $features->{end}             = $pf->end;
     $features->{seq_region_name} = $pf->seq_region_name;
@@ -167,19 +162,6 @@ sub get_probe_info {
       $features->{transcripts} = $transcripts;
     }
 
-#    my $flag_all_matches = $c->request->param('all_matches');
-#    if($flag_all_matches == 1){
-#      my $probe_features = $probe_feature_adaptor->fetch_all_by_Probe($probe);
-#      my $matches = [];
-#      for my $probe_feature (@$probe_features) {
-#        my $hash = {};
-#        $hash->{start}           = $probe_feature->start();
-#        $hash->{end}             = $probe_feature->end();
-#        $hash->{seq_region_name} = $probe_feature->seq_region_name();
-#        push(@$matches, $hash);
-#      }
-#      $features->{probe_feature} = $matches;
-#    }
     push(@$result, $features);
   }
   return($result);
@@ -195,10 +177,10 @@ sub get_microarray_info {
   my $array = $array_a->fetch_by_name_vendor($name, $vendor);
   
   my $result = {};
-  $result->{name} = $array->name;
+  $result->{name}   = $array->name;
   $result->{format} = $array->format;
-  $result->{type} = $array->type;
-  $result->{class} = $array->class;
+  $result->{type}   = $array->type;
+  $result->{class}  = $array->class;
 
   return($result);
 

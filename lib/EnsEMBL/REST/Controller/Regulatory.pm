@@ -23,7 +23,6 @@ use Moose;
 use namespace::autoclean;
 use Try::Tiny;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
-use Data::Dumper;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
@@ -43,9 +42,8 @@ sub species: Chained('/') PathPart('regulatory/species') CaptureArgs(1) {
   my ( $self, $c, $species) = @_;
   $c->stash(species => $species);
 
-  unless (defined $species) { $c->go('ReturnError', 'custom', [qq{Species must be provided as part of the URL.}])} 
+  unless (defined $species) { $c->go('ReturnError','custom',[qq{Species must be provided as part of the URL.}])} 
   $c->stash(species => $species);
-#  $c->log->debug(Dumper "S: $species");
 }
 
 
@@ -54,10 +52,10 @@ sub id: Chained('species') PathPart('id') Args(1) ActionClass('REST') {
   my ( $self, $c, $id) = @_;
 
   if(! defined $id){
-    $c->go('ReturnError', 'custom', [qq{Ensembl Stable ID  must be provided as part of the URL.}]);
+    $c->go('ReturnError','custom',[qq{Ensembl Stable ID  must be provided as part of the URL.}]);
   } 
   if($id !~ /ENSR\d{11}/){
-    $c->go('ReturnError', 'custom', [qq{Ensembl Regulation Stable IDs  have the format ENSR12345678901.}])
+    $c->go('ReturnError','custom',[qq{Ensembl Regulation Stable IDs  have the format ENSR12345678901.}])
   }
 }
 
@@ -65,7 +63,6 @@ sub id_GET {
   my ($self, $c, $id) = @_;
   my $regf;
 
-#  $c->log->debug(Dumper "ID: $id");
   try {
     $regf = $c->model('Regulatory')->fetch_regulatory_feature($id);
   } catch {
@@ -106,6 +103,7 @@ sub microarray_list_GET {
     };
     $self->status_ok($c, entity => $microarrays);
 }
+
 # stash array name
 sub microarray :Chained('species') PathPart('microarray') CaptureArgs(1) ActionClass('REST') { 
   my ($self, $c, $microarray) = @_;
@@ -118,7 +116,7 @@ sub microarray_GET {
   $c->stash(microarray => $microarray); 
 }
 
-# /regulatory/species/:species/microarray/:microarray/vendor/:vendor HumanWG_6_V2/ILMN_1763508
+# /regulatory/species/:species/microarray/:microarray/vendor/:vendor
 sub microarray_single: Chained('microarray') PathPart('vendor') Args(1) ActionClass('REST') { 
   my ($self, $c, $vendor) = @_;
   if(! defined $vendor){
@@ -152,7 +150,6 @@ sub microarray_probe_GET {
   my ($self, $c, $probe_name) = @_;
 
   my $probe_info;
-  $c->log->debug(Dumper "P: $probe_name");
   
   try {
     $probe_info = $c->model('Regulatory')->get_probe_info($probe_name);
