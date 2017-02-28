@@ -191,8 +191,11 @@ sub get_gene_phenotype_info {
   my %seen = ();
 
   foreach my $phen (@pfs) {
+    # the hashref returned by phen_as_hash may have some undefined values
+    # we need to create a key from the values so we're not returning duplicates
+    # so use grep {$_} to avoid joining uninitiliased strings from undef values
     my $hash = $self->phen_as_hash($phen);
-    my $key = join("", sort values %$hash);
+    my $key = join("", sort grep {$_} values %$hash);
     push (@phenotypes, $hash) unless $seen{$key};
     $seen{$key} = 1;
   }
