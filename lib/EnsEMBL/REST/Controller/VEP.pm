@@ -43,7 +43,13 @@ sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
   my $reg = $c->model('Registry');
   $c->stash->{species} = $reg->get_alias($species);
-  $c->stash->{assembly} = $reg->get_adaptor($species, 'core', 'coordsystem')->fetch_all->[0]->version;
+
+  my $csa = $reg->get_adaptor($species, 'core', 'coordsystem');
+  $c->go('ReturnError', 'from_ensembl', ['Unable to fetch CoordSystem adaptor']) unless $csa;
+  my $css = $csa->fetch_all;
+  $c->go('ReturnError', 'from_ensembl', ['No coordinate systems found']) unless $css && @$css;
+
+  $c->stash->{assembly} = $css->[0]->version;
   $c->stash->{has_variation} = $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation');
   $c->log->debug('Working with species '.$species);
 }
