@@ -54,7 +54,7 @@ sub fetch_regulatory_feature {
     for my $ra(@{$rf->regulatory_activity}) {
       $data->{$ra->epigenome->production_name} = $ra->activity;
     }
-    $result ->{activity} = $data;
+    $result->{activity} = $data;
   }
 
   return([$result]);
@@ -74,7 +74,6 @@ sub fetch_all_epigenomes {
   for my $eg (@$epigenomes) {
     my $data = {};
     $data->{gender}          = $eg->gender;
-    $data->{epigenome}       = $eg->efo_accession;
     $data->{name}            = $eg->production_name;
     $data->{scientific_name} = $eg->display_label;
     push(@$result, $data);
@@ -173,8 +172,9 @@ sub get_microarray_info {
   my $c       = $self->context;
   my $species = $c->stash->{species};  
   my $name    = $c->stash->{microarray};
+
   my $array_a = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Array');
-  my $array = $array_a->fetch_by_name_vendor($name, $vendor);
+  my $array   = $array_a->fetch_by_name_vendor($name, $vendor);
   
   my $result = {};
   $result->{name}   = $array->name;

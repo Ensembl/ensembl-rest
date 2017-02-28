@@ -42,7 +42,6 @@ $output = [
   scientific_name => "K562",
   name            => "K562",
   gender          => "female",
-  efo_id          => 'efo:EFO_0002067'
   },
 ];
 $json = json_GET($epigenomes_all,'GET list of all epigenomes');
@@ -74,21 +73,20 @@ $output = {
   class  => 'ILLUMINA_WG',
   type   => 'OLIGO'
 };
-$json = json_GET($regulatory_feature,'GET Information about a specific microarray');
-#eq_or_diff($json, $output, 'GET Information about a specific microarray');
+$json = json_GET($microarray_vendor,'GET Information about a specific microarray');
+eq_or_diff($json, $output, 'GET Information about a specific microarray');
 
 
 my $microarray_probe = '/regulatory/species/homo_sapiens/microarray/HumanWG_6_V2/probe/ILMN_1763508?content-type=application/json';
 $output = [ {
     seq_region_name => '2',
-    Location        => 'chromosome:GRCh38:2:1:242193529:1',
-    Description     => 'null',
-    Name            => 'HumanWG_6_V2',
+    description     => 'NULL',
+    name            => 'HumanWG_6_V2',
     end             => 68735253,
     start           => 68735204
   } ];
-$json = json_GET($regulatory_feature,'GET Information about a specific probe');
-#eq_or_diff($json, $output, 'GET Information about a specific probe');
+$json = json_GET($microarray_probe,'GET Information about a specific probe');
+eq_or_diff($json, $output, 'GET Information about a specific probe');
 
 
 done_testing();
