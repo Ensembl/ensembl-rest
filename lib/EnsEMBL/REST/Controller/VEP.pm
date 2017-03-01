@@ -19,12 +19,8 @@ limitations under the License.
 
 package EnsEMBL::REST::Controller::VEP;
 use Moose;
-use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
 use Data::Dumper;
-use Bio::DB::HTS::Faidx;
-use Bio::EnsEMBL::Slice;
-use Bio::EnsEMBL::Utils::Sequence qw(reverse_comp);
 use Bio::EnsEMBL::VEP::Runner;
 
 use Try::Tiny;
@@ -45,7 +41,15 @@ our $DOWNSTREAM_DISTANCE_BAK;
 # /vep/:species
 sub get_species : Chained('/') PathPart('vep') CaptureArgs(1) {
   my ( $self, $c, $species ) = @_;
-  $c->stash->{species} = $c->model('Registry')->get_alias($species);
+  my $reg = $c->model('Registry');
+  $c->stash->{species} = $reg->get_alias($species);
+
+  my $csa = $reg->get_adaptor($species, 'core', 'coordsystem');
+  $c->go('ReturnError', 'from_ensembl', ['Unable to fetch CoordSystem adaptor']) unless $csa;
+  my $css = $csa->fetch_all;
+  $c->go('ReturnError', 'from_ensembl', ['No coordinate systems found']) unless $css && @$css;
+
+  $c->stash->{assembly} = $css->[0]->version;
   $c->stash->{has_variation} = $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation');
   $c->log->debug('Working with species '.$species);
 }
@@ -158,14 +162,9 @@ sub get_allele : PathPart('') Args(2) {
   $config->{format} = 'ensembl';
   $config->{delimiter} = ' ';
 
-  try {
-    my $consequences = $self->get_consequences($c, $config, $string);
-    # $c->log->debug(Dumper $consequences);
-    $c->stash->{consequences} = $consequences;
-  } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', [qq{$_}]);
-  };
+  my $consequences = $self->get_consequences($c, $config, $string);
+  $c->stash->{consequences} = $consequences;
+
   $self->status_ok( $c, entity => $c->stash->{consequences} );
 }
 
@@ -187,13 +186,9 @@ sub get_id_GET {
   my $config = $self->_include_user_params($c,$user_config);
   $config->{format} = 'id';
   
-  my $consequences;
-  try {
-    $consequences = $self->get_consequences($c, $config, $rs_id);
-  } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', [qq{$_}]);
-  };
+  my $consequences = $self->get_consequences($c, $config, $rs_id);
+  $c->stash->{consequences} = $consequences;
+
   $self->status_ok( $c, entity => $consequences );
 }
 
@@ -213,6 +208,8 @@ sub get_hgvs_GET {
   $config->{format} = 'hgvs';
 
   my $consequences = $self->get_consequences($c, $config, $hgvs);
+  $c->stash->{consequences} = $consequences;
+
   $self->status_ok( $c, entity => $consequences );
 }
 
@@ -220,11 +217,17 @@ sub get_consequences {
   my ($self, $c, $config, $vfs) = @_;
   my $user_config = $c->request->parameters;
 
-  my $runner = Bio::EnsEMBL::VEP::Runner->new($config);
-  $runner->registry($c->model('Registry')->_registry());
-  $runner->{plugins} = $config->{plugins} || [];
+  my ($runner, $consequences);
 
-  my $consequences = $runner->run_rest($vfs);
+  try {
+    $runner = Bio::EnsEMBL::VEP::Runner->new($config);
+    $runner->registry($c->model('Registry')->_registry());
+    $runner->{plugins} = $config->{plugins} || [];
+    $consequences = $runner->run_rest($vfs);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
   
   # restore default distances, may have been altered by a plugin
   # this would otherwise persist into future requests!
@@ -272,18 +275,40 @@ sub get_hgvs_POST {
 
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
+
   # This list stops users altering more crucial variables.
   my @valid_keys = (qw/
-    hgvs
-    ccds
-    numbers
-    domains
-    canonical
-    protein
-    xref_refseq
+    gencode_basic
     refseq
     merged
     all_refseq
+
+    failed
+    variant_class
+    minimal
+
+    everything
+    appris
+    canonical
+    ccds
+    domains
+    hgvs
+    numbers
+    protein
+    tsl
+    uniprot
+    xref_refseq
+    phyloP
+    phastCons
+
+    pick
+    pick_allele
+    per_gene
+    pick_allele_gene
+    flag_pick
+    flag_pick_allele
+    flag_pick_allele_gene
+    pick_order
   /);
   
   my %vep_params = %{ $c->config->{'Controller::VEP'} };
@@ -291,9 +316,19 @@ sub _include_user_params {
   # stash species
   $vep_params{species} = $c->stash->{species};
 
+  # set ucsc_assembly param
+  my %assembly_map = (
+    'GRCh38' => 'hg38',
+    'GRCh37' => 'hg19'
+  );
+  if(my $mapped = $assembly_map{$c->stash->{assembly}}) {
+    $vep_params{ucsc_assembly} = $mapped;
+  }
+
+  # copy in params from URL
   map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
-  map { $vep_params{$_} = $c->request()->params() if ($_ ~~ @valid_keys) } keys %{$c->request->params()};
   
+  # we currently only have cache for human
   if ($c->stash->{species} ne 'homo_sapiens') {
     delete $vep_params{cache};
     delete $vep_params{fasta};
@@ -306,7 +341,6 @@ sub _include_user_params {
   my $plugin_config = $self->_configure_plugins($c,$user_config,\%vep_params);
   $vep_params{plugins} = $plugin_config if $plugin_config;
 
-  # $c->log->debug("After ".Dumper \%vep_params);
   return \%vep_params;
 }
 
