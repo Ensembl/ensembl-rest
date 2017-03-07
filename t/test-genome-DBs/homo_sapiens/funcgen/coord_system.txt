@@ -9,3 +9,5 @@
 2484	supercontig	GRCh37	2	default_version	824_141157	3	1	1
 2485	lrg		8	default_version	824_141157	1003	1	1
 2472	chromosome	GRCh37	1	default_version	824_141157	2	1	1
+2472	chromosome	GRCh38	1	default_version	88_38	4	1	1
+2473	scaffold	GRCh38	2	default_version	88_38	3	1	1

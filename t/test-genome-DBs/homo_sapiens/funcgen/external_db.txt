@@ -1,0 +1,1 @@
+50831	EFO	NULL	KNOWNXREF	1	0	Experimental Factor Ontology MISC NULL NULL The Experimental Factor Ontology provides a systematic description of many experimental variables available in EBI databases, and for external projects such as the NHGRI GWAS catalog. It combines parts of several biological ontologies, such as UBERON anatomy, ChEBI chemical compounds, and Cell Ontology.
