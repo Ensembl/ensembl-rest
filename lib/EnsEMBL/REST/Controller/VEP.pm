@@ -277,7 +277,7 @@ sub _include_user_params {
   my ($self,$c,$user_config) = @_;
 
   # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/
+  my %valid_keys = map {$_ => 1} (qw/
     gencode_basic
     refseq
     merged
@@ -326,7 +326,15 @@ sub _include_user_params {
   }
 
   # copy in params from URL
-  map { $vep_params{$_} = $user_config->{$_} if ($_ ~~ @valid_keys ) } keys %{$user_config};
+  # first copy *everything* to %tmp_vep_params from URL ($c->request->params) and POST body ($user_config)
+  # we need the unfiltered list to send to _configure_plugins
+  # data body ($user_config) takes precedence over URL, so add those second and don't worry about overwrite
+  my %tmp_vep_params;
+  map { $tmp_vep_params{$_} = $c->request()->param($_)} keys %{$c->request->params()};
+  map { $tmp_vep_params{$_} = $user_config->{$_}} keys %{$user_config};
+
+  # only copy allowed keys to %vep_params as we don't want users to be able to meddle
+  $vep_params{$_} = $tmp_vep_params{$_} for grep { $valid_keys{$_} } keys %tmp_vep_params;
   
   # we currently only have cache for human
   if ($c->stash->{species} ne 'homo_sapiens') {
@@ -338,7 +346,7 @@ sub _include_user_params {
     $vep_params{database} = 0;
   }
 
-  my $plugin_config = $self->_configure_plugins($c,$user_config,\%vep_params);
+  my $plugin_config = $self->_configure_plugins($c,\%tmp_vep_params,\%vep_params);
   $vep_params{plugins} = $plugin_config if $plugin_config;
 
   return \%vep_params;
