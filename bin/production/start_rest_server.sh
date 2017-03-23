@@ -51,7 +51,7 @@ export PERL5LIB
 
 export ENS_REST_LOG4PERL=$APP_HOME'/configurations/production/log4perl.conf'
 export PROGRESSIVE_CACTUS_DIR=${HOME}/src/progressiveCactus/
-export COMPARA_HAL_DIR=/mnt/data/87/
+export COMPARA_HAL_DIR=/mnt/shared/88/
 export PERL5LIB=$PERL5LIB:/home/ubuntu/src/ensembl-compara/modules/Bio/EnsEMBL/Compara/HAL/HALXS/blib/arch/auto
 
 # Server settings for starman
