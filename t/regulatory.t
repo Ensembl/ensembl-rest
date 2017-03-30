@@ -33,21 +33,60 @@ use Bio::EnsEMBL::Test::TestUtils;
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 Catalyst::Test->import('EnsEMBL::REST');
 
-#Regulatory feature testing
-{
-  is_json_GET("/regulatory/homo_sapiens/ENSR00001208657", [{
-  source => "Regulatory_Build",
-  ID => "ENSR00001208657",
-  feature_type => "Promoter Flanking Region",
-  description => "Predicted promoter flanking region",
-  end => 1025449,
-  seq_region_name => "6",
-  strand => "0",
-  bound_start => 1024250,
-  bound_end => 1025449,
-  start => 1024250
+my $output;
+my $json;
 
-  }], 'Getting regulatory_feature as JSON');
-}
+my $epigenomes_all = '/regulatory/species/homo_sapiens/epigenome?content-type=application/json';
+$output = [
+{
+  scientific_name => "K562",
+  name            => "K562",
+  gender          => "female",
+  },
+];
+$json = json_GET($epigenomes_all,'GET list of all epigenomes');
+eq_or_diff($json, $output, 'GET list of all epigenomes');
+
+
+my $regulatory_feature = '/regulatory/species/homo_sapiens/id/ENSR00001208657/?content-type=application/json';
+  $output = [{
+  source          => "Regulatory_Build",
+  ID              => "ENSR00001208657",
+  feature_type    => "Promoter Flanking Region",
+  description     => "Predicted promoter flanking region",
+  end             => 1025449,
+  seq_region_name => "6",
+  strand          => "0",
+  bound_start     => 1024250,
+  bound_end       => 1025449,
+  start           => 1024250
+
+  }];
+$json = json_GET($regulatory_feature,'GET specific Regulatory Feature');
+eq_or_diff($json, $output, 'GET specific Regulatory Feature');
+
+
+my $microarray_vendor = '/regulatory/species/homo_sapiens/microarray/HumanWG_6_V2/vendor/illumina/?content-type=application/json';
+$output = {
+  format => 'EXPRESSION',
+  name   => 'HumanWG_6_V2',
+  class  => 'ILLUMINA_WG',
+  type   => 'OLIGO'
+};
+$json = json_GET($microarray_vendor,'GET Information about a specific microarray');
+eq_or_diff($json, $output, 'GET Information about a specific microarray');
+
+
+my $microarray_probe = '/regulatory/species/homo_sapiens/microarray/HumanWG_6_V2/probe/ILMN_1763508?content-type=application/json';
+$output = [ {
+    seq_region_name => '2',
+    description     => 'NULL',
+    name            => 'HumanWG_6_V2',
+    end             => 68735253,
+    start           => 68735204
+  } ];
+$json = json_GET($microarray_probe,'GET Information about a specific probe');
+eq_or_diff($json, $output, 'GET Information about a specific probe');
+
 
 done_testing();

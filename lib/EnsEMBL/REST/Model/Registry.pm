@@ -377,28 +377,32 @@ sub _build_species_info {
         else {
           $dbc->sql_helper->execute_no_return(
             -SQL => q/select m1.meta_value, m2.meta_value, m3.meta_value, m4.meta_value
-		from meta m1, meta m2, meta m3, meta m4, meta m5, meta m6
+		from meta m1, meta m2, meta m3, meta m4
 		where
 		m1.species_id = m2.species_id
 		and m1.species_id = m3.species_id
 		and m1.species_id = m4.species_id
-		and m1.species_id = m5.species_id
-		and m1.species_id = m6.species_id
 		and m1.meta_key = ?
 		and m2.meta_key = ?
 		and m3.meta_key = ?
-		and m4.meta_key = ?
-		and m5.meta_key = ?
-		and m6.meta_key = ?/,
-            -PARAMS => ['species.production_name', 'species.division', 'species.display_name', 'species.taxonomy_id', 'species.strain', 'species.strain_collection'],
+		and m4.meta_key = ?/,
+            -PARAMS => ['species.production_name', 'species.division', 'species.display_name', 'species.taxonomy_id'],
             -CALLBACK => sub {
               my ($row) = @_;
               $division_lookup{$row->[0]} = $row->[1];
               $display_lookup{$row->[0]} = $row->[2];
               $taxon_lookup{$row->[0]} = $row->[3];
               $release_lookup{$row->[0]} = $schema_version;
-              $strain_lookup{$row->[0]} = $row->[4];
-              $strain_collection_lookup{$row->[0]} = $row->[5];
+              return;
+            }
+          );
+          $dbc->sql_helper->execute_no_return(
+            -SQL => 'select m1.meta_value, m2.meta_value, m3.meta_value from meta m1, meta m2, meta m3 where m1.species_id = m2.species_id and m1.species_id = m3.species_id and m1.meta_key = ? and m2.meta_key = ? and m3.meta_key = ?',
+            -PARAMS => ['species.production_name', 'species.strain', 'species.strain_collection'],
+            -CALLBACK => sub {
+              my ($row) = @_;
+              $strain_lookup{$row->[0]} = $row->[1];
+              $strain_collection_lookup{$row->[0]} = $row->[2];
               return;
             }
           );
