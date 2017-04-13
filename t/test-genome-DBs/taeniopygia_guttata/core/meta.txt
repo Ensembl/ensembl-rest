@@ -219,4 +219,4 @@
 1273	\N	patch	patch_86_87_c.sql|datetime_default_NULL
 1274	\N	patch	patch_87_88_a.sql|schema_version
 1275	\N	patch	patch_87_88_b.sql|seq_region_name_255
-1276    \N      patch   patch_88_89_a.sql|schema_version
+1277	\N	patch	patch_88_89_a.sql|schema_version

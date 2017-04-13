@@ -175,4 +175,4 @@
 1051	\N	patch	patch_86_87_c.sql|datetime_default_NULL
 1052	\N	patch	patch_87_88_a.sql|schema_version
 1053	\N	patch	patch_87_88_b.sql|seq_region_name_255
-1054    \N      patch   patch_88_89_a.sql|schema_version
+1055	\N	patch	patch_88_89_a.sql|schema_version

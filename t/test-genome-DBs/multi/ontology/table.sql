@@ -27,7 +27,7 @@ CREATE TABLE `meta` (
   `species_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `key_value_idx` (`meta_key`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=37 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `ontology` (
   `ontology_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -36,7 +36,7 @@ CREATE TABLE `ontology` (
   `data_version` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`ontology_id`),
   UNIQUE KEY `name_namespace_idx` (`name`,`namespace`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `relation` (
   `relation_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -48,7 +48,7 @@ CREATE TABLE `relation` (
   PRIMARY KEY (`relation_id`),
   UNIQUE KEY `child_parent_idx` (`child_term_id`,`parent_term_id`,`relation_type_id`,`intersection_of`,`ontology_id`),
   KEY `parent_idx` (`parent_term_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2607 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=14133 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `relation_type` (
   `relation_type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -74,7 +74,7 @@ CREATE TABLE `synonym` (
   PRIMARY KEY (`synonym_id`),
   UNIQUE KEY `term_synonym_idx` (`term_id`,`synonym_id`),
   KEY `name_idx` (`name`(50))
-) ENGINE=MyISAM AUTO_INCREMENT=3032 DEFAULT CHARSET=utf8 COLLATE=utf8_swedish_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=145221 DEFAULT CHARSET=utf8 COLLATE=utf8_swedish_ci;
 
 CREATE TABLE `term` (
   `term_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -89,5 +89,5 @@ CREATE TABLE `term` (
   UNIQUE KEY `accession_idx` (`accession`),
   UNIQUE KEY `ontology_acc_idx` (`ontology_id`,`accession`),
   KEY `name_idx` (`name`)
-) ENGINE=MyISAM AUTO_INCREMENT=1954 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=70099 DEFAULT CHARSET=latin1;
 

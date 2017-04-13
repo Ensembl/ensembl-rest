@@ -151,4 +151,4 @@
 400	\N	patch	patch_86_87_c.sql|datetime_default_NULL
 401	\N	patch	patch_87_88_a.sql|schema_version
 402	\N	patch	patch_87_88_b.sql|seq_region_name_255
-403     \N      patch   patch_88_89_a.sql|schema_version
+403	\N	patch	patch_88_89_a.sql|schema_version

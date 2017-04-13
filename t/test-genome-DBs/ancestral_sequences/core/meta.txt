@@ -34,4 +34,4 @@
 832	\N	patch	patch_86_87_c.sql|datetime_default_NULL
 833	\N	patch	patch_87_88_a.sql|schema_version
 834	\N	patch	patch_87_88_b.sql|seq_region_name_255
-835     \N      patch   patch_88_89_a.sql|schema_version
+835	\N	patch	patch_88_89_a.sql|schema_version
