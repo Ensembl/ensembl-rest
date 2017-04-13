@@ -1,6 +1,6 @@
 CREATE TABLE `analysis` (
   `analysis_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created` datetime DEFAULT NULL,
   `logic_name` varchar(100) NOT NULL,
   `db` varchar(120) DEFAULT NULL,
   `db_version` varchar(40) DEFAULT NULL,
