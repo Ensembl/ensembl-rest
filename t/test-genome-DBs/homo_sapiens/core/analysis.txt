@@ -20,7 +20,7 @@
 8294	2009-05-14 15:43:42	havana	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
 8295	2007-09-07 12:01:22	est2genome_human_havana	\N	10-Nov-10 (105)	\N	\N	\N	\N	ori_analysis => Est2genome_human_raw, mode => single	ClusterDepthFilter	\N	EST_Human	similarity
 8296	2007-09-07 12:01:22	est2genome_other_havana	\N	10-Nov-10 (105)	\N	\N	\N	\N	ori_analysis => Est2genome_other_raw, mode => single	ClusterDepthFilter	\N	EST_Other	similarity
-8297	0000-00-00 00:00:00	human_cdna	\N	\N	\N	exonerate	0.9.0	/usr/local/ensembl/bin/exonerate-0.9.0	\N	Exonerate2Genes	\N	Exonerate	similarity
+8297	\N	human_cdna	\N	\N	\N	exonerate	0.9.0	/usr/local/ensembl/bin/exonerate-0.9.0	\N	Exonerate2Genes	\N	Exonerate	similarity
 8298	2007-09-07 12:01:22	est2genome_mouse_havana	\N	10-Nov-10 (105)	\N	\N	\N	\N	ori_analysis => Est2genome_mouse_raw, mode => single	ClusterDepthFilter	\N	EST_Mouse	similarity
 8299	2009-03-11 17:25:55	human_protein	\N	refseq_40,uniprot_2010_07	\N	\N	\N	\N	\N	BestTargetted	\N	\N	\N
 8300	2009-05-13 13:23:17	tigrfam	TIGRfam	\N	/data/blastdb/Ensembl/interpro_scan/TIGRFAMs_HMM.LIB	/software/ensembl/bin/hmmer3/hmmscan	\N	/software/ensembl/bin/hmmer3/hmmscan	--acc --noali --cut_tc --cpu 1	ProteinAnnotation/Hmmpfam	\N	TIGRFAM	domain
