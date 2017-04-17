@@ -21,7 +21,7 @@ use Moose;
 use Bio::EnsEMBL::Variation::VariationFeature;
 use namespace::autoclean;
 use Data::Dumper;
-use Bio::DB::Fasta;
+use Faidx;
 use Bio::EnsEMBL::Variation::Utils::VEP qw(get_all_consequences parse_line validate_vf read_cache_info @REG_FEAT_TYPES);
 use Bio::EnsEMBL::Slice;
 use Bio::EnsEMBL::Utils::Sequence qw(reverse_comp);
@@ -39,7 +39,7 @@ BEGIN {
 }
 
 has 'fasta_db' => (
-  isa => 'Bio::DB::Fasta',
+  isa => 'Faidx',
   is => 'ro',
   lazy => 1,
   builder => '_find_fasta_cache',
@@ -161,7 +161,7 @@ sub _give_POST_to_VEP {
     # Overwrite Slice->seq method to use a local disk cache when using Human
     my $consequences;
     if ($c->stash->{species} eq 'homo_sapiens' && defined($config->{fasta})) {
-      $c->log->debug('Farming human out to Bio::DB');
+      $c->log->debug('Farming human out to Faidx');
       no warnings 'redefine';
       local *Bio::EnsEMBL::Slice::seq = $self->_new_slice_seq();
       $consequences = $self->get_consequences($c, $config, \@vfs);
@@ -414,7 +414,8 @@ sub _build_vf {
 sub _find_fasta_cache {
   my $self = shift;
   
-  my $fasta_db = Bio::DB::Fasta->new($self->fasta);
+  my $fasta_db = Faidx->new($self->fasta);
+  
   return $fasta_db;
 }
 
@@ -424,7 +425,8 @@ sub _new_slice_seq {
   my $fasta_db = $self->fasta_db;
   return sub {
     my $self = shift;
-    my $seq = $fasta_db->seq( $self->seq_region_name, $self->start => $self->end );
+    my $location_string = $self->seq_region_name.":".$self->start."-".$self->end ;
+    my ($seq, $length) = $fasta_db->get_sequence($location_string);
     $seq ||= 'N' x $self->length();
     reverse_comp( \$seq ) if $self->strand < 0;
     # default to a string of Ns if we couldn't get sequence
