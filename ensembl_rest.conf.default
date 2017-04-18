@@ -150,7 +150,9 @@ jsonp=1
     translation_coordinates=100..300
 
     regulation_id=ENSR00000099113
-    
+
+    phenotype_region=9:22125500-22136000
+
     variation_region=9:22125503-22125502:1
     variation_allele=C
     variation_region_two=1:6524705:6524705
