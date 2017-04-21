@@ -49,6 +49,13 @@ my $expected_data1 = [
             'attributes' => {
               'p_value' => '2.00e-7'
             },
+          },
+          {
+            'Variation' => 'rs142276873',
+            'description' => 'BRUGADA SYNDROME',
+            'location' => '11:6303493-6303493',
+            'mapped_to_accession' => 'Orphanet:130',
+            'source' => 'DGVa'
           }
         ];
 
