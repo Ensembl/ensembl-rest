@@ -162,6 +162,7 @@ jsonp=1
     variation_id_two=COSM476
 
     variation_id_three=rs1042779
+    variation_id_four=rs699
 
     ld_population_name=1000GENOMES:phase_3:KHV
     r2=0.85
