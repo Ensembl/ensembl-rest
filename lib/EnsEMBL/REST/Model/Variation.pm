@@ -167,9 +167,9 @@ sub get_phenotype_info {
 
   foreach my $phen (@$phenotypes) {
     my $hash = $self->phen_as_hash($phen);
-    
+
     # generate a key from the values to uniquify
-    my $key = join("", sort values %$hash);
+    my $key = join("", sort grep { $_ ne '' && ref($_) ne 'ARRAY'} values %$hash);
 
     push (@phenotypes, $hash) unless $seen{$key};
     $seen{$key} = 1;
