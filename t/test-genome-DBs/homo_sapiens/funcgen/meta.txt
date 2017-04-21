@@ -64,4 +64,15 @@
 639	\N	patch	patch_87_88_a.sql|schema_version
 640	\N	patch	patch_87_88_b.sql|seq_region_name_255
 641	\N	patch	patch_87_88_c.sql|sample_regulatory_feature_id field for regulatory build
-642     \N      patch   patch_88_89_a.sql|schema_version
+642	0		
+643	\N	patch	patch_88_89_a.sql|schema_version
+644	\N	patch	patch_88_89_b.sql|Created probe_seq table
+645	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
+646	\N	patch	patch_88_89_d.sql|created probe_transcript table
+647	\N	patch	patch_88_89_e.sql|created probeset_transcript table
+648	\N	patch	patch_88_89_f.sql|Removed probe features from object_xref and xref table
+649	\N	patch	patch_88_89_g.sql|Removed probe mappings from the xref tables
+650	\N	patch	patch_88_89_h.sql|Removed probe set mappings from the xref tables
+651	\N	patch	patch_88_89_i.sql|New columns for array table
+652	\N	patch	patch_88_89_j.sql|Added array_chip_id column to probe_set table
+653	\N	patch	patch_88_89_k.sql|Added probe_seq_id column to probe table
