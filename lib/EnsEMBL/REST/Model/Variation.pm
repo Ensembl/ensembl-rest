@@ -22,6 +22,7 @@ package EnsEMBL::REST::Model::Variation;
 use Moose;
 use Catalyst::Exception qw(throw);
 use Scalar::Util qw/weaken/;
+use Bio::EnsEMBL::Variation::Utils::Constants qw(%OVERLAP_CONSEQUENCES);
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
@@ -355,6 +356,26 @@ sub fetch_population_infos {
 
   return \@populations_list;
 }
+
+sub fetch_consequence_types {
+  my ($self) = @_;
+
+  my @consequence_types = ();
+
+  my $oc;
+  foreach my $key(keys %OVERLAP_CONSEQUENCES) {
+    $oc = $OVERLAP_CONSEQUENCES{$key};
+    push @consequence_types,
+        {
+          SO_term => $oc->SO_term,
+          SO_accession => $oc->SO_accession,
+          label => $oc->label,
+          description =>  $oc->description
+        }
+ }
+  return \@consequence_types;
+}
+
 
 with 'EnsEMBL::REST::Role::Content';
 

@@ -28,6 +28,7 @@ use Test::More;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::ApiVersion qw/software_version/;
+use Bio::EnsEMBL::Variation::Utils::Constants qw(%OVERLAP_CONSEQUENCES);
 use Test::Differences;
 use Data::Dumper;
 
@@ -230,6 +231,35 @@ is_json_GET(
       }
     ];
   is_json_GET('/info/variation/populations/homo_sapiens?filter=LD', $expected, 'Checking filtering for LD population works');
+}
+
+#/info/variation/consequence_types
+{
+  # Check correct data structure returned
+  my $consequence_types_json = json_GET('/info/variation/consequence_types', 'Get the consequence_types hash');
+  is(ref($consequence_types_json), 'ARRAY', 'Array wanted from endpoint');
+
+  # Check there are at least 10 consequence_types
+  cmp_ok(scalar(@{$consequence_types_json}), '>=', 10, 'Ensuring there are at least 10 consequence_types');
+
+  # Check the number of consequence types match those in the
+  # Bio::EnsEMBL::Variation::Utils::Constants qw(%OVERLAP_CONSEQUENCES);
+  my $num_consequences = scalar(keys(%OVERLAP_CONSEQUENCES));
+  cmp_ok(scalar(@{$consequence_types_json}), '==', $num_consequences, 'Endpoint returns same number of consequence types as Constants.pm');
+
+  my $known_SO_term = 'synonymous_variant';
+  my $known_SO_accession = 'SO:0001819';
+
+  # Check that this term exists in the data returned
+  # Does the array returned contain an element that has SO_term, SO_accession number above
+  my @matched = grep {
+                       (
+                         ($_->{SO_term} eq $known_SO_term)
+                         &&
+                         ($_->{SO_accession} eq $known_SO_accession)
+                       )
+                     } @$consequence_types_json;
+  cmp_ok(scalar(@matched), '==', 1, "Get match for known consequence type");
 }
 
 done_testing();
