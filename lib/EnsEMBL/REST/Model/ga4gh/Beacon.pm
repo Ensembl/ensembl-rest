@@ -25,13 +25,14 @@ use Catalyst::Exception;
 
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences); 
-  
+
+# use Data::Dumper;
+
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
 
 has 'context' => (is => 'ro',  weak_ref => 1);
 
- 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
   weaken($c);
@@ -86,7 +87,25 @@ sub beacon_query {
   my ($self, $data) = @_;
 
   my $beaconAlleleResponse;
+  my $beaconError;
 
+  $beaconAlleleResponse->{beaconId} = "EMBL-EBI Ensembl";
+  $beaconAlleleResponse->{exists} = undef;
+  $beaconAlleleResponse->{error} = undef;
+  $beaconAlleleResponse->{alleleRequest} = undef;
+  $beaconAlleleResponse->{datasetAlleleResponses} = undef;
+
+  # Check assembly requested is assembly of DB
+  my $db_assembly = $self->get_assembly();
+  my $assemblyId = $data->{assemblyId};
+  if (uc($db_assembly) ne uc($assemblyId)) {
+      $beaconError = $self->get_beacon_error(100, "Assembly (" .
+                                                  $assemblyId . ") not available");
+      $beaconAlleleResponse->{error} = $beaconError;
+      return $beaconAlleleResponse;
+  }
+  
+  # Check allele exists
   my $reference_name = $data->{referenceName};
   my $start = $data->{start};
   my $ref_allele = $data->{referenceBases};
@@ -102,15 +121,57 @@ sub beacon_query {
   } else {
     $exists_JSON = JSON::false;
   }
-	
-  $beaconAlleleResponse->{beaconId} = "EMBL-EBI Ensembl";
   $beaconAlleleResponse->{exists} = $exists_JSON;
-  $beaconAlleleResponse->{error} = undef;
-  $beaconAlleleResponse->{alleleRequest} = undef;
-  $beaconAlleleResponse->{datasetAlleleResponses} = undef;
-  
+
   return $beaconAlleleResponse;				
   
+}
+
+sub get_beacon_error {
+  my ($self, $error_code, $message) = @_;
+ 
+  my $error = {
+                "errorCode" => $error_code,
+                "message"   => $message,
+              };
+  return $error;
+}
+
+sub get_assembly {
+  my ($self) = @_;
+  my $db_meta = $self->fetch_db_meta();
+  return $db_meta->{assembly};
+}
+
+# Fetch required meta info 
+# TODO place in utilities
+sub fetch_db_meta {
+  my ($self)  = @_;
+
+  # my $c = $self->context();
+  # $c->log()->info("for info");
+  my $species = 'homo_sapiens';
+  my $core_ad = $self->context->model('Registry')->get_DBAdaptor($species, 'Core');
+
+  ## extract required meta data from core db
+  my $cmeta_ext_sth = $core_ad->dbc->db_handle->prepare(qq[ select meta_key, meta_value from meta]);
+  $cmeta_ext_sth->execute();
+  my $core_meta = $cmeta_ext_sth->fetchall_arrayref();
+
+  my %cmeta;
+  foreach my $l(@{$core_meta}){
+    $cmeta{$l->[0]} = $l->[1];
+  }
+
+  ## default ensembl set names/ids
+  my $db_meta;
+  $db_meta->{datasetId}      = "Ensembl";
+  $db_meta->{id}             = join(".", "Ensembl",
+                                         $cmeta{"schema_version"},
+                                         $cmeta{"assembly.default"});
+  $db_meta->{assembly}       = $cmeta{"assembly.default"};
+ 
+  return $db_meta;
 }
 
 # TODO  parameter for species
