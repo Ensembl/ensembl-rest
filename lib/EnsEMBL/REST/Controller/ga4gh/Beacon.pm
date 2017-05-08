@@ -23,7 +23,7 @@ use strict;
 use Moose;
 use namespace::autoclean;
 use Try::Tiny;
-use Data::Dumper;
+# use Data::Dumper;
 use JSON;
 use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
