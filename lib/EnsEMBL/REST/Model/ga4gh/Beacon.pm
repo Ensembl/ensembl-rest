@@ -156,10 +156,12 @@ sub beacon_query {
   my $beaconError;
 
   my $beacon = $self->get_beacon();
+  my $beaconAlleleRequest = $self->get_beacon_allele_request($data);
+
   $beaconAlleleResponse->{beaconId} = $beacon->{id};
   $beaconAlleleResponse->{exists} = undef;
   $beaconAlleleResponse->{error} = undef;
-  $beaconAlleleResponse->{alleleRequest} = undef;
+  $beaconAlleleResponse->{alleleRequest} = $beaconAlleleRequest;
   $beaconAlleleResponse->{datasetAlleleResponses} = undef;
 
   # Check assembly requested is assembly of DB
@@ -192,6 +194,20 @@ sub beacon_query {
 
   return $beaconAlleleResponse;				
   
+}
+
+# Get beacon_allele_request
+sub get_beacon_allele_request {
+  my ($self, $data) = @_;
+  my $beaconAlleleRequest;
+
+  for my $field (qw/referenceName start referenceBases alternateBases assemblyId/) {
+	$beaconAlleleRequest->{$field} = $data->{$field};
+  }
+  $beaconAlleleRequest->{datasetIds} = undef;
+  $beaconAlleleRequest->{includeDatasetResponses} = undef;
+
+  return $beaconAlleleRequest;
 }
 
 sub get_beacon_error {

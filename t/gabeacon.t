@@ -40,11 +40,11 @@ my $schema_version = $core_ad->get_MetaContainer()->single_value_by_key('schema_
 
 my $base=  '/ga4gh/beacon';
 my $q_base = $base . '/query';
-my $beaconId = "EMBL-EBI Ensembl";
 
 # For tests setting assembly to GRCh37 as that is the assembly
 # in the test database
 my $assemblyId = "GRCh37";
+my $beaconId = "Ensembl " . $assemblyId;
 
 # To check error handling for assembly differnent to DB
 my $unavailable_assembly = "GRCh38";
@@ -78,27 +78,45 @@ action_bad_post($q_base, $bad_post1, qr/Cannot find/, 'Throw bad request at endp
 my $post_data1 = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
                   '"assemblyId" : "' . $assemblyId . '" }'; 
 
+my $allele_request = {
+  "referenceName" => "7",
+  "start" => "86442403",
+  "referenceBases" => "T",
+  "alternateBases" => "C",
+  "assemblyId" => $assemblyId,
+  "datasetIds" => undef,
+  "includeDatasetResponses" => undef };
+
 my $expected_data1 = {
   "beaconId" => $beaconId,
-  "datasetAlleleResponses" => undef,
-  "alleleRequest" => undef,
+  "exists" => JSON::true,
   "error" => undef,
-  "exists" => JSON::true
+  "alleleRequest" => $allele_request,
+  "datasetAlleleResponses" => undef
 };
 
 my $json = json_POST( $q_base , $post_data1, 'POST dataset - 1 entry' );
 eq_or_diff($json, $expected_data1, "GA4GH Beacon query - variant at location");
 
 # Testing for a variant that exists at a given location by alleles swapped
-my $post_data2 = '{"referenceName": "7", "start" : 86442404, "referenceBases": "C", "alternateBases": "T",' . 
+my $post_data2 = '{"referenceName": "7", "start" : 86442403, "referenceBases": "C", "alternateBases": "T",' . 
                  '"assemblyId" : "' . $assemblyId . '" }';
  
+$allele_request = {
+  "referenceName" => "7",
+  "start" => "86442403",
+  "referenceBases" => "C",
+  "alternateBases" => "T",
+  "assemblyId" => $assemblyId,
+  "datasetIds" => undef,
+  "includeDatasetResponses" => undef };
+
 my $expected_data2 = {
   "beaconId" => $beaconId,
-  "datasetAlleleResponses" => undef,
-  "alleleRequest" => undef,
+  "exists" => JSON::false,
   "error" => undef,
-  "exists" => JSON::false
+  "alleleRequest" => $allele_request,
+  "datasetAlleleResponses" => undef
 };
 
 $json = json_POST( $q_base , $post_data2, 'POST dataset - 2 entry' );
@@ -108,12 +126,21 @@ eq_or_diff($json, $expected_data2, "GA4GH Beacon query - variant at location - a
 my $post_data3 = '{"referenceName": "7", "start" : 86442405, "referenceBases": "T", "alternateBases": "C",' . 
                    '"assemblyId" : "' . $assemblyId . '" }'; 
 
+$allele_request = {
+  "referenceName" => "7",
+  "start" => "86442405",
+  "referenceBases" => "T",
+  "alternateBases" => "C",
+  "assemblyId" => $assemblyId,
+  "datasetIds" => undef,
+  "includeDatasetResponses" => undef };
+
 my $expected_data3 = {
   "beaconId" => $beaconId,
-  "datasetAlleleResponses" => undef,
-  "alleleRequest" => undef,
+  "exists" => JSON::false,
   "error" => undef,
-  "exists" => JSON::false
+  "alleleRequest" => $allele_request,
+  "datasetAlleleResponses" => undef
 };
 
 $json = json_POST( $q_base , $post_data3, 'POST dataset - 3 entry' );
@@ -123,14 +150,33 @@ eq_or_diff($json, $expected_data3, "GA4GH Beacon query - variant not at location
 my $post_data4 = '{"referenceName": "7", "start" : 86442405, "referenceBases": "T", "alternateBases": "C",' . 
                    '"assemblyId" : "' . $unavailable_assembly . '" }';
  
+#my $expected_data4 = {
+#  "beaconId" => $beaconId,
+#  "datasetAlleleResponses" => undef,
+#  "alleleRequest" => undef,
+#  "error" => { "errorCode" => 100,
+#               "message" => "Assembly ($unavailable_assembly) not available"
+#             },
+#  "exists" => undef
+#};
+
+$allele_request = {
+  "referenceName" => "7",
+  "start" => "86442405",
+  "referenceBases" => "T",
+  "alternateBases" => "C",
+  "assemblyId" => $unavailable_assembly,
+  "datasetIds" => undef,
+  "includeDatasetResponses" => undef };
+
 my $expected_data4 = {
   "beaconId" => $beaconId,
-  "datasetAlleleResponses" => undef,
-  "alleleRequest" => undef,
+  "exists" => undef,
   "error" => { "errorCode" => 100,
                "message" => "Assembly ($unavailable_assembly) not available"
              },
-  "exists" => undef
+  "alleleRequest" => $allele_request,
+  "datasetAlleleResponses" => undef
 };
 
 $json = json_POST($q_base, $post_data4, 'POST dataset - 4 entry' );
