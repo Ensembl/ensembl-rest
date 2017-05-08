@@ -32,7 +32,11 @@ use Bio::EnsEMBL::Test::TestUtils;
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
+
 Catalyst::Test->import('EnsEMBL::REST');
+
+my $core_ad = $dba->get_DBAdaptor('core');
+my $schema_version = $core_ad->get_MetaContainer()->single_value_by_key('schema_version');
 
 my $base=  '/ga4gh/beacon';
 my $q_base = $base . '/query';
@@ -44,6 +48,22 @@ my $assemblyId = "GRCh37";
 
 # To check error handling for assembly differnent to DB
 my $unavailable_assembly = "GRCh38";
+
+# Test GET /ga4gh/beacon
+my $beacon_json = json_GET('/ga4gh/beacon/', 'Get the beacon representation');
+is(ref($beacon_json), 'HASH', 'HASH wanted from endpoint');
+cmp_ok(keys(%{$beacon_json}), '==', 13, 'Check beacon has correct number of fields');
+cmp_ok($beacon_json->{id}, 'eq', "Ensembl ". $assemblyId, 'Beacon id');
+cmp_ok($beacon_json->{version}, '==', $schema_version, 'Version');
+
+# Is there at least one dataset
+cmp_ok(scalar(@{$beacon_json->{'datasets'}}), '==', 1, 'Check have one dataset');
+my $first_dataset = $beacon_json->{'datasets'}->[0];
+cmp_ok(keys(%{$first_dataset}), '==', 12, 'Check dataset has correct number of fields');
+
+# Is the organization is a hash
+is(ref($beacon_json->{organization}), 'HASH', 'Organization should be a hash');
+cmp_ok(keys(%{$beacon_json->{organization}}), '==', 8, 'Check organization has correct number of fields');
 
 # POST checks 
 # Check for missing paramters

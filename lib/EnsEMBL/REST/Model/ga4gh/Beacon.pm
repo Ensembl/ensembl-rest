@@ -39,23 +39,43 @@ sub build_per_context_instance {
   return $self->new({ context => $c, %$self, @args });
 }
 
+# TODO - Only look up assembly once
+
 # returns ga4gh Beacon
 sub get_beacon {
   my ($self) = @_;
   my $beacon;
-  
-  $beacon->{id} = "TBD";
-  $beacon->{name} = "EMBL-EBI Ensembl";
-  $beacon->{apiVersion} = "v0.3.0";
-  $beacon->{organization} =  $self->get_beacon_organization();
-  $beacon->{description} = "TBD";
-  $beacon->{version} = "TBD";
 
-  $beacon->{welcomeURL} = undef;
-  $beacon->{alternativeURL} = undef;
+  # The Beacon identifier depends on the assembly requested
+  my $db_meta = $self->fetch_db_meta();
+
+  my $db_assembly = $db_meta->{assembly} || '';
+  my $schema_version = $db_meta->{schema_version} || '';
+
+  my $welcomeURL = 'http://rest.ensembl.org';
+  if ($db_assembly eq 'GRCh37') {
+    $welcomeURL = 'http://grch37.ensembl.org';
+  }
+
+  my $altURL = 'http://www.ensembl.org';
+  if ($db_assembly eq 'GRCh37') {
+    $altURL = 'http://grch37.ensembl.org';
+  }
+
+  # Unique identifier of the Beacon
+  $beacon->{id} = 'Ensembl ' . $db_assembly;
+  $beacon->{name} = 'Ensembl ' . $db_assembly;
+
+  $beacon->{apiVersion} = 'v0.3.0';
+  $beacon->{organization} =  $self->get_beacon_organization($db_meta);
+  $beacon->{description} = 'Human variant data from the Ensembl database';
+  $beacon->{version} = $schema_version;
+
+  $beacon->{welcomeUrl} = $welcomeURL;
+  $beacon->{alternativeUrl} = $altURL;
   $beacon->{createDateTime} = undef;
   $beacon->{updateDateTime} = undef;
-  $beacon->{datasets} = [];
+  $beacon->{datasets} = [$self->get_beacon_dataset($db_meta)];
   $beacon->{sampleAlleleRequests} = undef;
   $beacon->{info} = undef;
   
@@ -65,20 +85,66 @@ sub get_beacon {
 
 # returns ga4gh BeaconOrganization
 sub get_beacon_organization {
-  my ($self) = @_;
+  my ($self, $db_meta) = @_;
 
   my $organization;
   
+  my $description = "Ensembl creates, integrates and distributes reference datasets"
+                    . " and analysis tools that enable genomics."
+                    . " We are based at EMBL-EBI and our software"
+                    . " and data are freely available.";
+
+  my $address = "EMBL-EBI, Wellcome Genome Campus, Hinxton, "
+                . "Cambridgeshire, CB10 1SD, UK";
+
+  # The welcome URL depends on the assembly requested
+  my $db_assembly = $db_meta->{assembly};
+
+  my $welcomeURL = "http://www.ensembl.org";
+  if ($db_assembly eq 'GRCh37') {
+    $welcomeURL = "http://grch37.ensembl.org";
+  }
+
+  my $contactURL = "http://www.ensembl.org/info/about/contact/index.html";
+  my $logoURL = "http://www.ensembl.org/i/e-ensembl.png"; 
+
   # Unique identifier of the organization
-  $organization->{id} = "EMBL-EBI Ensembl";
-  $organization->{name} = "EMB-EBI";
-  $organization->{description} = "TBD";
-  $organization->{addresss} = "TBD";
-  $organization->{welcomeURL} = "TBD";
-  $organization->{contactURL} = "TBD";
-  $organization->{logoURL} = "TBD";
+  $organization->{id} = "Ensembl";
+  $organization->{name} = "Ensembl";
+  $organization->{description} = $description;
+  $organization->{addresss} = $address;
+  $organization->{welcomeUrl} = $welcomeURL;
+  $organization->{contactUrl} = $contactURL;
+  $organization->{logoUrl} = $logoURL;
   $organization->{info} = undef;
   return $organization;
+}
+
+sub get_beacon_dataset {
+  my ($self, $db_meta) = @_;
+
+  my $dataset;
+  
+  my $db_assembly = $db_meta->{assembly};
+  my $schema_version = $db_meta->{schema_version};
+  my $externalURL = 'http://www.ensembl.org';
+  if ($db_assembly eq 'GRCh37') {
+    $externalURL = 'http://grch37.ensembl.org';
+  }
+
+  $dataset->{id} = join(" ", 'Ensembl', $schema_version);
+  $dataset->{name} = join(" ", 'Ensembl', $schema_version);
+  $dataset->{description} = "Human variant data from the Ensembl database";
+  $dataset->{assemblyId} = $db_assembly;
+  $dataset->{createDateTime} = undef;
+  $dataset->{updateDateTime} = undef;
+  $dataset->{version} = $schema_version;
+  $dataset->{variantCount} = undef;
+  $dataset->{callCount} = undef;
+  $dataset->{sampleCount} =  undef;
+  $dataset->{externalUrl} = $externalURL; 
+  $dataset->{info} = undef;
+  return $dataset;
 }
 
 # TODO get the beaconID from getBeacon
@@ -89,7 +155,8 @@ sub beacon_query {
   my $beaconAlleleResponse;
   my $beaconError;
 
-  $beaconAlleleResponse->{beaconId} = "EMBL-EBI Ensembl";
+  my $beacon = $self->get_beacon();
+  $beaconAlleleResponse->{beaconId} = $beacon->{id};
   $beaconAlleleResponse->{exists} = undef;
   $beaconAlleleResponse->{error} = undef;
   $beaconAlleleResponse->{alleleRequest} = undef;
@@ -148,7 +215,7 @@ sub get_assembly {
 sub fetch_db_meta {
   my ($self)  = @_;
 
-  # my $c = $self->context();
+  # my $c = $self->context();-
   # $c->log()->info("for info");
   my $species = 'homo_sapiens';
   my $core_ad = $self->context->model('Registry')->get_DBAdaptor($species, 'Core');
@@ -170,6 +237,7 @@ sub fetch_db_meta {
                                          $cmeta{"schema_version"},
                                          $cmeta{"assembly.default"});
   $db_meta->{assembly}       = $cmeta{"assembly.default"};
+  $db_meta->{schema_version} = $cmeta{"schema_version"};
  
   return $db_meta;
 }
