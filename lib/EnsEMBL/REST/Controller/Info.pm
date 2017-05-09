@@ -224,6 +224,20 @@ sub populations: Chained('/') PathPart('info/variation/populations') Args(1) Act
   return;
 }
 
+sub consequence_types: Path('variation/consequence_types') Args(0) ActionClass('REST') { }
+
+sub consequence_types_GET {
+  my ($self, $c) = @_;
+  my $consequence_types;
+  try {
+    $consequence_types = $c->model('Variation')->fetch_consequence_types();
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $consequence_types);
+  return;
+}
 
 __PACKAGE__->meta->make_immutable;
 
