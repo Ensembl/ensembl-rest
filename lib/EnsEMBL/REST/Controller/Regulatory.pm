@@ -139,13 +139,15 @@ sub microarray_single_GET {
 
 }
 
-# /regulatory/species/:species/microarray/:microarray/probe/:probe HumanWG_6_V2/ILMN_1763508
+# /regulatory/species/:species/microarray/:microarray/probe/:probe 
+# /regulatory/species/homo_sapiens/microarray/HC-G110/vendor/affy/
 sub microarray_probe: Chained('microarray') PathPart('probe') Args(1) ActionClass('REST') { 
   my ($self, $c, $probe_name) = @_;
   if(! defined $probe_name){
     $c->go('ReturnError', 'custom', [qq{Probe name must be provided as part of the URL.}]);
   } 
 }
+
 sub microarray_probe_GET {
   my ($self, $c, $probe_name) = @_;
 
