@@ -21,10 +21,6 @@ limitations under the License.
 
 <html lang="en">
 <head>
-        <script src="/static/js/20-prettify.js"></script>
-        <script src="/static/js/30-jquery-1.11.1.min.js"></script>
-	<script src="/static/js/highlight/highlight.pack.js"></script>
-
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>[% site_name %] - [% template_title %]</title>
@@ -33,7 +29,7 @@ limitations under the License.
 	[% ELSE %]
 	<link href="[% bootstrap_css or '/static/css/10-bootstrap.css' %]" rel="stylesheet"/>
 	<link href="/static/css/20-prettify.css" rel="stylesheet"/>
-       	<link href="/static/css/25-default.css" rel="stylesheet"/>
+ 	<link href="/static/css/25-default.css" rel="stylesheet"/>
 	<link href="/static/css/50-additional.css" rel="stylesheet"/>
 	<link href="/static/css/51-docs.css" rel="stylesheet"/>
 	[% END %]
@@ -47,8 +43,10 @@ limitations under the License.
   <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="/static/js/highlight/highlight.pack.js"></script>
 </head>
-<body data-spy="scroll" data-target=".bs-docs-sidebar" onload="prettyPrint()">
+<body data-spy="scroll" data-target=".bs-docs-sidebar">
 <div class="container">
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
@@ -78,14 +76,11 @@ limitations under the License.
 	</div>
 </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 [% IF c.request.env.$psg %]
 <script src='[% c.request.env.$psg.1 %]'></script>
 [% ELSE %]
 <script src="/static/js/10-bootstrap.js"></script>
-
 [% END %]
-
 
 </body>
 </html>
