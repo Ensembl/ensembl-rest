@@ -31,6 +31,7 @@ use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
+my $dba2 = Bio::EnsEMBL::Test::MultiTestDB->new('meleagris_gallopavo');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
@@ -555,6 +556,20 @@ $base = '/overlap/translation';
   cmp_ok(scalar(@{$json}), '==', 2, 'Expect 2 overlaps');
   my $expected = { start => 43, end => 43, feature_type => 'residue_overlap', seq_region_name => $id };
   eq_or_diff($json->[0], $expected, 'Checking that the overlap is at the expected location');
+}
+
+# Test retrieving variation features where no variation db exists
+{
+  my $base = '/overlap/region/meleagris_gallopavo';
+  my $region = '3:1000000..2000000';
+  my $json = json_GET("$base/$region?feature=variation", "Retrieving variation where none exist");
+  cmp_ok(scalar(@{$json}), "==", 0, "Empty list returned");
+  $json = json_GET("$base/$region?feature=structural_variation", "Retrieving structural_variation where none exist");
+  cmp_ok(scalar(@{$json}), "==", 0, "Empty list returned");
+  $json = json_GET("$base/$region?feature=somatic_variation", "Retrieving somatic_variation where none exist");
+  cmp_ok(scalar(@{$json}), "==", 0, "Empty list returned");
+  $json = json_GET("$base/$region?feature=somatic_structural_variation", "Retrieving somatic_structural_variation where none exist");
+  cmp_ok(scalar(@{$json}), "==", 0, "Empty list returned");
 }
 
 
