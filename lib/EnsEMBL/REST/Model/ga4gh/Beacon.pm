@@ -400,7 +400,7 @@ sub get_dataset_allele_response {
  
   $ds_response->{'exists'} = JSON::true;
  
-  my $externalURL = "http://grch37.ensembl.org";
+  my $externalURL = "http://www.ensembl.org";
   if ($dataset->{assemblyId} eq 'GRCh37') {
     $externalURL = "http://grch37.ensembl.org";
   }
