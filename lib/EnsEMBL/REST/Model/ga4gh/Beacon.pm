@@ -64,7 +64,7 @@ sub get_beacon {
 
   # Unique identifier of the Beacon
   $beacon->{id} = 'Ensembl ' . $db_assembly;
-  $beacon->{name} = 'Ensembl ' . $db_assembly;
+  $beacon->{name} = 'EBI - Ensembl ' . $db_assembly;
 
   $beacon->{apiVersion} = 'v0.3.0';
   $beacon->{organization} =  $self->get_beacon_organization($db_meta);
@@ -98,19 +98,22 @@ sub get_beacon_organization {
                 . "Cambridgeshire, CB10 1SD, UK";
 
   # The welcome URL depends on the assembly requested
-  my $db_assembly = $db_meta->{assembly};
+  #my $db_assembly = $db_meta->{assembly};
 
-  my $welcomeURL = "http://www.ensembl.org";
-  if ($db_assembly eq 'GRCh37') {
-    $welcomeURL = "http://grch37.ensembl.org";
-  }
-
+  #my $welcomeURL = "http://www.ensembl.org";
+  #if ($db_assembly eq 'GRCh37') {
+  #  $welcomeURL = "http://grch37.ensembl.org";
+  #}
+  
+  my $welcomeURL = "https://www.ebi.ac.uk/";
   my $contactURL = "http://www.ensembl.org/info/about/contact/index.html";
-  my $logoURL = "http://www.ensembl.org/i/e-ensembl.png"; 
+  
+# TODO add URL to logo
+  my $logoURL; 
 
   # Unique identifier of the organization
-  $organization->{id} = "Ensembl";
-  $organization->{name} = "Ensembl";
+  $organization->{id} = "ebi";
+  $organization->{name} = "EMBL European Bioinformatics Institute";
   $organization->{description} = $description;
   $organization->{addresss} = $address;
   $organization->{welcomeUrl} = $welcomeURL;
