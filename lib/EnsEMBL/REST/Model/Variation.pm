@@ -176,7 +176,9 @@ sub get_phenotype_info {
     $seen{$key} = 1;
   }
 
-  return \@phenotypes;
+  my @sorted_phenotypes = sort { lc($a->{trait}) cmp lc($b->{trait}) } @phenotypes;
+
+  return \@sorted_phenotypes;
 }
 
 sub get_gene_phenotype_info {
@@ -201,7 +203,9 @@ sub get_gene_phenotype_info {
     $seen{$key} = 1;
   }
 
-  return \@phenotypes;
+  my @sorted_phenotypes = sort { lc($a->{trait}) cmp lc($b->{trait}) } @phenotypes;
+
+  return \@sorted_phenotypes;
 }
 
 sub phen_as_hash {

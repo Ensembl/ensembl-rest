@@ -150,7 +150,7 @@ sub fetch_features_by_region {
   my %record_data;
   my %phenotype_data;
 
-  foreach my $pf(@{$pfs}){
+  foreach my $pf(sort{ lc($a->phenotype_description()) cmp lc($b->phenotype_description()) } @{$pfs}){
 
     my $object_id = $pf->object_id(); 
     my $phe_id    = $pf->phenotype_id();
@@ -162,13 +162,13 @@ sub fetch_features_by_region {
 
     if ($only_phenotypes) {
       if (!$phenotype_data{$object_id}{$phe_id}) {
-        $pf_info->{description} = $pf->phenotype_description();
+        $pf_info->{description} = $phe_desc;
         $phenotype_data{$object_id}{$phe_id} = 1;
       }     
     }
     else {
       $pf_info = {
-                   description => $pf->phenotype_description(),
+                   description => $phe_desc,
                    location    => $pf->seq_region_name() . ":" . $pf->seq_region_start() . "-" . $pf->seq_region_end() ,
                    source      => $pf->source_name(), 
 		 };
