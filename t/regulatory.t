@@ -42,6 +42,7 @@ $output = [
   scientific_name => "K562",
   name            => "K562",
   gender          => "female",
+  efo_id          => "EFO:0002067",
   },
 ];
 $json = json_GET($epigenomes_all,'GET list of all epigenomes');
@@ -66,25 +67,24 @@ $json = json_GET($regulatory_feature,'GET specific Regulatory Feature');
 eq_or_diff($json, $output, 'GET specific Regulatory Feature');
 
 
-my $microarray_vendor = '/regulatory/species/homo_sapiens/microarray/HumanWG_6_V2/vendor/illumina/?content-type=application/json';
+my $microarray_vendor = '/regulatory/species/homo_sapiens/microarray/HC-G110/vendor/affy/?content-type=application/json';
 $output = {
   format => 'EXPRESSION',
-  name   => 'HumanWG_6_V2',
-  class  => 'ILLUMINA_WG',
+  name   => 'HC-G110',
+  class  => 'AFFY_UTR',
   type   => 'OLIGO'
 };
 $json = json_GET($microarray_vendor,'GET Information about a specific microarray');
 eq_or_diff($json, $output, 'GET Information about a specific microarray');
 
 
-my $microarray_probe = '/regulatory/species/homo_sapiens/microarray/HumanWG_6_V2/probe/ILMN_1763508?content-type=application/json';
-$output = [ {
-    seq_region_name => '2',
-    description     => 'NULL',
-    name            => 'HumanWG_6_V2',
-    end             => 68735253,
-    start           => 68735204
-  } ];
+my $microarray_probe = '/regulatory/species/homo_sapiens/microarray/HC-G110/probe/137:179;?content-type=application/json';
+$output =  {
+  microarray_name => 'HC-G110',
+  probe_length    => 25,
+  probe_name      => '137:179;',
+  sequence        => 'TCTCCTTTGCTGAGGCCTCCAGCTT'
+  } ;
 $json = json_GET($microarray_probe,'GET Information about a specific probe');
 eq_or_diff($json, $output, 'GET Information about a specific probe');
 

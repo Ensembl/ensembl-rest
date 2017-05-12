@@ -64,7 +64,6 @@
 639	\N	patch	patch_87_88_a.sql|schema_version
 640	\N	patch	patch_87_88_b.sql|seq_region_name_255
 641	\N	patch	patch_87_88_c.sql|sample_regulatory_feature_id field for regulatory build
-642	0		
 643	\N	patch	patch_88_89_a.sql|schema_version
 644	\N	patch	patch_88_89_b.sql|Created probe_seq table
 645	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table

@@ -250,6 +250,7 @@ sub transcript_variation {
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+  if (!$tva) { return []; }
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
   my $vfs = $vfa->fetch_all_by_Slice($transcript->feature_Slice);
@@ -274,6 +275,7 @@ sub somatic_transcript_variation {
   my $transcript = $translation->transcript();
   my $transcript_variants;
   my $tva = $c->model('Registry')->get_adaptor($species, 'variation', 'TranscriptVariation');
+  if (!$tva) { return []; }
 
   my $vfa = $c->model('Registry')->get_adaptor($species, 'variation', 'VariationFeature');
   my $vfs = $vfa->fetch_all_somatic_by_Slice($transcript->feature_Slice);
@@ -330,6 +332,7 @@ sub variation {
 
   my $c = $self->context();
   my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
+  if (!$vfa) { return []; }
 
   if( $c->request->parameters->{variant_set}){
     my $set = $self->_get_VariationSet();
@@ -347,6 +350,7 @@ sub structural_variation {
   my $sv_class = (@so_terms) ? $so_terms[0] : ();
   my $c = $self->context();
   my $svfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'structuralvariationfeature');
+  if (!$svfa) { return []; }
   return $svfa->fetch_all_by_Slice_SO_term($slice, $sv_class);
 }
 
@@ -354,6 +358,7 @@ sub somatic_variation {
   my ($self, $slice) = @_;
   my $c = $self->context();
   my $vfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'variationfeature');
+  if (!$vfa) { return []; }
   return $vfa->fetch_all_somatic_by_Slice_SO_terms($slice, $self->_get_SO_terms());
 }
 
@@ -364,6 +369,7 @@ sub somatic_structural_variation {
   # my ($sv_class) = @so_terms;
   my $c = $self->context();
   my $svfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'structuralvariationfeature');
+  if (!$svfa) { return []; }
   return $svfa->fetch_all_somatic_by_Slice($slice);
 }
 

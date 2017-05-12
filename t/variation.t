@@ -29,7 +29,7 @@ use Test::Differences;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
-
+use JSON;
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
@@ -42,7 +42,13 @@ my $base = '/variation/homo_sapiens';
   #is(scalar(@$json), 1, '1 variation feature returned');
   my $expected_variation_1 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.123049', minor_allele => 'A', ambiguity => 'R', var_class => 'SNP', synonyms => [], evidence => ['Multiple_observations','1000Genomes'], ancestral_allele => 'G', most_severe_consequence => 'intron_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"18:23821095-23821095", "strand" => 1, "start" => 23821095, "end" => 23821095, "seq_region_name" => "18", "coord_system" => "chromosome","allele_string"=>"G/A"}]};
   eq_or_diff($json, $expected_variation_1, "Checking the result from the variation endpoint");
-  
+
+# Include phenotype information
+  my $expected_phenotype = { %{$expected_variation_1},
+  "phenotypes" => [{"source" => "DGVa","variants" => undef, "ontology_accessions" => ["Orphanet:130"], "trait" => "BRUGADA SYNDROME", "genes" => undef}]};
+  my $phen_json = json_GET("$base/$id?phenotypes=1", "Phenotype info");
+  eq_or_diff($phen_json, $expected_phenotype, "Returning phenotype information");
+
 # Get additional genotype information
   $id = 'rs67521280';
   my $expected_variation_2 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => undef, minor_allele => undef, failed => 'None of the variant alleles match the reference allele;Mapped position is not compatible with reported alleles', ambiguity => undef, var_class => 'indel', synonyms => [], evidence => [], ancestral_allele => undef, most_severe_consequence => 'intergenic_variant', mappings => [{"assembly_name" => "GRCh37", "location"=> "11:6303493-6303493", "strand" => 1, "start" => 6303493, "end" => 6303493, "seq_region_name" => "11", "coord_system" => "chromosome","allele_string"=>"-/GT"}] };
@@ -50,7 +56,6 @@ my $base = '/variation/homo_sapiens';
   genotypes => [{genotype => "GT|GT", gender => "Male", sample => "J. CRAIG VENTER", submission_id => 'ss95559393'}] };
   my $genotype_json = json_GET("$base/$id?genotypes=1", "Genotype info");
   eq_or_diff($genotype_json, $expected_genotype, "Returning genotype information");
-
 
 # Include population allele frequency information
   my $expected_pops = { %{$expected_variation_2},

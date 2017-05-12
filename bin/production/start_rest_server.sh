@@ -52,9 +52,9 @@ export PERL5LIB
 . $HOME/perl5/perlbrew/etc/bashrc
 
 export ENS_REST_LOG4PERL=$APP_HOME'/configurations/production/log4perl.conf'
-export PROGRESSIVE_CACTUS_DIR=${HOME}/src/progressiveCactus/
-export COMPARA_HAL_DIR=/mnt/shared/88/
-export PERL5LIB=$PERL5LIB:/home/ubuntu/src/ensembl-compara/modules/Bio/EnsEMBL/Compara/HAL/HALXS/blib/arch/auto
+#export PROGRESSIVE_CACTUS_DIR=${HOME}/src/progressiveCactus/
+#export COMPARA_HAL_DIR=/mnt/shared/88/
+#export PERL5LIB=$PERL5LIB:/home/ubuntu/src/ensembl-compara/modules/Bio/EnsEMBL/Compara/HAL/HALXS/blib/arch/auto
 
 # Server settings for starman
 WORKERS=10
@@ -65,7 +65,7 @@ RESTART_INTERVAL=1
 # This is only relevant if using Catalyst
 TDP_HOME="$HOME/$APP"
 export TDP_HOME
-export PROGRESSIVE_CACTUS_DIR="$HOME/src/progressiveCactus/"
+#export PROGRESSIVE_CACTUS_DIR="$HOME/src/progressiveCactus/"
 
 export ENSEMBL_REST_CONFIG=$APP_HOME/configurations/production/ensembl_rest.conf
 STARMAN="starman --backlog $BACKLOG --max-requests $MAXREQUESTS --workers $WORKERS $APP_HOME/configurations/production/ensrest.psgi"

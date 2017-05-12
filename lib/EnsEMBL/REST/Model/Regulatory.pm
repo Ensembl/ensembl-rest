@@ -49,7 +49,7 @@ sub fetch_regulatory_feature {
   my $result = $rf->summary_as_hash();
 
   my $activity = $c->request->param('activity');
-  if($activity == 1) {
+  if(defined $activity and $activity == 1) {
     my $data; 
     for my $ra(@{$rf->regulatory_activity}) {
       $data->{$ra->epigenome->production_name} = $ra->activity;
@@ -62,7 +62,8 @@ sub fetch_regulatory_feature {
 }
 
 sub fetch_all_epigenomes {
-  my $self    = shift;
+  my ($self) = @_;
+
   my $c          = $self->context;
   my $species    = $c->stash->{species};
 
@@ -74,6 +75,7 @@ sub fetch_all_epigenomes {
   for my $eg (@$epigenomes) {
     my $data = {};
     $data->{gender}          = $eg->gender;
+    $data->{efo_id}          = $eg->efo_accession;
     $data->{name}            = $eg->production_name;
     $data->{scientific_name} = $eg->display_label;
     push(@$result, $data);
@@ -109,61 +111,56 @@ sub list_all_microarrays{
 }
 
 sub get_probe_info {
-  my $self       = shift;
-  my $probe_name = shift;
+  my ($self, $probe_name) = @_;
 
   if(! defined $probe_name){
    Catalyst::Exception->throw("No probe name given. Please specify one to retrieve from this service");
   }
 
-  my $c       = $self->context;
-  my $species = $c->stash->{species};
-  my $microarray = $c->stash->{microarray};
+  my $c               = $self->context;
+  my $species         = $c->stash->{species};
+  my $microarray_name = $c->stash->{microarray};
   
   my $probe_adaptor         = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Probe');
   my $probe_feature_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'ProbeFeature');
   # Fetch probe
-  my $probe = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray, $probe_name );
-  my $probe_features = $probe_feature_adaptor->fetch_all_by_Probe($probe);
+  my $probe = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray_name, $probe_name );
 
-  my $result = [];
-  for my $pf (@$probe_features) {
-    my $features = {};
-    $features->{name}            = $microarray ;
-    $features->{description}     = $pf->probe->description;
-    # Attaches whole chromosome instead of feature
-    # $features->{Location}        = $pf->seqname;
-    $features->{start}           = $pf->start;
-    $features->{end}             = $pf->end;
-    $features->{seq_region_name} = $pf->seq_region_name;
-
-
-    my $flag_transcript = $c->request->param('transcript');
-    my $flag_gene       = $c->request->param('gene');
-    
-    # Linked transcripts
-    if($flag_transcript == 1){
-      my $transript_mappings = $pf->get_all_Transcript_DBEntries();
-      my $transcripts = [];
-      for my $tm (@$transript_mappings) {
-        my $hash = {};
-        $hash->{display_id} = $tm->display_id();
-        $hash->{description}    = $tm->linkage_annotation();
-        # Add gene information
-        if($flag_gene == 1){
-          my $tr_a = $c->model('Registry')->get_adaptor( $species, 'Core', 'Transcript');
-          my $transcript = $tr_a->fetch_by_stable_id($tm->display_id);
-         $hash->{gene}->{stable_id}     = $transcript->get_Gene()->stable_id();
-         $hash->{gene}->{external_name} = $transcript->get_Gene()->external_name();
-        }
-        push(@$transcripts, $hash)
-      }
-      $features->{transcripts} = $transcripts;
-    }
-
-    push(@$result, $features);
+  if(! defined $probe) {
+    Catalyst::Exception->throw("Probe: '$probe_name' from array '$microarray_name' not found. Check spelling");
   }
-  return($result);
+
+  my $features = {};
+  $features->{microarray_name}  = $microarray_name ;
+  $features->{probe_name}       = $probe_name ;
+  $features->{probe_length}     = $probe->length;
+  $features->{sequence}         = $probe->sequence;
+
+  my $flag_transcript = $c->request->param('transcript');
+  my $flag_gene       = $c->request->param('gene');
+
+  # Linked transcripts
+  if($flag_transcript == 1){
+    my $pma      = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'ProbeTranscriptMapping');
+    my $transript_mappings = $pma->fetch_all_by_Probe($probe);
+    my $transcripts = [];
+    for my $tm (@$transript_mappings) {
+      my $hash = {};
+      $hash->{display_id}   = $tm->display_id();
+      $hash->{description}  = $tm->linkage_annotation();
+      # Add gene information
+      if($flag_gene == 1){
+        my $tr_a = $c->model('Registry')->get_adaptor( $species, 'Core', 'Transcript');
+        my $transcript = $tr_a->fetch_by_stable_id($tm->display_id);
+        $hash->{gene}->{stable_id}     = $transcript->get_Gene()->stable_id();
+        $hash->{gene}->{external_name} = $transcript->get_Gene()->external_name();
+      }
+      push(@$transcripts, $hash)
+    }
+    $features->{transcripts} = $transcripts;
+  }
+
+  return($features);
 }
 
 sub get_microarray_info {
@@ -175,6 +172,9 @@ sub get_microarray_info {
 
   my $array_a = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Array');
   my $array   = $array_a->fetch_by_name_vendor($name, $vendor);
+  if(! defined $array) {
+    Catalyst::Exception->throw("Array '$name' from '$vendor' not found. Please check spelling.");
+  }
   
   my $result = {};
   $result->{name}   = $array->name;
