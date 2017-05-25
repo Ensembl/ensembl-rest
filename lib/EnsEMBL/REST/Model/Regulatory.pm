@@ -146,7 +146,7 @@ sub get_probe_info {
     my $transcripts = [];
     for my $tm (@$transript_mappings) {
       my $hash = {};
-      $hash->{display_id}   = $tm->display_id();
+      $hash->{stable_id}   = $tm->display_id();
       $hash->{description}  = $tm->linkage_annotation();
       # Add gene information
       if($flag_gene == 1){
