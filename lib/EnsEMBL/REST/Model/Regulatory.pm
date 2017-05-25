@@ -146,12 +146,12 @@ sub get_probe_info {
     my $transcripts = [];
     for my $tm (@$transript_mappings) {
       my $hash = {};
-      $hash->{display_id}   = $tm->display_id();
-      $hash->{description}  = $tm->linkage_annotation();
+      $hash->{stable_id}    = $tm->stable_id();
+      $hash->{description}  = $tm->description();
       # Add gene information
       if($flag_gene == 1){
         my $tr_a = $c->model('Registry')->get_adaptor( $species, 'Core', 'Transcript');
-        my $transcript = $tr_a->fetch_by_stable_id($tm->display_id);
+        my $transcript = $tr_a->fetch_by_stable_id($tm->stable_id);
         $hash->{gene}->{stable_id}     = $transcript->get_Gene()->stable_id();
         $hash->{gene}->{external_name} = $transcript->get_Gene()->external_name();
       }
