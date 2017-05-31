@@ -59,19 +59,19 @@ my $base = '/variation/homo_sapiens';
 
 # Include population allele frequency information
   my $expected_pops = { %{$expected_variation_2},
-  populations => [{population => "HUMANGENOME_JCVI:J. Craig Venter",frequency => "1",allele => "GT",allele_count => "2", submission_id => 'ss95559393'}]};
+  populations => [{population => "HUMANGENOME_JCVI:J. Craig Venter",frequency => 1,allele => "GT",allele_count => 2, submission_id => 'ss95559393'}]};
   my $pops_json = json_GET("$base/$id?pops=1", "Population info");
   eq_or_diff($pops_json, $expected_pops, "Returning population information");
 
 # Include population_genotype information ( data faked)
    my $expected_pop_genos = { %{$expected_variation_2},
    population_genotypes =>[
- { count => '11',frequency => '0.5',    genotype => 'A|G', population => 'PERLEGEN:AFD_AFR_PANEL',    subsnp_id => 'ss23290311'}, 
- { count => '5', frequency => '0.227273', genotype => 'A|A',  population => 'PERLEGEN:AFD_AFR_PANEL',  subsnp_id => 'ss23290311'},
- { count => '6', frequency => '0.272727', genotype => 'G|G',  population => 'PERLEGEN:AFD_AFR_PANEL', subsnp_id => 'ss23290311' },
- { count => '9', frequency => '0.375', genotype => 'A|G',  population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'},
- { count => '1', frequency => '0.0416667', genotype => 'A|A', population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'  },
- { count => '14', frequency => '0.583333',  genotype => 'G|G',  population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'},
+ { count => 11,frequency => 0.5,    genotype => 'A|G', population => 'PERLEGEN:AFD_AFR_PANEL',    subsnp_id => 'ss23290311'}, 
+ { count => 5, frequency => 0.227273, genotype => 'A|A',  population => 'PERLEGEN:AFD_AFR_PANEL',  subsnp_id => 'ss23290311'},
+ { count => 6, frequency => 0.272727, genotype => 'G|G',  population => 'PERLEGEN:AFD_AFR_PANEL', subsnp_id => 'ss23290311' },
+ { count => 9, frequency => 0.375, genotype => 'A|G',  population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'},
+ { count => 1, frequency => 0.0416667, genotype => 'A|A', population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'  },
+ { count => 14, frequency => 0.583333,  genotype => 'G|G',  population => 'PERLEGEN:AFD_CHN_PANEL', subsnp_id => 'ss23290311'},
  ]};
  
    my $pop_genos_json = json_GET("$base/$id?population_genotypes=1", "Population_genotype info");
@@ -81,7 +81,5 @@ my $post_data = '{ "ids" : ["rs142276873","rs67521280"]}';
 my $expected_result = { rs142276873 => $expected_variation_1, rs67521280 => $expected_variation_2 };
 
 is_json_POST($base,$post_data,$expected_result,"Try to POST list of variations");
-
-
 
 done_testing();
