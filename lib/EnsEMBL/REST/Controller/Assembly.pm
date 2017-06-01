@@ -52,8 +52,14 @@ sub seq_region_GET {}
 sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   my ( $self, $c, $name) = @_;
   my $include_bands = $c->request->param('bands') || 0;
-  my $slice = $c->model('Lookup')->find_slice($name);
-  my $bands = $c->model('Assembly')->get_karyotype_info($slice) if $include_bands;
+  my ($slice, $bands);
+  try {
+    $slice = $c->model('Lookup')->find_slice($name);
+    $bands = $c->model('Assembly')->get_karyotype_info($slice) if $include_bands;
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
   if ($bands && scalar(@$bands) > 0) {
     $self->status_ok( $c, entity => { 
       length => $slice->length(),
