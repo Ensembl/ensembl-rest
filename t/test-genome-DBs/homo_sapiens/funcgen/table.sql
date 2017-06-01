@@ -1655,7 +1655,6 @@ CREATE TABLE `xref` (
 
 /**
 @table object_xref
-@desc Describes links between Ensembl objects and objects held in external databases.  The Ensembl object can be one of several types; the type is held in the ensembl_object_type column.  The ID of the particular Ensembl gene, translation or whatever is given in the ensembl_id column.  The xref_id points to the entry in the xref table that holds data about the external object.  Each Ensembl object can be associated with zero or more xrefs. An xref object can be associated with one or more Ensembl objects.
 @colour  #000000
 
 @column object_xref_id            Internal identifier.
