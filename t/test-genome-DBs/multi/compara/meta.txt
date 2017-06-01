@@ -1,4 +1,4 @@
-87	\N	schema_version	89
+87	\N	schema_version	90
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -72,3 +72,5 @@
 85	\N	patch	patch_87_88_h.sql|exon_boundaries
 86	\N	patch	patch_87_88_i.sql|genome_db.display_name
 88	\N	patch	patch_88_89_a.sql|schema_version
+89	\N	patch	patch_88_89_b.sql|genomic_align_tree_parent_id_null
+90	\N	patch	patch_89_90_a.sql|schema_version

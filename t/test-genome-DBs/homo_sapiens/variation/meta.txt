@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	89
+2	\N	schema_version	90
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -89,3 +89,4 @@
 89	\N	patch	patch_87_88_b.sql|seq_region_name_255
 90	\N	patch	patch_88_89_a.sql|schema version
 91	\N	patch	patch_88_89_b.sql|Drop strain_gtype_poly table
+92	\N	patch	patch_89_90_a.sql|schema_version
