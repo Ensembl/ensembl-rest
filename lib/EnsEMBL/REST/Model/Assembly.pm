@@ -63,28 +63,16 @@ sub get_slice_info {
   
   my $method = "get_" . $type;
   my $slices = $gc->$method;
-  my $c = $self->context();
-  my $include_bands = $c->request->param('bands') || 0;
   my @toplevels;
-  my $toplevels;
   
-  if ($has_karyotype && $include_bands) {
-    foreach my $slice (@$slices) {
-      push @toplevels, $self->features_karyotype_as_hash($slice);
-    }
-  } else {
-    foreach my $slice (@$slices) {
-      push @toplevels, $self->features_as_hash($slice);
-    }
+  foreach my $slice (@$slices) {
+    push @toplevels, $self->features_as_hash($slice, $has_karyotype);
   }
   return \@toplevels;
 }
 
 sub get_karyotype_info {
   my ($self, $slice) = @_;
-
-  my $c = $self->context();
-  my $species = $c->stash->{species};
 
   my @karyotype_info;
   my $karyotype_bands = $slice->get_all_KaryotypeBands();
@@ -95,30 +83,43 @@ sub get_karyotype_info {
   return \@karyotype_info;
 } 
 
-sub features_as_hash {
+sub get_synonym_info {
   my ($self, $slice) = @_;
+
+  my @synonym_info;
+  my $synonyms = $slice->get_all_synonyms();
+  foreach my $synonym (@$synonyms) {
+    push @synonym_info, $synonym->summary_as_hash;
+  }
+
+  return \@synonym_info;
+}
+
+sub features_as_hash {
+  my ($self, $slice, $has_karyotype) = @_;
+  my $c = $self->context();
+  my $include_bands = $c->request->param('bands') || 0;
+  my $include_synonyms = $c->request->param('synonyms') || 0;
   my $features;
   $features->{coord_system} = $slice->coord_system_name();
   $features->{name} = $slice->seq_region_name();
   $features->{length} = $slice->length();
-  return $features;
-}
 
-sub features_karyotype_as_hash {
-  my ($self, $slice) = @_;
-  my $features = $self->features_as_hash($slice);
-  my $bands;
-  # Only look for bands if slice is a chromosome
-  # Reduces performance issues
-  if ($slice->is_chromosome) {
-    $bands = $self->get_karyotype_info($slice);
+  if ($include_bands && $has_karyotype && $slice->is_chromosome) {
+    my $bands = $self->get_karyotype_info($slice);
     if (scalar(@$bands) > 0) {
       $features->{bands} = $bands;
     }
   }
+
+  if ($include_synonyms) {
+    my $synonyms = $self->get_synonym_info($slice);
+    if (scalar(@$synonyms) > 0) {
+      $features->{synonyms} = $synonyms;
+    }
+  }
   return $features;
 }
-
 
 sub get_slice_names {
   my ($self, $gc, $type) = @_;

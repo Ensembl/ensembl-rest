@@ -52,34 +52,38 @@ sub seq_region_GET {}
 sub seq_region: Chained('species') PathPart('') Args(1) ActionClass('REST') {
   my ( $self, $c, $name) = @_;
   my $include_bands = $c->request->param('bands') || 0;
-  my ($slice, $bands);
+  my $include_synonyms = $c->request->param('synonyms') || 0;
+  my ($slice, $bands, $synonyms);
   try {
     $slice = $c->model('Lookup')->find_slice($name);
     $bands = $c->model('Assembly')->get_karyotype_info($slice) if $include_bands;
+    $synonyms = $c->model('Assembly')->get_synonym_info($slice) if $include_synonyms;
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
+  my $hash = $self->_region_hash($c, $slice);
   if ($bands && scalar(@$bands) > 0) {
-    $self->status_ok( $c, entity => { 
-      length => $slice->length(),
-      coordinate_system => $slice->coord_system()->name(),
-      assembly_exception_type => $slice->assembly_exception_type(),
-      is_chromosome => $slice->is_chromosome(),
-      is_circular => ($slice->is_circular()||0),
-      karyotype_band => $bands,
-      assembly_name => $slice->coord_system()->version(),
-    });
-  } else {
-    $self->status_ok( $c, entity => {
-      length => $slice->length(),
-      coordinate_system => $slice->coord_system()->name(),
-      assembly_exception_type => $slice->assembly_exception_type(),
-      is_chromosome => $slice->is_chromosome(),
-      is_circular => ($slice->is_circular()||0),
-      assembly_name => $slice->coord_system()->version(),
-    });
+    $hash->{karyotype_band} = $bands;
   }
+  if ($synonyms && scalar(@$synonyms) > 0) {
+    $hash->{synonyms} = $synonyms;
+  }
+  $self->status_ok( $c, entity => $hash);
+}
+
+sub _region_hash {
+  my ($self, $c, $slice) = @_;
+  my $region;
+
+  $region->{length} = $slice->length();
+  $region->{coordinate_system} = $slice->coord_system()->name(),
+  $region->{assembly_exception_type} = $slice->assembly_exception_type(),
+  $region->{is_chromosome} = $slice->is_chromosome(),
+  $region->{is_circular} = ($slice->is_circular()||0),
+  $region->{assembly_name} = $slice->coord_system()->version(),
+
+  return $region;
 }
 
 __PACKAGE__->meta->make_immutable;

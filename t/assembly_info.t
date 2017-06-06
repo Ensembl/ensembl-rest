@@ -57,6 +57,18 @@ is_json_GET(
   'Checking info of region 6 matches expected'
 );
 
+is_json_GET(
+  '/info/assembly/homo_sapiens/6?synonyms=1',
+  {assembly_exception_type => 'REF', coordinate_system => 'chromosome', is_chromosome => 1, is_circular => 0, length => 171115067, assembly_name => 'GRCh37', synonyms => [{'name' => 'NC_000006.12', 'dbname' => 'RefSeq_genomic'}, {'name' => 'chr6', 'dbname' => 'UCSC'}] },
+  'Checking info of region 6 synonyms matches expected'
+);
+
+is_json_GET(
+  '/info/assembly/homo_sapiens/6?bands=1',
+  {assembly_exception_type => 'REF', coordinate_system => 'chromosome', is_chromosome => 1, is_circular => 0, length => 171115067, assembly_name => 'GRCh37', karyotype_band => [{'assembly_name' => 'GRCh37', 'id' => 'q11.21', 'seq_region_name' => '6', 'start' => '1026863', 'end' => '1027454', 'strand' => '0', 'stain' => 'gneg'}] },
+  'Checking info of region 6 bands matches expected'
+);
+
 action_bad('/info/assembly/homo_sapiens/wibble', 'Checking a bogus region results in no information');
 
 done_testing();
