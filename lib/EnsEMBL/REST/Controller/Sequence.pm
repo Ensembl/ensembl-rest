@@ -55,7 +55,7 @@ sub id_GET {
     $c->log()->debug('Finding the object');
     $c->model('Lookup')->find_object_by_stable_id($c->stash()->{id});
     $c->log()->debug('Processing the sequences');
-    $self->_process($c);
+    $self->_process($c, $stable_id);
     $c->log()->debug('Pushing out the entity');
     $self->_write($c);
   } catch {
@@ -86,7 +86,7 @@ sub id_POST {
   foreach my $id (@$id_list) {
     try {
       $c->model('Lookup')->find_object_by_stable_id($id);
-      $self->_process($c);
+      $self->_process($c, $id);
     } ;
   }
   $self->_write($c);
@@ -144,13 +144,14 @@ sub _get_region_sequence {
   push @$seq_stash, {
     id => $slice->name(),
     molecule => 'dna',
+    query => $region,
     seq => $seq,
   };
   $c->stash()->{sequences} = $seq_stash;
 }
 
 sub _process {
-  my ($self, $c) = @_;
+  my ($self, $c, $id) = @_;
   my $s = $c->stash();
   my $object = $s->{object};
   my $type = $c->request()->param('type') || $DEFAULT_TYPE;
@@ -175,7 +176,7 @@ sub _process {
       $s->{dosubseq} = 1;
   }
 
-  my $sequences = $self->_process_feature($c, $object, $type);
+  my $sequences = $self->_process_feature($c, $object, $type, $id);
   my $sequence_count = scalar(@{$sequences});
   if($sequence_count > 1 && ! $multiple_sequences) {
     my $err;
@@ -199,7 +200,7 @@ sub _process {
 }
 
 sub _process_feature {
-  my ($self, $c, $object, $type) = @_;
+  my ($self, $c, $object, $type, $id) = @_;
   
   my @sequences;
   
@@ -256,7 +257,7 @@ sub _process_feature {
 	# Catch case where no translation is available for a transcript
         next unless $t;
 
-	push(@sequences, @{$self->_process_feature($c, $t, $type)});
+	push(@sequences, @{$self->_process_feature($c, $t, $type, $id)});
       }
     }
     elsif($type eq 'genomic') {
@@ -275,7 +276,7 @@ sub _process_feature {
 	# we're asking for a protein, we have to save the original
 	# coordinates before we translate them each cycle
 	$self->_push_start_end($c) if($c->stash()->{dosubseq});
-        push(@sequences, @{$self->_process_feature($c, $transcript, $type)});
+        push(@sequences, @{$self->_process_feature($c, $transcript, $type, $id)});
 	$self->_pop_start_end($c) if($c->stash()->{dosubseq});
       }
     }
@@ -310,6 +311,7 @@ sub _process_feature {
       id => $object->stable_id(),
       seq => $seq,
       molecule => $molecule,
+      query => $id,
       desc => $desc 
     });
   }

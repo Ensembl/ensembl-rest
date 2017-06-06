@@ -59,6 +59,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       id => $id,
       desc => undef,
       molecule => 'dna',
+      query => $id,
     },
     'CDNA retrieval'
   );
@@ -77,6 +78,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       id => $id,
       desc => undef,
       molecule => 'dna',
+      query => $id,
     },
     'CDS retrieval'
   );
@@ -94,6 +96,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       id => $id,
       desc => undef,
       molecule => 'protein',
+      query => $id,
     },
     'Protein retrieval'
   );
@@ -125,6 +128,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       id => $id,
       desc => ($seq->desc ? $seq->desc : undef),
       molecule => 'dna',
+      query => $id,
     },
     'Gene genomic DNA retrieval'
   );
@@ -147,6 +151,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       id => $protein_id,
       desc => ($seq->desc ? $seq->desc : undef),
       molecule => 'protein',
+      query => $id,
     }],
     'Gene to protein sequence retrieval with multiple sequences on'
   );
@@ -188,6 +193,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       seq => uc($seq->seq),
       id => $seq->desc,
       molecule => 'dna',
+      query => $region,
     },
     'Basic genomic DNA retrieval'
   );
@@ -200,6 +206,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       seq => $seq_hm->seq,
       id => $seq_hm->desc,
       molecule => 'dna',
+      query => $small_region,
     },
     'Hard masking genomic DNA retrieval'
   );
@@ -211,6 +218,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       seq => $seq_sm->seq,
       id => $seq_sm->desc,
       molecule => 'dna',
+      query => $small_region,
     },
     'Soft masking genomic DNA retrieval'
   );
@@ -255,14 +263,14 @@ FASTA
   my $body = q/{ "ids" : [ "ENSP00000370194", "ENSG00000243439" ]}/;
   my $seq_a = q/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYPRSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQLECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKTIVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELVREMVHADVELMRTNPNA/;
   my $seq_b = q/GCCAGCCAGGGTGGCAGGTGCCTGTAGTCCCAGCTGCTTGGGAGGCTCAAGGATTGCTTGAACCCAGGAGTTCTGCCCTGCAGTGCGCGGTGCCCATCGGGTGACACCCATCAGGTATCTGCACTAAGTTCAGCATGAAGAGCAGCGGGCCACCAGGCTGCCTAAGAAGGAATGAACCAGCCTGCTTTGGAAACAGAGCAGCTGAAACTCCTGTGCCGATCAGTGGTGGGATCACACCTGTGAGTAGCCACGCCTGCCCAGGCAACACAGACCCTGTCTCTTGCAAAATTAAAAA/;
-  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein"},{"desc" => "chromosome:GRCh37:6:1507557:1507851:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna"}];
+  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein", query => "ENSP00000370194"},{"desc" => "chromosome:GRCh37:6:1507557:1507851:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna", query => "ENSG00000243439"}];
   is_json_POST($url,$body,$response,'Basic POST ID sequence fetch');
 
 }
 {
   my $url = "/sequence/region/homo_sapiens";
   my $body = q/{ "regions" : [ "6:1507557:1507851:1", "clearly stupid" ]}/;
-  my $expected = [{id => "chromosome:GRCh37:6:1507557:1507851:1",seq => "GCCAGCCAGGGTGGCAGGTGCCTGTAGTCCCAGCTGCTTGGGAGGCTCAAGGATTGCTTGAACCCAGGAGTTCTGCCCTGCAGTGCGCGGTGCCCATCGGGTGACACCCATCAGGTATCTGCACTAAGTTCAGCATGAAGAGCAGCGGGCCACCAGGCTGCCTAAGAAGGAATGAACCAGCCTGCTTTGGAAACAGAGCAGCTGAAACTCCTGTGCCGATCAGTGGTGGGATCACACCTGTGAGTAGCCACGCCTGCCCAGGCAACACAGACCCTGTCTCTTGCAAAATTAAAAA",molecule =>"dna"}];
+  my $expected = [{id => "chromosome:GRCh37:6:1507557:1507851:1",seq => "GCCAGCCAGGGTGGCAGGTGCCTGTAGTCCCAGCTGCTTGGGAGGCTCAAGGATTGCTTGAACCCAGGAGTTCTGCCCTGCAGTGCGCGGTGCCCATCGGGTGACACCCATCAGGTATCTGCACTAAGTTCAGCATGAAGAGCAGCGGGCCACCAGGCTGCCTAAGAAGGAATGAACCAGCCTGCTTTGGAAACAGAGCAGCTGAAACTCCTGTGCCGATCAGTGGTGGGATCACACCTGTGAGTAGCCACGCCTGCCCAGGCAACACAGACCCTGTCTCTTGCAAAATTAAAAA",molecule =>"dna", query => "6:1507557:1507851:1"}];
   is_json_POST($url,$body,$expected,'POST one good region request and one bad');
 
 }
@@ -391,7 +399,7 @@ FASTA
   my $body = q/{ "ids" : [ "ENSP00000370194", "ENSG00000243439" ]}/;
   my $seq_a = q/LAEYTADVDGVGTLRLLDAVKTCGLINSVKF/;
   my $seq_b = q/TGCACTAAGTTCAGCATGAAGAGCAGCGGGC/;
-  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein"},{"desc" => "chromosome:GRCh37:6:1507676:1507706:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna"}];
+  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein", query => "ENSP00000370194"},{"desc" => "chromosome:GRCh37:6:1507676:1507706:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna", query => "ENSG00000243439"}];
   is_json_POST($url,$body,$response,'POST ID sequence fetch with sequence trimming');
 
 }
