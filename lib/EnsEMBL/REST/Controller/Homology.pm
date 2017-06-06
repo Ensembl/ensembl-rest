@@ -167,17 +167,27 @@ sub get_orthologs_GET {
     my $aligned         = $c->request->param('aligned') // 1;
     my $cigar_line      = $c->request->param('cigar_line') // 1;
 
-    foreach my $ref (@{$c->stash->{homology_data}}) {
+    try {
+      foreach my $ref (@{$c->stash->{homology_data}}) {
         $ref->{homologies} = Bio::EnsEMBL::Compara::Utils::HomologyHash->convert($ref->{homologies}, -FORMAT_PRESET => $format, -NO_SEQ => $no_seq, -SEQ_TYPE => $seq_type, -ALIGNED => $aligned, -CIGAR_LINE => $cigar_line);
-    }
+      }
+    } catch {
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
+    };
     return $self->status_ok( $c, entity => { data => $c->stash->{homology_data} } );
 
   } else {
     # Let's use the OrthoXML writer
     my @homologies;
-    foreach my $ref (@{$c->stash->{homology_data}}) {
-      push @homologies, @{$ref->{homologies}};
-    }
+    try {
+      foreach my $ref (@{$c->stash->{homology_data}}) {
+        push @homologies, @{$ref->{homologies}};
+      }
+    } catch {
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
+    };
     return $self->status_ok($c, entity => \@homologies);
   }
 }
