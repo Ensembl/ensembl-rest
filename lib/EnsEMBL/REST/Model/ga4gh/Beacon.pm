@@ -115,7 +115,7 @@ sub get_beacon_organization {
   $organization->{id} = "ebi";
   $organization->{name} = "EMBL European Bioinformatics Institute";
   $organization->{description} = $description;
-  $organization->{addresss} = $address;
+  $organization->{address} = $address;
   $organization->{welcomeUrl} = $welcomeURL;
   $organization->{contactUrl} = $contactURL;
   $organization->{logoUrl} = $logoURL;
