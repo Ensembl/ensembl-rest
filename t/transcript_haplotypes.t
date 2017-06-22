@@ -55,6 +55,7 @@ $expected_output = {
       'population_frequencies' => { _all => 0.5 },
       'hex' => '3a9ac3283858fcddbf5935a58e51899e',
       'diffs' => [],
+      'contributing_variants' => [],
       'has_indel' => 0
     },
     {
@@ -74,6 +75,7 @@ $expected_output = {
           'diff' => '101C>Y'
         }
       ],
+      'contributing_variants' => [ 'rs137980927' ],
       'has_indel' => 0
     },
     {
@@ -93,6 +95,7 @@ $expected_output = {
           'diff' => '22A>V'
         }
       ],
+      'contributing_variants' => [ 'rs147768956' ],
       'has_indel' => 0
     }
   ],
@@ -109,6 +112,7 @@ $expected_output = {
       'hex' => 'a4fd92d6dce22c4c419d07b6278c63bd',
       'population_frequencies' => { _all => 0.5 },
       'diffs' => [],
+      'contributing_variants' => [],
       'has_indel' => 0
     },
     {
@@ -129,6 +133,7 @@ $expected_output = {
           'diff' => '302G>A'
         }
       ],
+      'contributing_variants' => [ 'rs137980927' ],
       'has_indel' => 0
     },
     {
@@ -149,6 +154,7 @@ $expected_output = {
           'diff' => '65C>T'
         }
       ],
+      'contributing_variants' => [ 'rs147768956' ],
       'has_indel' => 0
     }
   ],
