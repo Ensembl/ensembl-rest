@@ -82,4 +82,99 @@ my $expected_result = { rs142276873 => $expected_variation_1, rs67521280 => $exp
 
 is_json_POST($base,$post_data,$expected_result,"Try to POST list of variations");
 
+# In test database the variant data for the publication PMID:22779046 PMC:3392070
+# is set to $publication_output
+my $publication_output = 
+[ 
+  { 
+    "source" => "Variants (including SNPs and indels) imported from dbSNP",
+    "mappings" =>
+    [
+      {
+        "location"      => "4:103937974-103937974",
+        "assembly_name" => "GRCh37",
+        "end" => 103937974,
+        "seq_region_name" => "4",
+        "strand" => 1,
+        "coord_system" => "chromosome",
+        "allele_string" => "C/A",
+        "start" => 103937974 
+      }
+    ],
+    "name" => "rs7698608",
+    "MAF"  => "0.448577",
+    "ambiguity" => "M",
+    "var_class" => "SNP",
+    "synonyms" => 
+      [
+        "rs60248177",
+        "rs17215092"
+      ],
+    "evidence" => 
+      [
+      ],
+    "ancestral_allele" => undef,
+    "minor_allele" => "C",
+    "most_severe_consequence" => "5_prime_UTR_variant"
+  }
+];
+
+
+# GET variation/:species/pmid/:pmid
+{
+  my $pmid_base = $base . "/pmid";
+  my $pmid = 22779046;
+
+  # PMID not in test database
+  my $pmid_not_found = 123;
+
+  # PMID invalid
+  my $pmid_invalid = "ABC";
+
+  # Check correct data structure is returned
+  my $variants_json = json_GET($pmid_base . '/' . $pmid, 'Get the variants array');
+  is(ref($variants_json), 'ARRAY', 'Array wanted from endpoint');
+  
+  # Check the variations
+  eq_or_diff($variants_json, $publication_output, "Checking PMID endpoint");
+ 
+  # Invalid species
+  action_bad(
+    "/variation/wibble/pmid/" . $pmid,
+    'Bad species name results in a non-200 response'
+  );
+  # PMID not found
+  action_bad($pmid_base . "/" . $pmid_not_found, 'PMID should not be found.');
+
+  # PMID invalid format
+  action_bad($pmid_base . "/" . $pmid_invalid, 'PMID invalid');
+}
+
+
+
+# GET variation/:species/pmcid/:pmcid
+{
+  my $pmcid_base = $base . "/pmcid";
+  my $pmcid = "PMC3392070";
+
+  # PMCID not in test database
+  my $pmcid_not_found = "PMC123";
+
+  # Check correct data structure is returned
+  my $variants_json = json_GET($pmcid_base . '/' . $pmcid, 'Get the variants array');
+  is(ref($variants_json), 'ARRAY', 'Array wanted from endpoint');
+  
+  # Check the variations
+  eq_or_diff($variants_json, $publication_output, "Checking PMCID endpoint");
+ 
+  # Invalid species
+  action_bad(
+    "/variation/wibble/pmcid/" . $pmcid,
+    'Bad species name results in a non-200 response'
+  );
+
+  # PMCID not found
+  action_bad($pmcid_base . "/" . $pmcid_not_found, 'PMCID should not be found.');
+}
+
 done_testing();

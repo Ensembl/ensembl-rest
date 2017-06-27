@@ -81,6 +81,64 @@ sub fetch_variation_multiple {
   return \%return;  
 }
 
+sub fetch_variants_pmid {
+  my ($self, $pmid) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Publication');
+  $pa->db->include_failed_variations(1);
+
+  # Fetch a publication by its PubMed reference number
+  my $publication = $pa->fetch_by_pmid($pmid);
+
+  if (!$publication) {
+    Catalyst::Exception->throw("PMID ($pmid) not found for $species");
+  }
+
+  my $variants = $publication->variations();
+
+  $self->switch_off_options();
+  my @pub_variants = map {$self->to_hash($_)} @$variants;
+  return \@pub_variants;
+}
+
+sub fetch_variants_pmcid {
+  my ($self, $pmcid) = @_;
+
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Publication');
+  $pa->db->include_failed_variations(1);
+
+  # Fetch a publication by its PubMed Central reference number
+  my $publication = $pa->fetch_by_pmcid($pmcid);
+
+  if (!$publication) {
+    Catalyst::Exception->throw("PMCID ($pmcid) not found for $species");
+  }
+  my $variants = $publication->variations();
+
+  $self->switch_off_options();
+  my @pub_variants = map {$self->to_hash($_)} @$variants;
+  return \@pub_variants;
+}
+
+# The publication endpoints return variant structure using to_hash.
+# The publication endpoint does not have options, so switch these off if
+# set
+sub switch_off_options {
+  my ($self) = @_;
+  my $c = $self->context();
+  my @options = qw/pops genotypes phenotypes population_genotypes/;
+  foreach my $opt (@options) {
+    if ($c->request->param($opt)) {
+	$c->request->param($opt, 0);
+    }
+  }
+}
 
 sub to_hash {
   my ($self, $variation) = @_;
