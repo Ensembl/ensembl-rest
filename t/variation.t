@@ -29,6 +29,7 @@ use Test::Differences;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
+use Storable qw(dclone);
 use JSON;
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
@@ -176,5 +177,121 @@ my $publication_output =
   # PMCID not found
   action_bad($pmcid_base . "/" . $pmcid_not_found, 'PMCID should not be found.');
 }
+
+$base = '/variant_recoder/homo_sapiens';
+
+my $exp = [
+  {
+    'hgvsp' => [
+      'ENSP00000371073.2:p.Asp22Glu',
+      'ENSP00000371079.3:p.Asp22Glu',
+      'ENSP00000381976.1:p.Asp22Glu',
+      'ENSP00000399510.1:p.Asp22Glu',
+      'ENSP00000400904.1:p.Asp22Glu',
+      'ENSP00000394848.2:p.Asp22Glu',
+      'ENSP00000408558.1:p.Asp22Glu',
+      'ENSP00000412018.1:p.Asp22Glu',
+      'ENSP00000405307.1:p.Asp22Glu',
+      'ENSP00000414181.1:p.Asp22Glu'
+    ],
+    'hgvsc' => [
+      'ENST00000381657.2:c.66C>G',
+      'ENST00000381663.3:c.66C>G',
+      'ENST00000399012.1:c.66C>G',
+      'ENST00000415337.1:c.66C>G',
+      'ENST00000429181.1:c.66C>G',
+      'ENST00000430923.2:c.66C>G',
+      'ENST00000443019.1:c.66C>G',
+      'ENST00000445062.1:c.66C>G',
+      'ENST00000447472.1:c.66C>G',
+      'ENST00000448477.1:c.66C>G',
+      'ENST00000484611.2:n.158C>G'
+    ],
+    'id' => [
+      'rs200625439'
+    ],
+    'hgvsg' => [
+      'X:g.200920C>G'
+    ]
+  }
+];
+
+for my $input(qw(
+  rs200625439
+  ENST00000381657.2:c.66C>G
+  X:g.200920C>G
+)) {
+  $exp->[0]->{input} = $input;
+  is_deeply(
+    json_GET("$base/$input", "variant_recoder - $input"),
+    $exp,
+    'variant_recoder - GET - '.$input
+  );
+}
+
+# protein input can resolve to multiple HGVSg
+is_deeply(
+  [sort map {@{$_->{hgvsg}}} @{json_GET("$base/ENSP00000371073.2:p.Asp22Glu", "variant_recoder - multi")}],
+  ['X:g.200920C>A', 'X:g.200920C>G'],
+  'variant_recoder - GET - multi'
+);
+
+# restrict fields
+my $expf = dclone($exp);
+delete($expf->[0]->{$_}) for qw(hgvsc hgvsp);
+$expf->[0]->{input} = 'rs200625439';
+is_deeply(
+  json_GET("$base/rs200625439?fields=hgvsg,id", "variant_recoder - restrict fields"),
+  $expf,
+  'variant_recoder - GET - restrict fields'
+);
+
+# POST
+$exp->[0]->{input} = 'rs200625439';
+my $exp2 = [
+  {
+    'hgvsp' => [
+      'ENSP00000371073.2:p.Arg146Cys',
+      'ENSP00000371079.3:p.Arg146Cys',
+      'ENSP00000381976.1:p.Arg146Cys',
+      'ENSP00000399510.1:p.Arg146Cys',
+      'ENSP00000394848.2:p.Arg146Cys',
+      'ENSP00000405307.1:p.Arg146Cys'
+    ],
+    'hgvsc' => [
+      'ENST00000381657.2:c.436C>T',
+      'ENST00000381663.3:c.436C>T',
+      'ENST00000399012.1:c.436C>T',
+      'ENST00000415337.1:c.436C>T',
+      'ENST00000430923.2:c.436C>T',
+      'ENST00000447472.1:c.436C>T'
+    ],
+    'input' => 'rs142663151',
+    'id' => [
+      'rs142663151'
+    ],
+    'hgvsg' => [
+      'X:g.208208C>T'
+    ]
+  }
+];
+
+is_json_POST(
+  $base,
+  '{"ids" : ["rs200625439", "rs142663151"]}',
+  [$exp->[0], $exp2->[0]],
+  'variant_recoder - POST'
+);
+
+# restrict fields
+my $expf2 = dclone($exp2);
+delete($expf2->[0]->{$_}) for qw(hgvsc hgvsp);
+
+is_json_POST(
+  $base,
+  '{"ids" : ["rs200625439", "rs142663151"], "fields": "hgvsg,id"}',
+  [$expf->[0], $expf2->[0]],
+  'variant_recoder - POST - restrict fields'
+);
 
 done_testing();
