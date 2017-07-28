@@ -62,26 +62,6 @@ $expected_output = {
       'count' => 1,
       'flags' => [],
       'population_counts' => { _all => 1 },
-      'name' => 'ENSP00000320396:101C>Y',
-      'other_hexes' => {
-        '7b5a799b2ebb572601751cd89c1cacd7' => 1
-      },
-      'frequency' => '0.25',
-      'type' => 'protein',
-      'population_frequencies' => { _all => 0.25 },
-      'hex' => 'd45b8552801fe8f7e9aa2d9c0ba17961',
-      'diffs' => [
-        {
-          'diff' => '101C>Y'
-        }
-      ],
-      'contributing_variants' => [ 'rs137980927' ],
-      'has_indel' => 0
-    },
-    {
-      'count' => 1,
-      'flags' => [],
-      'population_counts' => { _all => 1 },
       'name' => 'ENSP00000320396:22A>V',
       'other_hexes' => {
         'fd753b22ce52698f9af398b40ec42163' => 1
@@ -96,6 +76,26 @@ $expected_output = {
         }
       ],
       'contributing_variants' => [ 'rs147768956' ],
+      'has_indel' => 0
+    },
+    {
+      'count' => 1,
+      'flags' => [],
+      'population_counts' => { _all => 1 },
+      'name' => 'ENSP00000320396:101C>Y',
+      'other_hexes' => {
+        '7b5a799b2ebb572601751cd89c1cacd7' => 1
+      },
+      'frequency' => '0.25',
+      'type' => 'protein',
+      'population_frequencies' => { _all => 0.25 },
+      'hex' => 'd45b8552801fe8f7e9aa2d9c0ba17961',
+      'diffs' => [
+        {
+          'diff' => '101C>Y'
+        }
+      ],
+      'contributing_variants' => [ 'rs137980927' ],
       'has_indel' => 0
     }
   ],
