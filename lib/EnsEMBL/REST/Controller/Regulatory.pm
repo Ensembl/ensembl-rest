@@ -164,6 +164,46 @@ sub microarray_probe_GET {
 }
 
 
+
+# /regulatory/species/:species/microarray/:microarray/probe_set/:probe_set/probe/:probe 
+# /regulatory/species/homo_sapiens/microarray/HC-G110/vendor/affy/
+sub microarray_probe_set: Chained('microarray') PathPart('probe_set') CaptureArgs(1) ActionClass('REST') { 
+  my ($self, $c, $probe_set) = @_;
+  if(! defined $probe_set){
+    $c->go('ReturnError', 'custom', [qq{ProbeSet name must be provided as part of the URL.}]);
+  } 
+}
+
+sub microarray_probe_set_GET {
+  my ($self, $c, $probe_set) = @_;
+  $c->stash(probe_set => $probe_set); 
+}
+
+# /regulatory/species/:species/microarray/:microarray/probe_set/:probe_set/probe/:probe 
+# /regulatory/species/homo_sapiens/microarray/HC-G110/vendor/affy/
+sub microarray_probe_set_probe: Chained('microarray_probe_set') PathPart('probe') Args(1) ActionClass('REST') { 
+  my ($self, $c, $probe) = @_;
+  if(! defined $probe){
+    $c->go('ReturnError', 'custom', [qq{Probe name must be provided as part of the URL.}]);
+  } 
+}
+
+sub microarray_probe_set_probe_GET {
+  my ($self, $c, $probe) = @_;
+#$c->stash(probe_set_probe => $probe); 
+  my $probe_info;
+  
+  try {
+    $probe_info = $c->model('Regulatory')->get_probe_info($probe, $c->stash->{probe_set});
+  }catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+
+  $self->status_ok($c, entity => $probe_info);
+}
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;

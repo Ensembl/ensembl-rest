@@ -36,7 +36,8 @@ fi
 APP_HOME=$(cd $SCRIPT_DIR/../../ && pwd)
 
 # Library path work
-for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl ensembl-io ensembl-hdf5; do
+#for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl ensembl-io ensembl-hdf5; do
+for ensdir in ensembl-variation ensembl-funcgen ensembl-compara ensembl ensembl-io; do
   PERL5LIB=$ENS_GIT_ROOT_DIR/$ensdir/modules:$PERL5LIB
   if [ ! -d "$ensdir" ];
   then
