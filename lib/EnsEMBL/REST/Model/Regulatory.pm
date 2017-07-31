@@ -111,7 +111,7 @@ sub list_all_microarrays{
 }
 
 sub get_probe_info {
-  my ($self, $probe_name) = @_;
+  my ($self, $probe_name, $probe_set) = @_;
 
   if(! defined $probe_name){
    Catalyst::Exception->throw("No probe name given. Please specify one to retrieve from this service");
@@ -122,12 +122,17 @@ sub get_probe_info {
   my $microarray_name = $c->stash->{microarray};
   
   my $probe_adaptor         = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Probe');
-  my $probe_feature_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'ProbeFeature');
   # Fetch probe
-  my $probe = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray_name, $probe_name );
+  my $probe;
+  if (defined $probe_set){ 
+    $probe = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray_name, $probe_name, $probe_set);
+  }
+  else {
+    $probe = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray_name, $probe_name );
+  }
 
   if(! defined $probe) {
-    Catalyst::Exception->throw("Probe: '$probe_name' from array '$microarray_name' not found. Check spelling");
+    Catalyst::Exception->throw("Probe: '$probe_name' from array '$microarray_name' '$probe_set' not found. Check spelling");
   }
 
   my $features = {};
@@ -135,6 +140,8 @@ sub get_probe_info {
   $features->{probe_name}       = $probe_name ;
   $features->{probe_length}     = $probe->length;
   $features->{sequence}         = $probe->sequence;
+  $features->{probe_set}        = $probe_set if(defined $probe_set);
+
 
   my $flag_transcript = $c->request->param('transcript');
   my $flag_gene       = $c->request->param('gene');
