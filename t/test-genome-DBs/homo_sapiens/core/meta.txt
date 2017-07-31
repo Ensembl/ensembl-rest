@@ -225,3 +225,4 @@
 1837	\N	patch	patch_88_89_a.sql|schema_version
 1839	\N	patch	patch_89_90_a.sql|schema_version
 1840	\N	patch	patch_89_90_b.sql|remove_status
+1841	\N	patch	patch_89_90_c.sql|pf_hit_name_case_sensitive

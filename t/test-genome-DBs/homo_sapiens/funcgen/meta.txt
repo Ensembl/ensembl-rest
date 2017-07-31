@@ -80,3 +80,6 @@
 652	\N	patch	patch_88_89_j.sql|Added array_chip_id column to probe_set table
 653	\N	patch	patch_88_89_k.sql|Added probe_seq_id column to probe table
 654	\N	patch	patch_89_90_a.sql|schema_version
+655	\N	patch	patch_89_90_b.sql|probe feature columns
+656	\N	patch	patch_89_90_c.sql|Adds stable id index for probe_transcript table
+657	\N	patch	patch_89_90_d.sql|Adds stable id index for probe_set_transcript table

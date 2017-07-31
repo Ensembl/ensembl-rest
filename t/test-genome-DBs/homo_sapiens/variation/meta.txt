@@ -90,3 +90,5 @@
 90	\N	patch	patch_88_89_a.sql|schema version
 91	\N	patch	patch_88_89_b.sql|Drop strain_gtype_poly table
 92	\N	patch	patch_89_90_a.sql|schema_version
+93	\N	patch	patch_89_90_b.sql|add start_retained_variant to consequence_types in variation_feature and transcript_variation
+94	\N	patch	patch_89_90_c.sql|remove regulatory and TFBS consequences from consequence_types in  transcript_variation

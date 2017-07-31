@@ -222,3 +222,4 @@
 1277	\N	patch	patch_88_89_a.sql|schema_version
 1278	\N	patch	patch_89_90_a.sql|schema_version
 1279	\N	patch	patch_89_90_b.sql|remove_status
+1280	\N	patch	patch_89_90_c.sql|pf_hit_name_case_sensitive
