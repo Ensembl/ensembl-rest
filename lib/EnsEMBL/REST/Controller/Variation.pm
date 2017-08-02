@@ -70,7 +70,52 @@ sub id_POST {
   $self->status_ok($c, entity => \%variations);
 }
 
+# /variation/:species/pmid/:pmid
+sub pmid : Chained('species') PathPart('pmid') ActionClass('REST') {
+  my ($self, $c, $pmid) = @_;
+}
 
+sub pmid_GET {
+  my ($self, $c, $pmid) = @_;
+
+  unless ($pmid) {$c->go('ReturnError', 'custom', ["PMID is a required parameter for this endpoint"])}
+
+  if ($pmid !~ /^\d+$/i) {
+    my $error_msg = qq{PMID must be an integer [got: $pmid]};
+    $c->go( 'ReturnError', 'custom', [$error_msg] );
+  } 
+
+  my $variants = [];
+  try {
+    $variants = $c->model('Variation')->fetch_variants_pmid($pmid);
+
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $variants);
+}
+
+# /variation/:species/pmcid/:pmcid
+sub pmcid : Chained('species') PathPart('pmcid') ActionClass('REST') {
+  my ($self, $c, $pmcid) = @_;
+}
+
+sub pmcid_GET {
+  my ($self, $c, $pmcid) = @_;
+
+  unless ($pmcid) {$c->go('ReturnError', 'custom', ["PMCID is a required parameter for this endpoint"])}
+
+  my $variants = [];
+  try {
+    $variants = $c->model('Variation')->fetch_variants_pmcid($pmcid);
+
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $variants);
+}
 
 
 __PACKAGE__->meta->make_immutable;
