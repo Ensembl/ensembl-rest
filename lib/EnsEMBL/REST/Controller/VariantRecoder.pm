@@ -40,10 +40,19 @@ sub species : Chained('/') PathPart('variant_recoder') CaptureArgs(1) {
   my $reg = $c->model('Registry');
   $c->stash->{species} = $reg->get_alias($species);
 
-  my $csa = $reg->get_adaptor($species, 'core', 'coordsystem');
-  $c->go('ReturnError', 'from_ensembl', ['Unable to fetch CoordSystem adaptor']) unless $csa;
-  my $css = $csa->fetch_all;
-  $c->go('ReturnError', 'from_ensembl', ['No coordinate systems found']) unless $css && @$css;
+  my ($csa, $css);
+  try {
+    $csa = $reg->get_adaptor($species, 'core', 'coordsystem');
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  try {
+    $css = $csa->fetch_all;
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
 
   $c->stash->{assembly} = $css->[0]->version;
   $c->stash->{has_variation} = $c->model('Registry')->get_adaptor( $species, 'Variation', 'Variation');
@@ -56,8 +65,6 @@ sub id: Chained('species') PathPart('') ActionClass('REST') {}
 
 sub id_GET {
   my ( $self, $c, $rs_id ) = @_;
-
-  if (!$c->stash->{has_variation}) { $c->go('ReturnError', 'custom', ["Species ".$c->stash->{species}." does not have a variation database"]); }
   
   unless ($rs_id) {$c->go('ReturnError', 'custom', ["variant ID is a required parameter for this endpoint"])}
 
@@ -69,8 +76,6 @@ sub id_GET {
 
 sub id_POST {
   my ($self, $c) = @_;
-
-  if (!$c->stash->{has_variation}) { $c->go('ReturnError', 'custom', ["Species ".$c->stash->{species}." does not have a variation database"]); }
   
   my $post_data = $c->req->data;
   my $config = $self->_include_user_params($c, $post_data);
