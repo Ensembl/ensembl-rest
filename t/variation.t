@@ -246,6 +246,11 @@ is_deeply(
   'variant_recoder - GET - restrict fields'
 );
 
+# test errors
+action_bad_regex('/variant_recoder', qr/page not found/, 'error - no species');
+action_bad_regex('/variant_recoder/dave', qr/Can not find internal name for species/, 'error - invalid species');
+action_bad_regex("$base/dave", qr/No variant found/, 'error - var not found');
+
 # POST
 $exp->[0]->{input} = 'rs200625439';
 my $exp2 = [
@@ -293,5 +298,8 @@ is_json_POST(
   [$expf->[0], $expf2->[0]],
   'variant_recoder - POST - restrict fields'
 );
+
+# test errors
+action_bad_post($base, '{}', qr/key in your POST/, 'error - POST missing key');
 
 done_testing();
