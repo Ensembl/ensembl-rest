@@ -89,4 +89,19 @@ $json = json_GET($microarray_probe,'GET Information about a specific probe');
 eq_or_diff($json, $output, 'GET Information about a specific probe');
 
 
+# regulatory/species/:species/microarray/:microarray/probe_set/:probe_set/probe/:probe
+my $microarray_probe_set_probe = '/regulatory/species/homo_sapiens/microarray/HC-G110/probe_set/1000_at/probe/137:179;?content-type=application/json';
+$output =  {
+ microarray_name => 'HC-G110',
+ probe_length    => 25,
+ probe_name      => '137:179;',
+ probe_set       => '1000_at',
+ sequence        => 'TCTCCTTTGCTGAGGCCTCCAGCTT'  
+  } ;
+$json = json_GET($microarray_probe_set_probe,'JSON: GET Information about a specific probe');
+eq_or_diff($json, $output, 'GET Information about a specific probes_set_');
+
 done_testing();
+
+
+
