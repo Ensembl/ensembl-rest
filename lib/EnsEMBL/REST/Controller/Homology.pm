@@ -67,8 +67,13 @@ sub get_adaptors :Private {
 sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   my ( $self, $c, $id ) = @_;
   my $lookup = $c->model('Lookup');
-  my ($species) = $lookup->find_object_location($id);
-  $c->go('ReturnError', 'custom', ["Could not find the ID '${id}' in any database. Please try again"]) if ! $species;
+  my $species;
+  try {
+    ($species) = $lookup->find_object_location($id);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', ["Could not find the ID '${id}' in any database. Please try again"]);
+  };
   $c->stash(stable_ids => [$id], species => $species);
   $c->detach('get_orthologs');
 }
