@@ -38,20 +38,6 @@ my $vep_get = '/vep/homo_sapiens/region/7:86442404-86442404:1/C?content-type=app
 my $vep_output =
 [{
   allele_string => "N/C",
-  colocated_variants =>
-  [{
-    afr_maf => "0.01",
-    allele_string => "T/C",
-    amr_maf => "0.04",
-    asn_maf => "0.09",
-    end => 86442404,
-    eur_maf => "0.02",
-    id => "rs2299222",
-    minor_allele => "C",
-    minor_allele_freq => "0.0399",
-    start => 86442404,
-    strand => 1,
-  }],
   end => 86442404,
   id => '7_86442404_N/C',
   input => '7 86442404 86442404 N/C 1',
