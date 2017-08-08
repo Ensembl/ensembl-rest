@@ -80,6 +80,7 @@ sub get_alignment {
   #Get method_link_species_set from method and species_set or species_set_group parameters
   my $mlss;
   if ($species_set_group) {
+    $species_set_group =~ s/collection-//;
     $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_species_set_name($method, $species_set_group);    
     Catalyst::Exception->throw("No method_link_specices_set found for method ${method} and species_set_group ${species_set_group} ") if ! $mlss;
   }
