@@ -1,0 +1,43 @@
+[%#
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [2016-2017] EMBL-European Bioinformatics Institute
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+%]
+
+<div class='tab-pane' id='r[% p.value.id %]'>
+<pre class="pre-scrollable prettyprint linenums">[% FILTER html %]
+library(httr)
+library(jsonlite)
+library(xml2)
+
+server <- "[% p.value.example.host %]"
+ext <- "[% p.value.uri %]"
+[% IF p.value.body -%]
+r <- POST(paste(server, ext, sep = ""), content_type("[% p.value.content %]"), accept("[% p.value.accept %]"), body = '[% p.value.body %]')
+[% ELSE %]
+r <- GET(paste(server, ext, sep = ""), content_type("[% p.value.content %]"))
+[% END -%]
+
+stop_for_status(r)
+
+[% IF (p.value.body && p.value.accept == 'application/json') || p.value.content == 'application/json' -%]
+# use this if you get a simple nested list back, otherwise inspect its structure
+# head(data.frame(t(sapply(content(r),c))))
+head(fromJSON(toJSON(content(r))))
+[% ELSE %]
+print(content(r))
+[% END -%]
+[% END %]
+</pre>
+</div>
