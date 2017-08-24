@@ -262,4 +262,30 @@ is_json_GET(
   cmp_ok(scalar(@matched), '==', 1, "Get match for known consequence type");
 }
 
+#/info/biotypesByGroup
+{
+  # Checking for correct response structure returned
+  
+  my $biotypeResult = json_GET('info/biotypes/group/pseudogene?object_type=gene', 'Get the biotypesByGroup with a object_type parameter value');
+  cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+  
+  $biotypeResult = json_GET('info/biotypes/group/pseudogene?db_type=core', 'Get the biotypesByGroup with a db_type parameter value');
+  cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+  
+  $biotypeResult = json_GET('info/biotypes/group/pseudogene?is_current=1', 'Get the biotypesByGroup with a is_current parameter value');
+  cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+  
+  $biotypeResult = json_GET('info/biotypes/group/pseudogene?object_type=gene;db_type=otherfeatures;is_current=1', 'Get the biotypesByGroup with default parameter values');
+  cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+
+  # Checking when wrong parameters are passed
+  
+  action_bad_regex('info/biotypes/group', qr/Could not fetch adaptor for species group/, 'Empty biotype group will produce an error message');
+  action_bad_regex('/info/biotypes/group/coding?object_type=mutantGene', qr/Invalid input: mutantGene/, 'Wrong object_type parameter will produce an error message expected');
+  action_bad_regex('/info/biotypes/group/coding?db_type=bigDataDB', qr/Invalid input: bigDataDB/, 'Wrong db_type parameter will produce an error message expected');
+  action_bad_regex('/info/biotypes/group/coding?is_current=999', qr/Invalid input: 999/, 'Wrong is_current parameter will produce an error message expected');
+}
+
 done_testing();
+
+

@@ -27,6 +27,7 @@
       'ontology'  => 'Bio::EnsEMBL::DBSQL::OntologyDBAdaptor',
       'compara'   => 'Bio::EnsEMBL::Compara::DBSQL::DBAdaptor',
       'stable_ids' => 'Bio::EnsEMBL::DBSQL::DBAdaptor',
+      'production' => 'Bio::EnsEMBL::Production::DBSQL::DBAdaptor',
     },
     'homology' => {
       'compara'   => 'Bio::EnsEMBL::Compara::DBSQL::DBAdaptor',

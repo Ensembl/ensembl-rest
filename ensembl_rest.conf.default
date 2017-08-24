@@ -180,6 +180,9 @@ jsonp=1
     genomic_alignment_pw_method=LASTZ_NET
     genomic_alignment_species2=gallus_gallus
     genomic_alignment_pw_region=2:106041430-106041480:1
+    biotypeGroup_object_type=transcript
+    biotypeGroup_db_type=otherfeatures
+    biotypeGroup_urlPart=coding
 
     info_division=ensembl
   </replacements>
@@ -320,3 +323,4 @@ jsonp=1
    use_vcf = 1
    vcf_config = __path_to(vcf_config.json)__
 </Model::LDFeatureContainer>
+

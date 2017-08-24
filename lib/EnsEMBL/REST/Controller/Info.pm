@@ -239,6 +239,20 @@ sub consequence_types_GET {
   return;
 }
 
+
+sub biotypesByGroup_GET {}
+
+sub biotypesByGroup: Chained('/') PathPart('info/biotypes/group') Args(1) ActionClass('REST') {
+  my ($self, $c, $biotypeGroup) = @_;
+  $c->stash(biotypeGroup => $biotypeGroup) if defined $biotypeGroup;
+
+  my $biotypeGroupsMembersHashRef = $c->model('BiotypeGroup')->getBiotypesBySpecificGroup();
+
+  $self->status_ok($c, entity => $biotypeGroupsMembersHashRef);
+  return;
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
+
