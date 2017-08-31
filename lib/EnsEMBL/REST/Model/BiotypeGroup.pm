@@ -37,7 +37,8 @@ sub getBiotypesBySpecificGroup {
   my ($self) = @_;
 
   my $c = $self->context();
-  my $biotypeGroup = $c->stash->{biotypeGroup};
+  my $biotypeGroup = undef;
+  $biotypeGroup = $c->stash->{biotypeGroup};
 
   my $db_type = undef;
   my $object_type = undef;
@@ -77,7 +78,8 @@ sub getBiotypesBySpecificGroup {
 
   my $dbAdaptor = $c->model('Registry')->get_DBAdaptor("multi",'production');
 
-  $c->go('ReturnError', 'custom', ["Could not fetch adaptor"]) unless $dbAdaptor;
+  Catalyst::Exception->throw('Could not fetch adaptor') unless $dbAdaptor;
+#  $c->go('ReturnError', 'custom', ["Could not fetch adaptor"]) unless $dbAdaptor;
 
   my $managerBiotype = $dbAdaptor->get_biotype_manager();
 
@@ -107,6 +109,65 @@ sub getBiotypesBySpecificGroup {
 return $biotypeGroupsMembersHashRef;
 }
 
+sub getBiotypesAllGroups {
+  my ($self) = @_;
+
+  my $db_type = undef;
+  my $object_type = undef;
+  my $is_current = undef;
+
+  my $c = $self->context();
+  if ($c->request->param('db_type')) {
+    $db_type = $c->request->param('db_type');
+  }
+    if ($c->request->param('object_type')) {
+    $object_type = $c->request->param('object_type');
+  }
+    if ($c->request->param('is_current')) {
+    $is_current = $c->request->param('is_current');
+  }
+
+  $db_type = 'core' if not defined $db_type;
+  $object_type = 'gene' if not defined $object_type;
+  $is_current = '1' if not defined $is_current;
+
+  my $dbAdaptor = $c->model('Registry')->get_DBAdaptor("multi",'production');
+
+  Catalyst::Exception->throw('Could not fetch adaptor') unless $dbAdaptor;
+#  $c->go('ReturnError', 'custom', ["Could not fetch adaptor"]) unless $dbAdaptor;
+
+  my $managerBiotype = $dbAdaptor->get_biotype_manager();
+
+  my $biotypeGroupsMembersHashRef;
+  my $biotypeGroupArrayRef = $managerBiotype->fetch_all_biotype_groups();
+
+  foreach my $biotypeValue (@{$biotypeGroupArrayRef}){
+    my %members;
+    map { $members{$_->{name}}++ }
+      @{$managerBiotype->get_objects(select => ['name'],
+			 query => [
+				   biotype_group => $biotypeValue,
+				   db_type => { like =>"%$db_type%"},
+				   object_type => "$object_type",
+				   is_current => "$is_current"
+				  ],
+			 distinct => 1)};
+
+  my @keysArray = keys %members;
+  if(@keysArray){
+
+  $biotypeGroupsMembersHashRef->{$biotypeValue} = \@keysArray;
+  }
+}
+
+  if (not defined $biotypeGroupsMembersHashRef) {
+
+  $biotypeGroupsMembersHashRef = {};
+  }
+
+return $biotypeGroupsMembersHashRef;
+}
+
 sub _validate {
   my ($self, $c, $inputParameter, $existingValues) = @_;
 
@@ -116,7 +177,8 @@ sub _validate {
    return 1;
   }else{
 
-    $c->go('ReturnError', 'custom', ["Invalid input: $inputParameter"]);
+	Catalyst::Exception->throw("Invalid input: $inputParameter");
+#    $c->go('ReturnError', 'custom', ["Invalid input: $inputParameter"]);
   }
 }
 

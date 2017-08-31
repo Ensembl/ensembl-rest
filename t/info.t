@@ -266,24 +266,33 @@ is_json_GET(
 {
   # Checking for correct response structure returned
   
-  my $biotypeResult = json_GET('info/biotypes/group/pseudogene?object_type=gene', 'Get the biotypesByGroup with a object_type parameter value');
-  cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+  my $expectedResponse1 = {LRG => ['LRG_gene']};
+  my $expectedResponse2 = {mnoncoding => ['misc_RNA']};
+  my $expectedResponse3 = {undefined => ['TEC']};
+  my $expectedResponse4 = {pseudogene => ['ncRNA_pseudogene', 'ncbi_pseudogene', 'pseudogene']};
   
-  $biotypeResult = json_GET('info/biotypes/group/pseudogene?db_type=core', 'Get the biotypesByGroup with a db_type parameter value');
+  my $biotypeResult = json_GET('info/biotype/group/LRG?object_type=gene', 'Get the biotypesByGroup with a object_type parameter value');
   cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+  eq_or_diff($biotypeResult, $expectedResponse1, "Returning correct information for expectedResponse1");
+
+  $biotypeResult = json_GET('info/biotype/group/mnoncoding?db_type=core', 'Get the biotypesByGroup with a db_type parameter value');
+  cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+  eq_or_diff($biotypeResult, $expectedResponse2, "Returning correct information for expectedResponse2");
   
-  $biotypeResult = json_GET('info/biotypes/group/pseudogene?is_current=1', 'Get the biotypesByGroup with a is_current parameter value');
+  $biotypeResult = json_GET('info/biotype/group/undefined?is_current=1', 'Get the biotypesByGroup with a is_current parameter value');
   cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+  eq_or_diff($biotypeResult, $expectedResponse3, "Returning correct information for expectedResponse3");
   
-  $biotypeResult = json_GET('info/biotypes/group/pseudogene?object_type=gene;db_type=otherfeatures;is_current=1', 'Get the biotypesByGroup with default parameter values');
+  $biotypeResult = json_GET('info/biotype/group/pseudogene?object_type=gene;db_type=otherfeatures;is_current=1', 'Get the biotypesByGroup with default parameter values');
   cmp_ok(scalar(keys %{$biotypeResult}), '==', 1, 'Ensuring we have the right number of biotype names available');
+  eq_or_diff($biotypeResult, $expectedResponse4, "Returning correct information for expectedResponse3");
 
   # Checking when wrong parameters are passed
   
-  action_bad_regex('info/biotypes/group', qr/Could not fetch adaptor for species group/, 'Empty biotype group will produce an error message');
-  action_bad_regex('/info/biotypes/group/coding?object_type=mutantGene', qr/Invalid input: mutantGene/, 'Wrong object_type parameter will produce an error message expected');
-  action_bad_regex('/info/biotypes/group/coding?db_type=bigDataDB', qr/Invalid input: bigDataDB/, 'Wrong db_type parameter will produce an error message expected');
-  action_bad_regex('/info/biotypes/group/coding?is_current=999', qr/Invalid input: 999/, 'Wrong is_current parameter will produce an error message expected');
+#  action_bad_regex('info/biotype/group', qr/Could not fetch adaptor for species group/, 'Empty biotype group will produce an error message');
+  action_bad_regex('/info/biotype/group/coding?object_type=mutantGene', qr/Invalid input: mutantGene/, 'Wrong object_type parameter will produce an error message expected');
+  action_bad_regex('/info/biotype/group/coding?db_type=bigDataDB', qr/Invalid input: bigDataDB/, 'Wrong db_type parameter will produce an error message expected');
+  action_bad_regex('/info/biotype/group/coding?is_current=999', qr/Invalid input: 999/, 'Wrong is_current parameter will produce an error message expected');
 }
 
 done_testing();

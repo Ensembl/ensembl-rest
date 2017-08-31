@@ -26,6 +26,7 @@ before_install:
     - git clone --branch 1.3.2 --depth 1 https://github.com/samtools/htslib.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-production.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-orm.git
+    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
     - cd htslib
     - make
     - export HTSLIB_DIR=$(pwd -P)
