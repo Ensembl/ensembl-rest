@@ -239,6 +239,46 @@ sub consequence_types_GET {
   return;
 }
 
+sub biotypesByGroup_GET {}
+
+sub biotypesByGroup: Chained('/') PathPart('info/biotype/group') Args(1) ActionClass('REST') {
+
+  my ($self, $c, $biotypeGroup) = @_;
+  $c->stash(biotypeGroup => $biotypeGroup) if defined $biotypeGroup;
+
+  my $biotypeGroupsMembersHashRef;
+  try {
+    $biotypeGroupsMembersHashRef = $c->model('BiotypeGroup')->getBiotypesBySpecificGroup();
+  }catch {
+
+    $c->go('ReturnError', 'custom', ["Invalid input: $_"]);
+  };
+
+  $self->status_ok($c, entity => $biotypeGroupsMembersHashRef);
+  return;
+}
+
+sub biotypesByGroupNoParam_GET {}
+
+sub biotypesByGroupNoParam: Chained('/') PathPart('info/biotype/group') Args(0) ActionClass('REST') {
+
+  my ($self, $c, $biotypeGroup) = @_;
+  $c->stash(biotypeGroup => $biotypeGroup) if defined $biotypeGroup;
+
+  my $biotypeGroupsMembersHashRef;
+  try {
+    $biotypeGroupsMembersHashRef = $c->model('BiotypeGroup')->getBiotypesAllGroups();
+  }catch {
+
+    $c->go('ReturnError', 'custom', ["Invalid input: $_"]);
+  };
+
+  $self->status_ok($c, entity => $biotypeGroupsMembersHashRef);
+  return;
+}
+
+
 __PACKAGE__->meta->make_immutable;
 
 1;
+
