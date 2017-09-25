@@ -33,7 +33,6 @@ before_install:
     - make
     - cd ../../
 
-
 install:
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --with-recommends --notest .
@@ -49,4 +48,4 @@ notifications:
     on_success: always
     on_failure: always
   slack:
-    secure: gTcWzQsVHKPxRJ1u0U2l2+QVujmG1uFW44kAO3l46V5Im5uLTOLeM20ykk6ox4kaPHLs5ky7NGzcJmTDLaHBKjI4Sa34l4tJd0lhkv+hKj9TSv5pDDCdUX8v869Nm8LqJKh26HqvVcN7eHFRatLD/tfYvvkaP1rLLhwLLdr7czQ=
+    secure: Q0MkdvATb4X2mhfFHugDe/EeDAD9mNn/K5atrKLt+vQ5gO6Pc/LkeLoFCBmO4GiJHrFf9UeE4qWCQ/xsRHVNK4qiukVvminRdF97DFWAzLZ3GqJvMYJxZx/JCiaUhjbLW+GVhPWo82WRHlW/kaqHc0qXyKnMkoHRf/kcZC2cA5E=
