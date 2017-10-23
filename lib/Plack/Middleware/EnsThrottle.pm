@@ -271,14 +271,14 @@ sub _blacklisted {
   my ($self, $env) = @_;
   my $list = $self->blacklist();
   return 0 unless $list;
-  return $list->find($env->{REMOTE_ADDR});
+  return $list->find($self->_client_id_helper($env));
 }
 
 sub _whitelisted {
   my ($self, $env) = @_;
   my $list = $self->whitelist();
   return 0 unless $list;
-  return $list->find($env->{REMOTE_ADDR});
+  return $list->find($self->_client_id_helper($env));
 }
 
 sub _whitelisted_hdr {
@@ -295,16 +295,17 @@ sub _whitelisted_hdr {
     return grep { $_ eq $hdr_value } @{$values};
 }
 
+sub _client_id_helper {
+  my ( $self, $env ) = @_;
+  return $env->{REMOTE_USER} ||
+      $env->{HTTP_X_CLUSTER_CLIENT_IP} ||
+      $env->{REMOTE_ADDR};
+}
+
 sub _client_id {
   my ($self, $env) = @_;
-  my $id;
+  my $id = $self->_client_id_helper($env);
   my $prefix = $self->client_id_prefix() || $CLIENT_ID_PREFIX;
-  if ( $env->{REMOTE_USER} ) {
-    $id = $env->{REMOTE_USER};
-  }
-  else {
-    $id = $env->{REMOTE_ADDR};
-  }
   return $prefix.'_'.$id;
 }
 
