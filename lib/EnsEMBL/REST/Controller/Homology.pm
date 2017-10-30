@@ -50,7 +50,9 @@ sub get_adaptors :Private {
 
   try {
     my $species = $c->stash()->{species};
-    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'), $self->default_compara());
+    my $param_compara = $c->request()->param('compara');
+    my $default_compara = $self->default_compara();
+    my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $param_compara, $default_compara);
     my $gma = $compara_dba->get_GeneMemberAdaptor();
     my $ha = $compara_dba->get_HomologyAdaptor();
     
@@ -71,8 +73,21 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   try {
     ($species) = $lookup->find_object_location($id);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', ["Could not find the ID '${id}' in any database. Please try again"]);
+    # if not found in stable_id_lookup, try looking it up in compara dbs
+    my $comparas = $c->model('Registry')->get_all_DBAdaptors('compara');
+    my $gene_member;
+    foreach my $compara_db ( @$comparas ) {
+      my $gma = $compara_db->get_GeneMemberAdaptor();
+      $gene_member = $gma->fetch_by_stable_id($id);
+      if ( $gene_member ) {
+        last;
+      }
+    }
+
+    if ( !$gene_member ) {
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', ["Could not find the ID '${id}' in any database. Please try again"]);
+    }
   };
   $c->stash(stable_ids => [$id], species => $species);
   $c->detach('get_orthologs');
