@@ -268,11 +268,15 @@ sub _build_lookup {
 sub get_best_compara_DBAdaptor {
   my ($self, $species, $request_compara_name, $default_compara) = @_;
   $default_compara = 'multi' if ! defined $default_compara;
-  my $compara_name = $request_compara_name || $self->get_compara_name_for_species($species);
-  if(!$compara_name) {
-    throw "Cannot find a suitable compara database for the species $species. Try specifying a compara parameter";
+
+  my $compara_name = $request_compara_name || ($species ? $self->get_compara_name_for_species($species) : undef);
+  my $dba;
+  if ( $compara_name ) {
+    $dba = $self->get_DBAdaptor($compara_name, 'compara', 'no alias check');
+    if ( !$dba ) {
+      throw "Cannot find a suitable compara database for the species $species. Try specifying a compara parameter";
+    }
   }
-  my $dba = $self->get_DBAdaptor($compara_name, 'compara', 'no alias check');
 
   # If the compara name we used was not the same then we've got another bite at the cherry
   if(! $dba && $compara_name ne $default_compara) {
