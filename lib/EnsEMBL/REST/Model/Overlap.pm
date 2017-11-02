@@ -34,7 +34,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory  motif chipseq array_probe band/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory  motif peak array_probe external band/
   };
 });
 
@@ -391,39 +391,28 @@ sub regulatory {
   my ($self, $slice) = @_;
   my $c          = $self->context();
   my $species    = $c->stash->{species};
-  my $rfa = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature');
-  my $rfs = $rfa->fetch_all_by_Slice($slice);
-  return($rfs);
+  my $adaptor = $c->model('Registry')->get_adaptor($species, 'funcgen', 'RegulatoryFeature');
+  return $adaptor->fetch_all_by_Slice($slice);
 }
 
-# Removed for e85 as we currently use different methods for different species
-# Regulation will streamline it for e86 and reintroduce
+sub peak {
+  my ($self, $slice) = @_;
+  my $c       = $self->context();
+  my $species = $c->stash->{species};
+  my $adaptor = $c->model('Registry')->get_adaptor($species, 'funcgen', 'Peak');
+  return $adaptor->fetch_all_by_Slice($slice);
+}
 
-#sub segmentation {
-#  my $self       = shift;
-#  my $slice      = shift;
-#  my $c          = $self->context();
-#  my @ctypes     = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
-#  my $species    = $c->stash->{species};
-#  my @fsets = ();
-#
-#  if(scalar @ctypes > 0){
-#    foreach my $ctype_name (@ctypes) {
-#      push @fsets, $c->model('Registry')->get_adaptor($species, 'funcgen', 'FeatureSet')->fetch_by_name('Segmentation:'.$ctype_name)
-#        || Catalyst::Exception->throw("No $species segmentation FeatureSet available with name: Segmentation:$ctype_name");
-#    }
-#  }
-#  else{
-#    Catalyst::Exception->throw("Must provide a cell_type parameter for a segmentation overlap query");
-#  }
-#
-#  return $c->model('Registry')->get_adaptor($species, 'funcgen', 'SegmentationFeature')->fetch_all_by_Slice_FeatureSets($slice, \@fsets);
-#}
-
+sub external {
+  my ($self, $slice) = @_;
+  my $c       = $self->context();
+  my $species = $c->stash->{species};
+  my $adaptor = $c->model('Registry')->get_adaptor($species, 'funcgen', 'ExternalFeature');
+  return $adaptor->fetch_all_by_Slice($slice);
+}
 
 sub motif {
-  my $self    = shift;
-  my $slice   = shift;
+  my ($self, $slice) = @_;
   my $c       = $self->context;
   my $species = $c->stash->{species};
   my $mfa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'motiffeature') ||
@@ -431,38 +420,6 @@ sub motif {
   return $mfa->fetch_all_by_Slice($slice);
 }
 
-sub chipseq {
-  my $self    = shift;
-  my $slice   = shift;
-  my $c       = $self->context;
-  my $species = $c->stash->{species};
-  my $params = {constraints => {}};
-
-  my @ctype_names = map { lc($_) } @{wrap_array($c->request->parameters->{cell_type})};
-  if (scalar @ctype_names > 0) {
-    my $cta        = $c->model('Registry')->get_adaptor($species, 'funcgen', 'celltype') ||
-     Catalyst::Exception->throw("No adaptor found for species $species, object CellType and DB funcgen");
-    my @ctypes     = map {$cta->fetch_by_name($_)} @ctype_names;
-    $params->{constraints}->{cell_types} = \@ctypes;
-  }
-
-  my @antibodies  = map { lc($_) } @{wrap_array($c->request->parameters->{antibody})};
-  if (scalar @antibodies > 0) {
-    my $fta        = $c->model('Registry')->get_adaptor($species, 'funcgen', 'featuretype');
-    my @ftypes     = ();
-    foreach my $antibody (@antibodies) {
-      push @ftypes, @{$fta->fetch_all_by_name($antibody)};
-      print scalar @ftypes . "\n";
-    }
-    $params->{constraints}->{feature_types} = \@ftypes;
-  }
-
-  my $afa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'annotatedfeature');
-  my $constraint = $afa->compose_constraint_query($params);
-  my $afeats     = $afa->fetch_all_by_Slice_constraint($slice, $constraint);
-  $afa->reset_true_tables;
-  return $afeats;
-}
 
 sub array_probe {
   my $self    = shift;
