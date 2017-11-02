@@ -30,12 +30,13 @@ use Plack::Middleware::EnsThrottle::Second;
 use Plack::Middleware::EnsThrottle::Minute;
 use Plack::Middleware::EnsThrottle::Hour;
 
+my $remote_ip_header = 'REMOTE_ADDR';
+
 my $default_remote_user_sub = sub {
   my ($app) = @_;
   sub {
     my ($env) = @_;
-    $env->{REMOTE_USER} = '127.0.0.1';
-    $env->{REMOTE_ADDR} = '127.0.0.1';
+    $env->{$remote_ip_header} = '127.0.0.1';
     $app->($env);
   };
 };
@@ -57,6 +58,19 @@ assert_basic_rate_limit('EnsThrottle::Hour', 3600, 'hour');
 
 note 'Custom messages';
 assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too much!');
+
+note 'Trying different remote ip headers';
+sleep_until_next_second();
+$remote_ip_header = 'HTTP_X_CLUSTER_CLIENT_IP';
+assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'Using HTTP_X_CLUSTER_CLIENT_IP as header');
+
+sleep_until_next_second();
+$remote_ip_header = 'REMOTE_USER';
+assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'Using REMOTE_USER as header');
+
+note 'Resetting remote ip header to default';
+$remote_ip_header = 'REMOTE_ADDR';
+sleep_until_next_second();
 
 {
   my ($remote_user, $remote_addr) = ('127.0.0.1', '127.0.0.1');
