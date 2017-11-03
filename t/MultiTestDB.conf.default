@@ -32,4 +32,11 @@
       'compara'   => 'Bio::EnsEMBL::Compara::DBSQL::DBAdaptor',
     },
   },
+  # uncomment to use preloaded databases (useful when doing lots of
+  # testing)
+#   'preloaded' = { 
+#        'homo_sapiens' => { 
+#                'funcgen' => 'tj1test_' 
+#        } 
+#   }
 }

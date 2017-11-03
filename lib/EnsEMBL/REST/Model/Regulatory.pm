@@ -73,12 +73,7 @@ sub fetch_all_epigenomes {
 
   my $result = [];
   for my $eg (@$epigenomes) {
-    my $data = {};
-    $data->{gender}          = $eg->gender;
-    $data->{efo_id}          = $eg->efo_accession;
-    $data->{name}            = $eg->production_name;
-    $data->{scientific_name} = $eg->display_label;
-    push(@$result, $data);
+    push(@$result, $eg->summary_as_hash() );
   }
   return($result);
 }

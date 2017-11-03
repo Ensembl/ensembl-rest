@@ -38,29 +38,30 @@ my $json;
 
 my $epigenomes_all = '/regulatory/species/homo_sapiens/epigenome?content-type=application/json';
 $output = [
-{
-  scientific_name => "K562",
-  name            => "K562",
-  gender          => "female",
-  efo_id          => "EFO:0002067",
+  {
+    description   => 'REMC Epigenome (Class2) for Lung',
+    display_label => 'Lung',                                         
+    efo_accession => undef,                                          
+    gender        => 'female',                                              
+    name          => 'Lung' 
   },
 ];
 $json = json_GET($epigenomes_all,'GET list of all epigenomes');
 eq_or_diff($json, $output, 'GET list of all epigenomes');
 
 
-my $regulatory_feature = '/regulatory/species/homo_sapiens/id/ENSR00001208657/?content-type=application/json';
+my $regulatory_feature = '/regulatory/species/homo_sapiens/id/ENSR00000105157/?content-type=application/json';
   $output = [{
-  source          => "Regulatory_Build",
-  ID              => "ENSR00001208657",
-  feature_type    => "Promoter Flanking Region",
-  description     => "Predicted promoter flanking region",
-  end             => 1025449,
-  seq_region_name => "6",
-  strand          => "0",
-  bound_start     => 1024250,
-  bound_end       => 1025449,
-  start           => 1024250
+    ID              => 'ENSR00000105157',                   
+    bound_end       => 76430144,                     
+    bound_start     => 76429380,                   
+    description     => 'Open chromatin region',
+    end             => 76430144,                           
+    feature_type    => 'Open chromatin',              
+    seq_region_name => 1,                      
+    source          => 'Regulatory_Build',              
+    start           => 76429380,                         
+    strand          => 0 
 
   }];
 $json = json_GET($regulatory_feature,'GET specific Regulatory Feature');
