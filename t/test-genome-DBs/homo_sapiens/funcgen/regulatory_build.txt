@@ -1,1 +1,1 @@
-1	The Ensembl Regulatory Build	14	2016-6	2016-6	19	16	1	1
+5	The Ensembl Regulatory Build for release 87	16	2016-10	2016-10	19	16	1	535880

@@ -282,82 +282,53 @@ my $base = '/overlap/region/homo_sapiens';
 
 #Regulatory feature testing
 {
-  my $region = '6:1024250..1025449';
+  my $region = '1:76429380..76430144';
   is_json_GET("$base/$region?feature=regulatory", [{
-      ID => 'ENSR00001208657',
-      bound_end => 1025449,
-      bound_start => 1024250,
-      description => 'Predicted promoter flanking region',
-      end => 1025449,
-      feature_type => 'regulatory' ,
-      seq_region_name => 6,
-      source => 'Regulatory_Build',
-      start => 1024250,
-      strand  => 0,
+    ID => 'ENSR00000105157',                   
+    bound_end => 76430144,                     
+    bound_start => 76429380,                   
+    description => 'Open chromatin region',
+    end => 76430144,                           
+    feature_type => 'regulatory',              
+    seq_region_name => 1,                      
+    source => 'Regulatory_Build',              
+    start => 76429380,                         
+    strand => 0 
   }], 'Getting regulatory_feature as JSON');
 }
 
 #Motif feature testing
 {
-  my $region = '6:1020000..1030000';
+  my $region = '1:23034888..23034896';
   is_json_GET("$base/$region?feature=motif", [{
-    start => 1027627,
-    end => 1027634,
-    strand => 1,
-    feature_type => 'motif',
-    score => 0.942,
-    seq_region_name => '6',
-    binding_matrix => 'MA0281.1',
-    motif_feature_type => 'USF1'
+    binding_matrix => 'MA0597.1', 
+    end => 23034896,                         
+    feature_type => 'motif',     
+    motif_feature_type => 'THAP1',
+    score => '7.391',                        
+    seq_region_name => 1,        
+    start => 23034888,           
+    strand => -1 
   }], 'Getting motif_feature as JSON');
 }
 
-#Segmentation feature testing
-#Disabled for e85 as we use different ways to access mouse and human segmentation. Activate in e86
-#{
-#  my $region = '6:1020000..1020449';
-#  is_json_GET("$base/$region?feature=segmentation;cell_type=K562", [{
-#    start => 1019450,
-#    end => 1020449,
-#    feature_type => 'segmentation',
-#    seq_region_name => '6',
-#    cell_type => 'K562',
-#    segmentation_feature_type => "Predicted heterochromatin",
-#  }], 'Getting segmentation_feature as JSON');
-#}
 
 #Probe feature testing
 {
-  my $region = '6:1020000..1030000';
+  my $region = '1:1020000..1030000';
   is_json_GET("$base/$region?feature=array_probe", [{
     start => 1020569,
     end => 1020593,
     feature_type => 'array_probe',
-    seq_region_name => '6',
+    seq_region_name => '1',
     strand => 1,
     probe_length => '25',
     array_probe_names => {'HuEx-1_0-st-v2' => '1256969'},
   }], 'Getting probe_feature as JSON');
 }
 
-#Annotated feature testing
-{
-  my $region = '6:1020000..1030000';
-  is_json_GET("$base/$region?feature=chipseq", [{
-      description =>  'H3K27me3 - K562 enriched sites',
-      end => 1024940,
-      epigenome => 'K562',
-      feature_type => 'chipseq',
-      score =>  '14.340487',
-      seq_region_name => 6,
-      source => 'ccat_histone',
-      start => 1024000,
-      strand => 0,
-      summit  => 1024410,
-  }], 'Getting probe_feature as JSON');
-}
 
-#Misc feature
+##Misc feature
 {
   my $region = '6:1070000..1080000';
   my $thirty_k_feature = {
