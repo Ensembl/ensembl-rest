@@ -1,1 +1,1 @@
-14	K562		Human myelogenous leukaemia cell line	K562	female	efo:EFO_0002067	\N	blood
+1	Lung	Lung	REMC Epigenome (Class2) for Lung	Lung	female	\N	\N	\N
