@@ -106,6 +106,7 @@ sub _encode {
   };
   foreach my $tag ($taxon->get_all_tags()) {
     my $values = $taxon->get_all_values_for_tag($tag);
+    $tag =~ s/\s/_/g;
     $entity->{tags}->{$tag} = $values;
   }
   $entity->{tags}->{'name'} = [ $taxon->name() ];

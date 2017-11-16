@@ -35,7 +35,7 @@ my $expected = qq();
 $expected = {scientific_name => "Homo sapiens",
   name => "Homo sapiens",
   id => "9606",
-  tags => {"ensembl alias name" => ["Human"],"scientific name" => ["Homo sapiens"],"genbank common name" => ["human"],"common name" => ["man"],"name" => ["Homo sapiens"],"authority" => ["Homo sapiens Linnaeus, 1758"]},
+  tags => {"ensembl_alias_name" => ["Human"],"scientific_name" => ["Homo sapiens"],"genbank_common_name" => ["human"],"common_name" => ["man"],"name" => ["Homo sapiens"],"authority" => ["Homo sapiens Linnaeus, 1758"]},
   leaf => 1
 };
 # Leaf => 1 is only true in test data.
@@ -62,10 +62,10 @@ $expected = [{
       scientific_name => 'Opisthokonta',    
       tags => {                             
         authority => ['Opisthokonta Cavalier-Smith 1987'],                                  
-        'ensembl alias name' => ['Animals and Fungi'],                                  
-        'ensembl timetree mya' => ['1500'],                                  
+        'ensembl_alias_name' => ['Animals and Fungi'],                                  
+        'ensembl_timetree_mya' => ['1500'],                                  
         name => ['Opisthokonta'],                                  
-        'scientific name' => ['Opisthokonta'],                                  
+        'scientific_name' => ['Opisthokonta'],                                  
         synonym => ['Fungi/Metazoa group','opisthokonts']                                   
       }                                     
     }
@@ -80,17 +80,17 @@ $expected = [{
     scientific_name => 'cellular organisms' ,
     tags => {
       name => ['cellular organisms'],
-      'scientific name' => ['cellular organisms'],
+      'scientific_name' => ['cellular organisms'],
       synonym => ['biota'],
     }
   },
   scientific_name => 'Eukaryota',
   tags => {
-    'blast name' => ['eukaryotes'],                        
-    'common name' => ['eukaryotes'],                        
-    'genbank common name' => ['eucaryotes'],                        
+    'blast_name' => ['eukaryotes'],                        
+    'common_name' => ['eukaryotes'],                        
+    'genbank_common_name' => ['eucaryotes'],                        
     name => ['Eukaryota'],                        
-    'scientific name' => ['Eukaryota'],                        
+    'scientific_name' => ['Eukaryota'],                        
     synonym => ['Eucarya','Eucaryotae','Eukarya','Eukaryotae']                         
   },
 
