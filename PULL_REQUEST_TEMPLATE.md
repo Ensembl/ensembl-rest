@@ -39,12 +39,6 @@ _Have you added/modified unit tests to test the changes?_
 
 Yes.
 
-### Changelog
-
-_Are you changing the functionality of an endpoint? If so, please give a one line summary for the public facing changelog._
-
-eg. [/xenobiology/orthologs] Added the ability to look up orthologs and paralogs from klingons and andorians
-
 _If so, do the tests pass/fail?_
 
 Pass, of course.
@@ -53,3 +47,8 @@ _Have you run the entire test suite and no regression was detected?_
 
 Yes.
 
+### Changelog
+
+_Are you changing the functionality of an endpoint? If so, please give a one line summary for the public facing changelog._
+
+eg. [/xenobiology/orthologs] Added the ability to look up orthologs and paralogs from klingons and andorians
