@@ -161,8 +161,8 @@ sub fetch_LDFeatureContainer_pairwise {
     try {
       $ldfc = $ldfca->fetch_by_VariationFeatures(\@vfs_pair, $population);
     } catch {
-      $c->log->error("LD endpoint for pairwise $variation_name1 $variation_name2 $population_name caused an error: $_");
       my $population_name = $population->name;
+      $c->log->error("LD endpoint for pairwise $variation_name1 $variation_name2 $population_name caused an error: $_");
       Catalyst::Exception->throw("LD computation for $variation_name1 $variation_name2 $population_name caused an error.");
     };
 
