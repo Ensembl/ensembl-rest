@@ -148,6 +148,8 @@ sub get_allele : PathPart('') Args(2) {
     };
     $c->go( 'ReturnError', 'custom', ["request for consequence of [$allele] matches reference [$reference_base]"] )
       if $reference_base eq $allele;
+
+    $reference_base ||= '-';
     my $allele_string = $reference_base . '/' . $allele;
     $s->{allele_string} = $allele_string;
     $s->{allele}        = $allele;
