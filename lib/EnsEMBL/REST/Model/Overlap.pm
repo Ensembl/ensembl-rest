@@ -34,7 +34,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory  motif peak array_probe external band/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory  motif peak array_probe other_regulatory band/
   };
 });
 
@@ -403,7 +403,7 @@ sub peak {
   return $adaptor->fetch_all_by_Slice($slice);
 }
 
-sub external {
+sub other_regulatory {
   my ($self, $slice) = @_;
   my $c       = $self->context();
   my $species = $c->stash->{species};
