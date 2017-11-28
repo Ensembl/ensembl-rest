@@ -26,6 +26,7 @@ BEGIN {
 
 use Test::More;
 use Test::Differences;
+use Test::Warnings qw(warning);
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Data::Dumper;
 use Bio::EnsEMBL::Test::TestUtils;
@@ -217,7 +218,7 @@ $ld_pairwise_get = '/ld/homo_sapiens/pairwise/rs1333047?population_name=1000GENO
 action_bad($ld_pairwise_get, 'Two variant names are required for this endpoint.');
 
 $ld_pairwise_get = '/ld/homo_sapiens/pairwise/rs1333047/rs4977575';
-$json = json_GET($ld_pairwise_get, 'GET pairwise LD data for all LD populations');
+warning { $json = json_GET($ld_pairwise_get, 'GET pairwise LD data for all LD populations') };
 eq_or_diff($json, $expected_output, "Example pairwise LD id1, id2");
 
 $ld_pairwise_get = '/ld/homo_sapiens/pairwise/rs1333047/rs1234567?population_name=1000GENOMES:phase_1_ASW';
