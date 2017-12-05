@@ -90,7 +90,7 @@ $json = json_GET($microarray_probe,'GET Information about a specific probe');
 eq_or_diff($json, $output, 'GET Information about a specific probe');
 
 
-# regulatory/species/:species/microarray/:microarray/probe_set/:probe_set/probe/:probe
+# regulatory/species/:species/microarray/:microarray/probe_set/:probe_set
 my $microarray_probe_set = '/regulatory/species/homo_sapiens/microarray/HC-G110/probe_set/1000_at?content-type=application/json';
 $output =  {
   microarray => 'HC-G110',
@@ -100,8 +100,8 @@ $output =  {
     ],                                  
   size => 16                          
   } ;
-$json = json_GET($microarray_probe_set,'JSON: GET Information about a specific probe');
-eq_or_diff($json, $output, 'GET Information about a specific probes_set_');
+$json = json_GET($microarray_probe_set,'JSON: GET Information about a specific probe_set');
+eq_or_diff($json, $output, 'GET Information about a specific probes_set');
 
 done_testing();
 
