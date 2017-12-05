@@ -165,9 +165,9 @@ sub microarray_probe_GET {
 
 
 
-# /regulatory/species/:species/microarray/:microarray/probe_set/:probe_set/probe/:probe 
+# /regulatory/species/:species/microarray/:microarray/probe_set/:probe_set 
 # /regulatory/species/homo_sapiens/microarray/HC-G110/vendor/affy/
-sub microarray_probe_set: Chained('microarray') PathPart('probe_set') CaptureArgs(1) ActionClass('REST') { 
+sub microarray_probe_set: Chained('microarray') PathPart('probe_set') Args(1) ActionClass('REST') { 
   my ($self, $c, $probe_set) = @_;
   if(! defined $probe_set){
     $c->go('ReturnError', 'custom', [qq{ProbeSet name must be provided as part of the URL.}]);
@@ -175,30 +175,17 @@ sub microarray_probe_set: Chained('microarray') PathPart('probe_set') CaptureArg
 }
 
 sub microarray_probe_set_GET {
-  my ($self, $c, $probe_set) = @_;
-  $c->stash(probe_set => $probe_set); 
-}
+  my ($self, $c, $probeset) = @_;
 
-# /regulatory/species/:species/microarray/:microarray/probe_set/:probe_set/probe/:probe 
-# /regulatory/species/homo_sapiens/microarray/HG-U133_Plus_2/probe_set/202820_at/probe/1129:545;
-sub microarray_probe_set_probe: Chained('microarray_probe_set') PathPart('probe') Args(1) ActionClass('REST') { 
-  my ($self, $c, $probe) = @_;
-  if(! defined $probe){
-    $c->go('ReturnError', 'custom', [qq{Probe name must be provided as part of the URL.}]);
-  } 
-}
-sub microarray_probe_set_probe_GET {
-  my ($self, $c, $probe) = @_;
-
-  my $probe_info;
+  my $probeset_info;
   try {
-    $probe_info = $c->model('Regulatory')->get_probe_info($probe, $c->stash->{probe_set});
+    $probeset_info = $c->model('Regulatory')->get_probeset_info($probeset);
   }catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 
-  $self->status_ok($c, entity => $probe_info);
+  $self->status_ok($c, entity => $probeset_info);
 }
 
 
