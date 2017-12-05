@@ -105,8 +105,49 @@ sub list_all_microarrays{
 
 }
 
+
+sub get_probeset_info {
+  my ($self, $probeset_name) = @_;
+
+  if(! defined $probeset_name){
+   Catalyst::Exception->throw("No ProbeSet name given. Please specify one to retrieve from this service");
+  }
+
+  my $c               = $self->context;
+  my $species         = $c->stash->{species};
+  my $microarray_name = $c->stash->{microarray};
+
+  my $ps_a = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'ProbeSet');
+  my $ps   = $ps_a->fetch_by_array_probe_set_name($microarray_name, $probeset_name);
+  
+  my $probes = $ps->get_all_Probes();
+  my @probe_names;
+  for my $probe (@$probes) {
+    push(@probe_names, $probe->name);
+  }
+  @probe_names = sort @probe_names;
+
+  my $result = {};
+  $result->{size}        = $ps->size;
+  $result->{name}        = $ps->name;
+  $result->{microarray}  = $microarray_name;
+  $result->{probes}      = \@probe_names;
+
+  my $flag_transcript = defined $c->request->param('transcript') ? $c->request->param('transcript') : 0;
+  my $flag_gene       = defined $c->request->param('gene') ? $c->request->param('gene') : 0;
+
+  # Transcript / Gene information
+  if($flag_transcript == 1 || $flag_gene == 1){
+    my $transript_mappings  = $ps->fetch_all_ProbeSetTranscriptMappings();
+    $result->{transcripts} = $self->_lookup_transcript_gene($transript_mappings, $flag_gene);
+  }
+
+  return($result);
+}
+
+
 sub get_probe_info {
-  my ($self, $probe_name, $probe_set) = @_;
+  my ($self, $probe_name) = @_;
 
   if(! defined $probe_name){
    Catalyst::Exception->throw("No probe name given. Please specify one to retrieve from this service");
@@ -116,54 +157,62 @@ sub get_probe_info {
   my $species         = $c->stash->{species};
   my $microarray_name = $c->stash->{microarray};
   
-  my $probe_adaptor         = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Probe');
-  # Fetch probe
-  my $probe;
-  if (defined $probe_set){ 
-    $probe = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray_name, $probe_name, $probe_set);
-  }
-  else {
-    $probe = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray_name, $probe_name );
-  }
+  my $probe_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Probe');
+  my $probe         = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray_name, $probe_name );
 
   if(! defined $probe) {
-    $probe_set = 'UNDEFINED' if(!defined $probe_set);
-    Catalyst::Exception->throw("Probe: '$probe_name' Array: '$microarray_name' ProbeSet: '$probe_set' not found. Check spelling");
+    Catalyst::Exception->throw("Probe: '$probe_name' Array: '$microarray_name'  not found. Check spelling");
   }
 
   my $features = {};
-  $features->{microarray_name}  = $microarray_name ;
-  $features->{probe_name}       = $probe_name ;
-  $features->{probe_length}     = $probe->length;
-  $features->{sequence}         = $probe->sequence;
-  $features->{probe_set}        = $probe_set if(defined $probe_set);
+  $features->{microarray} = $microarray_name ;
+  $features->{name}       = $probe_name ;
+  $features->{length}     = $probe->length;
+  $features->{sequence}   = $probe->sequence;
+
+# Useful? Discuss. Decide  
+#  $features->{probe_set}  = $probe_set if(defined $probe_set);
 
   my $flag_transcript = defined $c->request->param('transcript') ? $c->request->param('transcript') : 0;
-  my $flag_gene = defined $c->request->param('gene') ? $c->request->param('gene') : 0;
+  my $flag_gene       = defined $c->request->param('gene') ? $c->request->param('gene') : 0;
 
   # Linked transcripts
-  if($flag_transcript == 1){
-    my $pma      = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'ProbeTranscriptMapping');
-    my $transript_mappings = $pma->fetch_all_by_Probe($probe);
-    my $transcripts = [];
-    for my $tm (@$transript_mappings) {
-      my $hash = {};
-      $hash->{stable_id}    = $tm->stable_id();
-      $hash->{description}  = $tm->description();
-      # Add gene information
-      if($flag_gene == 1){
-        my $tr_a = $c->model('Registry')->get_adaptor( $species, 'Core', 'Transcript');
-        my $transcript = $tr_a->fetch_by_stable_id($tm->stable_id);
-        $hash->{gene}->{stable_id}     = $transcript->get_Gene()->stable_id();
-        $hash->{gene}->{external_name} = $transcript->get_Gene()->external_name();
-      }
-      push(@$transcripts, $hash)
-    }
-    $features->{transcripts} = $transcripts;
+  if($flag_transcript == 1 || $flag_gene == 1){
+    my $transript_mappings   = $probe->fetch_all_ProbeTranscriptMappings;
+    $features->{transcripts} = $self->_lookup_transcript_gene($transript_mappings, $flag_gene);
   }
 
   return($features);
 }
+
+# Add transcript and gene information for probe/probeset
+
+sub _lookup_transcript_gene {
+  my ($self, $transript_mappings, $flag_gene) = @_;
+
+  my $c               = $self->context;
+  my $species         = $c->stash->{species};
+
+    my $transcripts = [];
+    for my $tm (@$transript_mappings) {
+      my $hash = {};
+      $hash->{stable_id}    = $tm->stable_id;
+      $hash->{description}  = $tm->description;
+      # Add gene information
+      if($flag_gene == 1){
+        my $type = 'Transcript';
+        my $transcript =  $c->model('Lookup')->find_object($tm->stable_id, $species, 'Transcript', 'Core');
+        $hash->{gene}->{stable_id}     = $transcript->get_Gene()->stable_id;
+        $hash->{gene}->{external_name} = $transcript->get_Gene()->external_name;
+      }
+      push(@$transcripts, $hash)
+    }
+
+    return($transcripts);
+
+}
+
+
 
 sub get_microarray_info {
   my ($self,  $vendor) = @_;
