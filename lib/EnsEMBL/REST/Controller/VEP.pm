@@ -28,7 +28,7 @@ use Try::Tiny;
 require EnsEMBL::REST;
 
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
-BEGIN { 
+BEGIN {
   extends 'Catalyst::Controller::REST';
 }
 
@@ -88,7 +88,7 @@ sub get_region_POST {
   # $c->log->debug(Dumper $config->{'Controller::VEP'});
   # handle user config
   my $config = $self->_include_user_params($c,$post_data);
-  
+
   unless (exists $post_data->{variants}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "variants" key in your POST. Please check the format of your message against the documentation' ] );
   }
@@ -100,7 +100,7 @@ sub get_region_POST {
 
 sub _give_POST_to_VEP {
   my ($self,$c,$data,$config) = @_;
-  try {    
+  try {
     $config->{species} = $c->stash->{species}; # override VEP default for human
     my $consequences = $self->get_consequences($c, $config, join("\n", @$data));
     $c->stash->{consequences} = $consequences;
@@ -186,13 +186,13 @@ sub get_id_GET {
   my ( $self, $c, $rs_id ) = @_;
 
   if (!$c->stash->{has_variation}) { $c->go('ReturnError', 'custom', ["Species ".$c->stash->{species}." does not have a variation database"]); }
-  
+
   unless ($rs_id) {$c->go('ReturnError', 'custom', ["rs_id is a required parameter for this endpoint"])}
 
   my $user_config = $c->request->parameters;
   my $config = $self->_include_user_params($c,$user_config);
   $config->{format} = 'id';
-  
+
   my $consequences = $self->get_consequences($c, $config, $rs_id);
   $c->stash->{consequences} = $consequences;
 
@@ -209,7 +209,7 @@ sub get_hgvs_GET {
   my ($self, $c, $hgvs) = @_;
 
   unless ($hgvs) {$c->go('ReturnError', 'custom', ["HGVS is a required parameter for this endpoint"])}
-  
+
   my $user_config = $c->request->parameters;
   my $config = $self->_include_user_params($c,$user_config);
   $config->{format} = 'hgvs';
@@ -225,6 +225,8 @@ sub get_consequences {
   my $user_config = $c->request->parameters;
 
   my ($runner, $consequences);
+
+  $self->_amend_transcript_id($config);
 
   try {
     $runner = Bio::EnsEMBL::VEP::Runner->new($config);
@@ -248,7 +250,7 @@ sub get_id_POST {
   my ($self, $c) = @_;
 
   if (!$c->stash->{has_variation}) { $c->go('ReturnError', 'custom', ["Species ".$c->stash->{species}." does not have a variation database"]); }
-  
+
   my $post_data = $c->req->data;
   my $config = $self->_include_user_params($c,$post_data);
   unless (exists $post_data->{ids}) {
@@ -301,6 +303,7 @@ sub _include_user_params {
     phyloP
     phastCons
     distance
+    transcript_id
 
     pick
     pick_allele
@@ -311,7 +314,7 @@ sub _include_user_params {
     flag_pick_allele_gene
     pick_order
   /);
-  
+
   my %vep_params = %{ $c->config->{'Controller::VEP'} };
 
   # stash species
@@ -336,7 +339,7 @@ sub _include_user_params {
 
   # only copy allowed keys to %vep_params as we don't want users to be able to meddle
   $vep_params{$_} = $tmp_vep_params{$_} for grep { $valid_keys{$_} } keys %tmp_vep_params;
-  
+
   # we currently only have cache for human
   if ($c->stash->{species} ne 'homo_sapiens') {
     delete $vep_params{cache};
@@ -353,6 +356,16 @@ sub _include_user_params {
   return \%vep_params;
 }
 
+sub _amend_transcript_id {
+  my ($self, $config) = @_;
+
+  if(exists($config->{transcript_id}) && length($config->{transcript_id}) < 25 && not ($config->{transcript_id} =~ m/[^A-Z0-9_.]/i))
+  {
+    $config->{transcript_filter} = "stable_id is " . $config->{transcript_id};
+  }
+}
+
+
 sub _configure_plugins {
   my ($self,$c,$user_config,$vep_config) = @_;
 
@@ -368,7 +381,7 @@ sub _configure_plugins {
   open IN, $plugin_config_file or return [];
   my @content = <IN>;
   close IN;
-  
+
   my $VEP_PLUGIN_CONFIG = eval join('', @content);
   $c->log->warn("Could not eval VEP plugin config file: $@\n") if $@;
 
@@ -413,10 +426,10 @@ sub _configure_plugins {
         $c->log->warn("Failed to use module for VEP plugin $module:\n$@");
         next;
       }
-      
+
       # now check we can instantiate it, passing any parameters to the constructor
       my $instance;
-      
+
       eval {
         $instance = $module->new($vep_config, @params);
       };
@@ -433,4 +446,3 @@ sub _configure_plugins {
 }
 
 __PACKAGE__->meta->make_immutable;
-

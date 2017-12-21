@@ -511,6 +511,42 @@ $vep_output = [{
 $json = json_GET($vep_plugin_get,'GET consequences with test plugin');
 eq_or_diff($json, $vep_output, 'VEP plugin test');
 
+# test using transcript_id
+my $vep_transcript_id_get = '/vep/homo_sapiens/region/7:86442404-86442404:1/C?content-type=application/json&transcript_id=ENST00000361669';
+#my $vep_transcript_id_get = '/vep/homo_sapiens/id/rs955687031?content-type=application/json&transcript_id=ENST00000492223';
+$vep_output = [
+  {
+    allele_string => 'N/C',
+    assembly_name => 'GRCh37',
+    end => 86442404,
+    id => '7_86442404_N/C',
+    input => '7 86442404 86442404 N/C 1',
+    most_severe_consequence => 'intron_variant',
+    seq_region_name => 7,
+    start => 86442404,
+    strand => 1,
+    transcript_consequences => [
+      {
+        biotype => 'protein_coding',
+        consequence_terms => [
+          'intron_variant'
+        ],
+        gene_id => 'ENSG00000198822',
+        gene_symbol => 'GRM3',
+        gene_symbol_source => 'HGNC',
+
+        impact => 'MODIFIER',
+        strand => 1,
+        transcript_id => 'ENST00000361669',
+        variant_allele => 'C'
+      }
+    ]
+  }
+];                                               
+
+$json = json_GET($vep_transcript_id_get,'GET consequences with transcript_id');
+eq_or_diff($json, $vep_output, 'VEP transcript filter test');
+
 # test using refseq cache
 my $vep_refseq_get = '/vep/homo_sapiens/region/7:34097707-34097707:1/C?content-type=application/json&refseq=1';
 $json = json_GET($vep_refseq_get,'GET consequences with refseq cache');
