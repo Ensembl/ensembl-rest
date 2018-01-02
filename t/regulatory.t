@@ -52,7 +52,7 @@ eq_or_diff($json, $output, 'GET list of all epigenomes');
 
 my $regulatory_feature = '/regulatory/species/homo_sapiens/id/ENSR00000105157/?content-type=application/json';
   $output = [{
-    ID              => 'ENSR00000105157',                   
+    id              => 'ENSR00000105157',                   
     bound_end       => 76430144,                     
     bound_start     => 76429380,                   
     description     => 'Open chromatin region',

@@ -284,7 +284,7 @@ my $base = '/overlap/region/homo_sapiens';
 {
   my $region = '1:76429380..76430144';
   is_json_GET("$base/$region?feature=regulatory", [{
-    ID => 'ENSR00000105157',                   
+    id => 'ENSR00000105157',                   
     bound_end => 76430144,                     
     bound_start => 76429380,                   
     description => 'Open chromatin region',
