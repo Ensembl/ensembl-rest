@@ -317,13 +317,15 @@ my $base = '/overlap/region/homo_sapiens';
 {
   my $region = '1:1020000..1030000';
   is_json_GET("$base/$region?feature=array_probe", [{
-    start => 1020569,
-    end => 1020593,
-    feature_type => 'array_probe',
-    seq_region_name => '1',
-    strand => 1,
-    probe_length => '25',
-    array_probe_names => {'HuEx-1_0-st-v2' => '1256969'},
+    end => 1020593,                          
+    feature_type => 'array_probe', 
+    microarray => 'HuEx-1_0-st-v2',          
+    probe_length => 25,                      
+    probe_name => 1256969,                   
+    probe_set => '2938429;',                 
+    seq_region_name => 1,                    
+    start => 1020569,                        
+    strand => 1 
   }], 'Getting probe_feature as JSON');
 }
 
