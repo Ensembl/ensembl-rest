@@ -362,6 +362,7 @@ sub _amend_transcript_id {
   if(exists($config->{transcript_id}) && length($config->{transcript_id}) < 25 && not ($config->{transcript_id} =~ m/[^A-Z0-9_.]/i))
   {
     $config->{transcript_filter} = "stable_id is " . $config->{transcript_id};
+    $config->{no_intergenic} = 1;
   }
 }
 
