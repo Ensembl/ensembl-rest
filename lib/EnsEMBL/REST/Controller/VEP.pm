@@ -226,6 +226,8 @@ sub get_consequences {
 
   my ($runner, $consequences);
 
+  $self->_amend_transcript_id($config);
+
   try {
     $runner = Bio::EnsEMBL::VEP::Runner->new($config);
     $runner->registry($c->model('Registry')->_registry());
@@ -299,6 +301,7 @@ sub _include_user_params {
     uniprot
     xref_refseq
     phyloP
+    transcript_id
     phastCons
     distance
 
@@ -352,6 +355,18 @@ sub _include_user_params {
 
   return \%vep_params;
 }
+
+sub _amend_transcript_id {
+  my ($self, $config) = @_;
+
+  if(exists($config->{transcript_id}) && length($config->{transcript_id}) < 25 
+  && !($config->{transcript_id} =~ m/[^A-Z0-9_.]/i))
+  {
+    $config->{transcript_filter} = "stable_id is " . $config->{transcript_id};
+    $config->{no_intergenic} = 1;
+  }
+}
+
 
 sub _configure_plugins {
   my ($self,$c,$user_config,$vep_config) = @_;
