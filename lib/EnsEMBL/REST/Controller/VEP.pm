@@ -359,7 +359,8 @@ sub _include_user_params {
 sub _amend_transcript_id {
   my ($self, $config) = @_;
 
-  if(exists($config->{transcript_id}) && length($config->{transcript_id}) < 25 && not ($config->{transcript_id} =~ m/[^A-Z0-9_.]/i))
+  if(exists($config->{transcript_id}) && length($config->{transcript_id}) < 25 
+  && !($config->{transcript_id} =~ m/[^A-Z0-9_.]/i))
   {
     $config->{transcript_filter} = "stable_id is " . $config->{transcript_id};
     $config->{no_intergenic} = 1;
