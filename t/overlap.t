@@ -23,7 +23,6 @@ BEGIN {
   $ENV{CATALYST_CONFIG} = "$Bin/../ensembl_rest_testing.conf";
   $ENV{ENS_REST_LOG4PERL} = "$Bin/../log4perl_testing.conf";
 }
-use Data::Dumper;
 use Test::More;
 use Test::Differences;
 use Catalyst::Test ();
