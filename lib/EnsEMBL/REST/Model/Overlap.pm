@@ -345,9 +345,6 @@ sub variation {
 
 sub structural_variation {
   my ($self, $slice) = @_;
-#  my @so_terms = $self->_get_SO_terms();
-#  my ($source, $include_evidence, $somatic) = (undef)x3;
-#  my $sv_class = (@so_terms) ? $so_terms[0] : ();
   my $c = $self->context();
   my $svfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'structuralvariationfeature');
   if (!$svfa) { return []; }
@@ -364,9 +361,6 @@ sub somatic_variation {
 
 sub somatic_structural_variation {
   my ($self, $slice) = @_;
-  # my @so_terms = $self->_get_SO_terms();
-  # my ($source, $include_evidence, $somatic) = (undef)x3;
-  # my ($sv_class) = @so_terms;
   my $c = $self->context();
   my $svfa = $c->model('Registry')->get_adaptor($c->stash->{species}, 'variation', 'structuralvariationfeature');
   if (!$svfa) { return []; }
