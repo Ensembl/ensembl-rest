@@ -23,7 +23,6 @@ BEGIN {
   $ENV{CATALYST_CONFIG} = "$Bin/../ensembl_rest_testing.conf";
   $ENV{ENS_REST_LOG4PERL} = "$Bin/../log4perl_testing.conf";
 }
-
 use Test::More;
 use Test::Differences;
 use Catalyst::Test ();
@@ -545,5 +544,14 @@ $base = '/overlap/translation';
   cmp_ok(scalar(@{$json}), "==", 0, "Empty list returned");
 }
 
+# Test structural_variation overlap endpoint
+{
+  my $base = '/overlap/region/homo_sapiens';
+  my $region = '16:4000000..5000000';
+  my $json = json_GET("$base/$region?feature=structural_variation", "Retrieving structural_variation");
+  is(scalar(@{$json}), 1, '1 structural variation feature overlaps input region');
+  $json = json_GET("$base/$region?feature=somatic_structural_variation", "Retrieving somatic_structural_variation");
+  is(scalar(@{$json}), 1, '1 somatic structural variation feature overlaps input region');
+}
 
 done_testing();
