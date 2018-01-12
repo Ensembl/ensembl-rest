@@ -304,6 +304,7 @@ sub _include_user_params {
     transcript_id
     phastCons
     distance
+    ambiguity
 
     pick
     pick_allele
