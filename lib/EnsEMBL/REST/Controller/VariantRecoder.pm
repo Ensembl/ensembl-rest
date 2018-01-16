@@ -32,6 +32,29 @@ BEGIN {
   extends 'Catalyst::Controller::REST';
 }
 
+# This list describes user overridable variables for this endpoint. It protects other more fundamental variables
+has valid_user_params => ( 
+  is => 'ro', 
+  isa => 'HashRef', 
+  traits => ['Hash'], 
+  handles => { valid_user_param => 'exists' },
+  default => sub { return { map {$_ => 1} (qw/
+    gencode_basic
+    all_refseq
+
+    failed
+    minimal
+    fields
+
+    pick
+    pick_allele
+    per_gene
+    pick_allele_gene
+    pick_order
+    /) }
+  }
+);
+
 with 'EnsEMBL::REST::Role::PostLimiter';
 
 # /variant_recoder/:species
@@ -117,22 +140,6 @@ sub get_results {
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
 
-  # This list stops users altering more crucial variables.
-  my %valid_keys = map {$_ => 1} (qw/
-    gencode_basic
-    all_refseq
-
-    failed
-    minimal
-    fields
-
-    pick
-    pick_allele
-    per_gene
-    pick_allele_gene
-    pick_order
-  /);
-
   # copy in params from URL
   # first copy *everything* to %tmp_vr_params from URL ($c->request->params) and POST body ($user_config)
   # data body ($user_config) takes precedence over URL, so add those second and don't worry about overwrite
@@ -142,7 +149,7 @@ sub _include_user_params {
 
   # only copy allowed keys to %vr_params as we don't want users to be able to meddle
   my %vr_params = ( species => $c->stash->{species} );
-  $vr_params{$_} = $tmp_vr_params{$_} for grep { $valid_keys{$_} } keys %tmp_vr_params;
+  $vr_params{$_} = $tmp_vr_params{$_} for grep { $self->valid_user_param($_) } keys %tmp_vr_params;
 
   return \%vr_params;
 }
