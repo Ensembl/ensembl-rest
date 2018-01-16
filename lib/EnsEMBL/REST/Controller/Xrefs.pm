@@ -134,8 +134,7 @@ sub _encode :Private {
       info_type       => $dbe->info_type(),
       info_text       => $dbe->info_text(),
     };
-    given(ref($dbe)) {
-      when('Bio::EnsEMBL::IdentityXref') {
+    if (ref($dbe) eq 'Bio::EnsEMBL::IdentityXref') {
         $enc->{xref_identity}     = ($dbe->xref_identity()*1);
         $enc->{xref_start}        = ($dbe->xref_start()*1);
         $enc->{xref_end}          = ($dbe->xref_end()*1);
@@ -146,10 +145,8 @@ sub _encode :Private {
         $enc->{evalue}            = $dbe->evalue();
         $enc->{cigar_line}        = $dbe->cigar_line() if $dbe->cigar_line();
         $enc->{evalue}            = ($enc->{evalue}*1) if defined $enc->{evalue}; 
-      }
-      when('Bio::EnsEMBL::OntologyXref') {
+    } elsif (ref($dbe) eq 'Bio::EnsEMBL::OntologyXref') {
         $enc->{linkage_types} = $dbe->get_all_linkage_types();
-      }
     }
     push(@encoded, $enc);
   }

@@ -323,7 +323,7 @@ sub get_species {
     foreach my $inf(@{$info}){
     my $new_info_hash = {};
       foreach my $key(keys $inf){
-        $new_info_hash->{$key} = $inf->{$key} unless $key ~~ @hidden_keys;
+        $new_info_hash->{$key} = $inf->{$key} unless grep {$_ eq $key} @hidden_keys;
       }
     push ($new_info_list, $new_info_hash);
     }

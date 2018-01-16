@@ -24,6 +24,24 @@ use Try::Tiny;
 
 BEGIN {extends 'Catalyst::Controller::REST'; }
 
+# This list describes user overridable variables for this endpoint. It protects other more fundamental variables
+has valid_user_params => ( 
+  is => 'ro', 
+  isa => 'HashRef', 
+  traits => ['Hash'], 
+  handles => { valid_user_param => 'exists' },
+  default => sub { 
+    { 
+      db_type => 1,
+      expand => 1,
+      format => 1,
+      phenotypes => 1,
+      species => 1,
+      utr => 1
+    }
+  }
+);
+
 with 'EnsEMBL::REST::Role::PostLimiter';
 
 require EnsEMBL::REST;
@@ -113,26 +131,15 @@ sub symbol_POST {
   try {
     $feature_hash = $c->model('Lookup')->find_genes_by_symbol_list($symbol_list);
   };
-  # catch {
-  #   $c->go('ReturnError','custom', [qq{$_}]);
-  # };
   $self->status_ok( $c, entity => $feature_hash);
 }
 
+# Validate user variables against a list before merging them with config for the endpoint
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
-  # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/
-    db_type
-    expand
-    format
-    phenotypes
-    species
-    utr
-  /);
 
   foreach my $key (keys %$user_config) {
-    if ($key ~~ @valid_keys) {
+    if ($self->valid_user_param($key)) {
       $c->request->params->{$key} = $user_config->{$key};
     }
   }
