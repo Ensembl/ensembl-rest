@@ -74,7 +74,7 @@ has valid_user_params => (
     flag_pick_allele
     flag_pick_allele_gene
     pick_order
-  /}
+  /)}
   }
 );
 
