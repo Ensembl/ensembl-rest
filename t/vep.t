@@ -121,7 +121,7 @@ eq_or_diff($json, $vep_output, 'Example vep region get message');
 
 
 # test with non-toplevel sequence (should transform to toplevel)
-$vep_get = '/vep/homo_sapiens/region/HSCHR6_CTG1:1000001-1000001:1/G?content-type=application/json';
+$vep_get = '/vep/homo_sapiens/region/HSCHR6_CTG1:1000001-1000001:1/G?content-type=application/json&ambiguity=1';
 $vep_output = [
   {
     'assembly_name' => 'GRCh37',
@@ -145,6 +145,7 @@ $vep_output = [
 ];
 $json = json_GET($vep_get,'GET a VEP region on a non-toplevel sequence');
 
+$DB::single =1 ;
 my $vep_post = '/vep/homo_sapiens/region';
 my $vep_post_body = '{ "variants" : ["7 34381884 var1 C T . . .",
                                      "7 86442404 var2 T C . . ."]}';
@@ -561,6 +562,52 @@ is_deeply(
   },
   'refseq transcripts'
 );
+
+
+# test ambiguity flag
+$vep_hgvs_get = '/vep/homo_sapiens/hgvs/6:g.1102327G>T?content-type=application/json&ambiguity=1';
+$vep_output = [{
+  allele_string => 'G/T',
+  assembly_name => 'GRCh37',
+  end => 1102327,
+  id => '6:g.1102327G>T',
+  input => '6:g.1102327G>T',
+  most_severe_consequence => 'missense_variant',
+  seq_region_name => '6',
+  start => 1102327,
+  strand => 1,
+  transcript_consequences => [
+    {
+      ambiguity => 'K',
+      amino_acids => 'W/L',
+      biotype => 'protein_coding',
+      cdna_end => 581,
+      cdna_start => 581,
+      cds_end => 311,
+      cds_start => 311,
+      codons => 'tGg/tTg',
+      consequence_terms => [
+        'missense_variant'
+      ],
+      gene_id => 'ENSG00000176515',
+      gene_symbol => 'AL033381.1',
+      gene_symbol_source => 'Clone_based_ensembl_gene',
+      impact => 'MODERATE',
+      polyphen_prediction => 'possibly_damaging',
+      polyphen_score => '0.514',
+      protein_end => 104,
+      protein_start => 104,
+      strand => 1,
+      transcript_id => 'ENST00000314040',
+      variant_allele => 'T'
+    }
+  ]
+}];
+$DB::single = 1;
+$json = json_GET($vep_hgvs_get,'GET Ambiguity flag with HGVS notation');
+eq_or_diff($json, $vep_output, 'VEP Ambiguity Flag GET');
+
+
 
 my $body = '{ "blurb" : "stink" }';
 # Test malformed messages
