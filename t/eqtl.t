@@ -56,7 +56,7 @@ $multi->add_DBAdaptor('eqtl', $eqtl_a);
 my $response = json_GET("/eqtl/id/homo_sapiens/ENSG00000223972?content-type=application/json;statistic=p-value;tissue=Whole_Blood;variant_name=rs4951859", "Return p-value for known gene and variant");
 
 # Floats rounded to prevent precision variations between architectures and compilation options
-cmp_ok(sprintf("%.6f",$response->{minus_log10_p_value}) , '==', sprintf("%.6f",0.00618329914558938) ,'p-value accurate to 6 d.p.');
-cmp_ok(sprintf("%.6f",$response->{value}) , '==', sprintf("%.6f",0.985863302490807) ,'value accurate to 6 d.p.');
+cmp_ok(sprintf("%.6f",$response->[0]->{minus_log10_p_value}) , '==', sprintf("%.6f",0.00618329914558938) ,'p-value accurate to 6 d.p.');
+cmp_ok(sprintf("%.6f",$response->[0]->{value}) , '==', sprintf("%.6f",0.985863302490807) ,'value accurate to 6 d.p.');
 
 done_testing();
