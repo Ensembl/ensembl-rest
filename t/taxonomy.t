@@ -46,9 +46,8 @@ action_bad("/taxonomyid/-1", 'ID should not be found.');
 
 cmp_deeply(json_GET("/taxonomy/name/human?simple=1",'taxonomy/name'), [$expected], 'Test human lookup with name');
 my $result = json_GET("/taxonomy/name/canis%?simple=1",'Select wolf');
-is($result->[0]->{'id'},'9612','Wolf found by wildcarded Canis');
-is($result->[1]->{'id'},'9615','Beagle found by wildcarded Canis');
-is($result->[2]->{'id'},'9611','Canis node found by wildcarded Canis');
+
+cmp_bag([ map { $_->{id} } @$result], ['9612','9615','9611'],'Wolf, Beagle and Canis found via wildcard on Canis');
 
 $result = json_GET("/taxonomy/name/canis familiaris?simple=1",'Select dog');
 is($result->[0]->{'id'},'9615','Dog called by name');
