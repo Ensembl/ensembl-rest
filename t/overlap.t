@@ -25,6 +25,7 @@ BEGIN {
 }
 use Test::More;
 use Test::Differences;
+use Test::Deep;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
@@ -74,7 +75,7 @@ my $base = '/overlap/region/homo_sapiens';
   is(scalar(@{$json}), 7, '7 features representing gene models');
   
   my ($gene) = grep { $_->{feature_type} eq 'gene' } @{$json};
-  eq_or_diff_data($gene, {
+  cmp_deeply($gene, {
     id => 'ENSG00000176515',
     gene_id => 'ENSG00000176515',
     biotype => 'protein_coding',
@@ -192,7 +193,7 @@ my $base = '/overlap/region/homo_sapiens';
   my $expected_count = 2;
   my $json = json_GET("$base/$region?feature=variation", 'Fetching variations at '.$region);
   is(scalar(@{$json}), $expected_count, 'Expected variations at '.$region);
-  eq_or_diff_data($json->[0],{
+  cmp_deeply($json->[0],{
     start => 1001893,
     assembly_name => 'GRCh37',
     clinical_significance => [], 
@@ -233,7 +234,7 @@ my $base = '/overlap/region/homo_sapiens';
   my $region = '6:1000000..1010000';
   my $json = json_GET("$base/$region?feature=repeat", 'Getting RepeatFeature JSON');
   is(22, scalar(@{$json}), 'Searching for 22 repeats');
-  eq_or_diff_data($json->[0], {
+  cmp_deeply($json->[0], {
     start => 1000732,
     assembly_name => 'GRCh37',
     end => 1000776,
@@ -247,7 +248,7 @@ my $base = '/overlap/region/homo_sapiens';
 #Simple feature testing
 {
   my $region = '6:1020000..1030000';
-  is_json_GET("$base/$region?feature=simple", [{
+  cmp_deeply(json_GET("$base/$region?feature=simple","fetch simple_feature"), [{
     start => 1026863,
     assembly_name => 'GRCh37',
     end => 1027454,
@@ -266,7 +267,7 @@ my $base = '/overlap/region/homo_sapiens';
 #Band information testing
 {
   my $region = '6:1020000..1030000';
-  is_json_GET("$base/$region?feature=band", [{
+  cmp_deeply(json_GET("$base/$region?feature=band", "fetch band"), [{
     start => 1026863,
     assembly_name => 'GRCh37',
     end => 1027454,
@@ -282,7 +283,7 @@ my $base = '/overlap/region/homo_sapiens';
 #Regulatory feature testing
 {
   my $region = '1:76429380..76430144';
-  is_json_GET("$base/$region?feature=regulatory", [{
+  cmp_deeply(json_GET("$base/$region?feature=regulatory", 'Get regulatory_feature'), [{
     id => 'ENSR00000105157',                   
     bound_end => 76430144,                     
     bound_start => 76429380,                   
@@ -299,7 +300,7 @@ my $base = '/overlap/region/homo_sapiens';
 #Motif feature testing
 {
   my $region = '1:23034888..23034896';
-  is_json_GET("$base/$region?feature=motif", [{
+  cmp_deeply(json_GET("$base/$region?feature=motif","Get motif_feature"), [{
     binding_matrix => 'MA0597.1', 
     end => 23034896,                         
     feature_type => 'motif',     
@@ -315,7 +316,7 @@ my $base = '/overlap/region/homo_sapiens';
 #Probe feature testing
 {
   my $region = '1:1020000..1030000';
-  is_json_GET("$base/$region?feature=array_probe", [{
+  cmp_deeply(json_GET("$base/$region?feature=array_probe","Get probe_feature"), [{
     end => 1020593,                          
     feature_type => 'array_probe', 
     microarray => 'HuEx-1_0-st-v2',          
@@ -350,7 +351,7 @@ my $base = '/overlap/region/homo_sapiens';
     sanger_project => 'bA550K21',
     well_name => 'Chr6tp-3D12',
   };
-  is_json_GET("$base/$region?feature=misc", [
+  cmp_deeply(json_GET("$base/$region?feature=misc","Get misc_feature"), [
   {
     start => 1072318,
     assembly_name => 'GRCh37',
@@ -368,7 +369,7 @@ my $base = '/overlap/region/homo_sapiens';
   $thirty_k_feature  
   ], 'Getting misc_feature as JSON with no limits');
   
-  is_json_GET("$base/$region?feature=misc;misc_set=cloneset_30k",
+  cmp_deeply(json_GET("$base/$region?feature=misc;misc_set=cloneset_30k","Get misc_feature from cloneset_30k"),
      [$thirty_k_feature], 'Getting misc_feature as JSON with misc_set limit of cloneset_30k');
 }
 

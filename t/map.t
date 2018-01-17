@@ -25,6 +25,7 @@ BEGIN {
 }
 
 use Test::More;
+use Test::Deep;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 
@@ -33,8 +34,8 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 #Assembly mapping
 {
-  is_json_GET(
-    '/map/homo_sapiens/GRCh37/6/GRCh37',
+  cmp_deeply(json_GET(
+    '/map/homo_sapiens/GRCh37/6/GRCh37', 'map homo_sapiens'),
     {"mappings" => [{
       "original" => {
         "seq_region_name" => "6","strand" => 1,
@@ -79,8 +80,8 @@ my $basic_mapping = { mappings => [
 
 #cDNA mapping
 {
-  is_json_GET(
-    '/map/cdna/ENST00000314040/292..297',
+  cmp_deeply(json_GET(
+    '/map/cdna/ENST00000314040/292..297', 'map transcript the hard way'),
     $basic_mapping,
     'Mapping transcript cDNA to multi-region position to genome'
   );
@@ -88,8 +89,8 @@ my $basic_mapping = { mappings => [
 
 #CDS mapping
 {
-  is_json_GET(
-    '/map/cds/ENST00000314040/22..27',
+  cmp_deeply(json_GET(
+    '/map/cds/ENST00000314040/22..27', 'map cds the hard way'),
     $basic_mapping,
     'Mapping transcript CDS to multi-region position to genome'
   );
@@ -97,8 +98,8 @@ my $basic_mapping = { mappings => [
 
 #protein mapping
 {
-  is_json_GET(
-    '/map/translation/ENSP00000320396/8..9',
+  cmp_deeply(json_GET(
+    '/map/translation/ENSP00000320396/8..9','map translation the hard way'),
     $basic_mapping,
     'Mapping protein to multi-region position to genome'
   );
@@ -114,8 +115,8 @@ my $basic_mapping_cdna_including_original_region = { mappings => [
   ]};
 #cDNA mapping with include_original_region option
 {
-  is_json_GET(
-    '/map/cdna/ENST00000314040/292..297?include_original_region=1',
+  cmp_deeply(json_GET(
+    '/map/cdna/ENST00000314040/292..297?include_original_region=1', 'map cdna'),
     $basic_mapping_cdna_including_original_region,
     'Mapping transcript cDNA to multi-region position to genome with include_original_region option'
   );
@@ -132,8 +133,8 @@ my $basic_mapping_cds_including_original_region = {mappings => [
 
 #CDS mapping with include_original_region option
 {
-  is_json_GET(
-    '/map/cds/ENST00000314040/22..27?include_original_region=1',
+  cmp_deeply(json_GET(
+    '/map/cds/ENST00000314040/22..27?include_original_region=1', 'map cds with original region'),
     $basic_mapping_cds_including_original_region,
     'Mapping transcript CDS to multi-region position to genome with include_original_region option'
   );
@@ -142,8 +143,8 @@ my $basic_mapping_cds_including_original_region = {mappings => [
 # The following tests are for objects with different types but the same stable id.     
 #cDNA mapping
 {
-  is_json_GET(
-    '/map/cdna/CCDS10020.1/100..300',
+  cmp_deeply(json_GET(
+    '/map/cdna/CCDS10020.1/100..300', 'map cdna'),
     { mappings => [
       {
         "assembly_name"=>"GRCh37","end"=>28081775,"seq_region_name"=>"15","gap"=>0,
@@ -160,8 +161,8 @@ my $basic_mapping_cds_including_original_region = {mappings => [
 
 #CDS mapping
 {
-  is_json_GET(
-    '/map/cds/CCDS10020.1/100..300',
+  cmp_deeply(json_GET( 
+    '/map/cds/CCDS10020.1/100..300', 'map cds'),
     { "mappings" => [
       {
         "assembly_name"=>"GRCh37","end"=>28081775,"seq_region_name"=>"15","gap"=>0,
@@ -178,8 +179,8 @@ my $basic_mapping_cds_including_original_region = {mappings => [
 
 #protein mapping
 {
-  is_json_GET(
-    '/map/translation/CCDS10020.1/100..300',
+  cmp_deeply(json_GET( 
+    '/map/translation/CCDS10020.1/100..300', 'map translation'),
     { "mappings" => [
       {
         "assembly_name"=>"GRCh37","end"=>28032093,"seq_region_name"=>"15","gap"=>0,

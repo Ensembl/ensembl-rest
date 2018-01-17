@@ -25,11 +25,12 @@ BEGIN {
 }
 
 use Test::More;
+use Test::Deep;
+use Test::Differences;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::ApiVersion qw/software_version/;
 use Bio::EnsEMBL::Variation::Utils::Constants qw(%OVERLAP_CONSEQUENCES);
-use Test::Differences;
 use Data::Dumper;
 
 my $test = Bio::EnsEMBL::Test::MultiTestDB->new();
@@ -147,8 +148,7 @@ is_json_GET(
 {
   my $methods_json = json_GET('/info/compara/methods', 'Get the compara methods hash');
   cmp_ok(keys(%{$methods_json}), '==', 11, 'Ensuring we have the right number of compara methods available');
-  is_json_GET(
-    '/info/compara/methods?class=Homology', 
+  cmp_deeply(json_GET('/info/compara/methods?class=Homology', 'Get Homology methods'), 
     {'Homology.homology' => [qw/ENSEMBL_PROJECTIONS ENSEMBL_PARALOGUES ENSEMBL_ORTHOLOGUES/]}, 
     'Checking filtering brings back subsets of compara methods'
   );
@@ -193,7 +193,7 @@ is_json_GET(
         data_types => ['variation']
       }
     ];
-  is_json_GET('/info/variation/homo_sapiens?filter=dbSNP', $expected, 'Checking dbSNP source filtering works');
+  cmp_bag(json_GET('/info/variation/homo_sapiens?filter=dbSNP',"Get dbSNP variants"), $expected, 'Checking dbSNP source filtering works');
 }
 
 #/info/variation/populations/:species
@@ -230,7 +230,7 @@ is_json_GET(
         'size' => '61'
       }
     ];
-  is_json_GET('/info/variation/populations/homo_sapiens?filter=LD', $expected, 'Checking filtering for LD population works');
+  cmp_bag(json_GET('/info/variation/populations/homo_sapiens?filter=LD',"LD variants"), $expected, 'Checking filtering for LD population works');
 }
 
 #/info/variation/consequence_types

@@ -25,6 +25,7 @@ BEGIN {
 }
 
 use Test::More;
+use Test::Deep;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 
@@ -44,7 +45,7 @@ my $full_response = {
   biotype => 'protein_coding', display_name => 'AL033381.1', logic_name => 'ensembl', source => 'ensembl',
   description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109  [Source:UniProtKB/TrEMBL;Acc:Q8NAX6]'
 };
-is_json_GET("/lookup/$basic_id", $full_response, 'Get of a known ID to the old URL will return a value');
+cmp_deeply(json_GET("/lookup/$basic_id",'lookup a gene'), $full_response, 'Get of a known ID to the old URL will return a value');
 
 my $expanded_response = {
   %{$condensed_response},
@@ -59,7 +60,7 @@ my $expanded_response = {
                 ]
                 }]
                 };
-is_json_GET("/lookup/id/$basic_id?expand=1;format=condensed", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
+cmp_deeply(json_GET("/lookup/id/$basic_id?expand=1;format=condensed",'lookup an expanded gene'), $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
 
 my $id_with_phenotype = 'ENSG00000137273';
 my $phenotype_response = {
@@ -68,7 +69,7 @@ my $phenotype_response = {
     {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'positive regulation of transcription from RNA polymerase II promoter', variants => undef},
     {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'soft palate development',variants => undef}
    ],};
-is_json_GET("/lookup/id/$id_with_phenotype?phenotypes=1;format=condensed", $phenotype_response, 'Get of a known gene ID with phenotypes option will return phenotypes as well');
+cmp_deeply(json_GET("/lookup/id/$id_with_phenotype?phenotypes=1;format=condensed",'lookup a gene with phenotypes'), $phenotype_response, 'Get of a known gene ID with phenotypes option will return phenotypes as well');
 
 my $utr_response = {
   %{$condensed_response},
@@ -89,9 +90,9 @@ my $utr_response = {
                 }]
                 };
 
-is_json_GET("/lookup/id/$basic_id?expand=1;utr=1;format=condensed", $utr_response, 'Get of a known ID with utr option will return UTRs as well');
+cmp_deeply(json_GET("/lookup/id/$basic_id?expand=1;utr=1;format=condensed",'lookup gene with UTRs'), $utr_response, 'Get of a known ID with utr option will return UTRs as well');
 
-is_json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1;format=condensed", $expanded_response, 'Get of a known symbol returns the same result as with stable id');
+cmp_deeply(json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1;format=condensed",'lookup symbol with expand'), $expanded_response, 'Get of a known symbol returns the same result as with stable id');
 json_GET("/lookup/symbol/homo_sapiens/$symbol?expand=1", "Extended response works");
 
 action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');
@@ -101,8 +102,8 @@ action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');
 $basic_id = 'ENST00000314040';
 $condensed_response = {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => $basic_id};
 
-is_json_GET("/lookup/id/$basic_id?format=condensed", $condensed_response, 'Get of a known ID will return a value');
-is_json_GET("/lookup/$basic_id?format=condensed", $condensed_response, 'Get of a known ID to the old URL will return a value');
+cmp_deeply(json_GET("/lookup/id/$basic_id?format=condensed",'lookup transcript in condensed format'), $condensed_response, 'Get of a known ID will return a value');
+cmp_deeply(json_GET("/lookup/$basic_id?format=condensed", 'lookup transcript via old URL'), $condensed_response, 'Get of a known ID to the old URL will return a value');
 
 $full_response = {
   %{$condensed_response},
@@ -110,7 +111,7 @@ $full_response = {
   biotype => 'protein_coding', display_name => 'AL033381.1-201', logic_name => 'ensembl', source => 'ensembl',
   is_canonical => 1,
 };
-is_json_GET("/lookup/$basic_id", $full_response, 'Full response contains all Transcript information');
+cmp_deeply(json_GET("/lookup/$basic_id",'lookup transcript'), $full_response, 'Full response contains all Transcript information');
 
 $expanded_response = {
   %{$condensed_response},
@@ -122,7 +123,7 @@ $expanded_response = {
                  {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
                 ]
                 };
-is_json_GET("/lookup/id/$basic_id?expand=1;format=condensed", $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
+cmp_deeply(json_GET("/lookup/id/$basic_id?expand=1;format=condensed",'Expanded transcript by ID'), $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
 
 $utr_response = {
   %{$condensed_response},
@@ -140,7 +141,7 @@ $utr_response = {
                 ]
                 };
 
-is_json_GET("/lookup/id/$basic_id?expand=1;utr=1;format=condensed", $utr_response, 'Get of a known ID with utr option will return UTRs as well');
+cmp_deeply(json_GET("/lookup/id/$basic_id?expand=1;utr=1;format=condensed",'Transcript by ID with UTR'), $utr_response, 'Get of a known ID with utr option will return UTRs as well');
 
 
 # Test POST endpoints
@@ -176,7 +177,7 @@ my $id_response = {
 # use Data::Dumper;
 # my $tribble = do_POST("/lookup/id",$id_body);
 # note('trouble at mill:'.Dumper $tribble);
-is_json_POST("/lookup/id",$id_body,$id_response,"Try to do an ID post query");
+cmp_deeply(json_POST("/lookup/id",$id_body,'POST lookup by ID'),$id_response,"Try to do an ID post query");
 
 my $symbol_response = {
     'AL033381.1' => {                                                                                                         
@@ -221,6 +222,6 @@ my $symbol_body = qq{
 }
 };
 
-is_json_POST("/lookup/symbol/homo_sapiens",$symbol_body,$symbol_response,"Try to POST symbol query");
+cmp_deeply(json_POST("/lookup/symbol/homo_sapiens",$symbol_body,'POST lookup by symbol'),$symbol_response,"Try to POST symbol query");
 
 done_testing();

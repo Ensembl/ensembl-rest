@@ -26,10 +26,10 @@ BEGIN {
 
 use Test::More;
 use Test::Differences;
+use Test::Deep;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::TestUtils;
 use Bio::EnsEMBL::Test::MultiTestDB;
-use Data::Dumper;
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
@@ -66,21 +66,21 @@ my $expected_data2 = [];
 my $accession_query = 'accession/homo_sapiens/Orphanet:130';
 
 my $json1 = json_GET("$base/$accession_query", 'get by ontology accession');
-eq_or_diff($json1, $expected_data1, "Checking the get result from phenotype/accession");
+cmp_bag($json1, $expected_data1, "Checking the get result from phenotype/accession");
 
 
 ## get by term
 my $term_query = 'term/homo_sapiens/Brugada%20syndrome';
 
 my $json2 = json_GET("$base/$term_query", 'get by ontology term');
-eq_or_diff($json2, $expected_data1, "Checking the get result from phenotype/term");
+cmp_bag($json2, $expected_data1, "Checking the get result from phenotype/term");
 
 
 ## get by term & bad source
 my $term_source_query = 'term/homo_sapiens/Brugada%20syndrome?source=turnip';
 
 my $json3 = json_GET("$base/$term_source_query", 'get by ontology term & source');
-eq_or_diff($json3, $expected_data2, "Checking the get result from phenotype/term & source");
+cmp_bag($json3, $expected_data2, "Checking the get result from phenotype/term & source");
 
 
 ## get by term & good source
@@ -88,14 +88,14 @@ my $term_source_query2 = 'term/homo_sapiens/Brugada%20syndrome?source=DGVa';
 
 my $expected_data = [];
 my $json4 = json_GET("$base/$term_source_query2", 'get by ontology term & source');
-eq_or_diff($json4, $expected_data1, "Checking the get result from phenotype/term & source");
+cmp_bag($json4, $expected_data1, "Checking the get result from phenotype/term & source");
 
 
 ## get by accession inc children
 my $accession_child_query = 'accession/homo_sapiens/Orphanet:101934?include_children=1';
 
 my $json5 = json_GET("$base/$accession_child_query", 'get by ontology accession & child terms');
-eq_or_diff($json5, $expected_data1, "Checking the get result from phenotype/accession with child terms");
+cmp_bag($json5, $expected_data1, "Checking the get result from phenotype/accession with child terms");
 
 
 done_testing();
