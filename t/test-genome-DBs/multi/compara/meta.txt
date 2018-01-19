@@ -1,4 +1,4 @@
-96	\N	schema_version	91
+102	\N	schema_version	92
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -82,3 +82,8 @@
 97	\N	patch	patch_90_91_a.sql|schema_version
 98	\N	patch	patch_90_91_b.sql|gene_member_qc.seq_member_id.unsigned.foreign_key
 99	\N	patch	patch_90_91_c.sql|gene_member.biotype_group-index
+100	\N	patch	patch_91_92_c.sql|mapping_session_new_type_hmm
+101	\N	patch	patch_91_92_c.sql|tag_255
+103	\N	patch	patch_91_92_a.sql|schema_version
+104	\N	patch	patch_91_92_c.sql|mapping_session_new_type_hmm
+105	\N	patch	patch_91_92_c.sql|mapping_session_new_type_hmm

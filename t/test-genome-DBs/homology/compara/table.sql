@@ -275,7 +275,7 @@ CREATE TABLE `gene_tree_root_attr` (
 
 CREATE TABLE `gene_tree_root_tag` (
   `root_id` int(10) unsigned NOT NULL,
-  `tag` varchar(50) NOT NULL,
+  `tag` varchar(255) DEFAULT NULL,
   `value` mediumtext NOT NULL,
   KEY `root_id_tag` (`root_id`,`tag`),
   KEY `root_id` (`root_id`),
@@ -412,7 +412,7 @@ CREATE TABLE `homology_member` (
 
 CREATE TABLE `mapping_session` (
   `mapping_session_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` enum('family','tree') DEFAULT NULL,
+  `type` enum('family','tree','hmm') DEFAULT NULL,
   `when_mapped` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `rel_from` int(10) unsigned DEFAULT NULL,
   `rel_to` int(10) unsigned DEFAULT NULL,
@@ -437,7 +437,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=55 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
