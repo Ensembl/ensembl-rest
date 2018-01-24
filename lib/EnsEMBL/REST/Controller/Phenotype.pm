@@ -116,6 +116,39 @@ sub region: Chained('/') PathPart('phenotype/region') Args(2) ActionClass('REST'
   $self->status_ok($c, entity => $features );
 }
 
+
+=pod
+
+/phenotype/gene/homo_sapiens/HNF1A
+/phenotype/gene/:species/:gene?include_associated=1;include_overlap=1
+
+Return phenotype annotations for a given gene.
+
+include_associated = Include phenotypes associated with variants reporting this gene.
+include_overlap = Include phenotypes of features overlapping the gene.
+
+
+application/json
+
+=cut
+sub gene_GET {}
+
+sub gene: Chained('/') PathPart('phenotype/gene') Args(2) ActionClass('REST') {
+  my ($self, $c, $species, $gene) = @_;
+
+  my $phenotype_features;
+
+  try {
+    $phenotype_features = $c->model('Phenotype')->fetch_features_by_gene($species, $gene);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $phenotype_features );
+}
+
+
+
 with 'EnsEMBL::REST::Role::SliceLength';
 
 
