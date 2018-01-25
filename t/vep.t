@@ -567,6 +567,7 @@ is_deeply(
 $vep_hgvs_get = '/vep/homo_sapiens/hgvs/6:g.1102327G>T?content-type=application/json&ambiguity=1';
 $vep_output = [{
   allele_string => 'G/T',
+  ambiguity => 'K',
   assembly_name => 'GRCh37',
   end => 1102327,
   id => '6:g.1102327G>T',
@@ -577,7 +578,7 @@ $vep_output = [{
   strand => 1,
   transcript_consequences => [
     {
-      ambiguity => 'K',
+
       amino_acids => 'W/L',
       biotype => 'protein_coding',
       cdna_end => 581,
@@ -602,7 +603,6 @@ $vep_output = [{
     }
   ]
 }];
-$DB::single = 1;
 $json = json_GET($vep_hgvs_get,'GET Ambiguity flag with HGVS notation');
 eq_or_diff($json, $vep_output, 'VEP Ambiguity Flag GET');
 
