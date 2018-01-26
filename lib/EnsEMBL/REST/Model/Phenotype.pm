@@ -20,6 +20,7 @@ limitations under the License.
 package EnsEMBL::REST::Model::Phenotype;
 
 use Moose;
+use Try::Tiny;
 use Catalyst::Exception qw(throw);
 use Scalar::Util qw/weaken/;
 use List::MoreUtils qw(uniq);
@@ -213,7 +214,12 @@ sub fetch_features_by_gene {
 
   my $c = $self->context();
 
-  my $gene_ad = $c->model('Registry')->get_adaptor($species,'core', 'gene');
+  my $gene_ad;
+  try{
+    $gene_ad = $c->model('Registry')->get_adaptor($species,'core', 'gene');
+  };
+  unless (defined $gene_ad ) {Catalyst::Exception->throw("Species $species not found.");}
+
   my $phenfeat_ad = $c->model('Registry')->get_adaptor($species,'variation', 'phenotypefeature');
   my $slice_ad = $c->model('Registry')->get_adaptor($species, "core", "slice");
 
@@ -258,9 +264,7 @@ sub fetch_features_by_gene {
       $record->{attributes}->{beta_coefficient}      = $pf->beta_coefficient()      if $pf->beta_coefficient();
       $record->{attributes}->{associated_gene}       = $pf->associated_gene()       if $pf->associated_gene();
 
-      if ($record) {
-        $record->{ontology_accessions} = $ontology_accessions if (scalar(@$ontology_accessions));
-      }
+      $record->{ontology_accessions} = $ontology_accessions if (scalar(@$ontology_accessions));
 
       push @phenotype_features, $record;
     }

@@ -136,6 +136,8 @@ sub gene_GET {}
 sub gene: Chained('/') PathPart('phenotype/gene') Args(2) ActionClass('REST') {
   my ($self, $c, $species, $gene) = @_;
 
+  $self->_check_req_params($c);
+
   my $phenotype_features;
 
   try {
@@ -147,6 +149,32 @@ sub gene: Chained('/') PathPart('phenotype/gene') Args(2) ActionClass('REST') {
   $self->status_ok($c, entity => $phenotype_features );
 }
 
+
+=head2 _check_req_params
+  Arg [1]    : Context Object
+  Example    : $self->_check_req_params($context)
+  Description: Parameters passed once are scalar, muliple once are ARRAY.
+               The method checks for ARRAY and HASH Refs.
+  Returntype : None
+  Exceptions : Throws if ARRAY or HASH are found.
+  Caller     : general
+  Status     : Stable
+=cut
+
+sub _check_req_params {
+  my ($self, $c) = @_;
+
+  my $params = $c->req->params;
+
+  for my $p (sort keys %{$params}) {
+    if(ref $params->{$p} eq 'ARRAY') {
+      $c->go('ReturnError', 'custom', ["Duplicated parameter '$p' supplied"]);
+    }
+    if(ref $params->{$p} eq 'HASH') {
+      $c->go('ReturnError', 'from_ensembl', ["Hash in req_param not implemented"]);
+    }
+  }
+}
 
 
 with 'EnsEMBL::REST::Role::SliceLength';

@@ -42,6 +42,25 @@ my $gene_name='FOXF2';
 
 #Null based queries
 {
+  my $bad_get = '/phenotype/gene';
+  action_bad($bad_get, 'Species and gene are required for this endpoint.');
+
+  $bad_get = '/phenotype/gene//';
+  action_bad($bad_get, 'Species and gene are required for this endpoint.');
+ }
+
+#Bad parameters
+{
+  my $bad_get = '/phenotype/gene/speciesX/';
+  action_bad($bad_get, 'Species speciesX not found.');
+
+  $bad_get = '/phenotype/gene/speciesX/speciesX';
+  action_bad($bad_get, 'Species speciesX not found.');
+
+
+  $bad_get = '/phenotype/gene/speciesX/HNF1A';
+  action_bad_regex($bad_get, qr/speciesX/, 'Can not find internal name for species speciesX.');
+
   my $gene_name = 'gene123H';
   my $msg = "Gene gene123H not found.";
   action_bad_regex("$base/$gene_name", qr/gene123H/, $msg);
@@ -75,7 +94,7 @@ my $gene_name='FOXF2';
         ];
 	
   my $json = json_GET("$base/$gene", 'Gene with 2 phenotype features associated from GOAs ');
-  is(scalar(@{$json}), $expected, 'Gene with 2 phenotype associations found');
+  cmp_ok(scalar(@{$json}), "==", $expected, 'Gene with 2 phenotype associations found');
   eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
@@ -105,7 +124,7 @@ my $gene_name='FOXF2';
         ];
 	
   my $json = json_GET("$base/$gene_name", 'Gene with 2 phenotype features associated from GOAs ');
-  is(scalar(@{$json}), $expected, 'Gene with 2 phenotype associations found');
+  cmp_ok(scalar(@{$json}),"==", $expected, 'Gene with 2 phenotype associations found');
   eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
@@ -146,7 +165,7 @@ my $gene_name='FOXF2';
         ];
 	
   my $json = json_GET("$base/$gene_name?include_associated=1", 'Gene with 1 phenotype feature associated with a variant');
-  is(scalar(@{$json}), $expected, 'Gene with 1 phenotype association with variant found');
+  cmp_ok(scalar(@{$json}),"==", $expected, 'Gene with 1 phenotype association with variant found');
   eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
@@ -183,7 +202,7 @@ my $gene_name='FOXF2';
         ];
 	
   my $json = json_GET("$base/$gene_name?include_overlap=1", 'Gene with 3 phenotype feature overlap');
-  is(scalar(@{$json}), $expected, 'Gene with 3 phenotype feature overlaps');
+  cmp_ok(scalar(@{$json}), "==", $expected, 'Gene with 3 phenotype feature overlaps');
   eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
