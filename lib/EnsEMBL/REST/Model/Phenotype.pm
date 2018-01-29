@@ -20,8 +20,10 @@ limitations under the License.
 package EnsEMBL::REST::Model::Phenotype;
 
 use Moose;
+use Try::Tiny;
 use Catalyst::Exception qw(throw);
 use Scalar::Util qw/weaken/;
+use List::MoreUtils qw(uniq);
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
@@ -198,5 +200,77 @@ sub fetch_features_by_region {
 
   return \@phenotype_features;
 }
+
+
+=head fetch_features_by_gene
+
+extract phenotype features by gene identifier or gene symbol
+=cut
+
+sub fetch_features_by_gene {
+  my $self      = shift;
+  my $species   = shift;
+  my $gene      = shift;
+
+  my $c = $self->context();
+
+  my $gene_ad;
+  try{
+    $gene_ad = $c->model('Registry')->get_adaptor($species,'core', 'gene');
+  };
+  unless (defined $gene_ad ) {Catalyst::Exception->throw("Species $species not found.");}
+
+  my $phenfeat_ad = $c->model('Registry')->get_adaptor($species,'variation', 'phenotypefeature');
+  my $slice_ad = $c->model('Registry')->get_adaptor($species, "core", "slice");
+
+  my $include_assoc = $c->request->parameters->{include_associated};
+  my $include_overlap = $c->request->parameters->{include_overlap};
+
+  my $genes = $gene_ad->fetch_all_by_external_name($gene);
+
+  if (scalar @{$genes} == 0){
+    Catalyst::Exception->throw("Gene $gene not found.");
+  }
+
+  my @phenotype_features;
+  while (my $g = shift@{$genes}){
+    my @pfs = @{$phenfeat_ad->fetch_all_by_Gene($g)};
+    if ($include_assoc) {
+      my @pfs_assoc = @{$phenfeat_ad-> fetch_all_by_associated_gene($g->external_name())};
+      push @pfs, @pfs_assoc;
+    }
+    if ($include_overlap){
+      my $gene_specific_slice = $slice_ad->fetch_by_gene_stable_id($g->stable_id());
+      my @pfs_overlap = @{$phenfeat_ad->fetch_all_by_Slice($gene_specific_slice)};
+      push @pfs, @pfs_overlap;
+    }
+    @pfs = uniq @pfs;
+
+    while (my $pf = shift @pfs){
+      my $ontology_accessions = $pf->get_all_ontology_accessions();
+
+      my $record =  { description       => $pf->phenotype_description(),
+                      $pf->type()       => $pf->object_id,
+                      location          => $pf->seq_region_name() . ":" . $pf->seq_region_start() . "-" . $pf->seq_region_end() ,
+                      source            => $pf->source_name(),
+                    };
+
+      $record->{attributes}->{risk_allele}           = $pf->risk_allele()           if $pf->risk_allele();
+      $record->{attributes}->{clinical_significance} = $pf->clinical_significance() if $pf->clinical_significance();
+      $record->{attributes}->{external_reference}    = $pf->external_reference()    if $pf->external_reference(); ## from study - eg OMIM
+      $record->{attributes}->{external_id}           = $pf->external_id()           if $pf->external_id();        ## from attrib eg ClinVar
+      $record->{attributes}->{p_value}               = $pf->p_value()               if $pf->p_value();
+      $record->{attributes}->{odds_ratio}            = $pf->odds_ratio()            if $pf->odds_ratio();
+      $record->{attributes}->{beta_coefficient}      = $pf->beta_coefficient()      if $pf->beta_coefficient();
+      $record->{attributes}->{associated_gene}       = $pf->associated_gene()       if $pf->associated_gene();
+
+      $record->{ontology_accessions} = $ontology_accessions if (scalar(@$ontology_accessions));
+
+      push @phenotype_features, $record;
+    }
+  }
+  return \@phenotype_features;
+}
+
 
 1;
