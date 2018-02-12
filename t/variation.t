@@ -143,7 +143,7 @@ my $publication_output =
   is_deeply($variants_json->[0]->{mappings},$publication_output->[0]->{mappings},'PMID mappings key');
   cmp_bag($variants_json->[0]->{synonyms},$publication_output->[0]->{synonyms},'PMID synonyms');
   is($variants_json->[0]->{name}, $publication_output->[0]->{name} ,'PMID name key');
-  cmp_ok($variants_json->[0]->{MAF}, '==',$publication_output->[0]->{MAF} ,'PMID MAF key');
+  is($variants_json->[0]->{MAF},$publication_output->[0]->{MAF} ,'PMID MAF key'); # Interestingly these are not numerically equal under certain testing conditions...
   is($variants_json->[0]->{ambiguity}, $publication_output->[0]->{ambiguity} ,'PMID ambiguity key');
   is($variants_json->[0]->{var_class}, $publication_output->[0]->{var_class} ,'PMID source key');
   ok(!$variants_json->[0]->{ancestral_allele},'PMID ancestral_allele key not set');
@@ -182,7 +182,7 @@ my $publication_output =
   is_deeply($variants_json->[0]->{mappings},$publication_output->[0]->{mappings},'PMID mappings key');
   cmp_bag($variants_json->[0]->{synonyms},$publication_output->[0]->{synonyms},'PMID synonyms');
   is($variants_json->[0]->{name}, $publication_output->[0]->{name} ,'PMID name key');
-  cmp_ok($variants_json->[0]->{MAF}, '==',$publication_output->[0]->{MAF} ,'PMID MAF key');
+  is($variants_json->[0]->{MAF},$publication_output->[0]->{MAF} ,'PMID MAF key');
   is($variants_json->[0]->{ambiguity}, $publication_output->[0]->{ambiguity} ,'PMID ambiguity key');
   is($variants_json->[0]->{var_class}, $publication_output->[0]->{var_class} ,'PMID source key');
   ok(!$variants_json->[0]->{ancestral_allele},'PMID ancestral_allele key not set');
