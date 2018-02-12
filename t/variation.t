@@ -138,7 +138,18 @@ my $publication_output =
   is(ref($variants_json), 'ARRAY', 'Array wanted from endpoint');
   
   # Check the variations
-  cmp_bag($variants_json, $publication_output, "Checking PMID endpoint");
+  # Must be checked individually due to variable ordering in output. is_json doesn't ignore order, cmp_bag cannot handle arrays within hashes
+  is($variants_json->[0]->{source}, $publication_output->[0]->{source} ,'PMID source key');
+  is_deeply($variants_json->[0]->{mappings},$publication_output->[0]->{mappings},'PMID mappings key');
+  cmp_bag($variants_json->[0]->{synonyms},$publication_output->[0]->{synonyms},'PMID synonyms');
+  is($variants_json->[0]->{name}, $publication_output->[0]->{name} ,'PMID name key');
+  cmp_ok($variants_json->[0]->{MAF}, '==',$publication_output->[0]->{MAF} ,'PMID MAF key');
+  is($variants_json->[0]->{ambiguity}, $publication_output->[0]->{ambiguity} ,'PMID ambiguity key');
+  is($variants_json->[0]->{var_class}, $publication_output->[0]->{var_class} ,'PMID source key');
+  ok(!$variants_json->[0]->{ancestral_allele},'PMID ancestral_allele key not set');
+  is($variants_json->[0]->{minor_allele}, $publication_output->[0]->{minor_allele} ,'PMID minor_allele key');
+  is($variants_json->[0]->{most_severe_consequence}, $publication_output->[0]->{most_severe_consequence} ,'PMID most_severe_consequence key');
+
  
   # Invalid species
   action_bad(
@@ -167,7 +178,16 @@ my $publication_output =
   is(ref($variants_json), 'ARRAY', 'Array wanted from endpoint');
   
   # Check the variations
-  cmp_bag($variants_json, $publication_output, "Checking PMCID endpoint");
+  is($variants_json->[0]->{source}, $publication_output->[0]->{source} ,'PMID source key');
+  is_deeply($variants_json->[0]->{mappings},$publication_output->[0]->{mappings},'PMID mappings key');
+  cmp_bag($variants_json->[0]->{synonyms},$publication_output->[0]->{synonyms},'PMID synonyms');
+  is($variants_json->[0]->{name}, $publication_output->[0]->{name} ,'PMID name key');
+  cmp_ok($variants_json->[0]->{MAF}, '==',$publication_output->[0]->{MAF} ,'PMID MAF key');
+  is($variants_json->[0]->{ambiguity}, $publication_output->[0]->{ambiguity} ,'PMID ambiguity key');
+  is($variants_json->[0]->{var_class}, $publication_output->[0]->{var_class} ,'PMID source key');
+  ok(!$variants_json->[0]->{ancestral_allele},'PMID ancestral_allele key not set');
+  is($variants_json->[0]->{minor_allele}, $publication_output->[0]->{minor_allele} ,'PMID minor_allele key');
+  is($variants_json->[0]->{most_severe_consequence}, $publication_output->[0]->{most_severe_consequence} ,'PMID most_severe_consequence key');
  
   # Invalid species
   action_bad(
