@@ -64,7 +64,7 @@ use Catalyst qw/
 /;
 
 
-our $VERSION = '6.2';
+our $VERSION = '6.3';
 
 # Configure the application.
 #

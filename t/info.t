@@ -43,17 +43,20 @@ Catalyst::Test->import('EnsEMBL::REST');
 require EnsEMBL::REST;
 
 my $VERSION = software_version();
-my $schema_version = $dba->get_MetaContainer()->single_value_by_key('schema_version');
-$schema_version *= 1;
+my $core_schema_version = $dba->get_MetaContainer()->single_value_by_key('schema_version');
+$core_schema_version *= 1;
+
+my $compara_schema_version = $compara_dba->get_MetaContainer()->single_value_by_key('schema_version');
+$compara_schema_version *= 1;
 
 # info/comparas
 is_json_GET(
-  '/info/comparas', { comparas => [ { name => 'multi', release => $schema_version} ] }, "Comparas returns 1 DB"
+  '/info/comparas', { comparas => [ { name => 'multi', release => $compara_schema_version} ] }, "Comparas returns 1 DB"
 );
 
 # info/data
 is_json_GET(
-  '/info/data', {releases => [ $schema_version ]}, "only release available is $schema_version"
+  '/info/data', {releases => [ $core_schema_version ]}, "only release available is $core_schema_version"
 );
 
 # /info/ping
@@ -72,8 +75,8 @@ is_json_GET(
     return $info_species;
   };
 
-  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $schema_version, assembly => 'GRCh37', strain => 'test_strain', strain_collection => 'human'} ]};
-  my $expected_hide_strain_info = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $schema_version, assembly => 'GRCh37'} ]};
+  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37', strain => 'test_strain', strain_collection => 'human'} ]};
+  my $expected_hide_strain_info = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37'} ]};
   my $expected_empty_list = {species => [ ]};
 
   eq_or_diff_data(

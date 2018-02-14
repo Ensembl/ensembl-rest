@@ -168,7 +168,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=98 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=102 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -193,7 +193,8 @@ CREATE TABLE `motif_feature_variation` (
   PRIMARY KEY (`motif_feature_variation_id`),
   KEY `variation_feature_idx` (`variation_feature_id`),
   KEY `consequence_type_idx` (`consequence_types`),
-  KEY `somatic_feature_idx` (`feature_stable_id`,`somatic`)
+  KEY `somatic_feature_idx` (`feature_stable_id`,`somatic`),
+  KEY `feature_stable_idx` (`feature_stable_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `phenotype` (
@@ -337,7 +338,8 @@ CREATE TABLE `regulatory_feature_variation` (
   PRIMARY KEY (`regulatory_feature_variation_id`),
   KEY `variation_feature_idx` (`variation_feature_id`),
   KEY `consequence_type_idx` (`consequence_types`),
-  KEY `somatic_feature_idx` (`feature_stable_id`,`somatic`)
+  KEY `somatic_feature_idx` (`feature_stable_id`,`somatic`),
+  KEY `feature_stable_idx` (`feature_stable_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `sample` (
@@ -457,14 +459,14 @@ CREATE TABLE `structural_variation_feature` (
   KEY `study_idx` (`study_id`),
   KEY `attrib_idx` (`class_attrib_id`),
   KEY `variation_set_idx` (`variation_set_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10281998 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=11647237 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `structural_variation_sample` (
   `structural_variation_sample_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `structural_variation_id` int(10) unsigned NOT NULL,
   `sample_id` int(10) unsigned DEFAULT NULL,
   `strain_id` int(10) unsigned DEFAULT NULL,
-  `zygosity` enum('homozygous','heterozygous') DEFAULT NULL,
+  `zygosity` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`structural_variation_sample_id`),
   KEY `structural_variation_idx` (`structural_variation_id`),
   KEY `strain_idx` (`strain_id`),
@@ -483,6 +485,12 @@ CREATE TABLE `study` (
   KEY `source_idx` (`source_id`),
   KEY `external_reference_idx` (`external_reference`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4481 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `submitter` (
+  `submitter_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `description` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`submitter_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `submitter_handle` (
   `handle_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

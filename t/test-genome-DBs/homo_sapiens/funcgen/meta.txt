@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	91
+2	\N	schema_version	92
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -118,3 +118,4 @@
 690	\N	patch	patch_90_91_zg.sql|rename table dbfile_registry to data_file and change the way alignments link to it
 691	\N	patch	patch_90_91_zh.sql|Add new columns to read_file_experimental_configuration table
 692	\N	patch	patch_90_91_zi.sql|Create probe_id index on probe_transcript table
+693	\N	patch	patch_91_92_a.sql|schema_version

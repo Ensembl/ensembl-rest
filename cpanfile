@@ -27,6 +27,8 @@ requires 'XML::Simple';
 requires 'Readonly';
 requires 'Readonly::XS';
 requires 'DBD::SQLite';
+requires 'List::MoreUtils';
+requires 'Try::Tiny';
 
 # Transient dependencies from Ensembl
 requires 'Parse::RecDescent';
