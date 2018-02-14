@@ -27,6 +27,7 @@ BEGIN {
 use JSON;
 use Test::More;
 use Test::Differences;
+use Test::Deep;
 use Catalyst::Test();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
@@ -95,7 +96,7 @@ my $gene_name='FOXF2';
 	
   my $json = json_GET("$base/$gene", 'Gene with 2 phenotype features associated from GOAs ');
   cmp_ok(scalar(@{$json}), "==", $expected, 'Gene with 2 phenotype associations found');
-  eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
+  cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
 #Get Gene phenotype features given gene name
@@ -125,7 +126,7 @@ my $gene_name='FOXF2';
 	
   my $json = json_GET("$base/$gene_name", 'Gene with 2 phenotype features associated from GOAs ');
   cmp_ok(scalar(@{$json}),"==", $expected, 'Gene with 2 phenotype associations found');
-  eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
+  cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
 
@@ -166,7 +167,7 @@ my $gene_name='FOXF2';
 	
   my $json = json_GET("$base/$gene_name?include_associated=1", 'Gene with 1 phenotype feature associated with a variant');
   cmp_ok(scalar(@{$json}),"==", $expected, 'Gene with 1 phenotype association with variant found');
-  eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
+  cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
 
@@ -203,7 +204,7 @@ my $gene_name='FOXF2';
 	
   my $json = json_GET("$base/$gene_name?include_overlap=1", 'Gene with 3 phenotype feature overlap');
   cmp_ok(scalar(@{$json}), "==", $expected, 'Gene with 3 phenotype feature overlaps');
-  eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
+  cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
 done_testing();
