@@ -76,21 +76,21 @@ my $gene_name='FOXF2';
   my $expected_data = [
           {
             Gene => "ENSG00000137273",
-	    attributes => {
-	      external_reference => 'PMID:8626802'  
-	    },
-	    description => 'positive regulation of transcription from RNA polymerase II promoter',
-	    location => '6:1312675-1314992',
-	    source => 'GOA'
+            attributes => {
+              external_reference => 'PMID:8626802'  
             },
-	  {
-	    Gene => "ENSG00000137273",
-	    attributes => {
-	      external_reference => 'PMID:8626802'  
-	    },
-	    description => 'soft palate development',
-	    location => '6:1312675-1314992',
-	    source => 'GOA' 
+            description => 'positive regulation of transcription from RNA polymerase II promoter',
+            location => '6:1312675-1314992',
+            source => 'GOA'
+          },
+          {
+            Gene => "ENSG00000137273",
+            attributes => {
+              external_reference => 'PMID:8626802'  
+            },
+            description => 'soft palate development',
+            location => '6:1312675-1314992',
+            source => 'GOA' 
           }
         ];
 	
@@ -106,21 +106,21 @@ my $gene_name='FOXF2';
   my $expected_data = [
           {
             Gene => "ENSG00000137273",
-	    attributes => {
-	      external_reference => 'PMID:8626802'  
-	    },
-	    description => 'positive regulation of transcription from RNA polymerase II promoter',
-	    location => '6:1312675-1314992',
-	    source => 'GOA'
+            attributes => {
+              external_reference => 'PMID:8626802'  
             },
-	  {
-	    Gene => "ENSG00000137273",
-	    attributes => {
-	      external_reference => 'PMID:8626802'  
-	    },
-	    description => 'soft palate development',
-	    location => '6:1312675-1314992',
-	    source => 'GOA' 
+            description => 'positive regulation of transcription from RNA polymerase II promoter',
+            location => '6:1312675-1314992',
+            source => 'GOA'
+          },
+          {
+            Gene => "ENSG00000137273",
+            attributes => {
+              external_reference => 'PMID:8626802'  
+            },
+            description => 'soft palate development',
+            location => '6:1312675-1314992',
+            source => 'GOA' 
           }
         ];
 	
@@ -136,16 +136,16 @@ my $gene_name='FOXF2';
 
   my $expected_data = [
            {
-	    Gene => 'ENSG00000137273',
+      Gene => 'ENSG00000137273',
             attributes => {                        
               external_reference => 'PMID:8626802'
             },                                                       
             description => 'positive regulation of transcription from RNA polymerase II promoter',
             location => '6:1312675-1314992',  
             source => 'GOA'                  
-       	  },  
+          },  
           {                                                                                
-	    Gene => 'ENSG00000137273',
+      Gene => 'ENSG00000137273',
             attributes => {                        
               external_reference => 'PMID:8626802'
             },                                                                       
@@ -153,18 +153,18 @@ my $gene_name='FOXF2';
             location => '6:1312675-1314992',                                                 
             source => 'GOA'                                                               
           },       
-	  {
+         {
             Variation => 'rs2299222',
-	    attributes => {
-	      associated_gene => 'YES1,FOXF2',
-	      external_reference => 'pubmed/17122850'
-	    },
-	    description => 'ACHONDROPLASIA',
-	    location => '7:86442404-86442404',
-	    source => 'dbSNP'
+            attributes => {
+            associated_gene => 'YES1,FOXF2',
+            external_reference => 'pubmed/17122850'
+          },
+            description => 'ACHONDROPLASIA',
+            location => '7:86442404-86442404',
+            source => 'dbSNP'
           }
         ];
-	
+
   my $json = json_GET("$base/$gene_name?include_associated=1", 'Gene with 1 phenotype feature associated with a variant');
   cmp_ok(scalar(@{$json}),"==", $expected, 'Gene with 1 phenotype association with variant found');
   cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
@@ -177,7 +177,7 @@ my $gene_name='FOXF2';
 
   my $expected_data = [
           {
-	    Gene => 'ENSG00000137273',
+            Gene => 'ENSG00000137273',
             attributes => {                        
               external_reference => 'PMID:8626802'
             },                                                       
@@ -186,7 +186,7 @@ my $gene_name='FOXF2';
             source => 'GOA'                  
        	  },  
           {                                                                                
-	    Gene => 'ENSG00000137273',
+            Gene => 'ENSG00000137273',
             attributes => {                        
               external_reference => 'PMID:8626802'
             },                                                                       
@@ -194,12 +194,12 @@ my $gene_name='FOXF2';
             location => '6:1312675-1314992',                                                 
             source => 'GOA'                                                               
           },
-	  {
-	    StructuralVariation => 'esv1234',
-	    description => 'COSMIC:tumour_site:skin',
-	    location => '6:1312670-1390070',
-	    source => 'DGVa'
-	  }
+          {
+            StructuralVariation => 'esv1234',
+            description => 'COSMIC:tumour_site:skin',
+            location => '6:1312670-1390070',
+            source => 'DGVa'
+          }
         ];
 	
   my $json = json_GET("$base/$gene_name?include_overlap=1", 'Gene with 3 phenotype feature overlap');
