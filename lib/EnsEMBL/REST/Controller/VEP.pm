@@ -22,6 +22,7 @@ use Moose;
 use namespace::autoclean;
 use Data::Dumper;
 use Bio::EnsEMBL::VEP::Runner;
+use Bio::EnsEMBL::Utils::IO qw/slurp/;
 
 use Try::Tiny;
 
@@ -31,6 +32,52 @@ EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 BEGIN { 
   extends 'Catalyst::Controller::REST';
 }
+
+# This list describes user overridable variables for this endpoint. It protects other more fundamental variables
+has valid_user_params => ( 
+  is => 'ro', 
+  isa => 'HashRef', 
+  traits => ['Hash'], 
+  handles => { valid_user_param => 'exists' },
+  default => sub { return {
+    map {$_ => 1} (qw/
+    gencode_basic
+    refseq
+    merged
+    all_refseq
+
+    failed
+    variant_class
+    minimal
+
+    everything
+    appris
+    canonical
+    ccds
+    domains
+    hgvs
+    numbers
+    protein
+    tsl
+    uniprot
+    xref_refseq
+    phyloP
+    transcript_id
+    phastCons
+    distance
+    ambiguity
+
+    pick
+    pick_allele
+    per_gene
+    pick_allele_gene
+    flag_pick
+    flag_pick_allele
+    flag_pick_allele_gene
+    pick_order
+  /)}
+  }
+);
 
 with 'EnsEMBL::REST::Role::PostLimiter';
 
@@ -278,44 +325,6 @@ sub get_hgvs_POST {
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
 
-  # This list stops users altering more crucial variables.
-  my %valid_keys = map {$_ => 1} (qw/
-    gencode_basic
-    refseq
-    merged
-    all_refseq
-
-    failed
-    variant_class
-    minimal
-
-    everything
-    appris
-    canonical
-    ccds
-    domains
-    hgvs
-    numbers
-    protein
-    tsl
-    uniprot
-    xref_refseq
-    phyloP
-    transcript_id
-    phastCons
-    distance
-    ambiguity
-
-    pick
-    pick_allele
-    per_gene
-    pick_allele_gene
-    flag_pick
-    flag_pick_allele
-    flag_pick_allele_gene
-    pick_order
-  /);
-  
   my %vep_params = %{ $c->config->{'Controller::VEP'} };
 
   # stash species
@@ -339,7 +348,7 @@ sub _include_user_params {
   map { $tmp_vep_params{$_} = $user_config->{$_}} keys %{$user_config};
 
   # only copy allowed keys to %vep_params as we don't want users to be able to meddle
-  $vep_params{$_} = $tmp_vep_params{$_} for grep { $valid_keys{$_} } keys %tmp_vep_params;
+  $vep_params{$_} = $tmp_vep_params{$_} for grep { $self->valid_user_param($_) } keys %tmp_vep_params;
   
   # we currently only have cache for human
   if ($c->stash->{species} ne 'homo_sapiens') {
@@ -381,11 +390,9 @@ sub _configure_plugins {
   my $plugin_config_file = $vep_config->{plugin_config};
   return [] unless $plugin_config_file && -e $plugin_config_file;
 
-  open IN, $plugin_config_file or return [];
-  my @content = <IN>;
-  close IN;
-  
-  my $VEP_PLUGIN_CONFIG = eval join('', @content);
+  my $content = [];
+  $content = slurp($plugin_config_file);
+  my $VEP_PLUGIN_CONFIG = eval $content;
   $c->log->warn("Could not eval VEP plugin config file: $@\n") if $@;
 
   # iterate over all defined plugins

@@ -26,7 +26,6 @@ use Try::Tiny;
 require EnsEMBL::REST;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
-with 'EnsEMBL::REST::Role::PostLimiter';
 __PACKAGE__->config(
   map => {
     'text/html'           => [qw/View FASTAHTML/],
@@ -38,12 +37,33 @@ __PACKAGE__->config(
 );
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
+# This list describes user overridable variables for this endpoint. It protects other more fundamental variables
+has valid_user_params => ( 
+  is => 'ro', 
+  isa => 'HashRef', 
+  traits => ['Hash'], 
+  handles => { valid_user_param => 'exists' },
+  default => sub { return { map {$_ => 1} (qw/
+    multiple_sequences
+    start
+    end
+    type
+    expand_5prime
+    expand_3prime
+    mask_feature
+    mask
+    /) }
+  }
+);
+
 has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e7);
 
-my %allowed_values = (
-  type    => { map { $_, 1} qw(cds cdna genomic protein)},
-  mask    => { map { $_, 1} qw(soft hard) },
-);
+has allowed_values => (isa => 'HashRef', is => 'ro', default => sub {{
+  type => { map { $_, 1} qw(cds cdna genomic protein) },
+  mask => { map { $_, 1} qw(soft hard) }
+}});
+
+with 'EnsEMBL::REST::Role::PostLimiter','EnsEMBL::REST::Role::SliceLength','EnsEMBL::REST::Role::Content';
 
 my $DEFAULT_TYPE = 'genomic';
 
@@ -157,19 +177,19 @@ sub _process {
   my $type = $c->request()->param('type') || $DEFAULT_TYPE;
   my $multiple_sequences = $c->request->param('multiple_sequences');
   
-  Catalyst::Exception->throw(qq{The type '$type' is not understood by this service}) unless $allowed_values{type}{$type};
+  Catalyst::Exception->throw(qq{The type '$type' is not understood by this service}) unless $self->allowed_values->{type}{$type};
   
   if($c->request->param('start') || $c->request->param('end')) {
       # We don't support circular features at this time, if it's a circular
       # feature, and not a translation, throw an error.
       unless($object->isa('Bio::EnsEMBL::Translation')) {
-	  my $feat_slice = $object->feature_Slice();
-	  Catalyst::Exception->throw(qq{Circular slices aren't supported for sequence trimming at this time}) if($feat_slice->is_circular());
+        my $feat_slice = $object->feature_Slice();
+        Catalyst::Exception->throw(qq{Circular slices aren't supported for sequence trimming at this time}) if($feat_slice->is_circular());
       }
 
       # It doesn't make sense to expand the sequence when doing a sub-sequence
       if($c->request->param('expand_5prime') || $c->request->param('expand_3prime')) {
-	  Catalyst::Exception->throw(qq{You may not expand the 3prime or 5prime sequence end when requesting a sub-sequence});
+        Catalyst::Exception->throw(qq{You may not expand the 3prime or 5prime sequence end when requesting a sub-sequence});
       }
 
       # Remember this for later when we're processing the object
@@ -254,10 +274,10 @@ sub _process_feature {
       my @translations = ($object->translation());
       push(@translations, @{$object->get_all_alternative_translations()});
       foreach my $t (@translations) {
-	# Catch case where no translation is available for a transcript
+        # Catch case where no translation is available for a transcript
         next unless $t;
 
-	push(@sequences, @{$self->_process_feature($c, $t, $type, $id)});
+        push(@sequences, @{$self->_process_feature($c, $t, $type, $id)});
       }
     }
     elsif($type eq 'genomic') {
@@ -272,12 +292,12 @@ sub _process_feature {
     if($type ne 'genomic') {
       my $transcripts = $object->get_all_Transcripts();
       foreach my $transcript (@{$transcripts}) {
-	# Because each transcript will have different coordinates if
-	# we're asking for a protein, we have to save the original
-	# coordinates before we translate them each cycle
-	$self->_push_start_end($c) if($c->stash()->{dosubseq});
+        # Because each transcript will have different coordinates if
+        # we're asking for a protein, we have to save the original
+        # coordinates before we translate them each cycle
+        $self->_push_start_end($c) if($c->stash()->{dosubseq});
         push(@sequences, @{$self->_process_feature($c, $transcript, $type, $id)});
-	$self->_pop_start_end($c) if($c->stash()->{dosubseq});
+        $self->_pop_start_end($c) if($c->stash()->{dosubseq});
       }
     }
     else {
@@ -292,9 +312,9 @@ sub _process_feature {
   if($slice) {
     # If the user set limits on the range they wanted, process that
     if($c->stash()->{dosubseq}) {
-	my ($start, $end) = $self->_check_limits($c, $slice->length());
-	$slice = $slice->sub_Slice($start, $end);
-	$c->stash()->{dosubseq} = 0;
+      my ($start, $end) = $self->_check_limits($c, $slice->length());
+      $slice = $slice->sub_Slice($start, $end);
+      $c->stash()->{dosubseq} = 0;
     }
 
     $slice = $self->_enrich_slice($c, $slice);
@@ -394,8 +414,8 @@ sub _translate_coordinates {
   my $pep_start = length $obj->translate()->seq(); my $pep_end = 0;
   foreach my $coord (@coords) {
       if($coord->isa('Bio::EnsEMBL::Mapper::Coordinate')) {
-	  $pep_start = $coord->start if($coord->start < $pep_start);
-	  $pep_end = $coord->end if($coord->end > $pep_end);
+          $pep_start = $coord->start if($coord->start < $pep_start);
+          $pep_end = $coord->end if($coord->end > $pep_end);
       }
   }
 
@@ -456,7 +476,7 @@ sub _mask_slice {
   my $mask = $c->request()->param('mask') || q{};
   my $soft_mask = ($mask eq 'soft') ? 1 : 0;
   if($mask) {
-    $c->go('ReturnError', 'custom', ["'$mask' is not an allowed value for masking"]) unless $allowed_values{mask}{$mask};
+    $c->go('ReturnError', 'custom', ["'$mask' is not an allowed value for masking"]) unless $self->allowed_values->{mask}{$mask};
     return $slice->get_repeatmasked_seq(undef, $soft_mask);
   }
   return $slice;
@@ -500,27 +520,13 @@ sub _write {
 
 sub _include_user_params {
   my ($self,$c,$user_config) = @_;
-  # This list stops users altering more crucial variables.
-  my @valid_keys = (qw/
-    multiple_sequences
-    start
-    end
-    type
-    expand_5prime
-    expand_3prime
-    mask_feature
-    mask
-  /);
 
   foreach my $key (keys %$user_config) {
-    if ($key ~~ @valid_keys) {
+    if ($self->valid_user_param($key)) {
       $c->request->params->{$key} = $user_config->{$key};
     }
   }
 }
-
-with 'EnsEMBL::REST::Role::SliceLength';
-with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
 

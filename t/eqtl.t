@@ -53,9 +53,10 @@ my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(  -FILENAME => $hdf5, -CORE_DB
 $multi->add_DBAdaptor('eqtl', $eqtl_a);
 
 
-my $response = [
-{ minus_log10_p_value => '0.00618329914558938',
-  value => 0.985863302490807}];
+my $response = json_GET("/eqtl/id/homo_sapiens/ENSG00000223972?content-type=application/json;statistic=p-value;tissue=Whole_Blood;variant_name=rs4951859", "Return p-value for known gene and variant");
 
-is_json_GET("/eqtl/id/homo_sapiens/ENSG00000223972?content-type=application/json;statistic=p-value;tissue=Whole_Blood;variant_name=rs4951859", $response, "Return p-value for known gene and variant");
+# Floats rounded to prevent precision variations between architectures and compilation options
+cmp_ok(sprintf("%.6f",$response->[0]->{minus_log10_p_value}) , '==', sprintf("%.6f",0.00618329914558938) ,'p-value accurate to 6 d.p.');
+cmp_ok(sprintf("%.6f",$response->[0]->{value}) , '==', sprintf("%.6f",0.985863302490807) ,'value accurate to 6 d.p.');
+
 done_testing();

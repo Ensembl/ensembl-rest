@@ -26,6 +26,7 @@ BEGIN {
 
 use Test::More;
 use Test::Differences;
+use Test::Deep;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
@@ -42,13 +43,13 @@ my $base = '/variation/homo_sapiens';
   my $json = json_GET("$base/$id", 'Variation feature');
   #is(scalar(@$json), 1, '1 variation feature returned');
   my $expected_variation_1 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.123049', minor_allele => 'A', ambiguity => 'R', var_class => 'SNP', synonyms => [], evidence => ['Multiple_observations','1000Genomes'], ancestral_allele => 'G', most_severe_consequence => 'intron_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"18:23821095-23821095", "strand" => 1, "start" => 23821095, "end" => 23821095, "seq_region_name" => "18", "coord_system" => "chromosome","allele_string"=>"G/A"}]};
-  eq_or_diff($json, $expected_variation_1, "Checking the result from the variation endpoint");
+  cmp_deeply($json, $expected_variation_1, "Checking the result from the variation endpoint");
 
 # Include phenotype information
   my $expected_phenotype = { %{$expected_variation_1},
   "phenotypes" => [{"source" => "DGVa","variants" => undef, "ontology_accessions" => ["Orphanet:130"], "trait" => "BRUGADA SYNDROME", "genes" => undef}]};
   my $phen_json = json_GET("$base/$id?phenotypes=1", "Phenotype info");
-  eq_or_diff($phen_json, $expected_phenotype, "Returning phenotype information");
+  cmp_deeply($phen_json, $expected_phenotype, "Returning phenotype information");
 
 # Get additional genotype information
   $id = 'rs67521280';
@@ -56,13 +57,13 @@ my $base = '/variation/homo_sapiens';
   my $expected_genotype = { %{$expected_variation_2}, 
   genotypes => [{genotype => "GT|GT", gender => "Male", sample => "J. CRAIG VENTER", submission_id => 'ss95559393'}] };
   my $genotype_json = json_GET("$base/$id?genotypes=1", "Genotype info");
-  eq_or_diff($genotype_json, $expected_genotype, "Returning genotype information");
+  cmp_deeply($genotype_json, $expected_genotype, "Returning genotype information");
 
 # Include population allele frequency information
   my $expected_pops = { %{$expected_variation_2},
   populations => [{population => "HUMANGENOME_JCVI:J. Craig Venter",frequency => 1,allele => "GT",allele_count => 2, submission_id => 'ss95559393'}]};
   my $pops_json = json_GET("$base/$id?pops=1", "Population info");
-  eq_or_diff($pops_json, $expected_pops, "Returning population information");
+  cmp_deeply($pops_json, $expected_pops, "Returning population information");
 
 # Include population_genotype information ( data faked)
    my $expected_pop_genos = { %{$expected_variation_2},
@@ -76,7 +77,7 @@ my $base = '/variation/homo_sapiens';
  ]};
  
    my $pop_genos_json = json_GET("$base/$id?population_genotypes=1", "Population_genotype info");
-   eq_or_diff($pop_genos_json, $expected_pop_genos, "Returning population_genotype information");
+   cmp_deeply($pop_genos_json, $expected_pop_genos, "Returning population_genotype information");
 
 my $post_data = '{ "ids" : ["rs142276873","rs67521280"]}';
 my $expected_result = { rs142276873 => $expected_variation_1, rs67521280 => $expected_variation_2 };
@@ -137,7 +138,18 @@ my $publication_output =
   is(ref($variants_json), 'ARRAY', 'Array wanted from endpoint');
   
   # Check the variations
-  eq_or_diff($variants_json, $publication_output, "Checking PMID endpoint");
+  # Must be checked individually due to variable ordering in output. is_json doesn't ignore order, cmp_bag cannot handle arrays within hashes
+  is($variants_json->[0]->{source}, $publication_output->[0]->{source} ,'PMID source key');
+  is_deeply($variants_json->[0]->{mappings},$publication_output->[0]->{mappings},'PMID mappings key');
+  cmp_bag($variants_json->[0]->{synonyms},$publication_output->[0]->{synonyms},'PMID synonyms');
+  is($variants_json->[0]->{name}, $publication_output->[0]->{name} ,'PMID name key');
+  is($variants_json->[0]->{MAF},$publication_output->[0]->{MAF} ,'PMID MAF key'); # Interestingly these are not numerically equal under certain testing conditions...
+  is($variants_json->[0]->{ambiguity}, $publication_output->[0]->{ambiguity} ,'PMID ambiguity key');
+  is($variants_json->[0]->{var_class}, $publication_output->[0]->{var_class} ,'PMID source key');
+  ok(!$variants_json->[0]->{ancestral_allele},'PMID ancestral_allele key not set');
+  is($variants_json->[0]->{minor_allele}, $publication_output->[0]->{minor_allele} ,'PMID minor_allele key');
+  is($variants_json->[0]->{most_severe_consequence}, $publication_output->[0]->{most_severe_consequence} ,'PMID most_severe_consequence key');
+
  
   # Invalid species
   action_bad(
@@ -166,7 +178,16 @@ my $publication_output =
   is(ref($variants_json), 'ARRAY', 'Array wanted from endpoint');
   
   # Check the variations
-  eq_or_diff($variants_json, $publication_output, "Checking PMCID endpoint");
+  is($variants_json->[0]->{source}, $publication_output->[0]->{source} ,'PMID source key');
+  is_deeply($variants_json->[0]->{mappings},$publication_output->[0]->{mappings},'PMID mappings key');
+  cmp_bag($variants_json->[0]->{synonyms},$publication_output->[0]->{synonyms},'PMID synonyms');
+  is($variants_json->[0]->{name}, $publication_output->[0]->{name} ,'PMID name key');
+  is($variants_json->[0]->{MAF},$publication_output->[0]->{MAF} ,'PMID MAF key');
+  is($variants_json->[0]->{ambiguity}, $publication_output->[0]->{ambiguity} ,'PMID ambiguity key');
+  is($variants_json->[0]->{var_class}, $publication_output->[0]->{var_class} ,'PMID source key');
+  ok(!$variants_json->[0]->{ancestral_allele},'PMID ancestral_allele key not set');
+  is($variants_json->[0]->{minor_allele}, $publication_output->[0]->{minor_allele} ,'PMID minor_allele key');
+  is($variants_json->[0]->{most_severe_consequence}, $publication_output->[0]->{most_severe_consequence} ,'PMID most_severe_consequence key');
  
   # Invalid species
   action_bad(
