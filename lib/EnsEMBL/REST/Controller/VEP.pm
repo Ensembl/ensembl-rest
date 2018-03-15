@@ -300,7 +300,7 @@ sub get_id_POST {
   
   my $post_data = $c->req->data;
   my $config = $self->_include_user_params($c,$post_data);
-  $config->{format} = 'hgvs';  
+  $config->{format} = 'id';  
   unless (exists $post_data->{ids}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "ids" key in your POST. Please check the format of your message against the documentation' ] );
   }
