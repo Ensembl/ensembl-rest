@@ -135,7 +135,7 @@ sub get_region_POST {
   # $c->log->debug(Dumper $config->{'Controller::VEP'});
   # handle user config
   my $config = $self->_include_user_params($c,$post_data);
-  
+  $config->{format} = 'region';  
   unless (exists $post_data->{variants}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "variants" key in your POST. Please check the format of your message against the documentation' ] );
   }
@@ -300,6 +300,7 @@ sub get_id_POST {
   
   my $post_data = $c->req->data;
   my $config = $self->_include_user_params($c,$post_data);
+  $config->{format} = 'hgvs';  
   unless (exists $post_data->{ids}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "ids" key in your POST. Please check the format of your message against the documentation' ] );
   }
@@ -314,6 +315,7 @@ sub get_hgvs_POST {
 
   my $post_data = $c->req->data;
   my $config = $self->_include_user_params($c,$post_data);
+  $config->{format} = 'hgvs';  
   unless (exists $post_data->{hgvs_notations}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "hgvs_notations" key in your POST. Please check the format of your message against the documentation' ] );
   }
