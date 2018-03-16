@@ -1,7 +1,7 @@
 language: "perl"
 
 perl:
-  - "5.14"
+  - "5.26"
 
 sudo: false
 
@@ -22,7 +22,7 @@ before_install:
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-vep.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-funcgen.git
     - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-io.git
-    - git clone -b bioperl-release-1-6-1 --depth 1 https://github.com/bioperl/bioperl-live.git
+    - git clone -b release-1-6-924 --depth 1 https://github.com/bioperl/bioperl-live.git
     - git clone --branch 1.3.2 --depth 1 https://github.com/samtools/htslib.git
     - cd htslib
     - make
@@ -44,7 +44,7 @@ script: "./travisci/harness.sh"
 
 notifications:
   email:
-    on_success: always
-    on_failure: always
+    on_failure: change
   slack:
     secure: Q0MkdvATb4X2mhfFHugDe/EeDAD9mNn/K5atrKLt+vQ5gO6Pc/LkeLoFCBmO4GiJHrFf9UeE4qWCQ/xsRHVNK4qiukVvminRdF97DFWAzLZ3GqJvMYJxZx/JCiaUhjbLW+GVhPWo82WRHlW/kaqHc0qXyKnMkoHRf/kcZC2cA5E=
+    on_failure: change

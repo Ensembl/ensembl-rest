@@ -26,6 +26,7 @@ BEGIN {
 
 use Test::More;
 use Test::Differences;
+use Test::Deep;
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Data::Dumper;
 use Bio::EnsEMBL::Test::TestUtils;
@@ -162,7 +163,7 @@ $expected_output = {
   'total_haplotype_count' => 4
 };
 
-eq_or_diff($json, $expected_output, "Example transcript");
+cmp_deeply($json, $expected_output, "Example transcript");
 
 # request sequence
 $th_get = '/transcript_haplotypes/homo_sapiens/ENST00000314040?sequence=1';
@@ -174,7 +175,7 @@ $expected_output = {
   '31c01f1c180d58287b3f950852d4673f' => 'MLSPLWLQISKRPRPEVSVSNVCFSSALPTSNPTSLTLKHHNIFVLRVALEIIQYSVHGGRNRKPLEVTSLAYSCPENWWQKQIGVQPPDVHASALSPKPCVSWSRPLSLLSSTILFWKTHDERADFSKLHS*'
 };
 
-eq_or_diff({map {$_->{hex} => $_->{seq}} @{$json->{protein_haplotypes}}}, $expected_output, "Example transcript with sequence");
+cmp_deeply({map {$_->{hex} => $_->{seq}} @{$json->{protein_haplotypes}}}, $expected_output, "Example transcript with sequence");
 
 # request aligned sequences
 $th_get = '/transcript_haplotypes/homo_sapiens/ENST00000314040?aligned_sequences=1';
@@ -195,7 +196,7 @@ $expected_output = {
   ]
 };
 
-eq_or_diff({map {$_->{hex} => $_->{aligned_sequences}} @{$json->{protein_haplotypes}}}, $expected_output, "Example transcript with aligned_sequences");
+cmp_deeply({map {$_->{hex} => $_->{aligned_sequences}} @{$json->{protein_haplotypes}}}, $expected_output, "Example transcript with aligned_sequences");
 
 
 # request samples
@@ -215,7 +216,7 @@ $expected_output = {
   }
 };
 
-eq_or_diff({map {$_->{hex} => $_->{samples}} @{$json->{cds_haplotypes}}}, $expected_output, "Example transcript with samples");
+cmp_deeply({map {$_->{hex} => $_->{samples}} @{$json->{cds_haplotypes}}}, $expected_output, "Example transcript with samples");
 
 
 done_testing();

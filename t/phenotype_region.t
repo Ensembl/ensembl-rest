@@ -27,6 +27,7 @@ BEGIN {
 use JSON;
 use Test::More;
 use Test::Differences;
+use Test::Deep;
 use Catalyst::Test();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
@@ -73,7 +74,7 @@ my $var_region = '13:86442400:86442410';
 
   my $json = json_GET("$base/$var_region?feature_type=Variation", '1 Variation with phenotype feature associated from chr 13');
   is(scalar(@{$json}), $expected, 'Variation with phenotype association found in the region');
-  eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/region REST call");
+  cmp_bag($json, $expected_data, "Checking the result content from the phenotype/region REST call");
 }
 
 # Get the light result version (only phenotypes)
@@ -95,7 +96,7 @@ my $var_region = '13:86442400:86442410';
 
   my $json = json_GET("$base/$var_region?feature_type=Variation;only_phenotypes=1", '1 Variation with phenotype feature associated from chr 13 - light results');
   is(scalar(@{$json}), $expected, 'Variation with phenotype association found in the region - light result');
-  eq_or_diff($json, $expected_data, "Checking the result content from the phenotype/region REST call - light result");
+  cmp_bag($json, $expected_data, "Checking the result content from the phenotype/region REST call - light result");
 }
 
 

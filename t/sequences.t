@@ -25,6 +25,7 @@ BEGIN {
 }
 
 use Test::More;
+use Test::Deep;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::SeqIO;
@@ -52,8 +53,7 @@ Catalyst::Test->import('EnsEMBL::REST');
   my $id = 'ENST00000314040';
   my $url = '/sequence/id/'.$id.'?type=cdna;mask_feature=1';
   my $seq = $seqs{$id.'_cdna'};
-  is_json_GET(
-    $url,
+  cmp_deeply(json_GET($url, 'GET sequence/id'),
     {
       seq => $seq->seq(),
       id => $id,
@@ -71,8 +71,8 @@ Catalyst::Test->import('EnsEMBL::REST');
 # CDS ID based lookup
 {
   my $id = 'ENST00000314040';
-  is_json_GET(
-    '/sequence/id/'.$id.'?type=cds',
+  cmp_deeply(json_GET(
+    '/sequence/id/'.$id.'?type=cds', 'CDS via sequence/id'),
     {
       seq => $seqs{$id.'_cds'}->seq(),
       id => $id,
@@ -89,8 +89,7 @@ Catalyst::Test->import('EnsEMBL::REST');
   my $id = 'ENSP00000320396';
   my $seq = $seqs{$id.'_protein'};
   my $url = '/sequence/id/'.$id; 
-  is_json_GET(
-    $url,
+  cmp_deeply(json_GET($url, 'protein via sequence/id'),
     {
       seq => $seq->seq(),
       id => $id,
@@ -121,8 +120,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 {
   my $id = 'ENSG00000176515';
   my $seq = $seqs{$id.'_genomic'};
-  is_json_GET(
-    '/sequence/id/'.$id,
+  cmp_deeply(json_GET('/sequence/id/'.$id, 'dna via sequence/id'),
     {
       seq => uc($seq->seq),
       id => $id,
@@ -144,8 +142,8 @@ Catalyst::Test->import('EnsEMBL::REST');
   my $single_json = json_GET($base_url, 'Accept Gene -> Protein without multiple_sequences on if 1 sequence is available');
   is($single_json->{seq}, $seq->seq(), 'Checking sequence is fine and no array is present');
   
-  is_json_GET(
-    $base_url.';multiple_sequences=1',
+  cmp_bag(json_GET(
+    $base_url.';multiple_sequences=1', 'Multiple sequence fetch'),
     [{
       seq => $seq->seq,
       id => $protein_id,
@@ -187,8 +185,8 @@ Catalyst::Test->import('EnsEMBL::REST');
   my $region = '6:1080164-1105181';
   my $seq = $seqs{6};
   
-  is_json_GET(
-    '/sequence/region/homo_sapiens/'.$region,
+  cmp_deeply(json_GET(
+    '/sequence/region/homo_sapiens/'.$region, 'DNA via region'),
     {
       seq => uc($seq->seq),
       id => $seq->desc,
@@ -200,8 +198,8 @@ Catalyst::Test->import('EnsEMBL::REST');
   
   my $small_region = '6:1080164-1080464';
   my $seq_hm = $seqs{'6_hm'};
-  is_json_GET(
-    '/sequence/region/homo_sapiens/'.$small_region.'?mask=hard',
+  cmp_deeply(json_GET(
+    '/sequence/region/homo_sapiens/'.$small_region.'?mask=hard', 'Hard-masked sequence via region'),
     {
       seq => $seq_hm->seq,
       id => $seq_hm->desc,
@@ -212,8 +210,8 @@ Catalyst::Test->import('EnsEMBL::REST');
   );
   
   my $seq_sm = $seqs{'6_sm'};
-  is_json_GET(
-    '/sequence/region/homo_sapiens/'.$small_region.'?mask=soft',
+  cmp_deeply(json_GET(
+    '/sequence/region/homo_sapiens/'.$small_region.'?mask=soft', 'Soft-masked sequence via region'),
     {
       seq => $seq_sm->seq,
       id => $seq_sm->desc,
@@ -264,14 +262,14 @@ FASTA
   my $seq_a = q/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYPRSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQLECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKTIVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELVREMVHADVELMRTNPNA/;
   my $seq_b = q/GCCAGCCAGGGTGGCAGGTGCCTGTAGTCCCAGCTGCTTGGGAGGCTCAAGGATTGCTTGAACCCAGGAGTTCTGCCCTGCAGTGCGCGGTGCCCATCGGGTGACACCCATCAGGTATCTGCACTAAGTTCAGCATGAAGAGCAGCGGGCCACCAGGCTGCCTAAGAAGGAATGAACCAGCCTGCTTTGGAAACAGAGCAGCTGAAACTCCTGTGCCGATCAGTGGTGGGATCACACCTGTGAGTAGCCACGCCTGCCCAGGCAACACAGACCCTGTCTCTTGCAAAATTAAAAA/;
   my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein", query => "ENSP00000370194"},{"desc" => "chromosome:GRCh37:6:1507557:1507851:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna", query => "ENSG00000243439"}];
-  is_json_POST($url,$body,$response,'Basic POST ID sequence fetch');
+  cmp_bag(json_POST($url,$body,'POST sequence/id'),$response,'Basic POST ID sequence fetch');
 
 }
 {
   my $url = "/sequence/region/homo_sapiens";
   my $body = q/{ "regions" : [ "6:1507557:1507851:1", "clearly stupid" ]}/;
   my $expected = [{id => "chromosome:GRCh37:6:1507557:1507851:1",seq => "GCCAGCCAGGGTGGCAGGTGCCTGTAGTCCCAGCTGCTTGGGAGGCTCAAGGATTGCTTGAACCCAGGAGTTCTGCCCTGCAGTGCGCGGTGCCCATCGGGTGACACCCATCAGGTATCTGCACTAAGTTCAGCATGAAGAGCAGCGGGCCACCAGGCTGCCTAAGAAGGAATGAACCAGCCTGCTTTGGAAACAGAGCAGCTGAAACTCCTGTGCCGATCAGTGGTGGGATCACACCTGTGAGTAGCCACGCCTGCCCAGGCAACACAGACCCTGTCTCTTGCAAAATTAAAAA",molecule =>"dna", query => "6:1507557:1507851:1"}];
-  is_json_POST($url,$body,$expected,'POST one good region request and one bad');
+  cmp_bag(json_POST($url,$body,'POST sequence/region'),$expected,'POST one good region request and one bad');
 
 }
 

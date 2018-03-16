@@ -25,6 +25,7 @@ BEGIN {
 }
 
 use Test::More;
+use Test::Deep;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 
@@ -33,7 +34,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 my $term = "SO:0001506";
 
-is_json_GET("ontology/descendants/$term?zero_distance=0",
+cmp_bag(json_GET("ontology/descendants/$term?zero_distance=0", 'ontology/descendants zero_distance off'),
    [
        {
            "ontology" => "SO",
@@ -56,7 +57,7 @@ is_json_GET("ontology/descendants/$term?zero_distance=0",
    ], 'Check functionality of zero-distance flag'
 );
 
-is_json_GET("ontology/descendants/$term?zero_distance=1",
+cmp_bag(json_GET("ontology/descendants/$term?zero_distance=1", 'ontology/descendants zero_distance on'),
    [
        {
            "accession" => "SO:0001506",

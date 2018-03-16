@@ -25,6 +25,7 @@ BEGIN {
 }
 
 use Test::More;
+use Test::Deep;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Test::Differences;
@@ -71,7 +72,7 @@ my $UPI = 'UPI0000073BC4';
     version => '0',
   };
   my ($actual) = grep { $_->{primary_id} eq $go_id } @{$json};
-  eq_or_diff_data($actual, $expected, 'Checking GO Xrefs bring along their linkage types');
+  cmp_deeply($actual, $expected, 'Checking GO Xrefs bring along their linkage types');
 }
 
 # Check identity xrefs
@@ -92,7 +93,7 @@ my $UPI = 'UPI0000073BC4';
     xref_start => 1, xref_end => 132, xref_identity => 100,
   };
   my ($actual) = grep { $_->{primary_id} eq $external_id } @{$json};
-  eq_or_diff_data($actual, $expected, 'Checking identity Xrefs bring along their alignment data. Using '.$external_id); 
+  cmp_deeply($actual, $expected, 'Checking identity Xrefs bring along their alignment data. Using '.$external_id); 
 }
 
 #Name based xref lookup
