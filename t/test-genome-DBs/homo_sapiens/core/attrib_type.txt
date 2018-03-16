@@ -227,3 +227,5 @@
 365	projected4a2	Projected by alignment	Temporary (Monday, August 23, 2010)
 366	merged	Merged species	\N
 367	karyotype_rank	Rank in the karyotype	For a given seq_region, if it is part of the species karyotype, will indicate its rank
+405	ref_length	Golden Path Length	Length of the primary assembly
+406	total_length	Base Pairs	Total length of the assembly

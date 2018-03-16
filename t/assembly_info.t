@@ -47,6 +47,8 @@ is_json_GET(
     coord_system_versions => [qw/GRCh37 NCBI36 NCBI35 NCBI34/ ],
     default_coord_system_version => 'GRCh37',
     assembly_accession => 'GCA_000001405.9',
+    'base_pairs' => '3554996726',
+    'golden_path' => '3096649726'
   },
   'Checking output of info'
 );
