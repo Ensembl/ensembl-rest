@@ -105,6 +105,19 @@ CREATE TABLE `attrib_type` (
   UNIQUE KEY `code_idx` (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+CREATE TABLE `biotype` (
+  `biotype_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `object_type` enum('gene','transcript') NOT NULL DEFAULT 'gene',
+  `db_type` set('cdna','core','coreexpressionatlas','coreexpressionest','coreexpressiongnf','funcgen','otherfeatures','rnaseq','variation','vega','presite','sangervega') NOT NULL DEFAULT 'core',
+  `attrib_type_id` int(11) DEFAULT NULL,
+  `description` text,
+  `biotype_group` enum('coding','pseudogene','snoncoding','lnoncoding','mnoncoding','LRG','undefined','no_group') DEFAULT NULL,
+  `so_acc` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`biotype_id`),
+  UNIQUE KEY `name_type_idx` (`name`,`object_type`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 CREATE TABLE `coord_system` (
   `coord_system_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `species_id` int(10) unsigned NOT NULL DEFAULT '1',
@@ -476,7 +489,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=845 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=847 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,

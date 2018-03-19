@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	92
+2	\N	schema_version	93
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -99,3 +99,5 @@
 99	\N	patch	patch_91_92_b.sql|Add index on feature_stable_id in regulatory_feature_variation and motif_feature_variation
 100	\N	patch	patch_91_92_c.sql|Change the column zygosity in the table structural_variation_sample
 101	\N	patch	patch_91_92_d.sql|create table to store names of submitters to ClinVar etc
+102	\N	patch	patch_92_93_a.sql|schema version
+103	\N	patch	patch_92_93_b.sql|Extend phenotype_ontology_accession mapped_by_attrib predefined set

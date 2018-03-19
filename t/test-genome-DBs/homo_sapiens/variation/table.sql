@@ -168,7 +168,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=102 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=104 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -239,7 +239,7 @@ CREATE TABLE `phenotype_feature_attrib` (
 CREATE TABLE `phenotype_ontology_accession` (
   `phenotype_id` int(11) unsigned NOT NULL,
   `accession` varchar(255) NOT NULL,
-  `mapped_by_attrib` set('437','438','439','440','441','442','443','444') DEFAULT NULL,
+  `mapped_by_attrib` set('437','438','439','440','441','442','443','444','588','589','590','591','592','593','594') DEFAULT NULL,
   `mapping_type` enum('is','involves') DEFAULT NULL,
   PRIMARY KEY (`phenotype_id`,`accession`),
   KEY `accession_idx` (`accession`)
