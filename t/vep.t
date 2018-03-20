@@ -274,7 +274,16 @@ $vep_output =
 }];
 
 $json = json_POST($vep_post,$vep_post_body,'POST a selection of regions to the VEP');
+
 cmp_bag($json,$vep_output, "VEP region POST");
+
+$vep_post = '/vep/homo_sapiens/id';
+my $vep_post_body_invalid = '{ "ids" : ["invalid_id", "rs186950277", "rs17081232" ]}';
+$json = json_POST($vep_post,$vep_post_body_invalid,'POST a selection of IDs to VEP');
+
+$vep_post = '/vep/homo_sapiens/hgvs';
+$vep_post_body_invalid = '{ "hgvs_notations" : ["invalid_hgvs", "ENST00000314040:c.311G>T"] }';
+$json = json_POST($vep_post,$vep_post_body_invalid,'POST a selection of HGVS variants to VEP');
 
 
 # test vep/id
