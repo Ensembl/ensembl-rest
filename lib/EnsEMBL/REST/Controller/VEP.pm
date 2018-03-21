@@ -130,7 +130,6 @@ sub get_region_GET {
 sub get_region_POST {
   my ( $self, $c ) = @_;
   my $post_data = $c->req->data;
-
   # $c->log->debug(Dumper $post_data);
   # $c->log->debug(Dumper $config->{'Controller::VEP'});
   # handle user config
@@ -303,6 +302,7 @@ sub get_id_POST {
   unless (exists $post_data->{ids}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "ids" key in your POST. Please check the format of your message against the documentation' ] );
   }
+$config->{format} = 'id';
   my @ids = @{$post_data->{ids}};
   $self->assert_post_size($c,\@ids);
   $self->_give_POST_to_VEP($c,\@ids,$config);
@@ -317,6 +317,7 @@ sub get_hgvs_POST {
   unless (exists $post_data->{hgvs_notations}) {
     $c->go( 'ReturnError', 'custom', [ ' Cannot find "hgvs_notations" key in your POST. Please check the format of your message against the documentation' ] );
   }
+  $config->{format} = 'hgvs';
   my @hgvs = @{$post_data->{hgvs_notations}};
   $self->assert_post_size($c,\@hgvs);
   $self->_give_POST_to_VEP($c,\@hgvs,$config);
