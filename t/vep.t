@@ -26,6 +26,8 @@ BEGIN {
 
 use Test::More;
 use Test::Differences;
+use Test::Deep;
+use Test::Exception;
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
 use Catalyst::Test ();
@@ -117,7 +119,7 @@ my $vep_output =
 
 # Test vep/region
 my $json = json_GET($vep_get,'GET a VEP region');
-eq_or_diff($json, $vep_output, 'Example vep region get message');
+cmp_bag($json, $vep_output, 'Example vep region get message');
 
 
 # test with non-toplevel sequence (should transform to toplevel)
@@ -148,6 +150,7 @@ $json = json_GET($vep_get,'GET a VEP region on a non-toplevel sequence');
 my $vep_post = '/vep/homo_sapiens/region';
 my $vep_post_body = '{ "variants" : ["7 34381884 var1 C T . . .",
                                      "7 86442404 var2 T C . . ."]}';
+
 
 $vep_output =
 [{
@@ -272,7 +275,17 @@ $vep_output =
 }];
 
 $json = json_POST($vep_post,$vep_post_body,'POST a selection of regions to the VEP');
-eq_or_diff($json,$vep_output, "VEP region POST");
+cmp_bag($json,$vep_output, "VEP region POST");
+
+#Ensure that providing an invalid ID is correctly handled by the ID endpoint
+$vep_post = '/vep/homo_sapiens/id';
+my $vep_post_body_invalid = '{ "ids" : ["invalid_id", "rs186950277", "rs17081232" ]}';
+lives_ok{$json = json_POST($vep_post,$vep_post_body_invalid,'POST a selection of IDs to VEP')} 'ensuring invalid ID is handled';
+
+#Ensure that providing invalid hgvs is correctly handled by the HGVS endpoint
+$vep_post = '/vep/homo_sapiens/hgvs';
+$vep_post_body_invalid = '{ "hgvs_notations" : ["invalid_hgvs", "ENST00000314040:c.311G>T"] }';
+lives_ok{$json = json_POST($vep_post,$vep_post_body_invalid,'POST a selection of HGVS variants to VEP')} 'ensuring invalid HGVS is handled';
 
 
 # test vep/id
@@ -321,7 +334,7 @@ $vep_output =
   }];
 
 $json = json_GET($vep_id_get,'GET consequences for Variation ID');
-eq_or_diff($json, $vep_output, 'VEP id GET');
+cmp_bag($json, $vep_output, 'VEP id GET');
 
 
 my $vep_id_post = '/vep/homo_sapiens/id';
@@ -406,7 +419,7 @@ $vep_output =
 
 
 $json = json_POST($vep_id_post,$vep_id_body,'VEP ID list POST');
-eq_or_diff($json, $vep_output, 'VEP id POST');
+cmp_bag($json, $vep_output, 'VEP id POST');
 
 
 # test vep/hgvs with a genomic coord
@@ -449,7 +462,7 @@ $vep_output = [{
 }];
 
 $json = json_GET($vep_hgvs_get,'GET consequences for genomic HGVS notation');
-eq_or_diff($json, $vep_output, 'VEP genomic HGVS GET');
+cmp_bag($json, $vep_output, 'VEP genomic HGVS GET');
 
 # test vep/hgvs with a transcript coord
 $vep_hgvs_get = '/vep/homo_sapiens/hgvs/ENST00000314040:c.311G>T?content-type=application/json';
@@ -509,7 +522,7 @@ $vep_output = [{
 }];
 
 $json = json_GET($vep_plugin_get,'GET consequences with test plugin');
-eq_or_diff($json, $vep_output, 'VEP plugin test');
+cmp_bag($json, $vep_output, 'VEP plugin test');
 
 # test using transcript_id
 my $vep_transcript_id_get = '/vep/homo_sapiens/region/7:86442404-86442404:1/C?content-type=application/json&transcript_id=ENST00000361669';
@@ -545,7 +558,7 @@ $vep_output = [
 ];                                               
 
 $json = json_GET($vep_transcript_id_get,'GET consequences with transcript_id');
-eq_or_diff($json, $vep_output, 'VEP transcript filter test');
+cmp_bag($json, $vep_output, 'VEP transcript filter test');
 
 # test using refseq cache
 my $vep_refseq_get = '/vep/homo_sapiens/region/7:34097707-34097707:1/C?content-type=application/json&refseq=1';
