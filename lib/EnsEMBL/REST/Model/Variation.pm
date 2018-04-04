@@ -160,6 +160,7 @@ sub to_hash {
   $variation_hash->{mappings} = $self->get_variationFeature_info($variation);
   $variation_hash->{populations} = $self->get_allele_info($variation) if $c->request->param('pops');
   $variation_hash->{genotypes} = $self->get_sampleGenotype_info($variation) if $c->request->param('genotypes');
+  $variation_hash->{genotyping_chips} = $self->get_genotypingChip_info($variation) if $c->request->param('genotyping_chips');
   $variation_hash->{phenotypes} = $self->get_phenotype_info($variation) if $c->request->param('phenotypes');
   $variation_hash->{population_genotypes} = $self->get_populationGenotype_info($variation) if $c->request->param('population_genotypes');
 
@@ -202,6 +203,24 @@ sub get_sampleGenotype_info {
     push (@genotypes, $self->gen_as_hash($gen));
   }
   return \@genotypes;
+}
+
+## genotyping chips for variation
+sub get_genotypingChip_info {
+  my ($self, $variation) = @_;
+
+  my @formatted_gen;
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+  my $vsa = $c->model('Registry')->get_adaptor($species, 'Variation', 'VariationSet');
+
+  my $var_set = $vsa->fetch_by_name('Genotyping chip variants');
+  my $gen_chip = $vsa->fetch_all_by_Variation_super_VariationSet($variation, $var_set);
+  foreach my $gc (@$gen_chip) {
+    push (@formatted_gen, $gc->name());
+  }
+
+  return \@formatted_gen;
 }
 
 sub gen_as_hash {

@@ -51,6 +51,27 @@ my $base = '/variation/homo_sapiens';
   my $phen_json = json_GET("$base/$id?phenotypes=1", "Phenotype info");
   cmp_deeply($phen_json, $expected_phenotype, "Returning phenotype information");
 
+# Include genotyping chips information
+  $id = 'rs7698608';
+  my $expected_variation_3 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.448577', minor_allele => 'C', ambiguity => 'M', var_class => 'SNP', synonyms => ['rs60248177','rs17215092'], evidence => [], ancestral_allele => undef, most_severe_consequence => '5_prime_UTR_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"4:103937974-103937974", "strand" => 1, "start" => 103937974, "end" => 103937974, "seq_region_name" => "4", "coord_system" => "chromosome","allele_string"=>"C/A"}]};
+  $json = json_GET("$base/$id", 'Variation feature');
+  cmp_deeply($json, $expected_variation_3, "Checking the result from the variation endpoint");
+
+  my $expected_genotyping_chips = { %{$expected_variation_3},
+  "genotyping_chips" => ['Illumina_HumanOmni1-Quad', 'Affy GeneChip 500K', 'Illumina_HumanOmni2.5', 'Affy GenomeWideSNP_6.0', 'Illumina_HumanOmni5', 'Illumina_1M-duo' ]};
+  my $geno_chip_json = json_GET("$base/$id?genotyping_chips=1", "Genotyping chips info");
+  cmp_ok(exists $geno_chip_json->{'genotyping_chips'}, "==", 1, "Variant has genotyping chips information");
+  cmp_ok(scalar(@{$geno_chip_json->{'genotyping_chips'}}), "==", 6, 'Variant with 6 genotyping chips');
+
+# POST genotyping chips info
+  my $url = $base."?genotyping_chips=1";
+  my $post_data_genotyping_chips = '{ "ids" : ["rs142276873","rs7698608"] }';
+  #my $expected_result_genotyping_chips = { rs142276873 => { %{$expected_variation_1}, genotyping_chips => [] }, rs7698608 => $expected_genotyping_chips };
+  my $geno_chip_json_post = json_POST($url, $post_data_genotyping_chips, "POST list of variations and fetch with genotyping chips information");
+  cmp_ok(scalar(keys %{$geno_chip_json_post}), "==", 2, "POST genotyping chips info: retrieve 2 variants");
+  cmp_ok(scalar (@{$geno_chip_json_post->{"rs142276873"}->{'genotyping_chips'}}), "==", 0, "Variant has 0 genotyping chips information");
+  cmp_ok(scalar(@{$geno_chip_json_post->{"rs7698608"}->{'genotyping_chips'}}), "==", 6, 'Variant with 6 genotyping chips');
+
 # Get additional genotype information
   $id = 'rs67521280';
   my $expected_variation_2 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => undef, minor_allele => undef, failed => 'None of the variant alleles match the reference allele;Mapped position is not compatible with reported alleles', ambiguity => undef, var_class => 'indel', synonyms => [], evidence => [], ancestral_allele => undef, most_severe_consequence => 'intergenic_variant', mappings => [{"assembly_name" => "GRCh37", "location"=> "11:6303493-6303493", "strand" => 1, "start" => 6303493, "end" => 6303493, "seq_region_name" => "11", "coord_system" => "chromosome","allele_string"=>"-/GT"}] };
