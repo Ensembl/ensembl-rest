@@ -159,7 +159,7 @@ is_json_GET(
   my $biotypes_json = json_GET('/info/biotypes/groups/coding', 'Get the list of coding biotypes');
   is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
   cmp_ok(scalar(@{$biotypes_json}), '==', 39, 'Ensuring we have the right number of biotypes of group coding');
-  my $biotype = shift $biotypes_json;
+  my $biotype = shift @{$biotypes_json};
   is(ref($biotype), 'HASH', 'Biotypes represented by Hashes');
   my $expected = { name => 'IG_C_gene', biotype_group => 'coding', object_type => 'gene', so_acc => 'SO:0001217'};
   eq_or_diff_data($biotype, $expected, 'Checking internal contents of biotype hash as expected');
@@ -171,7 +171,7 @@ is_json_GET(
   my $biotypes_json = json_GET('/info/biotypes/name/guide_RNA', 'Get guide_RNA biotypes');
   is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
   cmp_ok(scalar(@{$biotypes_json}), '==', 2, 'Ensuring we have the right number of biotypes of name guide_RNA');
-  my $biotype = shift $biotypes_json;
+  my $biotype = shift @{$biotypes_json};
   is(ref($biotype), 'HASH', 'Biotypes represented by Hashes');
   my $expected = { name => 'guide_RNA', biotype_group => 'snoncoding', object_type => 'gene', so_acc => 'SO:0001263'};
   eq_or_diff_data($biotype, $expected, 'Checking internal contents of biotype hash as expected');
