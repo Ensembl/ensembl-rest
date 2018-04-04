@@ -53,7 +53,7 @@ my $base = '/variation/homo_sapiens';
 
 # Include genotyping chips information
   $id = 'rs7698608';
-  my $expected_variation_3 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.448577', minor_allele => 'C', ambiguity => 'M', var_class => 'SNP', synonyms => ['rs60248177','rs17215092'], evidence => [], ancestral_allele => undef, most_severe_consequence => '5_prime_UTR_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"4:103937974-103937974", "strand" => 1, "start" => 103937974, "end" => 103937974, "seq_region_name" => "4", "coord_system" => "chromosome","allele_string"=>"C/A"}]};
+  my $expected_variation_3 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.448577', minor_allele => 'C', ambiguity => 'M', var_class => 'SNP', synonyms => bag(qw/rs60248177 rs17215092/), evidence => [], ancestral_allele => undef, most_severe_consequence => '5_prime_UTR_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"4:103937974-103937974", "strand" => 1, "start" => 103937974, "end" => 103937974, "seq_region_name" => "4", "coord_system" => "chromosome","allele_string"=>"C/A"}]};
   $json = json_GET("$base/$id", 'Variation feature');
   cmp_deeply($json, $expected_variation_3, "Checking the result from the variation endpoint");
 
@@ -69,7 +69,7 @@ my $base = '/variation/homo_sapiens';
   #my $expected_result_genotyping_chips = { rs142276873 => { %{$expected_variation_1}, genotyping_chips => [] }, rs7698608 => $expected_genotyping_chips };
   my $geno_chip_json_post = json_POST($url, $post_data_genotyping_chips, "POST list of variations and fetch with genotyping chips information");
   cmp_ok(scalar(keys %{$geno_chip_json_post}), "==", 2, "POST genotyping chips info: retrieve 2 variants");
-  cmp_ok(scalar (@{$geno_chip_json_post->{"rs142276873"}->{'genotyping_chips'}}), "==", 0, "Variant has 0 genotyping chips information");
+  cmp_ok(scalar(@{$geno_chip_json_post->{"rs142276873"}->{'genotyping_chips'}}), "==", 0, "Variant has 0 genotyping chips information");
   cmp_ok(scalar(@{$geno_chip_json_post->{"rs7698608"}->{'genotyping_chips'}}), "==", 6, 'Variant with 6 genotyping chips');
 
 # Get additional genotype information
