@@ -143,15 +143,83 @@ sub external_dbs_GET :Local :Args(1) {
   return
 }
 
-sub biotypes :Local :ActionClass('REST') :Args(1) { }
+sub biotypes_GET { }
 
-sub biotypes_GET :Local :Args(1) { 
+sub biotypes : Chained('/') PathPart("info/biotypes") Args(1) ActionClass('REST') {
   my ($self, $c, $species) = @_;
   my $dba = $c->model('Registry')->get_DBAdaptor($species, 'core', 1);
   $c->go('ReturnError', 'custom', ["Could not fetch adaptor for species $species"]) unless $dba;
   my $obj_biotypes = EnsEMBL::REST::EnsemblModel::Biotype->get_Biotypes($c, $species);
   my @biotypes = map { $_->summary_as_hash() } @{$obj_biotypes};
   $self->status_ok($c, entity => \@biotypes);
+  return;
+}
+
+sub biotype_groups_GET { }
+
+sub biotype_groups : Chained('/') PathPart("info/biotypes/groups") Args(0) ActionClass('REST') {
+  my ($self, $c) = @_;
+
+  my $groups;
+
+  try {
+    $groups = $c->model('Biotype')->fetch_biotype_groups;
+
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+
+  $self->status_ok($c, entity => $groups);
+  return;
+}
+
+
+sub biotype_group_GET { }
+
+sub biotype_group : Chained('/') PathPart("info/biotypes/groups") Args(1) ActionClass('REST') {
+  my ($self, $c, $group) = @_;
+
+  my $biotypes;
+
+  try {
+    $biotypes = $c->model('Biotype')->fetch_biotypes_by_group($group);
+
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+
+  $self->status_ok($c, entity => $biotypes);
+  return;
+}
+
+sub biotype_names_GET { }
+
+sub biotype_names : Chained('/') PathPart("info/biotypes/name") Args(0) ActionClass('REST') {
+  my ($self, $c) = @_;
+
+  $c->go('ReturnError', 'custom', ["Missing argument ':name' for endpoint info/biotypes/name/:name"]);
+
+  return;
+}
+
+sub biotype_name_GET { }
+
+sub biotype_name : Chained('/') PathPart("info/biotypes/name") Args(1) ActionClass('REST') {
+  my ($self, $c, $name) = @_;
+
+  my $biotypes;
+
+  try {
+    $biotypes = $c->model('Biotype')->fetch_biotypes_by_name($name);
+
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+
+  $self->status_ok($c, entity => $biotypes);
   return;
 }
 
@@ -171,7 +239,7 @@ sub genomic_methods : Chained('/') PathPart('info/compara/methods') Args(0) Acti
   };
 
   $self->status_ok($c, entity => \%types);
-
+  return;
 }
 
 sub species_sets_GET { }
@@ -187,7 +255,7 @@ sub species_sets : Chained('/') PathPart("info/compara/species_sets") Args(1) Ac
   };
 
   $self->status_ok($c, entity => $species_sets);
-
+  return;
 }
 
 sub variation :Local :ActionClass('REST') :Args(1) { }
