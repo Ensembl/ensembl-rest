@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -92,7 +92,7 @@ sub fetch_biotypes_by_group {
   $dbc->sql_helper->execute_no_return(-SQL => $sql, -CALLBACK => sub {
     my ($row) = @_;
 
-    my $biotype = { 
+    my $biotype = {
       'name'          => $row->[0],
       'biotype_group' => $row->[1],
       'object_type'   => $row->[2],
@@ -126,7 +126,7 @@ sub fetch_biotypes_by_name {
   $dbc->sql_helper->execute_no_return(-SQL => $sql, -CALLBACK => sub {
     my ($row) = @_;
 
-    my $biotype = { 
+    my $biotype = {
       'name'          => $row->[0],
       'biotype_group' => $row->[1],
       'object_type'   => $row->[2],
