@@ -148,6 +148,9 @@ sub biotypes_GET { }
 sub biotypes : Chained('/') PathPart("info/biotypes") Args(1) ActionClass('REST') {
   my ($self, $c, $species) = @_;
   my $dba = $c->model('Registry')->get_DBAdaptor($species, 'core', 1);
+  if ( $species eq 'name') {
+    $c->go('ReturnError', 'custom', ["Missing argument ':name' for endpoint info/biotypes/name/:name"]);
+  }
   $c->go('ReturnError', 'custom', ["Could not fetch adaptor for species $species"]) unless $dba;
   my $obj_biotypes = EnsEMBL::REST::EnsemblModel::Biotype->get_Biotypes($c, $species);
   my @biotypes = map { $_->summary_as_hash() } @{$obj_biotypes};
@@ -191,16 +194,6 @@ sub biotype_group : Chained('/') PathPart("info/biotypes/groups") Args(1) Action
   };
 
   $self->status_ok($c, entity => $biotypes);
-  return;
-}
-
-sub biotype_names_GET { }
-
-sub biotype_names : Chained('/') PathPart("info/biotypes/name") Args(0) ActionClass('REST') {
-  my ($self, $c) = @_;
-
-  $c->go('ReturnError', 'custom', ["Missing argument ':name' for endpoint info/biotypes/name/:name"]);
-
   return;
 }
 
