@@ -176,13 +176,15 @@ sub biotype_groups : Path("biotypes/groups") Args(0) ActionClass('REST') {
 
 sub biotype_group_GET { }
 
-sub biotype_group : Path("biotypes/groups") Args(1) ActionClass('REST') {
-  my ($self, $c, $group) = @_;
+sub biotype_group : Path("biotypes/groups") CaptureArgs(2) ActionClass('REST') {
+  my ($self, $c, $group, $object_type) = @_;
+
+  $c->go('ReturnError', 'custom', ["Missing mandatory argument ':group' for endpoint info/biotypes/groups/:group/:object_type"]) unless $group;
 
   my $biotypes;
 
   try {
-    $biotypes = $c->model('Biotype')->fetch_biotypes_by_group($group);
+    $biotypes = $c->model('Biotype')->fetch_biotypes_by_group($group, $object_type);
 
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
@@ -190,7 +192,11 @@ sub biotype_group : Path("biotypes/groups") Args(1) ActionClass('REST') {
   };
 
   ## Return 404 for get requests with no return
-  $c->go( 'ReturnError', 'not_found', ["biotypes not found for group $group"]) unless $biotypes->[0];
+  if ( !$biotypes->[0] ) {
+    my $ot_error = '';
+    if ($object_type) { $ot_error = " and object_type $object_type" }
+    $c->go( 'ReturnError', 'not_found', ["biotypes not found for group $group$ot_error"]);
+  }
 
   $self->status_ok($c, entity => $biotypes);
   return;
@@ -198,15 +204,15 @@ sub biotype_group : Path("biotypes/groups") Args(1) ActionClass('REST') {
 
 sub biotype_name_GET { }
 
-sub biotype_name : Path("biotypes/name") CaptureArgs(1) ActionClass('REST') {
-  my ($self, $c, $name) = @_;
+sub biotype_name : Path("biotypes/name") CaptureArgs(2) ActionClass('REST') {
+  my ($self, $c, $name, $object_type) = @_;
 
-  $c->go('ReturnError', 'custom', ["Missing argument ':name' for endpoint info/biotypes/name/:name"]) unless $name;
+  $c->go('ReturnError', 'custom', ["Missing mandatory argument ':name' for endpoint info/biotypes/name/:name"]) unless $name;
 
   my $biotypes;
 
   try {
-    $biotypes = $c->model('Biotype')->fetch_biotypes_by_name($name);
+    $biotypes = $c->model('Biotype')->fetch_biotypes_by_name($name, $object_type);
 
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
@@ -214,7 +220,11 @@ sub biotype_name : Path("biotypes/name") CaptureArgs(1) ActionClass('REST') {
   };
 
   ## Return 404 for get requests with no return
-  $c->go( 'ReturnError', 'not_found', ["biotypes not found for name $name"]) unless $biotypes->[0];
+  if ( !$biotypes->[0] ) {
+    my $ot_error = '';
+    if ($object_type) { $ot_error = " and object_type $object_type" }
+    $c->go( 'ReturnError', 'not_found', ["biotypes not found for name $name$ot_error"]);
+  }
 
   $self->status_ok($c, entity => $biotypes);
   return;

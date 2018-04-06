@@ -81,11 +81,13 @@ Retrieves list of biotypes part of a provided biotype group
 =cut
 
 sub fetch_biotypes_by_group {
-  my ($self, $group) = @_;
+  my ($self, $group, $object_type) = @_;
 
   my $dbc = $self->context->model('Registry')->get_adaptor( 'Homo_sapiens', 'Core', 'Biotype' )->db->dbc();
 
-  my $sql = "SELECT name, biotype_group, object_type, so_acc FROM biotype WHERE biotype_group = \"$group\" ORDER BY object_type, name";
+  my $ot_filter = '';
+  if ( $object_type ) { $ot_filter = "AND object_type = \"$object_type\"" }
+  my $sql = "SELECT name, biotype_group, object_type, so_acc FROM biotype WHERE biotype_group = \"$group\" AND db_type LIKE '%core%' $ot_filter ORDER BY object_type, name";
 
   my @biotypes;
 
@@ -115,11 +117,13 @@ Retrieves biotypes with the provided name
 =cut
 
 sub fetch_biotypes_by_name {
-  my ($self, $name) = @_;
+  my ($self, $name, $object_type) = @_;
 
   my $dbc = $self->context->model('Registry')->get_adaptor( 'Homo_sapiens', 'Core', 'Biotype' )->db->dbc();
 
-  my $sql = "SELECT name, biotype_group, object_type, so_acc FROM biotype WHERE name = \"$name\" ORDER BY object_type, name";
+  my $ot_filter = '';
+  if ( $object_type ) { $ot_filter = "AND object_type = \"$object_type\"" }
+  my $sql = "SELECT name, biotype_group, object_type, so_acc FROM biotype WHERE name = \"$name\" AND db_type LIKE '%core%' $ot_filter ORDER BY object_type, name";
 
   my @biotypes;
 
