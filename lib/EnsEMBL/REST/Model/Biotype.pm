@@ -24,9 +24,7 @@ use Try::Tiny;
 use Catalyst::Exception qw(throw);
 use Scalar::Util qw/weaken/;
 use List::MoreUtils qw(uniq);
-
 use Bio::EnsEMBL::Utils::Scalar qw/assert_ref/;
-
 
 extends 'Catalyst::Model';
 
@@ -43,7 +41,7 @@ sub build_per_context_instance {
 
 =head fetch_by_name_object_type
 
-Fetches Biotype object by name and object_pype
+Fetches Biotype object by name and object_type
 
 =cut
 
@@ -106,9 +104,6 @@ sub fetch_biotypes_by_group {
 
   return \@biotypes;
 }
-
-
-
 
 =head fetch_biotypes_by_name
 

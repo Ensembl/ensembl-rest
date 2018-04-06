@@ -179,7 +179,7 @@ sub biotype_group_GET { }
 sub biotype_group : Path("biotypes/groups") CaptureArgs(2) ActionClass('REST') {
   my ($self, $c, $group, $object_type) = @_;
 
-  $c->go('ReturnError', 'custom', ["Missing mandatory argument ':group' for endpoint info/biotypes/groups/:group/:object_type"]) unless $group;
+  $c->go('ReturnError', 'custom', ["Missing argument ':group' for endpoint info/biotypes/groups/:group/:object_type"]) unless $group;
 
   my $biotypes;
 
@@ -207,7 +207,7 @@ sub biotype_name_GET { }
 sub biotype_name : Path("biotypes/name") CaptureArgs(2) ActionClass('REST') {
   my ($self, $c, $name, $object_type) = @_;
 
-  $c->go('ReturnError', 'custom', ["Missing mandatory argument ':name' for endpoint info/biotypes/name/:name"]) unless $name;
+  $c->go('ReturnError', 'custom', ["Missing mandatory argument ':name' for endpoint info/biotypes/name/:name/:object_type"]) unless $name;
 
   my $biotypes;
 
