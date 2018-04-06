@@ -192,7 +192,7 @@ sub biotype_group : Path("biotypes/groups") CaptureArgs(2) ActionClass('REST') {
   };
 
   ## Return 404 for get requests with no return
-  if ( !$biotypes->[0] ) {
+  if ( ! scalar @{$biotypes} ) {
     my $ot_error = '';
     if ($object_type) { $ot_error = " and object_type $object_type" }
     $c->go( 'ReturnError', 'not_found', ["biotypes not found for group $group$ot_error"]);
@@ -220,7 +220,7 @@ sub biotype_name : Path("biotypes/name") CaptureArgs(2) ActionClass('REST') {
   };
 
   ## Return 404 for get requests with no return
-  if ( !$biotypes->[0] ) {
+  if ( ! scalar @{$biotypes} ) {
     my $ot_error = '';
     if ($object_type) { $ot_error = " and object_type $object_type" }
     $c->go( 'ReturnError', 'not_found', ["biotypes not found for name $name$ot_error"]);
