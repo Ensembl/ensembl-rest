@@ -165,6 +165,7 @@ is_json_GET(
   is(ref($biotype), 'HASH', 'Biotypes represented by Hashes');
   my $expected = { name => 'IG_C_gene', biotype_group => 'coding', object_type => 'gene', so_acc => 'SO:0001217'};
   eq_or_diff_data($biotype, $expected, 'Checking internal contents of biotype hash as expected');
+  action_bad_regex('/info/biotypes/groups/fake_group', qr/biotypes not found for group/, 'No matches for provided group error');
 }
 
 # /info/biotypes/name/:name
@@ -177,6 +178,7 @@ is_json_GET(
   is(ref($biotype), 'HASH', 'Biotypes represented by Hashes');
   my $expected = { name => 'guide_RNA', biotype_group => 'snoncoding', object_type => 'gene', so_acc => 'SO:0001263'};
   eq_or_diff_data($biotype, $expected, 'Checking internal contents of biotype hash as expected');
+  action_bad_regex('/info/biotypes/name/fake_name', qr/biotypes not found for name/, 'No matches for provided name error');
 }
 
 #/info/compara/methods

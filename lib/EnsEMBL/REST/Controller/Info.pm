@@ -189,6 +189,9 @@ sub biotype_group : Path("biotypes/groups") Args(1) ActionClass('REST') {
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
 
+  ## Return 404 for get requests with no return
+  $c->go( 'ReturnError', 'not_found', ["biotypes not found for group $group"]) unless $biotypes->[0];
+
   $self->status_ok($c, entity => $biotypes);
   return;
 }
@@ -209,6 +212,9 @@ sub biotype_name : Path("biotypes/name") CaptureArgs(1) ActionClass('REST') {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
+
+  ## Return 404 for get requests with no return
+  $c->go( 'ReturnError', 'not_found', ["biotypes not found for name $name"]) unless $biotypes->[0];
 
   $self->status_ok($c, entity => $biotypes);
   return;
