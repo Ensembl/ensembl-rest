@@ -500,16 +500,6 @@ sub get_data {
     $data->{short_EPO_soft} =  {description=>'','end'=>106040550,'seq'=>'TAGTGG-TGAttttttggttttttGCCTGCTGGCCCTCCTTCTTTGTACTCA','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040500,'strand'=>1};
     $data->{short_EPO_hard} =  {description=>'','end'=>106040550,'seq'=>'TAGTGG-TGANNNNNNNNNNNNNNGCCTGCTGGCCCTCCTTCTTTGTACTCA','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040500,'strand'=>1};
 
-    push @{$data->{LASTZ_NET_no_overlaps}}, {description=>'','end'=>106041480,'seq'=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGCAGTTTACGCTGAATCAC','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106041430,'strand'=>1};
-    push @{$data->{LASTZ_NET_no_overlaps}}, {description=>'','end'=>100371632,'seq'=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGC.................','seq_region'=>2,'species'=>'gallus_gallus','start'=>100371599,'strand'=>1};
-
-   push @{$data->{LASTZ_NET_all_overlaps}}, {description=>'','end'=>106041480,'seq'=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGCAGTTTACGCTGAATCAC','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106041430,'strand'=>1};
-    push @{$data->{LASTZ_NET_all_overlaps}}, {description=>'','end'=>100371632,'seq'=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGC-----------------','seq_region'=>2,'species'=>'gallus_gallus','start'=>100371599,'strand'=>1};
-   push @{$data->{LASTZ_NET_all_overlaps}}, {description=>'','end'=>809,'seq'=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGCAGATTTTGAT-----AT','seq_region'=>'AADN03027098.1','species'=>'gallus_gallus','start'=>764,'strand'=>1};
-
-   push @{$data->{LASTZ_NET_restrict_overlaps}}, {description=>'','end'=>106041480,'seq'=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGCAGTTTACGCTGAATCAC','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106041430,'strand'=>1};
-    push @{$data->{LASTZ_NET_restrict_overlaps}}, {description=>'Composite is: chromosome:Galgal4:2:100371599:100371632:1 + scaffold:Galgal4:AADN03027098.1:798:809:1','end'=>51,'seq'=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGCAGATTTTGAT-----AT','seq_region'=>'Composite','species'=>'gallus_gallus','start'=>1,'strand'=>1};
-
     my ($block1, $block2);
     push @{$block1}, {description=>'',end=>106041463,seq=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGC',seq_region=>'2',species=>'taeniopygia_guttata',start=>106041430,strand=>1};
     push @{$block1}, {description=>'',end=>100371632,seq=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGC',seq_region=>'2',species=>'gallus_gallus',start=>100371599,strand=>1};
