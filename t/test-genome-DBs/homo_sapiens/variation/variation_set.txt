@@ -1,4 +1,5 @@
 1	All failed variations	Variations that have failed the Ensembl QC checks	179
+2	Genotyping chip variants	Variants which have assays on commercial chips held in ensembl	360
 3	Affy GenomeWideSNP_6.0	Variants from the Affymetrix Genome-Wide Human SNP Array 6.0	333
 4	Illumina_Human660W-quad	Variants from the Illumina Human660W-quad whole genome genotyping array designed for association studies	334
 5	Illumina_1M-duo	Variants from the Illumina Human1M-duo v3 whole genome genotyping array designed for association studies	335
