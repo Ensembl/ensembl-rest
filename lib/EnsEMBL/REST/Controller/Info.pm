@@ -145,13 +145,88 @@ sub external_dbs_GET :Local :Args(1) {
 
 sub biotypes :Local :ActionClass('REST') :Args(1) { }
 
-sub biotypes_GET :Local :Args(1) { 
+sub biotypes_GET :Local :Args(1) {
   my ($self, $c, $species) = @_;
   my $dba = $c->model('Registry')->get_DBAdaptor($species, 'core', 1);
   $c->go('ReturnError', 'custom', ["Could not fetch adaptor for species $species"]) unless $dba;
   my $obj_biotypes = EnsEMBL::REST::EnsemblModel::Biotype->get_Biotypes($c, $species);
   my @biotypes = map { $_->summary_as_hash() } @{$obj_biotypes};
   $self->status_ok($c, entity => \@biotypes);
+  return;
+}
+
+sub biotype_groups_GET { }
+
+sub biotype_groups : Path("biotypes/groups") Args(0) ActionClass('REST') {
+  my ($self, $c) = @_;
+
+  my $groups;
+
+  try {
+    $groups = $c->model('Biotype')->fetch_biotype_groups;
+
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+
+  $self->status_ok($c, entity => $groups);
+  return;
+}
+
+sub biotype_group_GET { }
+
+sub biotype_group : Path("biotypes/groups") CaptureArgs(2) ActionClass('REST') {
+  my ($self, $c, $group, $object_type) = @_;
+
+  $c->go('ReturnError', 'custom', ["Missing argument ':group' for endpoint info/biotypes/groups/:group/:object_type"]) unless $group;
+
+  my $biotypes;
+
+  try {
+    $biotypes = $c->model('Biotype')->fetch_biotypes_by_group($group, $object_type);
+
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+
+  ## Return 404 for get requests with no return
+  if ( ! scalar @{$biotypes} ) {
+    my $ot_error = '';
+    if ($object_type) { $ot_error = " and object_type $object_type" }
+    $c->go( 'ReturnError', 'not_found', ["biotypes not found for group $group$ot_error"]);
+  }
+
+  $self->status_ok($c, entity => $biotypes);
+  return;
+}
+
+sub biotype_name_GET { }
+
+sub biotype_name : Path("biotypes/name") CaptureArgs(2) ActionClass('REST') {
+  my ($self, $c, $name, $object_type) = @_;
+
+  $c->go('ReturnError', 'custom', ["Missing mandatory argument ':name' for endpoint info/biotypes/name/:name/:object_type"]) unless $name;
+
+  my $biotypes;
+
+  try {
+    $biotypes = $c->model('Biotype')->fetch_biotypes_by_name($name, $object_type);
+
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+
+  ## Return 404 for get requests with no return
+  if ( ! scalar @{$biotypes} ) {
+    my $ot_error = '';
+    if ($object_type) { $ot_error = " and object_type $object_type" }
+    $c->go( 'ReturnError', 'not_found', ["biotypes not found for name $name$ot_error"]);
+  }
+
+  $self->status_ok($c, entity => $biotypes);
   return;
 }
 
@@ -171,7 +246,7 @@ sub genomic_methods : Chained('/') PathPart('info/compara/methods') Args(0) Acti
   };
 
   $self->status_ok($c, entity => \%types);
-
+  return;
 }
 
 sub species_sets_GET { }
@@ -187,7 +262,7 @@ sub species_sets : Chained('/') PathPart("info/compara/species_sets") Args(1) Ac
   };
 
   $self->status_ok($c, entity => $species_sets);
-
+  return;
 }
 
 sub variation :Local :ActionClass('REST') :Args(1) { }

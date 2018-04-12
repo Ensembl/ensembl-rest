@@ -147,6 +147,44 @@ is_json_GET(
   action_bad_regex('/info/biotypes/wibble', qr/Could not fetch adaptor for species .+/, 'Bogus species means error message');
 }
 
+# /info/biotypes/groups
+{
+  my $groups_json = json_GET('/info/biotypes/groups', 'Get the list biotype groups');
+  is(ref($groups_json), 'ARRAY', 'Array wanted from endpoint');
+  cmp_ok(scalar(@{$groups_json}), '==', 8, 'Ensuring we have the right number of biotype groups');
+  is(shift @{$groups_json}, 'coding', 'first group is coding');
+  is(pop @{$groups_json}, 'no_group', 'last group is no_group')
+}
+
+# /info/biotypes/groups/:group
+{
+  my $biotypes_json = json_GET('/info/biotypes/groups/coding', 'Get the list of coding biotypes');
+  is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
+  cmp_ok(scalar(@{$biotypes_json}), '==', 33, 'Ensuring we have the right number of biotypes of group coding');
+  my $biotype = shift @{$biotypes_json};
+  is(ref($biotype), 'HASH', 'Biotypes represented by Hashes');
+  my $expected = { name => 'IG_C_gene', biotype_group => 'coding', object_type => 'gene', so_acc => 'SO:0001217'};
+  eq_or_diff_data($biotype, $expected, 'Checking internal contents of biotype hash as expected');
+  action_bad_regex('/info/biotypes/groups/fake_group', qr/biotypes not found for group/, 'No matches for provided group error');
+  action_bad_regex('/info/biotypes/groups/coding/aaa', qr/biotypes not found for group coding and object_type/, 'No matches for provided object_type error');
+}
+
+# /info/biotypes/name/:name
+{
+  action_bad_regex('/info/biotypes/name', qr/Missing mandatory argument/, 'No argument provided means error message');
+  my $biotypes_json = json_GET('/info/biotypes/name/CRISPR', 'Get CRISPR biotypes');
+  is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
+  cmp_ok(scalar(@{$biotypes_json}), '==', 2, 'Ensuring we have the right number of biotypes of name CRISPR');
+  my $biotype = shift @{$biotypes_json};
+  is(ref($biotype), 'HASH', 'Biotypes represented by Hashes');
+  my $expected = { name => 'CRISPR', biotype_group => 'snoncoding', object_type => 'gene', so_acc => 'SO:0001263'};
+  eq_or_diff_data($biotype, $expected, 'Checking internal contents of biotype hash as expected');
+  my $biotype_json = json_GET('/info/biotypes/name/CRISPR/gene', 'Get CRISPR gene biotype');
+  eq_or_diff_data(shift @{$biotype_json}, $expected, 'Checking internal contents of biotype hash as expected');
+  action_bad_regex('/info/biotypes/name/fake_name', qr/biotypes not found for name/, 'No matches for provided name error');
+  action_bad_regex('/info/biotypes/name/CRISPR/fake_ot', qr/biotypes not found for name CRISPR and object_type/, 'No matches for provided object_type error');
+}
+
 #/info/compara/methods
 {
   my $methods_json = json_GET('/info/compara/methods', 'Get the compara methods hash');

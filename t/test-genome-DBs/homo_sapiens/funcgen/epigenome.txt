@@ -1,1 +1,1 @@
-1	Lung	Lung	REMC Epigenome (Class2) for Lung	Lung	female	\N	\N	\N
+1	Lung	Lung	REMC Epigenome (Class2) for Lung	Lung	female

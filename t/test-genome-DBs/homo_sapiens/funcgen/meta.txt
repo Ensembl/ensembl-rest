@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	92
+2	\N	schema_version	93
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -119,3 +119,18 @@
 691	\N	patch	patch_90_91_zh.sql|Add new columns to read_file_experimental_configuration table
 692	\N	patch	patch_90_91_zi.sql|Create probe_id index on probe_transcript table
 693	\N	patch	patch_91_92_a.sql|schema_version
+694	\N	patch	patch_91_92_b.sql|Drop column paired_with from table read_file
+695	\N	patch	patch_91_92_c.sql|Create underlying_structure table
+696	\N	patch	patch_92_93_a.sql|schema_version
+697	\N	patch	patch_92_93_b.sql|obsolete
+698	\N	patch	patch_92_93_c.sql|obsolete
+699	\N	patch	patch_92_93_d.sql|Create table for chance quality check
+700	\N	patch	patch_92_93_e.sql|Peak_calling table changes
+701	\N	patch	patch_92_93_f.sql|Updates to alignment table
+702	\N	patch	patch_92_93_g.sql|New table idr
+703	\N	patch	patch_92_93_h.sql|execution_plan table
+704	\N	patch	patch_92_93_i.sql|fastqc table
+705	\N	patch	patch_92_93_j.sql|phantom peak table
+706	\N	patch	patch_92_93_k.sql|frip table
+707	\N	patch	patch_92_93_l.sql|epigenome columns
+708	\N	patch	patch_92_93_m.sql|Remove constraints
