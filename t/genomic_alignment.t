@@ -103,15 +103,7 @@ my $data = get_data();
 
   is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
   eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
-  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
-  #Can have 2 alternative trees
-  my $found = 0;
-  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
-    if ($data_tree eq $json->[0]{tree}) {
-       $found = 1;
-    }
-  }
-  is($found, 1, "Single EPO tree");
+  eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, 'Single EPO tree');
 }
 
 #Small region EPO, tree, phyloxml
@@ -142,15 +134,7 @@ my $data = get_data();
 
   is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
   eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
-  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
-  #Can have 2 alternative trees
-  my $found = 0;
-  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
-    if ($data_tree eq $json->[0]{tree}) {
-       $found = 1;
-    }
-  }
-  is($found, 1, "Single EPO tree");
+  eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, 'Single EPO tree');
 }
 
 #Small region EPO, block, tree, aligned, phyloxml
@@ -182,16 +166,7 @@ my $data = get_data();
 
   is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
   eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO_no_gaps}, "First EPO alignment, block");
-
-  #Can have 2 alternative trees
-  my $found = 0;
-  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
-    if ($data_tree eq $json->[0]{tree}) {
-       $found = 1;
-    }
-  }
-  is($found, 1, "Single EPO tree");
-
+  eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, 'Single EPO tree');
 }
 
 #Small region EPO, tree, not aligned, phyloxml
@@ -331,15 +306,7 @@ my $data = get_data();
 
   is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
   eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
-  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
-  #Can have 2 alternative trees
-  my $found = 0;
-  foreach my $data_tree (@{$data->{short_EPO_tree_no_branch_lengths}}) {
-    if ($data_tree eq $json->[0]{tree}) {
-       $found = 1;
-    }
-  }
-  is($found, 1, "Single EPO tree");
+  eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree_no_branch_lengths}, 'Single EPO tree');
 }
 
 
@@ -373,15 +340,7 @@ my $data = get_data();
 
   is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
   eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
-  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
-  #Can have 2 alternative trees
-  my $found = 0;
-  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
-    if ($data_tree eq $json->[0]{tree}) {
-       $found = 1;
-    }
-  }
-  is($found, 1, "Single EPO tree");
+  eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, 'Single EPO tree');
 }
 
 #Small region EPO, tree, branch lengths phyloxml
@@ -414,15 +373,7 @@ my $data = get_data();
 
   is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, block");
   eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, block");
-  #eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, "Single EPO tree");
-  #Can have 2 alternative trees
-  my $found = 0;
-  foreach my $data_tree (@{$data->{short_EPO_tree}}) {
-    if ($data_tree eq $json->[0]{tree}) {
-       $found = 1;
-    }
-  }
-  is($found, 1, "Single EPO tree");
+  eq_or_diff_data($json->[0]{tree}, $data->{short_EPO_tree}, 'Single EPO tree');
 }
 
 #Small region EPO, tree, branch lengths phyloxml
@@ -453,17 +404,8 @@ my $data = get_data();
   my $json = json_GET("/alignment/region/$species/$region?method=EPO;species_set_group=birds", "large EPO alignment, multiple trees");
   is (scalar(@{$json}), $number_of_alignment_blocks, "number of alignment blocks, large block, multiple trees");
 
-  #expect to find 2 trees (leaf ordering can be different)
-  my $found = 0;
-  foreach my $data_tree (@{$data->{large_EPO_tree}}) {
-      foreach my $json_obj (@$json) {  
-        #print "TREE !$data_tree! !" . $json_obj->{tree} . "!\n";
-         if ($data_tree eq $json_obj->{tree}) {
-      	    $found++;
-    	 }
-      }	  
-  }	  
-  is($found, 2, "Large EPO tree");
+  my @trees = sort map {$_->{tree}} @$json;
+  eq_or_diff_data(\@trees, $data->{large_EPO_tree}, "Large EPO tree");
 }
 
 #EPO, large block, multiple trees
@@ -547,38 +489,16 @@ sub get_data {
     my $data;
 
     $data->{short_EPO} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAA--------GAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
+    $data->{short_EPO_tree} = '(taeniopygia_guttata_2_106040050_106040100[+]:0.1715,(gallus_gallus_2_100370256_100370312[+]:0.0414,meleagris_gallopavo_3_49885207_49885257[+]:0.0414)Ggal-Mgal[2]:0.1242)Ggal-Mgal-Tgut[3]:0;';
 
-    push @{$data->{short_EPO_tree}},"((meleagris_gallopavo_3_49885207_49885257[+]:0.0414,gallus_gallus_2_100370256_100370312[+]:0.0414)Mgal-Ggal[2]:0.1242,taeniopygia_guttata_2_106040050_106040100[+]:0.1715)Mgal-Ggal-Tgut[3]:0;";
-     push @{$data->{short_EPO_tree}},"((meleagris_gallopavo_3_49885207_49885257[+]:0.0414,gallus_gallus_2_100370256_100370312[+]:0.0414)Mgal-Ggal[2]:0.1242,taeniopygia_guttata_2_106040050_106040100[+]:0.1715)Tgut-Mgal-Ggal[3]:0;";
+    $data->{short_EPO_tree_no_branch_lengths} = '(taeniopygia_guttata_2_106040050_106040100[+],(gallus_gallus_2_100370256_100370312[+],meleagris_gallopavo_3_49885207_49885257[+]));';
 
-    push @{$data->{short_EPO_tree}}, "((gallus_gallus_2_100370256_100370312[+]:0.0414,meleagris_gallopavo_3_49885207_49885257[+]:0.0414)Ggal-Mgal[2]:0.1242,taeniopygia_guttata_2_106040050_106040100[+]:0.1715)Tgut-Ggal-Mgal[3]:0;";
-    push @{$data->{short_EPO_tree}}, "((gallus_gallus_2_100370256_100370312[+]:0.0414,meleagris_gallopavo_3_49885207_49885257[+]:0.0414)Ggal-Mgal[2]:0.1242,taeniopygia_guttata_2_106040050_106040100[+]:0.1715)Ggal-Mgal-Tgut[3]:0;";
-
-   push @{$data->{short_EPO_tree_no_branch_lengths}}, "((gallus_gallus_2_100370256_100370312[+],meleagris_gallopavo_3_49885207_49885257[+]),taeniopygia_guttata_2_106040050_106040100[+]);";
-   push @{$data->{short_EPO_tree_no_branch_lengths}}, "((meleagris_gallopavo_3_49885207_49885257[+],gallus_gallus_2_100370256_100370312[+]),taeniopygia_guttata_2_106040050_106040100[+]);";
-
-    push @{$data->{large_EPO_tree}}, "((meleagris_gallopavo_3_49885207_49885557[+]:0.0414,gallus_gallus_2_100370256_100370612[+]:0.0414)Mgal-Ggal[2]:0.1242,taeniopygia_guttata_2_106040050_106040400[+]:0.1715)Mgal-Ggal-Tgut[3]:0;";
-    push @{$data->{large_EPO_tree}}, "((meleagris_gallopavo_3_49885207_49885557[+]:0.0414,gallus_gallus_2_100370256_100370612[+]:0.0414)Mgal-Ggal[2]:0.1242,taeniopygia_guttata_2_106040050_106040400[+]:0.1715)Tgut-Mgal-Ggal[3]:0;";
-
-    push @{$data->{large_EPO_tree}}, "((gallus_gallus_2_100370256_100370612[+]:0.0414,meleagris_gallopavo_3_49885207_49885557[+]:0.0414)Ggal-Mgal[2]:0.1242,taeniopygia_guttata_2_106040050_106040400[+]:0.1715)Ggal-Mgal-Tgut[3]:0;";
-    push @{$data->{large_EPO_tree}}, "((gallus_gallus_2_100370256_100370612[+]:0.0414,meleagris_gallopavo_3_49885207_49885557[+]:0.0414)Ggal-Mgal[2]:0.1242,taeniopygia_guttata_2_106040050_106040400[+]:0.1715)Tgut-Ggal-Mgal[3]:0;";
-
-    push @{$data->{large_EPO_tree}}, "(meleagris_gallopavo_3_49885558_49886610[+]:0.1656,taeniopygia_guttata_2_106040401_106041500[+]:0.1715)Tgut-Mgal[2]:0;";
-    push @{$data->{large_EPO_tree}}, "(meleagris_gallopavo_3_49885558_49886610[+]:0.1656,taeniopygia_guttata_2_106040401_106041500[+]:0.1715)Mgal-Tgut[2]:0;";
+    push @{$data->{large_EPO_tree}}, '(taeniopygia_guttata_2_106040050_106040400[+]:0.1715,(gallus_gallus_2_100370256_100370612[+]:0.0414,meleagris_gallopavo_3_49885207_49885557[+]:0.0414)Ggal-Mgal[2]:0.1242)Ggal-Mgal-Tgut[3]:0;';
+    push @{$data->{large_EPO_tree}}, '(taeniopygia_guttata_2_106040401_106041500[+]:0.1715,meleagris_gallopavo_3_49885558_49886610[+]:0.1656)Mgal-Tgut[2]:0;';
 
     $data->{short_EPO_no_gaps} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAAGAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
     $data->{short_EPO_soft} =  {description=>'','end'=>106040550,'seq'=>'TAGTGG-TGAttttttggttttttGCCTGCTGGCCCTCCTTCTTTGTACTCA','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040500,'strand'=>1};
     $data->{short_EPO_hard} =  {description=>'','end'=>106040550,'seq'=>'TAGTGG-TGANNNNNNNNNNNNNNGCCTGCTGGCCCTCCTTCTTTGTACTCA','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040500,'strand'=>1};
-
-    push @{$data->{LASTZ_NET_no_overlaps}}, {description=>'','end'=>106041480,'seq'=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGCAGTTTACGCTGAATCAC','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106041430,'strand'=>1};
-    push @{$data->{LASTZ_NET_no_overlaps}}, {description=>'','end'=>100371632,'seq'=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGC.................','seq_region'=>2,'species'=>'gallus_gallus','start'=>100371599,'strand'=>1};
-
-   push @{$data->{LASTZ_NET_all_overlaps}}, {description=>'','end'=>106041480,'seq'=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGCAGTTTACGCTGAATCAC','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106041430,'strand'=>1};
-    push @{$data->{LASTZ_NET_all_overlaps}}, {description=>'','end'=>100371632,'seq'=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGC-----------------','seq_region'=>2,'species'=>'gallus_gallus','start'=>100371599,'strand'=>1};
-   push @{$data->{LASTZ_NET_all_overlaps}}, {description=>'','end'=>809,'seq'=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGCAGATTTTGAT-----AT','seq_region'=>'AADN03027098.1','species'=>'gallus_gallus','start'=>764,'strand'=>1};
-
-   push @{$data->{LASTZ_NET_restrict_overlaps}}, {description=>'','end'=>106041480,'seq'=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGCAGTTTACGCTGAATCAC','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106041430,'strand'=>1};
-    push @{$data->{LASTZ_NET_restrict_overlaps}}, {description=>'Composite is: chromosome:Galgal4:2:100371599:100371632:1 + scaffold:Galgal4:AADN03027098.1:798:809:1','end'=>51,'seq'=>'ACTCATCAGTATTTAACACAGCTTGTGACACTGCAGATTTTGAT-----AT','seq_region'=>'Composite','species'=>'gallus_gallus','start'=>1,'strand'=>1};
 
     my ($block1, $block2);
     push @{$block1}, {description=>'',end=>106041463,seq=>'ACTCATTCGCATTTATCACAGTTTATAAAATTGC',seq_region=>'2',species=>'taeniopygia_guttata',start=>106041430,strand=>1};
