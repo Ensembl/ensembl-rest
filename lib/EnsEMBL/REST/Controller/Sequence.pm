@@ -329,13 +329,13 @@ sub _process_feature {
 
     push(@sequences, {
       id => $object->stable_id(),
+      version => $object->version(),
       seq => $seq,
       molecule => $molecule,
       query => $id,
       desc => $desc 
     });
   }
-  
   return \@sequences;
 }
 

@@ -51,6 +51,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 # CDNA ID based lookup
 {
   my $id = 'ENST00000314040';
+  my $version = 1;
   my $url = '/sequence/id/'.$id.'?type=cdna;mask_feature=1';
   my $seq = $seqs{$id.'_cdna'};
   cmp_deeply(json_GET($url, 'GET sequence/id'),
@@ -60,6 +61,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       desc => undef,
       molecule => 'dna',
       query => $id,
+      version => $version,
     },
     'CDNA retrieval'
   );
@@ -71,6 +73,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 # CDS ID based lookup
 {
   my $id = 'ENST00000314040';
+  my $version = 1;
   cmp_deeply(json_GET(
     '/sequence/id/'.$id.'?type=cds', 'CDS via sequence/id'),
     {
@@ -79,6 +82,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       desc => undef,
       molecule => 'dna',
       query => $id,
+      version => $version,
     },
     'CDS retrieval'
   );
@@ -87,6 +91,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 # Protein ID based lookup
 {
   my $id = 'ENSP00000320396';
+  my $version = 1;
   my $seq = $seqs{$id.'_protein'};
   my $url = '/sequence/id/'.$id; 
   cmp_deeply(json_GET($url, 'protein via sequence/id'),
@@ -96,6 +101,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       desc => undef,
       molecule => 'protein',
       query => $id,
+      version => $version,
     },
     'Protein retrieval'
   );
@@ -119,6 +125,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 # Gene genomic DNA
 {
   my $id = 'ENSG00000176515';
+  my $version = 1;
   my $seq = $seqs{$id.'_genomic'};
   cmp_deeply(json_GET('/sequence/id/'.$id, 'dna via sequence/id'),
     {
@@ -127,6 +134,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       desc => ($seq->desc ? $seq->desc : undef),
       molecule => 'dna',
       query => $id,
+      version => $version,
     },
     'Gene genomic DNA retrieval'
   );
@@ -135,6 +143,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 # Gene to protein
 {
   my $id = 'ENSG00000176515';
+  my $version = 1;
   my $protein_id = 'ENSP00000320396';
   my $seq = $seqs{$protein_id.'_protein'};
   
@@ -150,6 +159,7 @@ Catalyst::Test->import('EnsEMBL::REST');
       desc => ($seq->desc ? $seq->desc : undef),
       molecule => 'protein',
       query => $id,
+      version => $version,
     }],
     'Gene to protein sequence retrieval with multiple sequences on'
   );
@@ -261,7 +271,7 @@ FASTA
   my $body = q/{ "ids" : [ "ENSP00000370194", "ENSG00000243439" ]}/;
   my $seq_a = q/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYPRSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQLECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKTIVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELVREMVHADVELMRTNPNA/;
   my $seq_b = q/GCCAGCCAGGGTGGCAGGTGCCTGTAGTCCCAGCTGCTTGGGAGGCTCAAGGATTGCTTGAACCCAGGAGTTCTGCCCTGCAGTGCGCGGTGCCCATCGGGTGACACCCATCAGGTATCTGCACTAAGTTCAGCATGAAGAGCAGCGGGCCACCAGGCTGCCTAAGAAGGAATGAACCAGCCTGCTTTGGAAACAGAGCAGCTGAAACTCCTGTGCCGATCAGTGGTGGGATCACACCTGTGAGTAGCCACGCCTGCCCAGGCAACACAGACCCTGTCTCTTGCAAAATTAAAAA/;
-  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein", query => "ENSP00000370194"},{"desc" => "chromosome:GRCh37:6:1507557:1507851:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna", query => "ENSG00000243439"}];
+  my $response = [{"desc" => undef,"id" => "ENSP00000370194", version => 4, "seq" => $seq_a,"molecule" => "protein", query => "ENSP00000370194"},{"desc" => "chromosome:GRCh37:6:1507557:1507851:1","id" => "ENSG00000243439", version => 2, "seq" => $seq_b,"molecule" => "dna", query => "ENSG00000243439"}];
   cmp_bag(json_POST($url,$body,'POST sequence/id'),$response,'Basic POST ID sequence fetch');
 
 }
@@ -279,7 +289,7 @@ FASTA
   my $url = "/sequence/id/$id?start=10&end=30";
   my $fasta = fasta_GET($url, 'Getting 20 bp sub-sequence');
   my $expected = <<'FASTA';
->ENSG00000243439 chromosome:GRCh37:6:1507566:1507586:1
+>ENSG00000243439.2 chromosome:GRCh37:6:1507566:1507586:1
 GGTGGCAGGTGCCTGTAGTCC
 FASTA
   is($fasta, $expected, 'Genomic 20bp sub-sequence');
@@ -289,7 +299,7 @@ FASTA
   my $url = "/sequence/id/$id?end=30";
   my $fasta = fasta_GET($url, 'Getting genomic sub-sequence without start parameter');
   my $expected = <<'FASTA';
->ENSG00000243439 chromosome:GRCh37:6:1507557:1507586:1
+>ENSG00000243439.2 chromosome:GRCh37:6:1507557:1507586:1
 GCCAGCCAGGGTGGCAGGTGCCTGTAGTCC
 FASTA
   is($fasta, $expected, 'Getting genomic sub-sequence without start parameter');
@@ -299,7 +309,7 @@ FASTA
   my $url = "/sequence/id/$id?start=25000";
   my $fasta = fasta_GET($url, 'Getting transcript sub-sequence without end parameter');
   my $expected = <<'FASTA';
->ENST00000314040 chromosome:GRCh37:6:1105163:1105181:1
+>ENST00000314040.1 chromosome:GRCh37:6:1105163:1105181:1
 CTGTTGCTTCACACTCCCG
 FASTA
   is($fasta, $expected, 'Getting transcript sub-sequence without end parameter');
@@ -309,7 +319,7 @@ FASTA
   my $url = "/sequence/id/$id?type=protein&start=200";
   my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript without end parameter');
   my $expected = <<'FASTA';
->ENSP00000259806
+>ENSP00000259806.1
 SPPPAAAAAAAAAPETTSSSSSSSSASCASSSSSSNSASAPSAACKSAGGGGAGAGSGGA
 KKASSGLRRPEKPPYSYIALIVMAIQSSPSKRLTLSEIYQFLQARFPFFRGAYQGWKNSV
 RHNLSLNECFIKLPKGLGRPGKGHYWTIDPASEFMFEEGSFRRRPRGFRRKCQALKPMYH
@@ -325,7 +335,7 @@ FASTA
   my $url = "/sequence/id/$id?type=protein&start=10&end=30";
   my $fasta = fasta_GET($url, 'Getting protein sub-sequence from translation feature with start and end');
   my $expected = <<'FASTA';
->ENSP00000259806
+>ENSP00000259806.1
 APLRRACSPVPGALQAALMSP
 FASTA
   is($fasta, $expected, 'Getting protein sub-sequence from translation feature with start and end');
@@ -335,7 +345,7 @@ FASTA
   my $url = "/sequence/id/$id?type=protein&start=30&end=30";
   my $fasta = fasta_GET($url, 'Getting single bp protein sub-sequence from translation feature');
   my $expected = <<'FASTA';
->ENSP00000259806
+>ENSP00000259806.1
 P
 FASTA
   is($fasta, $expected, 'Getting single bp sub-sequence from translation feature');
@@ -345,7 +355,7 @@ FASTA
   my $url = "/sequence/id/$id?type=protein&end=200";
   my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript without start parameter');
   my $expected = <<'FASTA';
->ENSP00000383537
+>ENSP00000383537.3
 XSNLKRDVAHLYRGVGSRYIMGSG
 FASTA
   is($fasta, $expected, 'Getting protein sub-sequence from transcript without start parameter');
@@ -355,7 +365,7 @@ FASTA
   my $url = "/sequence/id/$id?type=protein&start=10&end=10";
   my $fasta = fasta_GET($url, 'Getting protein sub-sequence from transcript with length 1bp');
   my $expected = <<'FASTA';
->ENSP00000383537
+>ENSP00000383537.3
 K
 FASTA
   is($fasta, $expected, 'Getting protein sub-sequence from transcript with length 1bp');
@@ -365,13 +375,13 @@ FASTA
   my $url = "/sequence/id/$id?type=protein&multiple_sequences=1&start=150000";
   my $fasta = fasta_GET($url, 'Getting protein sub-sequence from gene, using multiple');
   my $expected = <<'FASTA';
->ENSP00000436726
+>ENSP00000436726.1
 ISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYP
 RSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQL
 ECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKT
 IVWEGKNENEVGRCKETGKVHVTVDLKYYRPTEVDFLQGDCTKAKQKLNWKPRVAFDELV
 REMVHADVELMRTNPNA
->ENSP00000370194
+>ENSP00000370194.4
 ISFDLAEYTADVDGVGTLRLLDAVKTCGLINSVKFYQASTSELYGKVQEIPQKETTPFYP
 RSPYGAAKLYAYWIVVNFREAYNLFAVNGILFNHESPRRGANFVTRKISRSVAKIYLGQL
 ECFSLGNLDAKRDWGHAKDYVEAMWLMLQNDEPEDFVIATGEVHSVREFVEKSFLHIGKT
@@ -397,7 +407,7 @@ FASTA
   my $body = q/{ "ids" : [ "ENSP00000370194", "ENSG00000243439" ]}/;
   my $seq_a = q/LAEYTADVDGVGTLRLLDAVKTCGLINSVKF/;
   my $seq_b = q/TGCACTAAGTTCAGCATGAAGAGCAGCGGGC/;
-  my $response = [{"desc" => undef,"id" => "ENSP00000370194","seq" => $seq_a,"molecule" => "protein", query => "ENSP00000370194"},{"desc" => "chromosome:GRCh37:6:1507676:1507706:1","id" => "ENSG00000243439","seq" => $seq_b,"molecule" => "dna", query => "ENSG00000243439"}];
+  my $response = [{"desc" => undef,"id" => "ENSP00000370194", version => 4, "seq" => $seq_a,"molecule" => "protein", query => "ENSP00000370194"},{"desc" => "chromosome:GRCh37:6:1507676:1507706:1","id" => "ENSG00000243439", version => 2, "seq" => $seq_b,"molecule" => "dna", query => "ENSG00000243439"}];
   is_json_POST($url,$body,$response,'POST ID sequence fetch with sequence trimming');
 
 }

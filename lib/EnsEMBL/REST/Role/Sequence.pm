@@ -75,7 +75,8 @@ sub _fasta {
     -format => 'fasta',
   );
   foreach my $entity (@{$sequences}) {
-    my $seq = Bio::Seq->new(-ID => $entity->{id}, -MOLECULE => $entity->{molecule}, -ALPHABET => $entity->{molecule}, -SEQ => $entity->{seq});
+    my $id_with_version = exists $entity->{version} ? $entity->{id} .'.'. $entity->{version} : $entity->{id};
+    my $seq = Bio::Seq->new(-ID => $id_with_version, -MOLECULE => $entity->{molecule}, -ALPHABET => $entity->{molecule}, -SEQ => $entity->{seq});
     $seq->desc($entity->{desc}) if $entity->{desc};
     $seq_out->write_seq($seq);
   }
@@ -97,7 +98,8 @@ sub _seqxml {
   $w->startTag("seqXML", [$xsi_uri, 'noNamespaceSchemaLocation'] => "${seqxml_uri}", 'seqXMLversion', $version);
   
   foreach my $entity (@{$sequences}) {
-    $w->startTag('entry', 'id' => $entity->{id});
+    my $id_with_version = exists $entity->{version} ? $entity->{id} .'.'. $entity->{version} : $entity->{id};
+    $w->startTag('entry', 'id' => $id_with_version);
     my $tag_name = { dna => 'DNAseq', protein => 'AAseq' }->{$entity->{molecule}};
     $w->dataElement($tag_name, $entity->{seq});
     $w->endTag('entry');

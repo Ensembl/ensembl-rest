@@ -34,7 +34,7 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 my $basic_id = 'ENSG00000176515';
 my $symbol = "AL033381.1";
-my $condensed_response = {object_type => 'Gene', db_type => 'core', species => 'homo_sapiens', id => $basic_id};
+my $condensed_response = {object_type => 'Gene', db_type => 'core', species => 'homo_sapiens', id => $basic_id, version => 1};
 
 is_json_GET("/lookup/id/$basic_id?format=condensed", $condensed_response, 'Get of a known ID will return a value');
 is_json_GET("/lookup/$basic_id?format=condensed", $condensed_response, 'Get of a known ID to the old URL will return a value');
@@ -50,13 +50,13 @@ cmp_deeply(json_GET("/lookup/$basic_id",'lookup a gene'), $full_response, 'Get o
 my $expanded_response = {
   %{$condensed_response},
   Transcript => [
-                 {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040',
- Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
+                 {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040',version => 1,
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396', version => 1},
         Exon =>
                 [
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861'},
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874'},
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861', version => 1},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874', version => 1},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869', version => 1}
                 ]
                 }]
                 };
@@ -64,7 +64,7 @@ cmp_deeply(json_GET("/lookup/id/$basic_id?expand=1;format=condensed",'lookup an 
 
 my $id_with_phenotype = 'ENSG00000137273';
 my $phenotype_response = {
-	object_type => 'Gene', db_type => 'core', species => 'homo_sapiens', id => $id_with_phenotype,
+	object_type => 'Gene', db_type => 'core', species => 'homo_sapiens', id => $id_with_phenotype, version => 3,
 	phenotypes => [
     {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'positive regulation of transcription from RNA polymerase II promoter', variants => undef},
     {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'soft palate development',variants => undef}
@@ -74,8 +74,8 @@ cmp_deeply(json_GET("/lookup/id/$id_with_phenotype?phenotypes=1;format=condensed
 my $utr_response = {
   %{$condensed_response},
   Transcript => [
-                 {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040',
- Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
+                 {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040', version => 1,
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396', version => 1},
          UTR => [
                 {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'},
                 {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'},
@@ -83,9 +83,9 @@ my $utr_response = {
                 ],
         Exon =>
                 [
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861'},
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874'},
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861', version => 1},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874', version => 1},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869', version => 1}
                 ]
                 }]
                 };
@@ -100,7 +100,7 @@ action_bad("/lookup/id/${basic_id}extra", 'ID should not be found. Fail');
 # Test with a transcript
 
 $basic_id = 'ENST00000314040';
-$condensed_response = {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => $basic_id};
+$condensed_response = {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => $basic_id, version => 1};
 
 cmp_deeply(json_GET("/lookup/id/$basic_id?format=condensed",'lookup transcript in condensed format'), $condensed_response, 'Get of a known ID will return a value');
 cmp_deeply(json_GET("/lookup/$basic_id?format=condensed", 'lookup transcript via old URL'), $condensed_response, 'Get of a known ID to the old URL will return a value');
@@ -115,19 +115,19 @@ cmp_deeply(json_GET("/lookup/$basic_id",'lookup transcript'), $full_response, 'F
 
 $expanded_response = {
   %{$condensed_response},
- Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396', version => 1},
         Exon =>
                 [
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861'},
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874'},
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861', version => 1},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874', version => 1},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869', version => 1}
                 ]
                 };
 cmp_deeply(json_GET("/lookup/id/$basic_id?expand=1;format=condensed",'Expanded transcript by ID'), $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
 
 $utr_response = {
   %{$condensed_response},
- Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396'},
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000320396', version => 1},
          UTR => [
                 {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'},
                 {object_type => 'five_prime_UTR', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000314040'},
@@ -135,9 +135,9 @@ $utr_response = {
                 ],
         Exon =>
                 [
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861'},
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874'},
-                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869'}
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271861', version => 1},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271874', version => 1},
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001271869', version => 1}
                 ]
                 };
 

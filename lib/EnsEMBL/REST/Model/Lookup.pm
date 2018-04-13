@@ -568,6 +568,9 @@ sub features_as_hash {
     } else {
       Catalyst::Exception->throw(qq{ID '$id' does not support 'full' format type. Please use 'condensed'});
     }
+  } else{
+    $obj = $self->find_object($id, $species, $object_type, $db_type) if !$obj;
+    $features->{version} = $obj->version() * 1 if $obj->version();
   }
 
   return $features;
