@@ -9,43 +9,27 @@
 
 ### Description
 
-_One or more sentences describing in detail the proposed changes._
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut feugiat ligula vel enim congue, nec faucibus turpis ornare. Integer nulla massa, fermentum nec elit a, dapibus luctus ante. Vestibulum eleifend enim et consectetur convallis.
+_Using one or more sentences, describe in detail the proposed changes._
 
 ### Use case
 
 _Describe the problem. Please provide an example representing the motivation behind the need for having these changes in place._
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas lobortis aliquet risus id dapibus. In vulputate porta justo. Vestibulum in arcu varius, laoreet urna a, egestas dui.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ultrices egestas urna, vel mollis felis viverra iaculis. Phasellus ac nisi imperdiet ipsum viverra porta.
-
 ### Benefits
 
 _If applicable, describe the advantages the changes will have._
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean eget diam quis leo faucibus sagittis. Sed dapibus, magna ut porttitor malesuada, lorem purus tincidunt magna, ut dignissim mi quam et elit.
 
 ### Possible Drawbacks
 
 _If applicable, describe any possible undesirable consequence of the changes._
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie tincidunt quam, id dapibus mauris consequat eu. Phasellus in neque quis purus laoreet malesuada in sit amet tellus.
-
 ### Testing
 
 _Have you added/modified unit tests to test the changes?_
 
-Yes.
-
 _If so, do the tests pass/fail?_
 
-Pass, of course.
-
 _Have you run the entire test suite and no regression was detected?_
-
-Yes.
 
 ### Changelog
 
