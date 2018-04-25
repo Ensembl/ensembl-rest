@@ -134,3 +134,13 @@
 706	\N	patch	patch_92_93_k.sql|frip table
 707	\N	patch	patch_92_93_l.sql|epigenome columns
 708	\N	patch	patch_92_93_m.sql|Remove constraints
+709	\N	patch	patch_92_93_n.sql|Fix ids, add missing autoincrement
+710	\N	patch	patch_92_93_o.sql|Create peak_calling_statistic table
+711	\N	patch	patch_92_93_p.sql|Create segmentation_state_assignment table
+712	\N	patch	patch_92_93_q.sql|Create segmentation_state_emission table
+713	\N	patch	patch_92_93_r.sql|Create regulatory_build_statistics table
+714	\N	patch	patch_92_93_s.sql|drop segmentation_feature table
+715	\N	patch	patch_92_93_t.sql|drop alignment_qc_phantom_peak table
+716	\N	patch	patch_92_93_u.sql|Create probemapping meta table
+717	\N	patch	patch_92_93_v.sql|Create probemapping statistic table
+718	\N	patch	patch_92_93_w.sql|Modify index name_exp_idx from table read_file_experimental_configuration

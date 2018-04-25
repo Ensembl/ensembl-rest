@@ -489,7 +489,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=1291 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1292 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -541,7 +541,7 @@ CREATE TABLE `object_xref` (
   `ensembl_object_type` enum('RawContig','Transcript','Gene','Translation','Operon','OperonTranscript','Marker') NOT NULL,
   `xref_id` int(10) unsigned NOT NULL,
   `linkage_annotation` varchar(255) DEFAULT NULL,
-  `analysis_id` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `analysis_id` smallint(5) unsigned DEFAULT NULL,
   PRIMARY KEY (`object_xref_id`),
   UNIQUE KEY `xref_idx` (`xref_id`,`ensembl_object_type`,`ensembl_id`,`analysis_id`),
   KEY `analysis_idx` (`analysis_id`),
