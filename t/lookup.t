@@ -67,7 +67,7 @@ my $phenotype_response = {
 	object_type => 'Gene', db_type => 'core', species => 'homo_sapiens', id => $id_with_phenotype, version => 3,
 	phenotypes => [
     {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'positive regulation of transcription from RNA polymerase II promoter', variants => undef},
-    {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'soft palate development',variants => undef}
+    {genes => undef,source => 'GOA',study => 'PMID:8626802',trait => 'soft palate development', ontology_accessions => [ 'GO:0060023'], variants => undef}
    ],};
 cmp_deeply(json_GET("/lookup/id/$id_with_phenotype?phenotypes=1;format=condensed",'lookup a gene with phenotypes'), $phenotype_response, 'Get of a known gene ID with phenotypes option will return phenotypes as well');
 
