@@ -184,12 +184,16 @@ $vep_output =
   allele_string => "T/C",
   colocated_variants =>
   [{
-    afr_af => "0.01",
+    frequencies => {
+      C => {
+        afr => "0.01",
+        amr => "0.04",
+        asn => "0.09",
+        eur => "0.02",
+      }
+    },
     allele_string => "T/C",
-    amr_af => "0.04",
-    asn_af => "0.09",
     end => 86442404,
-    eur_af => "0.02",
     id => "rs2299222",
     minor_allele => "C",
     minor_allele_freq => "0.0399",
@@ -295,17 +299,21 @@ $vep_output =
   allele_string => "G/A/T",
   colocated_variants =>
   [{
-    allele_string => "G/A/T",
-    afr_af => 0,
-    asn_af => 0,
-    amr_af => "0.01",
-    end => 60403074,
-    eur_af => "0.0013",
-    id => "rs186950277",
-    minor_allele => "A",
-    minor_allele_freq => "0.0014",
-    start => 60403074,
-    strand => 1,
+    'minor_allele_freq' => '0.0014',
+    'frequencies' => {
+      'A' => {
+        'amr' => '0.01',
+        'afr' => '0',
+        'eur' => '0.0013',
+        'asn' => '0'
+      }
+    },
+    'end' => '60403074',
+    'strand' => '1',
+    'id' => 'rs186950277',
+    'allele_string' => 'G/A/T',
+    'minor_allele' => 'A',
+    'start' => '60403074'
   }],
   end => 60403074,
   id => 'rs186950277',
@@ -344,17 +352,21 @@ $vep_output =
   allele_string => "G/A/T",
   colocated_variants =>
   [{
-    allele_string => "G/A/T",
-    afr_af => 0,
-    asn_af => 0,
-    amr_af => "0.01",
-    end => 60403074,
-    eur_af => "0.0013",
-    id => "rs186950277",
-    minor_allele => "A",
-    minor_allele_freq => "0.0014",
-    start => 60403074,
-    strand => 1,
+    'minor_allele_freq' => '0.0014',
+    'frequencies' => {
+      'A' => {
+        'amr' => '0.01',
+        'afr' => '0',
+        'eur' => '0.0013',
+        'asn' => '0'
+      }
+    },
+    'end' => '60403074',
+    'strand' => '1',
+    'id' => 'rs186950277',
+    'allele_string' => 'G/A/T',
+    'minor_allele' => 'A',
+    'start' => '60403074'
   }],
   end => 60403074,
   id => 'rs186950277',
@@ -385,17 +397,21 @@ $vep_output =
     allele_string => 'G/A',
     colocated_variants => [
       {
-        afr_af => '0.45',
-        allele_string => 'G/A',
-        amr_af => '0.25',
-        asn_af => '0.24',
-        end => 32305409,
-        eur_af => '0.11',
-        id => 'rs17081232',
-        minor_allele => 'A',
-        minor_allele_freq => '0.2443',
-        start => 32305409,
-        strand => 1
+        'minor_allele_freq' => '0.2443',
+        'frequencies' => {
+          'A' => {
+            'amr' => '0.25',
+            'afr' => '0.45',
+            'eur' => '0.11',
+            'asn' => '0.24'
+          }
+        },
+        'end' => '32305409',
+        'strand' => '1',
+        'id' => 'rs17081232',
+        'allele_string' => 'G/A',
+        'minor_allele' => 'A',
+        'start' => '32305409'
       }
     ],
     end => 32305409,
