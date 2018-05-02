@@ -90,6 +90,7 @@ my $gene_name='FOXF2';
             },
             description => 'soft palate development',
             location => '6:1312675-1314992',
+            ontology_accessions => [ 'GO:0060023'],
             source => 'GOA' 
           }
         ];
@@ -120,6 +121,7 @@ my $gene_name='FOXF2';
             },
             description => 'soft palate development',
             location => '6:1312675-1314992',
+            ontology_accessions => [ 'GO:0060023'],
             source => 'GOA' 
           }
         ];
@@ -151,10 +153,12 @@ my $gene_name='FOXF2';
             },                                                                       
             description => 'soft palate development',                                       
             location => '6:1312675-1314992',                                                 
+            ontology_accessions => [ 'GO:0060023'],
             source => 'GOA'                                                               
           },       
          {
             Variation => 'rs2299222',
+            ontology_accessions => ['Orphanet:15'],
             attributes => {
             associated_gene => 'YES1,FOXF2',
             external_reference => 'pubmed/17122850'
@@ -192,6 +196,7 @@ my $gene_name='FOXF2';
             },                                                                       
             description => 'soft palate development',                                       
             location => '6:1312675-1314992',                                                 
+            ontology_accessions => [ 'GO:0060023'],
             source => 'GOA'                                                               
           },
           {
