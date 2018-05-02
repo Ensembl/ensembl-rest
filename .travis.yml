@@ -14,15 +14,20 @@ addons:
 env:
   - COVERALLS=false
 
+before_deploy:
+  - export ENSEMBL_BRANCH=master
+  - if [[ $TRAVIS_BRANCH =~ ^release\/[0-9]+$ ]]; then export ENSEMBL_BRANCH=$TRAVIS_BRANCH; fi
+  - echo "ENSEMBL_BRANCH=$ENSEMBL_BRANCH"
+
 before_install:
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-test.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-hdf5.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-compara.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-variation.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-vep.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-funcgen.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-io.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-test.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-hdf5.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-compara.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-variation.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-vep.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-funcgen.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-io.git
     - git clone -b release-1-6-924 --depth 1 https://github.com/bioperl/bioperl-live.git
     - git clone --branch 1.3.2 --depth 1 https://github.com/samtools/htslib.git
     - cd htslib
