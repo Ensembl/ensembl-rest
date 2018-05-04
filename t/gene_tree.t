@@ -459,7 +459,7 @@ $nh = nh_GET(
     'Gene-tree (ncRNA) by ID',
 );
 
-my $restricted_RF01299_nh_simple = '(ENSORLT00000026615:0.0716974,ENSPFOT00000021580:0.0877229):0;';
+my $restricted_RF01299_nh_simple = '(ENSORLT00000026615:0.0716974,ENSPFOT00000021580:0.0877229);';
 is($nh, $restricted_RF01299_nh_simple, 'Got the correct newick');
 
 

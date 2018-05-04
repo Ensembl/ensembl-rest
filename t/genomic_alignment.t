@@ -489,12 +489,12 @@ sub get_data {
     my $data;
 
     $data->{short_EPO} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAA--------GAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
-    $data->{short_EPO_tree} = '(taeniopygia_guttata_2_106040050_106040100[+]:0.1715,(gallus_gallus_2_100370256_100370312[+]:0.0414,meleagris_gallopavo_3_49885207_49885257[+]:0.0414)Ggal-Mgal[2]:0.1242)Ggal-Mgal-Tgut[3]:0;';
+    $data->{short_EPO_tree} = '(taeniopygia_guttata_2_106040050_106040100[+]:0.1715,(gallus_gallus_2_100370256_100370312[+]:0.0414,meleagris_gallopavo_3_49885207_49885257[+]:0.0414)Ggal-Mgal[2]:0.1242)Ggal-Mgal-Tgut[3];';
 
     $data->{short_EPO_tree_no_branch_lengths} = '(taeniopygia_guttata_2_106040050_106040100[+],(gallus_gallus_2_100370256_100370312[+],meleagris_gallopavo_3_49885207_49885257[+]));';
 
-    push @{$data->{large_EPO_tree}}, '(taeniopygia_guttata_2_106040050_106040400[+]:0.1715,(gallus_gallus_2_100370256_100370612[+]:0.0414,meleagris_gallopavo_3_49885207_49885557[+]:0.0414)Ggal-Mgal[2]:0.1242)Ggal-Mgal-Tgut[3]:0;';
-    push @{$data->{large_EPO_tree}}, '(taeniopygia_guttata_2_106040401_106041500[+]:0.1715,meleagris_gallopavo_3_49885558_49886610[+]:0.1656)Mgal-Tgut[2]:0;';
+    push @{$data->{large_EPO_tree}}, '(taeniopygia_guttata_2_106040050_106040400[+]:0.1715,(gallus_gallus_2_100370256_100370612[+]:0.0414,meleagris_gallopavo_3_49885207_49885557[+]:0.0414)Ggal-Mgal[2]:0.1242)Ggal-Mgal-Tgut[3];';
+    push @{$data->{large_EPO_tree}}, '(taeniopygia_guttata_2_106040401_106041500[+]:0.1715,meleagris_gallopavo_3_49885558_49886610[+]:0.1656)Mgal-Tgut[2];';
 
     $data->{short_EPO_no_gaps} =  {description=>'','end'=>106040100,'seq'=>'TGAACAAAGAAATGTCTTATCCCACAGAGAGTACAGACATTATAGAGTTAT','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040050,'strand'=>1};
     $data->{short_EPO_soft} =  {description=>'','end'=>106040550,'seq'=>'TAGTGG-TGAttttttggttttttGCCTGCTGGCCCTCCTTCTTTGTACTCA','seq_region'=>2,'species'=>'taeniopygia_guttata','start'=>106040500,'strand'=>1};
