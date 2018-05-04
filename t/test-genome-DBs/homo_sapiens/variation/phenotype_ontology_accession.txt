@@ -1,1 +1,3 @@
+1	Orphanet:15	438	is
 3	Orphanet:130	438	is
+58138	GO:0060023	438	is
