@@ -221,7 +221,6 @@ sub fetch_features_by_gene {
   unless (defined $gene_ad ) {Catalyst::Exception->throw("Species $species not found.");}
 
   my $phenfeat_ad = $c->model('Registry')->get_adaptor($species,'variation', 'phenotypefeature');
-  $phenfeat_ad->_include_ontology(1);
   my $slice_ad = $c->model('Registry')->get_adaptor($species, "core", "slice");
 
   my $include_assoc = $c->request->parameters->{include_associated};
@@ -270,7 +269,6 @@ sub fetch_features_by_gene {
       push @phenotype_features, $record;
     }
   }
-  $phenfeat_ad->_include_ontology(0);
   return \@phenotype_features;
 }
 
