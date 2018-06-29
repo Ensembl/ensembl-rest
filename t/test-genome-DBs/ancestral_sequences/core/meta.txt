@@ -49,3 +49,4 @@
 847	\N	patch	patch_92_93_c.sql|collate_index_interpro
 848	\N	patch	patch_93_94_a.sql|schema_version
 849	\N	patch	patch_93_94_c.sql|nullable_ox_analysis
+850	\N	patch	patch_93_94_b.sql|nullable_ox_analysis

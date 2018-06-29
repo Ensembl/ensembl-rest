@@ -166,3 +166,4 @@
 416	\N	patch	patch_92_93_c.sql|collate_index_interpro
 417	\N	patch	patch_93_94_a.sql|schema_version
 418	\N	patch	patch_93_94_c.sql|nullable_ox_analysis
+419	\N	patch	patch_93_94_b.sql|nullable_ox_analysis

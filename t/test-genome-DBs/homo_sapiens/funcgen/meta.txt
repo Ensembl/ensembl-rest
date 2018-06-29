@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	93
+2	\N	schema_version	94
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -144,3 +144,5 @@
 716	\N	patch	patch_92_93_u.sql|Create probemapping meta table
 717	\N	patch	patch_92_93_v.sql|Create probemapping statistic table
 718	\N	patch	patch_92_93_w.sql|Modify index name_exp_idx from table read_file_experimental_configuration
+719	\N	patch	patch_93_94_a.sql|schema_version
+720	\N	patch	patch_93_94_b.sql|Modify column display_label length from epigenome table

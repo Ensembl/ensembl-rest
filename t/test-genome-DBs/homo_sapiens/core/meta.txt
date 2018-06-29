@@ -237,3 +237,4 @@
 1850	\N	patch	patch_92_93_c.sql|collate_index_interpro
 1851	\N	patch	patch_93_94_a.sql|schema_version
 1852	\N	patch	patch_93_94_c.sql|nullable_ox_analysis
+1853	\N	patch	patch_93_94_b.sql|nullable_ox_analysis
