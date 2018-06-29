@@ -152,8 +152,8 @@ is_json_GET(
   my $groups_json = json_GET('/info/biotypes/groups', 'Get the list biotype groups');
   is(ref($groups_json), 'ARRAY', 'Array wanted from endpoint');
   cmp_ok(scalar(@{$groups_json}), '==', 8, 'Ensuring we have the right number of biotype groups');
-  is(shift @{$groups_json}, 'coding', 'first group is coding');
-  is(pop @{$groups_json}, 'no_group', 'last group is no_group')
+  is(shift @{$groups_json}, 'LRG', 'first group is LRG');
+  is(pop @{$groups_json}, 'undefined', 'last group is undefined')
 }
 
 # /info/biotypes/groups/:group

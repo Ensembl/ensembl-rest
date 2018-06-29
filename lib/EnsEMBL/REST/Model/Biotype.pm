@@ -64,12 +64,12 @@ Retrieves list of biotype groups
 sub fetch_biotype_groups {
   my ($self) = @_;
 
-  my $dbc = $self->context->model('Registry')->get_adaptor( 'Homo_sapiens', 'Core', 'Biotype' )->db->dbc();
+  my $biotype_adaptor = $self->context->model('Registry')->get_adaptor( 'Homo_sapiens', 'Core', 'Biotype' );
+  my $biotypes = $biotype_adaptor->fetch_all();
+  my %groups = grep { $_ =~ /[a-zA-Z]/ } map {$_->biotype_group, 1} @$biotypes;
+  my @keys = sort keys %groups;
 
-  my $sql = "SELECT DISTINCT biotype_group FROM biotype WHERE biotype_group IS NOT NULL ORDER BY biotype_group";
-  my $biotypes = $dbc->sql_helper->execute_simple(-SQL => $sql);
-
-  return $biotypes;
+  return \@keys;
 }
 
 =head fetch_biotypes_by_group
@@ -81,26 +81,9 @@ Retrieves list of biotypes part of a provided biotype group
 sub fetch_biotypes_by_group {
   my ($self, $group, $object_type) = @_;
 
-  my $dbc = $self->context->model('Registry')->get_adaptor( 'Homo_sapiens', 'Core', 'Biotype' )->db->dbc();
-
-  my $ot_filter = '';
-  if ( $object_type ) { $ot_filter = "AND object_type = \"$object_type\"" }
-  my $sql = "SELECT name, biotype_group, object_type, so_acc FROM biotype WHERE biotype_group = \"$group\" AND db_type LIKE '%core%' $ot_filter ORDER BY object_type, name";
-
-  my @biotypes;
-
-  $dbc->sql_helper->execute_no_return(-SQL => $sql, -CALLBACK => sub {
-    my ($row) = @_;
-
-    my $biotype = {
-      'name'          => $row->[0],
-      'biotype_group' => $row->[1],
-      'object_type'   => $row->[2],
-      'so_acc'        => $row->[3]
-    };
-
-    push @biotypes, $biotype;
-  });
+  my $biotype_adaptor = $self->context->model('Registry')->get_adaptor( 'Homo_sapiens', 'Core', 'Biotype' );
+  my $biotypes = $biotype_adaptor->fetch_all_by_group_object_db_type($group, $object_type);
+  my @biotypes = map {$self->to_hash($_)} @$biotypes;
 
   return \@biotypes;
 }
@@ -114,28 +97,24 @@ Retrieves biotypes with the provided name
 sub fetch_biotypes_by_name {
   my ($self, $name, $object_type) = @_;
 
-  my $dbc = $self->context->model('Registry')->get_adaptor( 'Homo_sapiens', 'Core', 'Biotype' )->db->dbc();
-
-  my $ot_filter = '';
-  if ( $object_type ) { $ot_filter = "AND object_type = \"$object_type\"" }
-  my $sql = "SELECT name, biotype_group, object_type, so_acc FROM biotype WHERE name = \"$name\" AND db_type LIKE '%core%' $ot_filter ORDER BY object_type, name";
-
-  my @biotypes;
-
-  $dbc->sql_helper->execute_no_return(-SQL => $sql, -CALLBACK => sub {
-    my ($row) = @_;
-
-    my $biotype = {
-      'name'          => $row->[0],
-      'biotype_group' => $row->[1],
-      'object_type'   => $row->[2],
-      'so_acc'        => $row->[3]
-    };
-
-    push @biotypes, $biotype;
-  });
+  my $biotype_adaptor = $self->context->model('Registry')->get_adaptor( 'Homo_sapiens', 'Core', 'Biotype' );
+  my $biotypes = $biotype_adaptor->fetch_all_by_name($name, $object_type);
+  my @biotypes = map {$self->to_hash($_)} @$biotypes;
 
   return \@biotypes;
+}
+
+sub to_hash {
+  my ($self, $biotype) = @_;
+  my $c = $self->context();
+  my $biotype_hash;
+
+  $biotype_hash->{name} = $biotype->name;
+  $biotype_hash->{biotype_group} = $biotype->biotype_group;
+  $biotype_hash->{object_type} = $biotype->object_type;
+  $biotype_hash->{so_acc} = $biotype->so_acc;
+
+  return $biotype_hash;
 }
 
 1;
