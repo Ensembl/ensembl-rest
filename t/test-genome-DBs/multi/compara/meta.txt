@@ -1,4 +1,4 @@
-107	\N	schema_version	93
+107	\N	schema_version	94
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -89,3 +89,4 @@
 105	\N	patch	patch_91_92_c.sql|mapping_session_new_type_hmm
 106	\N	patch	patch_91_92_b.sql|mapping_session_new_type_hmm
 108	\N	patch	patch_92_93_a.sql|schema_version
+109	\N	patch	patch_93_94_a.sql|schema_version
