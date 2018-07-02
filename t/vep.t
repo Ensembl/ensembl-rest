@@ -186,17 +186,17 @@ $vep_output =
   [{
     frequencies => {
       C => {
-        afr => "0.01",
-        amr => "0.04",
-        asn => "0.09",
-        eur => "0.02",
+        afr => 0.01,
+        amr => 0.04,
+        asn => 0.09,
+        eur => 0.02,
       }
     },
     allele_string => "T/C",
     end => 86442404,
     id => "rs2299222",
     minor_allele => "C",
-    minor_allele_freq => "0.0399",
+    minor_allele_freq => 0.0399,
     start => 86442404,
     strand => 1,
   }],
@@ -299,21 +299,21 @@ $vep_output =
   allele_string => "G/A/T",
   colocated_variants =>
   [{
-    'minor_allele_freq' => '0.0014',
+    'minor_allele_freq' => 0.0014,
     'frequencies' => {
       'A' => {
-        'amr' => '0.01',
-        'afr' => '0',
-        'eur' => '0.0013',
-        'asn' => '0'
+        'amr' => 0.01,
+        'afr' => 0,
+        'eur' => 0.0013,
+        'asn' => 0
       }
     },
-    'end' => '60403074',
-    'strand' => '1',
+    'end' => 60403074,
+    'strand' => 1,
     'id' => 'rs186950277',
     'allele_string' => 'G/A/T',
     'minor_allele' => 'A',
-    'start' => '60403074'
+    'start' => 60403074
   }],
   end => 60403074,
   id => 'rs186950277',
@@ -352,21 +352,21 @@ $vep_output =
   allele_string => "G/A/T",
   colocated_variants =>
   [{
-    'minor_allele_freq' => '0.0014',
+    'minor_allele_freq' => 0.0014,
     'frequencies' => {
       'A' => {
-        'amr' => '0.01',
-        'afr' => '0',
-        'eur' => '0.0013',
-        'asn' => '0'
+        'amr' => 0.01,
+        'afr' => 0,
+        'eur' => 0.0013,
+        'asn' => 0
       }
     },
-    'end' => '60403074',
-    'strand' => '1',
+    'end' => 60403074,
+    'strand' => 1,
     'id' => 'rs186950277',
     'allele_string' => 'G/A/T',
     'minor_allele' => 'A',
-    'start' => '60403074'
+    'start' => 60403074
   }],
   end => 60403074,
   id => 'rs186950277',
@@ -397,21 +397,21 @@ $vep_output =
     allele_string => 'G/A',
     colocated_variants => [
       {
-        'minor_allele_freq' => '0.2443',
+        'minor_allele_freq' => 0.2443,
         'frequencies' => {
           'A' => {
-            'amr' => '0.25',
-            'afr' => '0.45',
-            'eur' => '0.11',
-            'asn' => '0.24'
+            'amr' => 0.25,
+            'afr' => 0.45,
+            'eur' => 0.11,
+            'asn' => 0.24
           }
         },
-        'end' => '32305409',
-        'strand' => '1',
+        'end' => 32305409,
+        'strand' => 1,
         'id' => 'rs17081232',
         'allele_string' => 'G/A',
         'minor_allele' => 'A',
-        'start' => '32305409'
+        'start' => 32305409
       }
     ],
     end => 32305409,
@@ -467,7 +467,7 @@ $vep_output = [{
       gene_symbol_source => 'Clone_based_ensembl_gene',
       impact => 'MODERATE',
       polyphen_prediction => 'possibly_damaging',
-      polyphen_score => '0.514',
+      polyphen_score => 0.514,
       protein_end => 104,
       protein_start => 104,
       strand => 1,
@@ -526,7 +526,7 @@ $vep_output = [{
       gene_symbol_source => 'Clone_based_ensembl_gene',
       impact => 'MODERATE',
       polyphen_prediction => 'possibly_damaging',
-      polyphen_score => '0.514',
+      polyphen_score => 0.514,
       protein_end => 104,
       protein_start => 104,
       strand => 1,
@@ -623,7 +623,7 @@ $vep_output = [{
       gene_symbol_source => 'Clone_based_ensembl_gene',
       impact => 'MODERATE',
       polyphen_prediction => 'possibly_damaging',
-      polyphen_score => '0.514',
+      polyphen_score => 0.514,
       protein_end => 104,
       protein_start => 104,
       strand => 1,
