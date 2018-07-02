@@ -46,3 +46,5 @@
 61	\N	patch	patch_91_92_b.sql|mapping_session_new_type_hmm
 63	\N	patch	patch_92_93_a.sql|schema_version
 64	\N	patch	patch_93_94_a.sql|schema_version
+65	\N	patch	patch_93_94_b.sql|homology_description_not_null
+66	\N	patch	patch_93_94_c.sql|method_link_display_name
