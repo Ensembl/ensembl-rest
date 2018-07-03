@@ -60,6 +60,7 @@ limitations under the License.
                         <li><a href="http://github.com/Ensembl/ensembl-rest/wiki/Change-log">Change Log</a></li>
                         <li><a href="[% service_parent_url %]/info/about/index.html">About the Ensembl Project</a></li>
                         <li><a href="[% service_parent_url %]/info/about/contact/">Contact Ensembl</a></li>
+                        <li><a target="_blank" href="https://www.ebi.ac.uk/data-protection/ensembl/privacy-notice">Privacy Notice</a></li>
                     </ul>
             </div><!-- container-->
         </div><!-- navbar-inner-->
