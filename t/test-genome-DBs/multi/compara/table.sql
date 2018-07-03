@@ -374,7 +374,7 @@ CREATE TABLE `hmm_profile` (
 CREATE TABLE `homology` (
   `homology_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `method_link_species_set_id` int(10) unsigned NOT NULL,
-  `description` enum('ortholog_one2one','ortholog_one2many','ortholog_many2many','within_species_paralog','other_paralog','gene_split','between_species_paralog','alt_allele','homoeolog_one2one','homoeolog_one2many','homoeolog_many2many') DEFAULT NULL,
+  `description` enum('ortholog_one2one','ortholog_one2many','ortholog_many2many','within_species_paralog','other_paralog','gene_split','between_species_paralog','alt_allele','homoeolog_one2one','homoeolog_one2many','homoeolog_many2many') NOT NULL,
   `is_tree_compliant` tinyint(1) NOT NULL DEFAULT '0',
   `dn` float(10,5) DEFAULT NULL,
   `ds` float(10,5) DEFAULT NULL,
@@ -459,12 +459,13 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=110 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=112 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(50) NOT NULL DEFAULT '',
   `class` varchar(50) NOT NULL DEFAULT '',
+  `display_name` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`method_link_id`),
   UNIQUE KEY `type` (`type`)
 ) ENGINE=MyISAM AUTO_INCREMENT=502 DEFAULT CHARSET=latin1;
