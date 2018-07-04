@@ -274,6 +274,19 @@ is_json_GET(
   cmp_bag(json_GET('/info/variation/populations/homo_sapiens?filter=LD',"LD variants"), $expected, 'Checking filtering for LD population works');
 }
 
+#/info/variation/populations/:species:/:population_name
+{
+  my $population_name = "1000GENOMES:phase_1_ASW";
+  my $json = json_GET("/info/variation/populations/homo_sapiens/1000GENOMES:phase_1_ASW", 'GET specific population for given species in variation database');
+  cmp_ok(scalar(@{$json}), '==', 1, 'Test that one population was returned');
+  cmp_ok($json->[0]->{name}, 'eq', $population_name, 'Test that correct population was returned');
+  cmp_ok($json->[0]->{size}, '==', 61, 'Test correct population size');
+  cmp_ok(scalar(@{$json->[0]->{individuals}}), '==', 61, 'Test that correct number of individuals was returned');
+  cmp_ok($json->[0]->{individuals}->[0]->{name}, 'eq', '1000GENOMES:phase_1:NA19625', 'Test first individual name');
+  cmp_ok($json->[0]->{individuals}->[0]->{gender}, 'eq', 'Female', 'Test first individual gender');
+
+}
+
 #/info/variation/consequence_types
 {
   # Check correct data structure returned

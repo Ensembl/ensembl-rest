@@ -299,6 +299,23 @@ sub populations: Chained('/') PathPart('info/variation/populations') Args(1) Act
   return;
 }
 
+sub population_name_GET: {}
+
+sub population_name: Chained('/') PathPart('info/variation/populations') Args(2) ActionClass('REST') {
+  my ($self, $c, $species, $pop_name) = @_;
+  $c->stash(species => $species) if defined $species;
+  $c->stash(population_name => $pop_name) if defined $pop_name;
+  my $populations;
+  try {
+    $populations = $c->model('Variation')->fetch_population_infos($c->request->param('filter'));
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $populations);
+  return;
+}
+
 sub consequence_types: Path('variation/consequence_types') Args(0) ActionClass('REST') { }
 
 sub consequence_types_GET {

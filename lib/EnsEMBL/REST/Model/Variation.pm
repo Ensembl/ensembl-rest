@@ -417,18 +417,23 @@ sub fetch_population_infos {
 
   my $c = $self->context();
   my $species = $c->stash->{species};
+  my $population_name = $c->stash->{population_name} if defined $c->stash->{population_name};
 
   my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
   
   my $populations;
-  if (defined $filter) {
-    if ($filter eq 'LD') {
-      $populations = $pa->fetch_all_LD_Populations(); 
-    } else {
-      Catalyst::Exception->throw("Unknown filter option '$filter'");
-    }
+  if (defined $population_name){
+    push @$populations, $pa->fetch_by_name($population_name);
   } else {
-    $populations = $pa->fetch_all();
+    if (defined $filter) {
+      if ($filter eq 'LD') {
+        $populations = $pa->fetch_all_LD_Populations();
+      } else {
+        Catalyst::Exception->throw("Unknown filter option '$filter'");
+      }
+    } else {
+      $populations = $pa->fetch_all();
+    }
   }
   if (!$populations) {
     Catalyst::Exception->throw("Couldn't fetch populations.");
@@ -436,7 +441,18 @@ sub fetch_population_infos {
 
   my @populations_list = ();
   foreach my $population (@$populations) {
-    push @populations_list, {name => $population->name, description => $population->description, size => $population->size};
+    my $pop = {name => $population->name, description => $population->description, size => $population->size};
+
+    if (defined $population_name) {
+      my @individuals =();
+      foreach my $individual (@{$population->get_all_Individuals()}) {
+        my $ind = {name => $individual->name};
+        $ind->{gender} = $individual->gender if defined $individual->gender;
+        push @individuals, $ind;
+      }
+      $pop->{individuals} = \@individuals if scalar(@individuals);
+    }
+    push @populations_list, $pop;
   }
 
   return \@populations_list;
