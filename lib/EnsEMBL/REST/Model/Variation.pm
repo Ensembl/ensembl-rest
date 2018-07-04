@@ -423,7 +423,9 @@ sub fetch_population_infos {
   
   my $populations;
   if (defined $population_name){
-    push @$populations, $pa->fetch_by_name($population_name);
+    my $population = $pa->fetch_by_name($population_name);
+    unless (defined $population ) {Catalyst::Exception->throw("Population '$population_name' not found.");}
+    push @$populations, $population;
   } else {
     if (defined $filter) {
       if ($filter eq 'LD') {

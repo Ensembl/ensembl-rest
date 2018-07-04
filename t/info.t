@@ -284,7 +284,12 @@ is_json_GET(
   cmp_ok(scalar(@{$json->[0]->{individuals}}), '==', 61, 'Test that correct number of individuals was returned');
   cmp_ok($json->[0]->{individuals}->[0]->{name}, 'eq', '1000GENOMES:phase_1:NA19625', 'Test first individual name');
   cmp_ok($json->[0]->{individuals}->[0]->{gender}, 'eq', 'Female', 'Test first individual gender');
+}
 
+#/info/variation/populations/:species:/:population_name - bad name
+{
+  my $bad_get = "/info/variation/populations/homo_sapiens/badPopulationName";
+  action_bad($bad_get, "Population badPopulationName not found.");
 }
 
 #/info/variation/consequence_types
