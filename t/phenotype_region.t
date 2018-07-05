@@ -109,6 +109,41 @@ my $var_region = '13:86442400:86442410';
   is(scalar(@{$json}), $expected, 'Gene with phenotype association in the region');
   my $phe_asso = $json->[0]->{'phenotype_associations'};
   is(scalar(@{$phe_asso}), $expected_asso, '2 phenotype associations with the gene in the region');
+  my $phe_2nd = $phe_asso->[1];
+  my $expected_mim = '119570';
+  is ($phe_2nd->{attributes}->{MIM}, $expected_mim, '2nd phenotype has expected minimal attributes');
+}
+
+#Get Gene phenotype features and include review_status, pubmed, submitters
+{
+  my $region = '6:1312670:1315000';
+  my $expected_json = [ {
+	'phenotype_associations' => [
+	{
+		'source' => 'GOA',
+		'location' => '6:1312675-1314992',
+		'description' => 'positive regulation of transcription from RNA polymerase II promoter',
+		'attributes' => {
+			'external_reference' => 'PMID:8626802'
+		}
+	},
+	{
+		'source' => 'GOA',
+		'ontology_accessions' => ['GO:0060023'],
+		'location' => '6:1312675-1314992',
+		'description' => 'soft palate development',
+		'attributes' => {
+			'review_status' => 'no assertion criteria provided',
+			'MIM' => '119570',
+			'submitter_names' => ['OMIM', 'Illumina'],
+			'external_reference' => 'PMID:8626802',
+			'pubmed_ids' => ['PMID:1313972', 'PMID:1319114', 'PMID:1328889']
+		}
+	}],
+	'id' => 'ENSG00000137273'
+    }];
+  my $json = json_GET("$base/$region?feature_type=Gene;include_review_status=1;include_pubmed_id=1;include_submitter=1;", '1 Gene with 2 phenotype feature associated from chr 6 and include phenotype feature attributes');
+  cmp_bag ($json, $expected_json, 'compare deeply and 2nd phenotype has expected included attributes');
 }
 
 

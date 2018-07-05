@@ -98,6 +98,47 @@ my $json5 = json_GET("$base/$accession_child_query", 'get by ontology accession 
 cmp_bag($json5, $expected_data1, "Checking the get result from phenotype/accession with child terms");
 
 
+## get by accession & optional parameters submitter, pubmed_id, review_status
+my $accession_query_mim = 'accession/homo_sapiens/GO:0060023?include_submitter=1;include_pubmed_id=1;include_review_status=1';
+my $expected_data6 =  [
+   {
+      'source' => 'GOA',
+      'location' => '6:1312675-1314992',
+      'description' => 'soft palate development',
+      'mapped_to_accession' => 'GO:0060023',
+      'Gene' => 'ENSG00000137273',
+      'attributes' => {
+        'review_status' => 'no assertion criteria provided',
+        'MIM' => '119570',
+        'external_reference' => 'PMID:8626802',
+        'pubmed_ids' => ['PMID:1313972', 'PMID:1319114', 'PMID:1328889']
+      }
+    }
+    ];
+my $json6 = json_GET("$base/$accession_query_mim", 'get by ontology accession - term with MIM id, including review_status, pubmed_id, submitter');
+cmp_bag($json6, $expected_data6, "Checking the get result from phenotype/accession - term with MIM id, including review_status, pubmed_id, submitter");
+
+
+## get by term & optional parameters submitter, pubmed_id, review_status
+my $term_query_mim = 'term/homo_sapiens/soft%20palate%20development?include_review_status=1;include_pubmed_id=1;include_submitter=1';
+my $expected_data7 =  [
+    {
+       'source' => 'GOA',
+       'location' => '6:1312675-1314992',
+       'description' => 'soft palate development',
+       'mapped_to_accession' => 'GO:0060023',
+       'Gene' => 'ENSG00000137273',
+       'attributes' => {
+         'review_status' => 'no assertion criteria provided',
+         'MIM' => '119570',
+         'external_reference' => 'PMID:8626802',
+         'pubmed_ids' => ['PMID:1313972', 'PMID:1319114', 'PMID:1328889']
+       }
+     }
+    ];
+my $json7 = json_GET("$base/$term_query_mim", 'get by ontology term - by term with MIM id');
+cmp_bag($json7, $expected_data7, "Checking the get result from phenotype/term - with MIM id");
+
 done_testing();
 
 
