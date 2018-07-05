@@ -303,11 +303,11 @@ sub population_name_GET: {}
 
 sub population_name: Chained('/') PathPart('info/variation/populations') Args(2) ActionClass('REST') {
   my ($self, $c, $species, $pop_name) = @_;
-  $c->stash(species => $species) if defined $species;
-  $c->stash(population_name => $pop_name) if defined $pop_name;
+  $c->stash(species => $species);
+  $c->stash(population_name => $pop_name);
   my $populations;
   try {
-    $populations = $c->model('Variation')->fetch_population_infos($c->request->param('filter'));
+    $populations = $c->model('Variation')->fetch_population_infos();
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
