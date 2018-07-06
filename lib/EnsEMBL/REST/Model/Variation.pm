@@ -420,7 +420,9 @@ sub fetch_population_infos {
   my $population_name = $c->stash->{population_name} if defined $c->stash->{population_name};
 
   my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
-  
+  if (!$pa) {
+    Catalyst::Exception->throw("Species $species does not have population data.");
+  }
   my $populations;
   if (defined $population_name){
     my $population = $pa->fetch_by_name($population_name);

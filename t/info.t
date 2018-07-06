@@ -292,6 +292,19 @@ is_json_GET(
   action_bad($bad_get, "Population badPopulationName not found.");
 }
 
+#/info/variation/populations/:species:/:population_name - bad_species
+{
+  my $bad_get = "/info/variation/populations/bad_species/1000GENOMES:phase_1_ASW";
+  action_bad($bad_get, 'bad_species is not a valid species name');
+}
+
+#/info/variation/populations/:species:/:population_name - species with no population data
+{
+  my $chicken = Bio::EnsEMBL::Test::MultiTestDB->new("gallus_gallus");
+  my $bad_get = "/info/variation/populations/gallus_gallus/1000GENOMES:phase_1_ASW";
+  action_bad($bad_get, 'Species gallus_gallus does not have population data');
+}
+
 #/info/variation/consequence_types
 {
   # Check correct data structure returned
