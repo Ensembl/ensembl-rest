@@ -26,3 +26,7 @@
 25	allele_symbol	Allele symbol	Allele symbol linked with phenotype association
 26	allele_accession_id	Allele accession ID	Allele accession ID linked with phenotype association
 33	marker_accession_id	Marker accession ID	Marker ID linked with phenotype association
+51	MIM	MIM id	MIM id
+52	pubmed_id	PubMed ID	PubMed identifier
+53	submitter_id	Submitter_ID	ID for data submitter
+54	review_status	ClinVar review_status	ClinVar review_status for assertion

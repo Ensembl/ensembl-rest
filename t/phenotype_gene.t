@@ -86,6 +86,7 @@ my $gene_name='FOXF2';
           {
             Gene => "ENSG00000137273",
             attributes => {
+              MIM => '119570',
               external_reference => 'PMID:8626802'  
             },
             description => 'soft palate development',
@@ -117,6 +118,7 @@ my $gene_name='FOXF2';
           {
             Gene => "ENSG00000137273",
             attributes => {
+              MIM => '119570',
               external_reference => 'PMID:8626802'  
             },
             description => 'soft palate development',
@@ -138,7 +140,7 @@ my $gene_name='FOXF2';
 
   my $expected_data = [
            {
-      Gene => 'ENSG00000137273',
+            Gene => 'ENSG00000137273',
             attributes => {                        
               external_reference => 'PMID:8626802'
             },                                                       
@@ -147,8 +149,9 @@ my $gene_name='FOXF2';
             source => 'GOA'                  
           },  
           {                                                                                
-      Gene => 'ENSG00000137273',
+            Gene => 'ENSG00000137273',
             attributes => {                        
+              MIM => '119570',
               external_reference => 'PMID:8626802'
             },                                                                       
             description => 'soft palate development',                                       
@@ -192,6 +195,7 @@ my $gene_name='FOXF2';
           {                                                                                
             Gene => 'ENSG00000137273',
             attributes => {                        
+              MIM => '119570',
               external_reference => 'PMID:8626802'
             },                                                                       
             description => 'soft palate development',                                       
@@ -208,6 +212,41 @@ my $gene_name='FOXF2';
         ];
 	
   my $json = json_GET("$base/$gene_name?include_overlap=1", 'Gene with 3 phenotype feature overlap');
+  cmp_ok(scalar(@{$json}), "==", $expected, 'Gene with 3 phenotype feature overlaps');
+  cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
+}
+
+#Get Gene phenotype features including submitters, including pubmed_id and review status
+{
+  my $expected = 2;
+
+  my $expected_data = [
+          {
+            Gene => 'ENSG00000137273',
+            attributes => {
+              external_reference => 'PMID:8626802'
+            },
+            description => 'positive regulation of transcription from RNA polymerase II promoter',
+            location => '6:1312675-1314992',
+            source => 'GOA'
+	        },
+          {
+            Gene => 'ENSG00000137273',
+            attributes => {
+              MIM => '119570',
+              pubmed_ids => ['PMID:1313972', 'PMID:1319114', 'PMID:1328889'],
+              review_status => 'no assertion criteria provided',
+              submitter_names => ['OMIM','Illumina'],
+              external_reference => 'PMID:8626802'
+            },
+            ontology_accessions => ['GO:0060023'],
+            description => 'soft palate development',
+            location => '6:1312675-1314992',
+            source => 'GOA'
+          }
+        ];
+
+  my $json = json_GET("$base/$gene_name?include_submitter=1;include_pubmed_id=1;include_review_status=1", 'Gene with 2 phenotype features and for one including submitter, pubmed_id and review_status data');
   cmp_ok(scalar(@{$json}), "==", $expected, 'Gene with 3 phenotype feature overlaps');
   cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }

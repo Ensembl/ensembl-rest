@@ -99,31 +99,45 @@ sub fetch_features{
   my $species   = shift;
   my $accession = shift;
 
-  my $phenfeat_ad = $self->context->model('Registry')->get_adaptor($species,'variation', 'phenotypefeature');
+  my $c = $self->context();
+
+  my $phenfeat_ad = $c->model('Registry')->get_adaptor($species,'variation', 'phenotypefeature');
+
+  my $include_pubmedid = $c->request->parameters->{include_pubmed_id};
+  my $include_reviewstatus = $c->request->parameters->{include_review_status};
 
   my $pfs = $phenfeat_ad->fetch_all_by_phenotype_accession_type_source($accession, 'is', $self->context->request->param('source'));
 
   my @phenotype_features;
   foreach my $pf(@{$pfs}){
+    my $feature_summary = $pf->summary_as_hash();
 
-    my $record =  { description         => $pf->phenotype_description(),
-                    mapped_to_accession => $accession,
-                    $pf->type()         => $pf->object_id,
-                    location            => $pf->seq_region_name() . ":" . $pf->seq_region_start() . "-" . $pf->seq_region_end() ,
-                    source              => $pf->source_name(),
-                  };
+    my %summary_new = map { $_ => $feature_summary->{$_} } qw/description source location /;
+    $summary_new{$pf->type} = $feature_summary->{$pf->type};
+    $summary_new{mapped_to_accession} = $accession;
 
-    $record->{attributes}->{risk_allele}           = $pf->risk_allele()           if $pf->risk_allele(); 
-    $record->{attributes}->{clinical_significance} = $pf->clinical_significance() if $pf->clinical_significance();
-    $record->{attributes}->{external_reference}    = $pf->external_reference()    if $pf->external_reference(); ## from study - eg OMIM
-    $record->{attributes}->{external_id}           = $pf->external_id()           if $pf->external_id();        ## from attrib eg ClinVar
-    $record->{attributes}->{p_value}               = $pf->p_value()               if $pf->p_value();
-    $record->{attributes}->{odds_ratio}            = $pf->odds_ratio()            if $pf->odds_ratio();
-    $record->{attributes}->{beta_coefficient}      = $pf->beta_coefficient()      if $pf->beta_coefficient();
-    $record->{attributes}->{associated_gene}       = $pf->associated_gene()       if $pf->associated_gene();
+    my %attributes;
+    $attributes{risk_allele} = $feature_summary->{attributes}{risk_allele}                if exists $feature_summary->{attributes}{risk_allele};
+    $attributes{clinical_significance} = $feature_summary->{attributes}{clinvar_clin_sig} if exists $feature_summary->{attributes}{clinvar_clin_sig};
+    $attributes{external_reference} = $feature_summary->{external_reference}              if exists $feature_summary->{external_reference};
+    $attributes{external_id} = $feature_summary->{attributes}{external_id}                if exists $feature_summary->{attributes}{external_id};
+    $attributes{p_value} = $feature_summary->{attributes}{p_value}                        if exists $feature_summary->{attributes}{p_value};
+    $attributes{odds_ratio} = $feature_summary->{attributes}{odds_ratio}                  if exists $feature_summary->{attributes}{odds_ratio};
+    $attributes{beta_coefficient} = $feature_summary->{attributes}{beta_coef}             if exists $feature_summary->{attributes}{beta_coef};
+    $attributes{associated_gene} = $feature_summary->{attributes}{associated_gene}        if exists $feature_summary->{attributes}{associated_gene};
+    $attributes{MIM} = $feature_summary->{attributes}{MIM}                                if exists $feature_summary->{attributes}{MIM};
 
+    if ($include_pubmedid && exists $feature_summary->{attributes}{pubmed_id}) {
+      my $pmids = $feature_summary->{attributes}{pubmed_id};
+      $pmids =~ s/,/,PMID:/g;
+      $pmids = "PMID:".$pmids;
+      my @pubmed_ids = split(',',$pmids);
+      $attributes{pubmed_ids} = \@pubmed_ids;
+    }
+    $attributes{review_status} = $feature_summary->{attributes}{review_status}       if $include_reviewstatus && exists $feature_summary->{attributes}{review_status};
 
-    push @phenotype_features, $record;                             
+    $summary_new{attributes} = \%attributes                                          if scalar keys %attributes;
+    push @phenotype_features, \%summary_new;
   }
 
   return \@phenotype_features;
@@ -146,50 +160,52 @@ sub fetch_features_by_region {
 
   my $pf_type = $c->request->parameters->{feature_type};
   my $only_phenotypes = $c->request->parameters->{only_phenotypes};
+  my $include_submitter = $c->request->parameters->{include_submitter};
+  my $include_pubmedid = $c->request->parameters->{include_pubmed_id};
+  my $include_reviewstatus = $c->request->parameters->{include_review_status};
 
   my $pfs = $phenfeat_ad->fetch_all_by_Slice_with_ontology_accession($slice, $pf_type);
 
   my %record_data;
   my %phenotype_data;
-
   foreach my $pf(sort{ lc($a->phenotype_description()) cmp lc($b->phenotype_description()) } @{$pfs}){
+    my $feature_summary = $pf->summary_as_hash();
 
-    my $object_id = $pf->object_id(); 
-    my $phe_id    = $pf->phenotype_id();
-    my $phe_desc  = $pf->phenotype_description();
-    my $ontology_accessions = $pf->get_all_ontology_accessions();
+    my $phe_id = $pf->phenotype_id;
+    my %summary_new;
+    if ($only_phenotypes){
+      if (!$phenotype_data{$feature_summary->{id} }{$phe_id}) {
+        $summary_new{description} = $feature_summary->{description};
+        $phenotype_data{$feature_summary->{id} }{$phe_id} = 1;
+      }
+    } else{
+      %summary_new = map { $_ => $feature_summary->{$_} } qw/description source location /;
 
-    $record_data{$object_id} = [] if (!$record_data{$object_id});
-    my $pf_info;
+      my %attributes;
+      $attributes{risk_allele} = $feature_summary->{attributes}{risk_allele}                if exists $feature_summary->{attributes}{risk_allele};
+      $attributes{clinical_significance} = $feature_summary->{attributes}{clinvar_clin_sig} if exists $feature_summary->{attributes}{clinvar_clin_sig};
+      $attributes{external_reference} = $feature_summary->{external_reference}              if exists $feature_summary->{external_reference};
+      $attributes{external_id} = $feature_summary->{attributes}{external_id}                if exists $feature_summary->{attributes}{external_id};
+      $attributes{p_value} = $feature_summary->{attributes}{p_value}                        if exists $feature_summary->{attributes}{p_value};
+      $attributes{odds_ratio} = $feature_summary->{attributes}{odds_ratio}                  if exists $feature_summary->{attributes}{odds_ratio};
+      $attributes{beta_coefficient} = $feature_summary->{attributes}{beta_coef}             if exists $feature_summary->{attributes}{beta_coef};
+      $attributes{associated_gene} = $feature_summary->{associated_gene}                    if exists $feature_summary->{associated_gene};
+      $attributes{MIM} = $feature_summary->{attributes}{MIM}                                if exists $feature_summary->{attributes}{MIM};
+      $attributes{submitter_names} = $feature_summary->{attributes}{submitter_names}        if $include_submitter && exists $feature_summary->{attributes}{submitter_names};
+      $attributes{review_status} = $feature_summary->{attributes}{review_status}            if $include_reviewstatus && exists $feature_summary->{attributes}{review_status};
 
-    if ($only_phenotypes) {
-      if (!$phenotype_data{$object_id}{$phe_id}) {
-        $pf_info->{description} = $phe_desc;
-        $phenotype_data{$object_id}{$phe_id} = 1;
-      }     
+      if ($include_pubmedid && exists $feature_summary->{attributes}{pubmed_id}) {
+        my $pmids = $feature_summary->{attributes}{pubmed_id};
+        $pmids =~ s/,/,PMID:/g;
+        $pmids = "PMID:".$pmids;
+        my @pubmed_ids = split(',',$pmids);
+        $attributes{pubmed_ids} = \@pubmed_ids;
+      }
+      $summary_new{attributes} = \%attributes                                          if scalar keys %attributes;
     }
-    else {
-      $pf_info = {
-                   description => $phe_desc,
-                   location    => $pf->seq_region_name() . ":" . $pf->seq_region_start() . "-" . $pf->seq_region_end() ,
-                   source      => $pf->source_name(), 
-		 };
+    $summary_new{ontology_accessions} = $feature_summary->{ontology_accessions}        if exists $feature_summary->{ontology_accessions};
 
-      $pf_info->{attributes}->{risk_allele}           = $pf->risk_allele()           if $pf->risk_allele();
-      $pf_info->{attributes}->{clinical_significance} = $pf->clinical_significance() if $pf->clinical_significance();
-      $pf_info->{attributes}->{external_reference}    = $pf->external_reference()    if $pf->external_reference(); ## from study - eg OMIM
-      $pf_info->{attributes}->{external_id}           = $pf->external_id()           if $pf->external_id();        ## from attrib eg ClinVar
-      $pf_info->{attributes}->{p_value}               = $pf->p_value()               if $pf->p_value();
-      $pf_info->{attributes}->{odds_ratio}            = $pf->odds_ratio()            if $pf->odds_ratio();
-      $pf_info->{attributes}->{beta_coefficient}      = $pf->beta_coefficient()      if $pf->beta_coefficient();
-      $pf_info->{attributes}->{associated_gene}       = $pf->associated_gene()       if $pf->associated_gene();
-    }
-    
-    if ($pf_info) {
-      $pf_info->{ontology_accessions} = $ontology_accessions if (scalar(@$ontology_accessions));
-
-      push(@{$record_data{$object_id}}, $pf_info);
-    }
+    push @{$record_data{$feature_summary->{$pf->type}}}, \%summary_new;
   }
 
   my @phenotype_features;
@@ -225,6 +241,9 @@ sub fetch_features_by_gene {
 
   my $include_assoc = $c->request->parameters->{include_associated};
   my $include_overlap = $c->request->parameters->{include_overlap};
+  my $include_submitter = $c->request->parameters->{include_submitter};
+  my $include_pubmedid = $c->request->parameters->{include_pubmed_id};
+  my $include_reviewstatus = $c->request->parameters->{include_review_status};
 
   my $genes = $gene_ad->fetch_all_by_external_name($gene);
 
@@ -247,26 +266,36 @@ sub fetch_features_by_gene {
     @pfs = uniq @pfs;
 
     while (my $pf = shift @pfs){
-      my $ontology_accessions = $pf->get_all_ontology_accessions();
+      my $feature_summary = $pf->summary_as_hash();
 
-      my $record =  { description       => $pf->phenotype_description(),
-                      $pf->type()       => $pf->object_id,
-                      location          => $pf->seq_region_name() . ":" . $pf->seq_region_start() . "-" . $pf->seq_region_end() ,
-                      source            => $pf->source_name(),
-                    };
+      my %summary_new = map { $_ => $feature_summary->{$_} } qw/description source location /;
+      $summary_new{$pf->type} = $feature_summary->{$pf->type};
 
-      $record->{attributes}->{risk_allele}           = $pf->risk_allele()           if $pf->risk_allele();
-      $record->{attributes}->{clinical_significance} = $pf->clinical_significance() if $pf->clinical_significance();
-      $record->{attributes}->{external_reference}    = $pf->external_reference()    if $pf->external_reference(); ## from study - eg OMIM
-      $record->{attributes}->{external_id}           = $pf->external_id()           if $pf->external_id();        ## from attrib eg ClinVar
-      $record->{attributes}->{p_value}               = $pf->p_value()               if $pf->p_value();
-      $record->{attributes}->{odds_ratio}            = $pf->odds_ratio()            if $pf->odds_ratio();
-      $record->{attributes}->{beta_coefficient}      = $pf->beta_coefficient()      if $pf->beta_coefficient();
-      $record->{attributes}->{associated_gene}       = $pf->associated_gene()       if $pf->associated_gene();
+      my %attributes;
+      $attributes{risk_allele} = $feature_summary->{attributes}{risk_allele}                if exists $feature_summary->{attributes}{risk_allele};
+      $attributes{clinical_significance} = $feature_summary->{attributes}{clinvar_clin_sig} if exists $feature_summary->{attributes}{clinvar_clin_sig};
+      $attributes{external_reference} = $feature_summary->{external_reference}              if exists $feature_summary->{external_reference};
+      $attributes{external_id} = $feature_summary->{attributes}{external_id}                if exists $feature_summary->{attributes}{external_id};
+      $attributes{p_value} = $feature_summary->{attributes}{p_value}                        if exists $feature_summary->{attributes}{p_value};
+      $attributes{odds_ratio} = $feature_summary->{attributes}{odds_ratio}                  if exists $feature_summary->{attributes}{odds_ratio};
+      $attributes{beta_coefficient} = $feature_summary->{attributes}{beta_coef}             if exists $feature_summary->{attributes}{beta_coef};
+      $attributes{associated_gene} = $feature_summary->{associated_gene}                    if exists $feature_summary->{associated_gene};
+      $attributes{MIM} = $feature_summary->{attributes}{MIM}                                if exists $feature_summary->{attributes}{MIM};
+      $attributes{submitter_names} = $feature_summary->{attributes}{submitter_names}        if $include_submitter && exists $feature_summary->{attributes}{submitter_names};
+      $attributes{review_status} = $feature_summary->{attributes}{review_status}            if $include_reviewstatus && exists $feature_summary->{attributes}{review_status};
 
-      $record->{ontology_accessions} = $ontology_accessions if (scalar(@$ontology_accessions));
+      if ($include_pubmedid && exists $feature_summary->{attributes}{pubmed_id}) {
+        my $pmids = $feature_summary->{attributes}{pubmed_id};
+        $pmids =~ s/,/,PMID:/g;
+        $pmids = "PMID:".$pmids;
+        my @pubmed_ids = split(',',$pmids);
+        $attributes{pubmed_ids} = \@pubmed_ids;
+      }
+      $summary_new{attributes} = \%attributes                                          if scalar keys %attributes;
 
-      push @phenotype_features, $record;
+      $summary_new{ontology_accessions} = $feature_summary->{ontology_accessions}      if exists $feature_summary->{ontology_accessions};
+
+      push @phenotype_features, \%summary_new;
     }
   }
   return \@phenotype_features;

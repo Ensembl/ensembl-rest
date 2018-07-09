@@ -1,0 +1,2 @@
+1	OMIM
+2	Illumina
