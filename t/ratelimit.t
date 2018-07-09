@@ -148,6 +148,7 @@ sleep_until_next_second();
 
       note 'And pause then try with the wrong token value';
       sleep(1);
+      sleep_until_next_second();
       $res = $cb->(GET '/');
       is($res->code(), 200, 'Checking for a 200');
       $res = $cb->(GET '/', 'Token' => 'imnocool');
@@ -155,6 +156,7 @@ sleep_until_next_second();
 
       note 'And pause then try with the wrong token header';
       sleep(1);
+      sleep_until_next_second();
       $res = $cb->(GET '/');
       is($res->code(), 200, 'Checking for a 200');
       $res = $cb->(GET '/', 'Ttoken' => 'imacool');
