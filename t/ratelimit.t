@@ -74,6 +74,7 @@ sleep_until_next_second();
 
 {
   my ($remote_user, $remote_addr) = ('127.0.0.1', '127.0.0.1');
+  my $backend = Plack::Middleware::EnsThrottle::SimpleBackend->new(); # explicit definition, so we can reset it later
 
   # Doing my tests with the Second throttle. Don't change the way this builder is setup
   # otherwise the app fails to load and none of the tests will work.
@@ -102,7 +103,7 @@ sleep_until_next_second();
       blacklist => ['192.167.0.0-192.167.255.255'],
       whitelist_hdr => 'Token',
       whitelist_hdr_values => ['loveme', 'imacool'],
-      client_id_prefix => 'second', backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
+      client_id_prefix => 'second', backend => $backend;
 
     sub {
       my ($env) = @_;
@@ -131,7 +132,6 @@ sleep_until_next_second();
       cmp_ok($res->header('X-RateLimit-Reset'), '<', 1.0, 'Reset header must be less than a second');
       cmp_ok($res->header('X-RateLimit-Period'), '==', 1, 'Rate limit period is a second');
       cmp_ok($res->header('X-RateLimit-Remaining'), '==', 0, 'Remaining header is 0');
-
       my $retry_after = $res->header('Retry-After');
       Time::HiRes::sleep($retry_after);
       note "Slept for $retry_after second(s). We should be able to do more requests";
@@ -139,28 +139,31 @@ sleep_until_next_second();
       is($res->code(), 200, 'Checking for a 200');
       cmp_ok($res->header('X-RateLimit-Remaining'), '==', 0, 'Remaining header is 0');
 
+      sleep_until_next_second();
+      $backend->init();
+
       note 'Checking if rate limit is disabled using magic password headers';
       $res = $cb->(GET '/', 'Token' => 'imacool');
       is($res->code(), 200, 'Checking for a 200');
       note 'Sending request again with the rate limit disabling header';
       $res = $cb->(GET '/', 'Token' => 'imacool');
-      is($res->code(), 200, 'Checking for a 200');
+      is($res->code(), 200, 'Checking for a 200, rate limit disabled for this user');
 
-      note 'And pause then try with the wrong token value';
-      sleep(1);
       sleep_until_next_second();
+      $backend->init();
+
       $res = $cb->(GET '/');
       is($res->code(), 200, 'Checking for a 200');
       $res = $cb->(GET '/', 'Token' => 'imnocool');
-      is($res->code(), 429, 'Checking for a 429');
+      is($res->code(), 429, 'Checking for a 429, when an invalid token is used');
 
-      note 'And pause then try with the wrong token header';
-      sleep(1);
       sleep_until_next_second();
+      $backend->init();
+
       $res = $cb->(GET '/');
       is($res->code(), 200, 'Checking for a 200');
       $res = $cb->(GET '/', 'Ttoken' => 'imacool');
-      is($res->code(), 429, 'Checking for a 429');
+      is($res->code(), 429, 'Checking for a 429, when an invalid header is used for a token');
 
       note 'Checking an ignored non-rate limited path';
       $res = $cb->(GET '/ignore');
