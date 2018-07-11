@@ -60,6 +60,9 @@ note 'Custom messages';
 assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too much!');
 
 note 'Trying different remote ip headers';
+# These are the product of different load balancers. Since the load balancer is the source
+# of the request, it must report the real client ID in a header. These are three of those
+# headers
 sleep_until_next_second();
 $remote_ip_header = 'HTTP_X_CLUSTER_CLIENT_IP';
 assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'Using HTTP_X_CLUSTER_CLIENT_IP as header');

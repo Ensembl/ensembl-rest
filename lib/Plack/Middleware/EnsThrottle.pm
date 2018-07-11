@@ -167,7 +167,6 @@ sub call {
       #If we are throttled then we have to prepare the throttle response
       if($remaining_requests == 0) {
         $res = [429, ['Content-Type', 'text/plain'], [$self->message() || $MESSAGE]];
-        $remaining_requests = 0;
         $retry_after = 1;
       }
       else {
@@ -295,6 +294,7 @@ sub _whitelisted_hdr {
     return grep { $_ eq $hdr_value } @{$values};
 }
 
+# Try to get the IP of the real client, and not any intervening load balancer or proxy
 sub _client_id_helper {
   my ( $self, $env ) = @_;
   return $env->{REMOTE_USER} ||
