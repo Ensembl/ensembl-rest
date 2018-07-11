@@ -275,7 +275,7 @@ sleep_until_next_second();
 
       #Now inspect the numbers in the storage engine. We should not have negative numbers
       my ($value) = values %{$minute_backend->{hash}};
-      cmp_ok($value, '==', $max_requests, 'Checking that the backing hash maxs out at '.$max_requests);
+      cmp_ok($value, '==', $max_requests, 'Checking that the backing hash maxes out at '.$max_requests);
     };
 }
 
@@ -285,13 +285,13 @@ sub sleep_until_next_second {
   my $time = Time::HiRes::time();
   my $ceil = ceil($time);
   my $diff = $ceil-$time;
-  if($diff < 0.5) {
+  # if($diff < 0.5) {
     note "Sleeping for ${diff} fractions of a second to avoid time related test failures";
     Time::HiRes::sleep($diff);
-  }
-  else {
-    note "Carrying on. We are $diff fraction of a second away from the second. Should be ok";
-  }
+  # }
+  # else {
+    # note "Carrying on. We are $diff fraction of a second away from the second. Should be ok";
+  # }
   return;
 }
 
@@ -303,6 +303,7 @@ sub sleep_until_next_minute {
   my $diff = 60 - $seconds;
   if($diff < 4) {
     note "Sleeping for $diff seconds to avoid time related test failure";
+    sleep($diff);
   }
   else {
     note "Carrying on. We are $diff seconds away from the minute. Should be ok";
