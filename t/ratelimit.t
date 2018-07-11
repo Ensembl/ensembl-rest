@@ -285,7 +285,7 @@ sub sleep_until_next_second {
   my $time = Time::HiRes::time();
   my $ceil = ceil($time);
   my $diff = $ceil-$time;
-  if($diff < 0.3) {
+  if($diff < 0.5) {
     note "Sleeping for ${diff} fractions of a second to avoid time related test failures";
     Time::HiRes::sleep($diff);
   }
