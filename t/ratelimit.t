@@ -41,6 +41,11 @@ my $default_remote_user_sub = sub {
   };
 };
 
+# Verify that anonymisation works on key for memcached:
+my $anonymised_IP = Plack::Middleware::EnsThrottle::Second->_client_id({ REMOTE_USER => '127.0.0.1', HTTP_USER_AGENT => 'Curl'});
+is($anonymised_IP, 'throttle_eb4189c32cd43041d6602cafc025a909', 'Given the same user IP and user agent, we should always get the same hashed result');
+
+
 # First check if we build the object it'll die without key attributes
 throws_ok { Plack::Middleware::EnsThrottle::Second->new()->prepare_app() } 
   qr/Cannot continue.+max_requests/, 'No max_requests given caught';
