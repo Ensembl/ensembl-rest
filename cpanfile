@@ -65,3 +65,4 @@ test_requires 'Test::Deep';
 test_requires 'HTTP::Request::Common';
 test_requires 'Plack::Test';
 test_requires 'Net::CIDR::Lite';
+test_requires 'Test::Time::HiRes';
