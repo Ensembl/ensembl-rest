@@ -18,6 +18,7 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use Test::Time::HiRes;
 use Plack::Test;
 use Plack::Builder;
 use HTTP::Request::Common;
@@ -60,20 +61,24 @@ note 'Custom messages';
 assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'You have done too much!');
 
 note 'Trying different remote ip headers';
-sleep_until_next_second();
+# These are the product of different load balancers. Since the load balancer is the source
+# of the request, it must report the real client ID in a header. These are three of those
+# headers
+new_second();
 $remote_ip_header = 'HTTP_X_CLUSTER_CLIENT_IP';
 assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'Using HTTP_X_CLUSTER_CLIENT_IP as header');
 
-sleep_until_next_second();
+new_second();
 $remote_ip_header = 'REMOTE_USER';
 assert_basic_rate_limit('EnsThrottle::Second', 1, 'second', 'Using REMOTE_USER as header');
 
 note 'Resetting remote ip header to default';
 $remote_ip_header = 'REMOTE_ADDR';
-sleep_until_next_second();
+new_second();
 
 {
   my ($remote_user, $remote_addr) = ('127.0.0.1', '127.0.0.1');
+  my $backend = Plack::Middleware::EnsThrottle::SimpleBackend->new(); # explicit definition, so we can reset it later
 
   # Doing my tests with the Second throttle. Don't change the way this builder is setup
   # otherwise the app fails to load and none of the tests will work.
@@ -102,7 +107,7 @@ sleep_until_next_second();
       blacklist => ['192.167.0.0-192.167.255.255'],
       whitelist_hdr => 'Token',
       whitelist_hdr_values => ['loveme', 'imacool'],
-      client_id_prefix => 'second', backend => Plack::Middleware::EnsThrottle::SimpleBackend->new();
+      client_id_prefix => 'second', backend => $backend;
 
     sub {
       my ($env) = @_;
@@ -117,48 +122,54 @@ sleep_until_next_second();
     client =>  sub {
       my ($cb) = @_;
       
-      sleep_until_next_second();
+      new_second();
 
       my $res = $cb->(GET '/');
-      is($res->code(), 200, 'Checking for a 200');
+      Time::HiRes::sleep(0.01); # Need to hang about a little to avoid being too fast for the smallest delay
+      is($res->code(), 200, 'Checking for a 200 on first request');
+
       cmp_ok($res->header('X-RateLimit-Limit'), '==', 1, 'Limit header must be set to 1');
       cmp_ok($res->header('X-RateLimit-Remaining'), '==', 0, 'Remaining header is 0');
       $res = $cb->(GET '/');
-      is($res->code(), 429, 'Checking for a 429 (more than 1 request per second I hope)');
+
+      is($res->code(), 429, 'Checking for a 429 (on second request with no pause');
       cmp_ok($res->header('Retry-After'), '<=', 1.0, 'Retry-After header must be less than or equal to a second');
       cmp_ok($res->header('Retry-After'), '>', 0, 'Retry-After header must be greater than zero seconds');
       cmp_ok($res->header('X-RateLimit-Limit'), '==', 1, 'Limit header must be set to 1');
-      cmp_ok($res->header('X-RateLimit-Reset'), '<', 1.0, 'Reset header must be less than a second');
+      cmp_ok($res->header('X-RateLimit-Reset'), '<=', 1.0, 'Reset header must be less than or equal to a second');
       cmp_ok($res->header('X-RateLimit-Period'), '==', 1, 'Rate limit period is a second');
       cmp_ok($res->header('X-RateLimit-Remaining'), '==', 0, 'Remaining header is 0');
-
       my $retry_after = $res->header('Retry-After');
-      Time::HiRes::sleep($retry_after);
+      note "Retry delay until current limiter lapses in whole seconds: $retry_after";
+      new_second();
       note "Slept for $retry_after second(s). We should be able to do more requests";
       $res = $cb->(GET '/');
+
       is($res->code(), 200, 'Checking for a 200');
       cmp_ok($res->header('X-RateLimit-Remaining'), '==', 0, 'Remaining header is 0');
+
+      new_second();
 
       note 'Checking if rate limit is disabled using magic password headers';
       $res = $cb->(GET '/', 'Token' => 'imacool');
       is($res->code(), 200, 'Checking for a 200');
       note 'Sending request again with the rate limit disabling header';
       $res = $cb->(GET '/', 'Token' => 'imacool');
-      is($res->code(), 200, 'Checking for a 200');
+      is($res->code(), 200, 'Checking for a 200, rate limit disabled for this user');
 
-      note 'And pause then try with the wrong token value';
-      sleep(1);
+      new_second();
+
       $res = $cb->(GET '/');
       is($res->code(), 200, 'Checking for a 200');
       $res = $cb->(GET '/', 'Token' => 'imnocool');
-      is($res->code(), 429, 'Checking for a 429');
+      is($res->code(), 429, 'Checking for a 429, when an invalid token is used');
 
-      note 'And pause then try with the wrong token header';
-      sleep(1);
+      new_second();
+
       $res = $cb->(GET '/');
       is($res->code(), 200, 'Checking for a 200');
       $res = $cb->(GET '/', 'Ttoken' => 'imacool');
-      is($res->code(), 429, 'Checking for a 429');
+      is($res->code(), 429, 'Checking for a 429, when an invalid header is used for a token');
 
       note 'Checking an ignored non-rate limited path';
       $res = $cb->(GET '/ignore');
@@ -233,7 +244,7 @@ sleep_until_next_second();
     client => sub {
       my ($cb) = @_;
 
-      sleep_until_next_minute();
+      Test::Time::HiRes::set_time(undef, Time::HiRes::time() + 60); # Jump into next minute, doesn't matter where.
 
       note 'Testing limiting on second first (set to 3 req per second)';
       foreach my $iter (1..3) {
@@ -249,7 +260,9 @@ sleep_until_next_second();
       cmp_ok($res->header('X-RateLimit-Period'), '==', 60, 'Rate limit period is a minute');
       my $retry_after = $res->header('Retry-After');
       cmp_ok($retry_after, '<=', 1, 'Checking Retry-After is less than or equal to a second (we hit the per second limit)');
-      Time::HiRes::sleep($retry_after);
+
+      new_second();
+
       note "Slept for $retry_after second(s). Able to do more 2 more requests before hitting the minute rate limit";
 
       #Final request
@@ -267,41 +280,23 @@ sleep_until_next_second();
 
       #Now inspect the numbers in the storage engine. We should not have negative numbers
       my ($value) = values %{$minute_backend->{hash}};
-      cmp_ok($value, '==', $max_requests, 'Checking that the backing hash maxs out at '.$max_requests);
+      cmp_ok($value, '==', $max_requests, 'Checking that the backing hash maxes out at '.$max_requests);
     };
 }
 
-# Subroutine which sleeps the current process until the next second if we are 
-# within 0.3s of it. This gives us a clear run for code to run
-sub sleep_until_next_second {
-  my $time = Time::HiRes::time();
-  my $ceil = ceil($time);
-  my $diff = $ceil-$time;
-  if($diff < 0.3) {
-    note "Sleeping for ${diff} fractions of a second to avoid time related test failures";
-    Time::HiRes::sleep($diff);
-  }
-  else {
-    note "Carrying on. We are $diff fraction of a second away from the second. Should be ok";
-  }
-  return;
+
+# Force the clock onto the next second. Note core::time and TimeHiRes::time are not necessarily the same when doing this.
+sub new_second {
+  my ($seconds) = Time::HiRes::time();
+  $seconds++;
+  Test::Time::HiRes::set_time(undef, $seconds);
 }
 
-# Subroutine which sleeps the current process until the next minute if we are 
-# within 4 seconds of it. We also test the second using sleep_until_next_second()
-sub sleep_until_next_minute {
-  my $dt = DateTime->now;
-  my $seconds = $dt->second;
-  my $diff = 60 - $seconds;
-  if($diff < 4) {
-    note "Sleeping for $diff seconds to avoid time related test failure";
-  }
-  else {
-    note "Carrying on. We are $diff seconds away from the minute. Should be ok";
-  }
-  sleep_until_next_second();
-  return;
+sub now {
+  my ($second, $micro) = Time::HiRes::gettimeofday();
+  note sprintf "%d.%d\n", $second, $micro;
 }
+
 
 sub assert_basic_rate_limit {
   my ($rate_limit_middleware, $period_seconds, $period_name, $custom_message) = @_;
@@ -320,7 +315,7 @@ sub assert_basic_rate_limit {
     app => $app,
     client => sub {
       my ($cb) = @_;
-
+      new_second();
       my $res = $cb->(GET '/');
       cmp_ok($res->code(), '==', 200, 'Checking we are not limited');
       $res = $cb->(GET '/');

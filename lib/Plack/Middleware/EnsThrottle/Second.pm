@@ -25,12 +25,13 @@ use parent 'Plack::Middleware::EnsThrottle';
 
 sub key {
   my ($self, $env) = @_;
-  return sprintf('%s_%d', $self->_client_id($env),CORE::time());
+  my ($seconds,$microseconds) = Time::HiRes::time();
+  return sprintf('%s_%d', $self->_client_id($env),$seconds);
 }
  
 sub reset_time {
   my ($self) = @_;
-  my ($seconds, $microseconds) = Time::HiRes::gettimeofday;
+  my ($seconds, $microseconds) = Time::HiRes::time;
   #Current millis from microseconds
   my $millis = $microseconds/1000;
   #The time remaining in seconds before we will allow more requests
