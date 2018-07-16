@@ -350,7 +350,7 @@ sub find_object_location {
         my $lookup = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
         Catalyst::Exception->throw("No lookup database available on server, archive lookup not possible for $id. Please contact the administrator of this server") unless $lookup;
       }
-      Catalyst::Exception->throw("No object found for $id");
+      $log->debug("No object found for $id");
     }
   }
 
