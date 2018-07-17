@@ -110,13 +110,14 @@ use Net::CIDR::Lite;
 use Readonly;
 use Plack::Middleware::EnsThrottle::SimpleBackend;
 use Plack::Request;
+use Digest::MD5 qw/md5_hex/;
 
 Readonly::Scalar my $CLIENT_ID_PREFIX => 'throttle';
 Readonly::Scalar my $MESSAGE => 'Too many requests';
 Readonly::Scalar my $RETRY_AFTER_ADDITION => 0;
 
 # Implement the following in subclasses (stubbed as yada-yada)
-# - period - time overwhich we calculate the limit (seconds)
+# - period - time over which we calculate the limit (seconds)
 # - key - the key to use in our backend storage layer to store current number of requests
 # - reset_time - time until we will accept a new request
 
@@ -297,16 +298,23 @@ sub _whitelisted_hdr {
 # Try to get the IP of the real client, and not any intervening load balancer or proxy
 sub _client_id_helper {
   my ( $self, $env ) = @_;
+
   return $env->{REMOTE_USER} ||
-      $env->{HTTP_X_CLUSTER_CLIENT_IP} ||
-      $env->{REMOTE_ADDR};
+    $env->{HTTP_X_CLUSTER_CLIENT_IP} ||
+    $env->{REMOTE_ADDR};
 }
 
+# This is only called in subclasses - Second, Minute, Hour.
+# Add the user agent to salt the IP in unpredictable fashion, then anonymise via md5sum.
+# This is to improve our GDPR compliance in regard to storing user IP addresses in the memcached.
 sub _client_id {
   my ($self, $env) = @_;
   my $id = $self->_client_id_helper($env);
+  
   my $prefix = $self->client_id_prefix() || $CLIENT_ID_PREFIX;
-  return $prefix.'_'.$id;
+  my $user_agent = '';
+  $user_agent = $env->{HTTP_USER_AGENT} if exists $env->{HTTP_USER_AGENT};
+  return $prefix.'_'.md5_hex($user_agent.$id);
 }
 
 sub _populate_cidr {
@@ -324,7 +332,7 @@ sub _populate_array {
     my ($self, $input) = @_;
 
     if($input) {
-	$input = (ref($input) eq 'ARRAY') ? $input : [$input];
+      $input = (ref($input) eq 'ARRAY') ? $input : [$input];
     }
     return $input;
 }
