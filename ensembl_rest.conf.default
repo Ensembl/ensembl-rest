@@ -181,6 +181,10 @@ jsonp=1
     genomic_alignment_species2=gallus_gallus
     genomic_alignment_pw_region=2:106041430-106041480:1
 
+    biotype_group=coding
+    biotype_name=CRISPR
+    biotype_ot=gene
+
     info_division=ensembl
   </replacements>
 </Model::Documentation>
