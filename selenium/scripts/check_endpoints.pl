@@ -64,10 +64,11 @@ exit 0;
 
 
 sub test_endpoints {
-  ok $selenium->open($base_url), 'homepage';
+  ok( $selenium->open($base_url), 'homepage' );
   foreach my $href (get_hrefs_like('/documentation/info')) {   
-    ok $selenium->open($href) && eval { page_loads_without_error() }, $href;
+    ok( $selenium->open($href) && eval { page_loads_without_error() }, $href );
   }
+  return;
 }
 
 sub get_hrefs_like {
