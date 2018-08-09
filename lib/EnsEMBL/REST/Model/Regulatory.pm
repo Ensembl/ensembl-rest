@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +50,7 @@ sub fetch_regulatory_feature {
 
   my $activity = $c->request->param('activity');
   if(defined $activity and $activity == 1) {
-    my $data; 
+    my $data;
     for my $ra(@{$rf->regulatory_activity}) {
       $data->{$ra->epigenome->production_name} = $ra->activity;
     }
@@ -80,7 +80,7 @@ sub fetch_all_epigenomes {
 
 sub list_all_microarrays{
   my ($self, $motif) = @_;
-  
+
   my $c       = $self->context;
   my $species = $c->stash->{species};
 
@@ -119,7 +119,7 @@ sub get_probeset_info {
 
   my $ps_a = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'ProbeSet');
   my $ps   = $ps_a->fetch_by_array_probe_set_name($microarray_name, $probeset_name);
-  
+
   my $probes = $ps->get_all_Probes();
   my @probe_names;
   for my $probe (@$probes) {
@@ -156,7 +156,7 @@ sub get_probe_info {
   my $c               = $self->context;
   my $species         = $c->stash->{species};
   my $microarray_name = $c->stash->{microarray};
-  
+
   my $probe_adaptor = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Probe');
   my $probe         = $probe_adaptor->fetch_by_array_probe_probeset_name( $microarray_name, $probe_name );
 
@@ -170,7 +170,7 @@ sub get_probe_info {
   $features->{length}     = $probe->length;
   $features->{sequence}   = $probe->sequence;
 
-# Useful? Discuss. Decide  
+# Useful? Discuss. Decide
 #  $features->{probe_set}  = $probe_set if(defined $probe_set);
 
   my $flag_transcript = defined $c->request->param('transcript') ? $c->request->param('transcript') : 0;
@@ -216,9 +216,9 @@ sub _lookup_transcript_gene {
 
 sub get_microarray_info {
   my ($self,  $vendor) = @_;
-  
+
   my $c       = $self->context;
-  my $species = $c->stash->{species};  
+  my $species = $c->stash->{species};
   my $name    = $c->stash->{microarray};
 
   my $array_a = $c->model('Registry')->get_adaptor( $species, 'Funcgen', 'Array');
@@ -226,7 +226,7 @@ sub get_microarray_info {
   if(! defined $array) {
     Catalyst::Exception->throw("Array '$name' from '$vendor' not found. Please check spelling.");
   }
-  
+
   my $result = {};
   $result->{name}   = $array->name;
   $result->{format} = $array->format;
@@ -235,6 +235,43 @@ sub get_microarray_info {
 
   return($result);
 
+}
+
+sub get_binding_matrix {
+    my ( $self, $binding_matrix_stable_id ) = @_;
+
+    my $c       = $self->context();
+    my $species = $c->stash->{species};
+    my $binding_matrix_adaptor =
+      $c->model('Registry')
+      ->get_adaptor( $species, 'Funcgen', 'BindingMatrix' );
+    my $binding_matrix =
+      $binding_matrix_adaptor->fetch_by_stable_id($binding_matrix_stable_id);
+
+    if ( !defined $binding_matrix ) {
+        Catalyst::Exception->throw( 'Binding Matrix '
+              . $binding_matrix_stable_id
+              . ' not found. Please check spelling.' );
+    }
+
+    my $unit = 'frequencies';
+    if ( defined $c->request->param('unit') ) {
+        $unit = $c->request->param('unit');
+    }
+
+    use Bio::EnsEMBL::Funcgen::BindingMatrix::Converter;
+    my $converter = Bio::EnsEMBL::Funcgen::BindingMatrix::Converter->new();
+
+    if ( $unit eq 'probabilities' ) {
+        $binding_matrix =
+          $converter->from_frequencies_to_probabilities($binding_matrix);
+    }
+    elsif ( $unit eq 'bits' ) {
+        $binding_matrix =
+          $converter->from_frequencies_to_bits($binding_matrix);
+    }
+
+    return $binding_matrix->summary_as_hash();
 }
 
 with 'EnsEMBL::REST::Role::Content';
