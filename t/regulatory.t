@@ -60,7 +60,7 @@ my $regulatory_feature = '/regulatory/species/homo_sapiens/id/ENSR00000105157/?c
     feature_type    => 'Open chromatin',
     seq_region_name => 1,
     source          => 'Regulatory_Build',
-    start           => 76429380,                         
+    start           => 76429380,
     strand          => 0
 
   }];
@@ -132,10 +132,10 @@ $output = {
     "max_element"     => 45331,
     "length"          => 15,
     "unit"            => "Frequencies",
-    "elements_string" => '10448\t364\t350\t45331\t45331\t45331\t187\t27\t57\t45331\t45331\t45331\t829\t1377\t25202\t\n'
-                         . '18876\t45331\t66\t124\t8\t6\t45331\t45331\t6\t46\t11\t15\t45331\t17589\t4640\t\n'
-                         . '2105\t87\t45331\t91\t25\t4\t593\t4\t45331\t7\t23\t4\t4251\t253\t5644\t\n'
-                         . '13901\t5937\t31\t112\t444\t8\t497\t3801\t3\t5\t1002\t13\t80\t27742\t9846\t\n'
+    "elements_string" => "10448\t364\t350\t45331\t45331\t45331\t187\t27\t57\t45331\t45331\t45331\t829\t1377\t25202\t\n"
+                         . "18876\t45331\t66\t124\t8\t6\t45331\t45331\t6\t46\t11\t15\t45331\t17589\t4640\t\n"
+                         . "2105\t87\t45331\t91\t25\t4\t593\t4\t45331\t7\t23\t4\t4251\t253\t5644\t\n"
+                         . "13901\t5937\t31\t112\t444\t8\t497\t3801\t3\t5\t1002\t13\t80\t27742\t9846\t\n"
 
 };
 
@@ -143,7 +143,5 @@ $json = json_GET( $binding_matrix,
     'GET specific Binding Matrix with Frequencies units' );
 eq_or_diff( $json, $output,
     'GET specific Binding Matrix with Frequencies units' );
-
-
 
 done_testing();
