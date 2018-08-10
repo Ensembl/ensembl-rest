@@ -52,7 +52,7 @@ sub fetch_regulatory_feature {
   if(defined $activity and $activity == 1) {
     my $data;
     for my $ra(@{$rf->regulatory_activity}) {
-      $data->{$ra->epigenome->production_name} = $ra->activity;
+      $data->{$ra->get_Epigenome->production_name} = $ra->activity;
     }
     $result->{activity} = $data;
   }
