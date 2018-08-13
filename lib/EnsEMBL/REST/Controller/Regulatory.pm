@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
 Copyright [2016-2018] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ sub species: Chained('/') PathPart('regulatory/species') CaptureArgs(1) {
 sub species2: Chained('/') PathPart('species') CaptureArgs(1) {
   my ( $self, $c, $species) = @_;
 
-  unless (defined $species) { $c->go('ReturnError','custom',[qq{Species must be provided as part of the URL.}])}
+  unless (defined $species) { $c->go('ReturnError','custom',[qq{Species must be provided as part of the URL.}])} 
   $c->stash(species => $species);
 }
 
@@ -62,7 +62,7 @@ sub id: Chained('species') PathPart('id') Args(1) ActionClass('REST') {
 
   if(! defined $id){
     $c->go('ReturnError','custom',[qq{Ensembl Stable ID  must be provided as part of the URL.}]);
-  }
+  } 
   if($id !~ /ENSR\d{11}/){
     $c->go('ReturnError','custom',[qq{Ensembl Regulation Stable IDs  have the format ENSR12345678901.}])
   }
@@ -125,7 +125,7 @@ sub binding_matrix : Chained('species2') PathPart('binding_matrix') Args(1) {
 sub microarray_list: Chained('species') PathPart('microarray') ActionClass('REST') { }
 sub microarray_list_GET {
   my ($self, $c) = @_;
-
+  
     my $microarrays;
     try {
       $microarrays = $c->model('Regulatory')->list_all_microarrays();
@@ -137,23 +137,23 @@ sub microarray_list_GET {
 }
 
 # stash array name
-sub microarray :Chained('species') PathPart('microarray') CaptureArgs(1) ActionClass('REST') {
+sub microarray :Chained('species') PathPart('microarray') CaptureArgs(1) ActionClass('REST') { 
   my ($self, $c, $microarray) = @_;
   if(! defined $microarray){
     $c->go('ReturnError', 'custom', [qq{Microarray name must be provided as part of the URL.}]);
-  }
+  } 
 }
 sub microarray_GET {
   my ($self, $c, $microarray) = @_;
-  $c->stash(microarray => $microarray);
+  $c->stash(microarray => $microarray); 
 }
 
 # /regulatory/species/:species/microarray/:microarray/vendor/:vendor
-sub microarray_single: Chained('microarray') PathPart('vendor') Args(1) ActionClass('REST') {
+sub microarray_single: Chained('microarray') PathPart('vendor') Args(1) ActionClass('REST') { 
   my ($self, $c, $vendor) = @_;
   if(! defined $vendor){
     $c->go('ReturnError', 'custom', [qq{Vendor name must be provided as part of the URL.}]);
-  }
+  } 
 }
 sub microarray_single_GET {
   my ($self, $c, $vendor) = @_;
@@ -171,20 +171,20 @@ sub microarray_single_GET {
 
 }
 
-# /regulatory/species/:species/microarray/:microarray/probe/:probe
+# /regulatory/species/:species/microarray/:microarray/probe/:probe 
 # /regulatory/species/homo_sapiens/microarray/HC-G110/vendor/affy/
-sub microarray_probe: Chained('microarray') PathPart('probe') Args(1) ActionClass('REST') {
+sub microarray_probe: Chained('microarray') PathPart('probe') Args(1) ActionClass('REST') { 
   my ($self, $c, $probe_name) = @_;
   if(! defined $probe_name){
     $c->go('ReturnError', 'custom', [qq{Probe name must be provided as part of the URL.}]);
-  }
+  } 
 }
 
 sub microarray_probe_GET {
   my ($self, $c, $probe_name) = @_;
 
   my $probe_info;
-
+  
   try {
     $probe_info = $c->model('Regulatory')->get_probe_info($probe_name);
   }catch {
@@ -197,13 +197,13 @@ sub microarray_probe_GET {
 
 
 
-# /regulatory/species/:species/microarray/:microarray/probe_set/:probe_set
+# /regulatory/species/:species/microarray/:microarray/probe_set/:probe_set 
 # /regulatory/species/homo_sapiens/microarray/HC-G110/vendor/affy/
-sub microarray_probe_set: Chained('microarray') PathPart('probe_set') Args(1) ActionClass('REST') {
+sub microarray_probe_set: Chained('microarray') PathPart('probe_set') Args(1) ActionClass('REST') { 
   my ($self, $c, $probe_set) = @_;
   if(! defined $probe_set){
     $c->go('ReturnError', 'custom', [qq{ProbeSet name must be provided as part of the URL.}]);
-  }
+  } 
 }
 
 sub microarray_probe_set_GET {

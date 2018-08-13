@@ -1,12 +1,12 @@
-# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
 # Copyright [2016-2018] EMBL-European Bioinformatics Institute
-#
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 #      http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,10 +40,10 @@ my $epigenomes_all = '/regulatory/species/homo_sapiens/epigenome?content-type=ap
 $output = [
   {
     description   => 'REMC Epigenome (Class2) for Lung',
-    display_label => 'Lung',
-    efo_accession => undef,
-    gender        => 'female',
-    name          => 'Lung'
+    display_label => 'Lung',                                         
+    efo_accession => undef,                                          
+    gender        => 'female',                                              
+    name          => 'Lung' 
   },
 ];
 $json = json_GET($epigenomes_all,'GET list of all epigenomes');
@@ -52,16 +52,16 @@ eq_or_diff($json, $output, 'GET list of all epigenomes');
 
 my $regulatory_feature = '/regulatory/species/homo_sapiens/id/ENSR00000105157/?content-type=application/json';
   $output = [{
-    id              => 'ENSR00000105157',
-    bound_end       => 76430144,
-    bound_start     => 76429380,
+    id              => 'ENSR00000105157',                   
+    bound_end       => 76430144,                     
+    bound_start     => 76429380,                   
     description     => 'Open chromatin region',
-    end             => 76430144,
-    feature_type    => 'Open chromatin',
-    seq_region_name => 1,
-    source          => 'Regulatory_Build',
-    start           => 76429380,
-    strand          => 0
+    end             => 76430144,                           
+    feature_type    => 'Open chromatin',              
+    seq_region_name => 1,                      
+    source          => 'Regulatory_Build',              
+    start           => 76429380,                         
+    strand          => 0 
 
   }];
 $json = json_GET($regulatory_feature,'GET specific Regulatory Feature');
@@ -94,11 +94,11 @@ eq_or_diff($json, $output, 'GET Information about a specific probe');
 my $microarray_probe_set = '/regulatory/species/homo_sapiens/microarray/HC-G110/probe_set/1000_at?content-type=application/json';
 $output =  {
   microarray => 'HC-G110',
-  name => '1000_at',
-  probes => [
-    '137:179;'
-    ],
-  size => 16
+  name => '1000_at',          
+  probes => [                         
+    '137:179;'                        
+    ],                                  
+  size => 16                          
   } ;
 $json = json_GET($microarray_probe_set,'JSON: GET Information about a specific probe_set');
 eq_or_diff($json, $output, 'GET Information about a specific probes_set');
