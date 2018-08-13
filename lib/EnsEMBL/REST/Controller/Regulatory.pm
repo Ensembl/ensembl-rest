@@ -40,7 +40,16 @@ BEGIN {extends 'Catalyst::Controller::REST'; }
 
 sub species: Chained('/') PathPart('regulatory/species') CaptureArgs(1) {
   my ( $self, $c, $species) = @_;
+
+  unless (defined $species) { $c->go('ReturnError','custom',[qq{Species must be provided as part of the URL.}])}
   $c->stash(species => $species);
+}
+
+#this is a temp subroutine, almost identical to the 'species' one.
+#It's used in order to ommit the 'regulatory' term from the endpoint string
+#without disrupting the other endpoints that contain it.
+sub species2: Chained('/') PathPart('species') CaptureArgs(1) {
+  my ( $self, $c, $species) = @_;
 
   unless (defined $species) { $c->go('ReturnError','custom',[qq{Species must be provided as part of the URL.}])} 
   $c->stash(species => $species);
@@ -73,7 +82,7 @@ sub id_GET {
 
 }
 
-# /regulatory/species/:species/epigenome/:epigenome
+# /regulatory/species/:species/epigenome/
 sub epigenome: Chained('species') PathPart('epigenome') ActionClass('REST') { }
 
 sub epigenome_GET {
@@ -87,6 +96,29 @@ sub epigenome_GET {
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $epigenomes);
+}
+
+# /species/:species/binding_matrix/:binding_matrix_stable_id/
+sub binding_matrix : Chained('species2') PathPart('binding_matrix') Args(1) {
+    my ( $self, $c, $binding_matrix_stable_id ) = @_;
+
+    unless ( defined $binding_matrix_stable_id ) {
+        $c->go( 'ReturnError', 'custom',
+            [qq{Binding Matrix stable id must be provided as part of the URL.}] );
+    }
+
+    # $c->stash( binding_matrix_name => $binding_matrix_name );
+
+    my $binding_matrix;
+    try {
+        $binding_matrix =
+          $c->model('Regulatory')->get_binding_matrix($binding_matrix_stable_id);
+    }
+    catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->status_ok($c, entity => $binding_matrix);
 }
 
 # /regulatory/species/:species/microarray

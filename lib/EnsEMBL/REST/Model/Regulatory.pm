@@ -237,6 +237,43 @@ sub get_microarray_info {
 
 }
 
+sub get_binding_matrix {
+    my ( $self, $binding_matrix_stable_id ) = @_;
+
+    my $c       = $self->context();
+    my $species = $c->stash->{species};
+    my $binding_matrix_adaptor =
+      $c->model('Registry')
+      ->get_adaptor( $species, 'Funcgen', 'BindingMatrix' );
+    my $binding_matrix =
+      $binding_matrix_adaptor->fetch_by_stable_id($binding_matrix_stable_id);
+
+    if ( !defined $binding_matrix ) {
+        Catalyst::Exception->throw( 'Binding Matrix '
+              . $binding_matrix_stable_id
+              . ' not found. Please check spelling.' );
+    }
+
+    my $unit = 'frequencies';
+    if ( defined $c->request->param('unit') ) {
+        $unit = $c->request->param('unit');
+    }
+
+    use Bio::EnsEMBL::Funcgen::BindingMatrix::Converter;
+    my $converter = Bio::EnsEMBL::Funcgen::BindingMatrix::Converter->new();
+
+    if ( $unit eq 'probabilities' ) {
+        $binding_matrix =
+          $converter->from_frequencies_to_probabilities($binding_matrix);
+    }
+    elsif ( $unit eq 'bits' ) {
+        $binding_matrix =
+          $converter->from_frequencies_to_bits($binding_matrix);
+    }
+
+    return $binding_matrix->summary_as_hash();
+}
+
 with 'EnsEMBL::REST::Role::Content';
 
 __PACKAGE__->meta->make_immutable;
