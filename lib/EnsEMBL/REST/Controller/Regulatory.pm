@@ -99,26 +99,31 @@ sub epigenome_GET {
 }
 
 # /species/:species/binding_matrix/:binding_matrix_stable_id/
-sub binding_matrix : Chained('species2') PathPart('binding_matrix') Args(1) {
+sub binding_matrix : Chained('species2') PathPart('binding_matrix') Args(1)
+  ActionClass('REST') {
     my ( $self, $c, $binding_matrix_stable_id ) = @_;
 
     unless ( defined $binding_matrix_stable_id ) {
         $c->go( 'ReturnError', 'custom',
-            [qq{Binding Matrix stable id must be provided as part of the URL.}] );
+            [qq{Binding Matrix stable id must be provided as part of the URL.}]
+        );
     }
+}
 
-    # $c->stash( binding_matrix_name => $binding_matrix_name );
+sub binding_matrix_GET {
+    my ( $self, $c, $binding_matrix_stable_id ) = @_;
 
     my $binding_matrix;
     try {
         $binding_matrix =
-          $c->model('Regulatory')->get_binding_matrix($binding_matrix_stable_id);
+          $c->model('Regulatory')
+          ->get_binding_matrix($binding_matrix_stable_id);
     }
     catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', [qq{$_}]);
-  };
-  $self->status_ok($c, entity => $binding_matrix);
+        $c->go( 'ReturnError', 'from_ensembl', [qq{$_}] ) if $_ =~ /STACK/;
+        $c->go( 'ReturnError', 'custom', [qq{$_}] );
+    };
+    $self->status_ok( $c, entity => $binding_matrix );
 }
 
 # /regulatory/species/:species/microarray
