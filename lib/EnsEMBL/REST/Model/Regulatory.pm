@@ -22,6 +22,7 @@ package EnsEMBL::REST::Model::Regulatory;
 use Moose;
 use Catalyst::Exception qw(throw);
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
+use Bio::EnsEMBL::Funcgen::BindingMatrix::Converter;
 use Scalar::Util qw/weaken/;
 extends 'Catalyst::Model';
 
@@ -259,7 +260,6 @@ sub get_binding_matrix {
         $unit = $c->request->param('unit');
     }
 
-    use Bio::EnsEMBL::Funcgen::BindingMatrix::Converter;
     my $converter = Bio::EnsEMBL::Funcgen::BindingMatrix::Converter->new();
 
     if ( $unit eq 'probabilities' ) {
