@@ -21,6 +21,7 @@ package EnsEMBL::REST::Model::Regulatory;
 
 use Moose;
 use Catalyst::Exception qw(throw);
+use Try::Tiny;
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 use Bio::EnsEMBL::Funcgen::BindingMatrix::Converter;
 use Bio::EnsEMBL::Funcgen::BindingMatrix::Constants qw ( :all );
@@ -268,7 +269,8 @@ sub get_binding_matrix {
         }
     }
 
-    my $converter = Bio::EnsEMBL::Funcgen::BindingMatrix::Converter->new();
+    try {
+        my $converter = Bio::EnsEMBL::Funcgen::BindingMatrix::Converter->new();
 
         if ( $unit eq PROBABILITIES ) {
             $binding_matrix =
@@ -284,6 +286,15 @@ sub get_binding_matrix {
             $binding_matrix =
               $converter->from_frequencies_to_weights($binding_matrix);
         }
+    }
+    catch {
+        Catalyst::Exception->throw(
+                'Not possible to get the binding matrix with '
+              . $unit
+              . '. Please try a different unit' );
+    };
+
+
     return $binding_matrix->summary_as_hash();
 }
 
