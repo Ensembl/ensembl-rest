@@ -23,6 +23,7 @@ use Moose;
 use Catalyst::Exception qw(throw);
 use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 use Bio::EnsEMBL::Funcgen::BindingMatrix::Converter;
+use Bio::EnsEMBL::Funcgen::BindingMatrix::Constants qw ( :all );
 use Scalar::Util qw/weaken/;
 extends 'Catalyst::Model';
 
@@ -255,21 +256,29 @@ sub get_binding_matrix {
               . ' not found. Please check spelling.' );
     }
 
-    my $unit = 'frequencies';
+    my $unit;
     if ( defined $c->request->param('unit') ) {
         $unit = $c->request->param('unit');
+        $unit = ucfirst(lc($unit));
+        my $valid_units = VALID_UNITS;
+        if ( !grep $_ eq $unit, @{$valid_units} ) {
+            Catalyst::Exception->throw( $unit
+                  . ' is not a valid BindingMatrix unit. List of valid units: '
+                  . join( ",", @{$valid_units} ) );
+        }
     }
 
     my $converter = Bio::EnsEMBL::Funcgen::BindingMatrix::Converter->new();
 
-    if ( $unit eq 'probabilities' ) {
-        $binding_matrix =
-          $converter->from_frequencies_to_probabilities($binding_matrix);
-    }
-    elsif ( $unit eq 'bits' ) {
-        $binding_matrix =
-          $converter->from_frequencies_to_bits($binding_matrix);
-    }
+        if ( $unit eq PROBABILITIES ) {
+            $binding_matrix =
+              $converter->from_frequencies_to_probabilities($binding_matrix);
+        }
+
+        if ( $unit eq BITS ) {
+            $binding_matrix =
+              $converter->from_frequencies_to_bits($binding_matrix);
+        }
 
     return $binding_matrix->summary_as_hash();
 }
