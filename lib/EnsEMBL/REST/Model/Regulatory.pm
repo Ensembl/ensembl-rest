@@ -280,6 +280,10 @@ sub get_binding_matrix {
               $converter->from_frequencies_to_bits($binding_matrix);
         }
 
+        if ( $unit eq WEIGHTS ) {
+            $binding_matrix =
+              $converter->from_frequencies_to_weights($binding_matrix);
+        }
     return $binding_matrix->summary_as_hash();
 }
 
