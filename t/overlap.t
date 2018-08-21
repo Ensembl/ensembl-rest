@@ -297,18 +297,18 @@ my $base = '/overlap/region/homo_sapiens';
   }], 'Getting regulatory_feature as JSON');
 }
 
-#Motif feature testing
+#Motif feature testing 
 {
   my $region = '1:23034888..23034896';
   cmp_deeply(json_GET("$base/$region?feature=motif","Get motif_feature"), [{
-    binding_matrix => 'MA0597.1', 
-    end => 23034896,                         
-    feature_type => 'motif',     
-    motif_feature_type => 'THAP1',
-    score => '7.391',                        
-    seq_region_name => 1,        
-    start => 23034888,           
-    strand => -1 
+    binding_matrix => 'IRF4_AD_TCAAGG20NCG_NCGAAACCGAAACYN_m1_c3_Cell2013',
+    end => 23034896,
+    feature_type => 'motif',
+    score => '7.391',
+    seq_region_name => 1,
+    start => 23034888,
+    strand => -1,
+    stable_id => 'ENSM00000000001'
   }], 'Getting motif_feature as JSON');
 }
 
