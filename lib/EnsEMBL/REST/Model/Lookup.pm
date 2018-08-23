@@ -597,6 +597,37 @@ sub find_slice {
   return $slice;
 }
 
+sub proteome {
+  my ($self, $species) = @_;
+  my $c = $self->context();
+  my $s = $c->stash();
+
+  my $adaptor = $c->model('Registry')->get_adaptor($species, 'core', 'slice');
+  Catalyst::Exception->throw("Do not know anything about the species $species and core database") unless $adaptor;
+
+  my $proteome_download_allowed = $c->model('Registry')->proteome_download_allowed($species);
+  Catalyst::Exception->throw("Proteome download is not allowed for the species $species") unless $proteome_download_allowed;
+
+  my ($toplevel, $ver, $non_ref, $dup, $lrg, $only_protein_coding) = ('toplevel', undef, undef, undef, undef, 1);
+  my $slices = $adaptor->fetch_all($toplevel, $ver, $non_ref, $dup, $lrg, $only_protein_coding);
+  Catalyst::Exception->throw("No slice found for the toplevel coord system") unless $slices;
+
+  my @proteins = ();
+  my ($type, $logic_name, $load_transcripts) = ('protein_coding', undef, 1);
+
+  while (my $slice = shift @{$slices}) {
+    my $genes = $slice->get_all_Genes_by_type($type, $logic_name, $load_transcripts) || [];
+    while (my $gene = shift @{$genes}) {
+        my $canonical = $gene->canonical_transcript();
+       if ($canonical) {
+         my $protein = $canonical->translate();
+         push @proteins, { id => $protein->display_id(), seq => $protein->seq() } if $protein;
+       }
+    }
+  }
+  return \@proteins;
+}
+
 sub decode_region {
   my ($self, $region, $no_warnings, $no_errors) = @_;
   my $c = $self->context();

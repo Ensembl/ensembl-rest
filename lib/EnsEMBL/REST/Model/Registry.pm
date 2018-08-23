@@ -333,6 +333,19 @@ sub get_species {
   return [ grep { $_ > 0 } map {$_->{release} += 0; $_} @{$info} ];
 }
 
+sub proteome_download_allowed {
+  my ($self, $species) = @_;
+  my $info = $self->_species_info();
+
+  my $species_lc = lc($species);
+  for my $item (@{$info}) {
+    if ($species_lc eq lc($item->{name}) || (grep { $_ eq $species_lc } @{$item->{aliases}})) {
+       return $item->{proteome_download_allowed} || 0;
+    }
+  }
+  return 0;
+}
+
 sub _build_species_info {
   my ($self) = @_;
   my @species;
@@ -346,7 +359,7 @@ sub _build_species_info {
 
   my @all_dbadaptors = grep {$_->dbc->dbname ne 'ncbi_taxonomy'} @{$Bio::EnsEMBL::Registry::registry_register{_DBA}};
   my @core_dbadaptors;
-  my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup, %strain_lookup, %strain_collection_lookup);
+  my (%groups_lookup, %division_lookup, %common_lookup, %taxon_lookup, %display_lookup, %release_lookup, %assembly_lookup, %accession_lookup, %strain_lookup, %strain_collection_lookup, %proteome_download_allowed);
   my %processed_db;
   while(my $dba = shift @all_dbadaptors) {
     my $species = $dba->species();
@@ -377,6 +390,7 @@ sub _build_species_info {
           $accession_lookup{$species} = $mc->single_value_by_key('assembly.accession');
           $strain_lookup{$species} = $mc->single_value_by_key('species.strain');
           $strain_collection_lookup{$species} = $mc->single_value_by_key('species.strain_collection');
+          $proteome_download_allowed{$species} = $mc->single_value_by_key('proteome_download_allowed');
          }
         else {
           $dbc->sql_helper->execute_no_return(
@@ -467,6 +481,7 @@ sub _build_species_info {
       assembly => $assembly_lookup{$species},
       strain => $strain_lookup{$species},
       strain_collection => $strain_collection_lookup{$species},
+      proteome_download_allowed => $proteome_download_allowed{$species},
     };
     push(@species, $info);
   }
