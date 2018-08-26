@@ -1,0 +1,40 @@
+1	Genes annotated with <a href="http://gmod.org/wiki/MAKER">MAKER</a> by <a href="http://www.vectorbase.org">VectorBase</a>.	Genes	1	{'colour_key' => '[biotype]','caption' => 'Genes','name' => 'Genes','label_key' => '[biotype]','default' => {'MultiTop' => 'gene_label','contigviewbottom' => 'transcript_label','MultiBottom' => 'collapsed_label','contigviewtop' => 'gene_label','cytoview' => 'gene_label','alignsliceviewbottom' => 'as_collapsed_label'},'key' => 'ensembl'}
+11	Repeats identified by <a rel="external" href="http://www.repeatmasker.org">RepeatMasker</a>, using a custom library of <em>ab initio</em> repeat profiles for this species.	Repeats: Custom library	1	\N
+12	<a rel="external" href="https://tandem.bu.edu/trf/trf.html">Tandem Repeats Finder</a> locates adjacent copies of a pattern of nucleotides.	Tandem repeats (TRF)	1	\N
+10	Dust is a program that identifies low-complexity sequences (regions of the genome with a biased distribution of nucleotides, such as a repeat). The Dust module is widely used with BLAST to prevent 'sticky' regions from determining false hits.	Low complexity (Dust)	1	\N
+13	Repeats identified by <a rel="external" href="http://www.repeatmasker.org">RepeatMasker</a>, using the <a rel="external" href="http://www.girinst.org/repbase/">Repbase</a> library of repeat profiles.	Repeats: Repbase	1	\N
+112	<a href="https://www.ncbi.nlm.nih.gov/Structure/cdd/cdd.shtml">Conserved Domain Database</a> models.	CDD	1	{'type' => 'domain'}
+113	<a href="http://www.cathdb.info/">CATH/Gene3D</a> families.	Gene3D	1	{'type' => 'domain'}
+114	<a href="http://hamap.expasy.org/">HAMAP</a> is a system, based on manual protein annotation, that identifies and semi-automatically annotates proteins that are part of well-conserved families or subfamilies: the HAMAP families.	HAMAP	1	{'type' => 'domain'}
+115	Protein families from <a href="http://www.pantherdb.org/">PANTHER</a>.	PANTHER	1	{'type' => 'domain'}
+116	Protein domains and motifs in the <a rel="external" href="http://pfam.xfam.org">Pfam</a> database.	Pfam	1	{'type' => 'domain'}
+117	Protein domains and motifs from the <a rel="external" href="http://prosite.expasy.org">PROSITE</a> profiles database.	PROSITE profiles	1	{'type' => 'domain'}
+118	Protein domains and motifs from the <a rel="external" href="http://pir.georgetown.edu">PIR (Protein Information Resource)</a> Superfamily database.	PIRSF	1	{'type' => 'domain'}
+119	Protein fingerprints (groups of conserved motifs) from the <a href="http://www.bioinf.manchester.ac.uk/dbbrowser/PRINTS/index.php">PRINTS</a> database.	Prints	1	{'type' => 'domain'}
+120	Protein domains and motifs from the <a rel="external" href="http://prosite.expasy.org">PROSITE</a> patterns database.	PROSITE patterns	1	{'type' => 'domain'}
+121	<a href="http://sfld.rbvi.ucsf.edu/">Structure-Function Linkage Database</a> families.	SFLD	1	{'type' => 'domain'}
+122	Protein domains and motifs in the <a rel="external" href="http://smart.embl-heidelberg.de">SMART</a> database.	SMART	1	{'type' => 'domain'}
+123	Protein domains and motifs in the <a rel="external" href="http://supfam.org/SUPERFAMILY">SUPERFAMILY</a> database.	Superfamily	1	{'type' => 'domain'}
+124	Protein domains and motifs in the <a rel="external" href="http://www.jcvi.org/cgi-bin/tigrfams/index.cgi">TIGRFAM</a> database.	TIGRFAM	1	{'type' => 'domain'}
+125	Prediction of intrinsically disordered regions in proteins by <a href="http://protein.bio.unipd.it/mobidblite/">MobiDB lite</a>.	MobiDB lite	1	{'type' => 'feature'}
+127	Prediction of transmembrane helices in proteins by <a rel="external" href="http://www.cbs.dtu.dk/~krogh/TMHMM">TMHMM</a>.	Transmembrane helices	1	\N
+128	Prediction of signal peptide cleavage sites by <a rel="external" href="http://www.cbs.dtu.dk/services/SignalP">SignalP</a>.	Cleavage site (Signalp)	1	{'type' => 'feature'}
+126	Prediction of coiled-coil regions in proteins is by <a rel="external" href="http://www.sciencemag.org/cgi/reprint/252/5009/1162">Ncoils</a>.	Coiled-coils (Ncoils)	1	\N
+131	InterPro2Pathway mapping is obtained from interproScan results.	InterPro2Pathway mapping	0	\N
+129	InterPro2GO file is generated manually by the InterPro team at the EBI.	InterPro2GO mapping	0	\N
+130	Identification of peptide low complexity sequences by <a rel="external" href="http://www.biology.wustl.edu/gcg/seg.html">Seg</a>.	Low complexity (Seg)	1	\N
+137	UniParc mapping based on sequence checksums	UniParc cross-reference	1	\N
+138	UniProt cross-reference derived transitively from a UniParc identifier	UniParc-derived cross-reference	0	\N
+141	Cross references to UniProt Swiss-Prot (reviewed) proteins, determined by alignment against the proteome with <em>blastp</em>.	UniProt reviewed proteins	0	\N
+86	Cross references to RefSeq peptide sequences, determined by alignment against the proteome with <em>blastp</em>.	RefSeq peptides	0	\N
+87	Cross references to RefSeq nucleotide sequences, determined by alignment against the transcriptome with <em>blastx</em>.	RefSeq transcripts	0	\N
+142	Cross references to UniProt TrEMBL (unreviewed) proteins, determined by alignment against the proteome with <em>blastp</em>.	UniProt unreviewed proteins	0	\N
+140	Cross-reference derived transitively from a UniProt record	UniProt-derived cross-reference	0	\N
+75	Density of short non-coding RNA genes, calculated by dividing the chromosome into 150 "bins" and counting the genes in each. (For very short chromosomes, e.g. MT, some genes contribute to multiple bins.)	Short non-coding genes (density)	1	\N
+76	Density of long non-coding RNA genes, calculated by dividing the chromosome into 150 "bins" and counting the genes in each. (For very short chromosomes, e.g. MT, some genes contribute to multiple bins.)	Long non-coding genes (density)	1	\N
+77	Percentage of G/C bases in the sequence.	GC content	1	\N
+78	Density of coding genes, calculated by dividing the chromosome into 150 "bins" and counting the genes in each. (For very short chromosomes, e.g. MT, some genes contribute to multiple bins.)	Coding genes (density)	1	\N
+79	Density of pseudogenes, calculated by dividing the chromosome into 150 "bins" and counting the genes in each. (For very short chromosomes, e.g. MT, some genes contribute to multiple bins.)	Pseudogenes (density)	1	\N
+80	Percentage of repetitive elements for top level sequences (such as chromosomes, scaffolds, etc.)	Repeats (percent)	1	\N
+111	<a href="http://prodom.prabi.fr/">ProDom</a> domains.	ProDom	1	{'type' => 'domain'}
+139	GO term derived transitively from a UniProt record	UniProt-derived GO term	1	\N

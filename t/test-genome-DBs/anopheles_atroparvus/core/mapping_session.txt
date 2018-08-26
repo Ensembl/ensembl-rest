@@ -1,0 +1,6 @@
+1	anopheles_atroparvus_core_1404_74_1	anopheles_atroparvus_core_1406_75_1	1404	1406	AatrE1.1	AatrE1.2	2014-05-21 15:56:47
+2	anopheles_atroparvus_core_1506_79_1	anopheles_atroparvus_core_1508_80_1	1506	1508	AatrE1.2	AatrE1.3	2015-06-18 15:56:01
+3	anopheles_atroparvus_core_1612_86_1	anopheles_atroparvus_core_1702_87_1	1612	1702	AatrE1.3	AatrE1.4	2017-01-18 15:15:05
+4	anopheles_atroparvus_core_1704_88_1	anopheles_atroparvus_core_1706_88_1	1704	1706	AatrE1.4	AatrE1.5	2017-05-11 11:15:01
+5	anopheles_atroparvus_core_1708_88_1	anopheles_atroparvus_core_1710_89_1	1708	1710	AatrE1.5	AatrE1.6	2017-09-06 10:12:19
+6	anopheles_atroparvus_core_1804_91_2	anopheles_atroparvus_core_1806_92_3	1804	1806	AatrE2.1	AatrE3.1	2018-06-25 10:12:19

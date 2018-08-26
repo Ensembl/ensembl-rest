@@ -1,0 +1,46 @@
+1	encode	Encode regions	Regions that were examined in the <a rel="external" href="http://www.genome.gov/10005107">Encode</a> pilot project.	1877426
+2	genomicctg	Genomic contigs	The largest contigs constructed by the Genome Reference Consortium, <a rel="external" href="http://genomereference.org">GRC</a>, for this genomic assembly.	100530253
+3	tilepath	Tilepath	BAC clones upon which the current genomic assembly was based.  Colours indicate a finished sequence (gold clones), phase 1 sequencing (dark pink), phase 0 (light pink) or other (grey).  Clones that have been fluorescence in situ hybridisation (FISH) mapped are marked with a black triangle in the top left corner.  If a clone is shown in outline, the mapping to the genome is problematic and the true length may not be displayed.	1071649
+9	encode_excluded	ENCODE excluded regions	Genomic regions that have been identified as problematic in the human genome by the ENCODE project. These regions contain abnormally high unique-mapping read coverage signal in open chromatin and control/input datasets across many cell lines and are classified as dispersed high mappability artifacts, dispersed low mappability artifacts, satellite repeats, centromeric repeats, telomeric repeats or snRNA repeats.	4132352
+10	bac_map	BAC map	Full list of mapped BAC clones	500000
+11	ASSEMBLY	WGS/Clones assembly	The tiling path of clones and WGS contigs	1000000
+12	bacs	BACs	BACs	13738670
+13	gap	gaps		44494
+14	matepairs	Mate pairs	Inconsistent mate pairs	21557510
+15	atag_CLE	Assembly tag	Clone_left_end	1000000
+16	atag_CRE	Assembly tag	Clone_right_end	1000000
+17	atag_Misc	Assembly tag	Misc	1000000
+18	atag_Unsure	Assembly tag	Unsure	1000000
+19	CHORI-17	CHORI-17 library	Mapped clone end sequences from human CHORI-17 BAC library (CH17)	18090412
+20	RPCI-11	RPCI-11 library	Mapped clone end sequences from human RPCI-11 BAC library (RP11)	18084827
+21	ABC	ABC libraries	Mapped clone end sequences from ABCs (ABC7, ABC8, ABC9, ABC10, ABC11, ABC12, ABC13, ABC14, ABC16, ABC21, ABC22, ABC24, ABC27) human fosmid libraries (ABC)	18047227
+22	WIBR-2	WIBR-2 library	Mapped clone end sequences from WIBR-2 human fosmid library (WI2)	18043599
+23	CH243	CHORI-243 library	Mapped clone end sequences from sheep CHORI-243 BAC library (CH243)	197393133
+59	RP71_clones	RP71 zebrafish clones	RP71 library of clones for zebrafish	0
+60	DKEYP_clones	DKEYP zebrafish clones	DKEYP library of clones for zebrafish	0
+61	DKEY_clones	DKEY zebrafish clones	DKEY library of clones for zebrafish	0
+62	CH211_clones	CH211 zebrafish clones	CH211 library of clones for zebrafish	0
+63	CH73_clones	CH73 zebrafish clones	CH73 library of clones for zebrafish	0
+64	ZFOS_clones	ZFOS zebrafish clones	ZFOS library of clones for zebrafish	0
+65	CH1073_clones	CH1073 zebrafish clones	CH1073 library of clones for zebrafish	0
+70	CH26_clones	CH26 mouse clones	CH26 library of clones for mouse	0
+71	CH28_clones	CH28 mouse clones	CH28 library of clones for mouse	0
+72	CH33_clones	CH33 mouse clones	CH33 library of clones for mouse	0
+73	CH36_clones	CH36 mouse clones	CH36 library of clones for mouse	0
+74	CH34_clones	CH34 mouse clones	CH34 library of clones for mouse	0
+75	CT7_clones	CT7 mouse clones	CT7 library of clones for mouse	0
+76	CH25_clones	CH25 mouse clones	CH25 library of clones for mouse	0
+77	MM_DBa_clones	MM_DBa mouse clones	MM_DBa library of clones for mouse	0
+78	RP22_clones	RP22 mouse clones	RP22 library of clones for mouse	0
+79	RP21_clones	RP21 mouse clones	RP21 library of clones for mouse	0
+80	MHPP_clones	MHPP mouse clones	MHPP library of clones for mouse	0
+81	C3H_clones	C3H mouse clones	C3H library of clones for mouse	0
+82	RP24_clones	RP24 mouse clones	RP24 library of clones for mouse	0
+83	bMQ_clones	bMQ mouse clones	bMQ library of clones for mouse	0
+84	CH29_clones	CH29 mouse clones	CH29 library of clones for mouse	0
+85	MHPN_clones	MHPN mouse clones	MHPN library of clones for mouse	0
+86	RP23_clones	RP23 mouse clones	RP23 library of clones for mouse	0
+87	MSMg01_clones	MSMg01 mouse clones	MSMg01 library of clones for mouse	0
+88	B6Ng01_clones	B6Ng01 mouse clones	B6Ng01 library of clones for mouse	0
+89	DN_clones	DN mouse clones	DN library of clones for mouse	0
+90	WI1_clones	WI1 mouse clones	WI1 library of clones for mouse	0

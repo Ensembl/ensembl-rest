@@ -46,6 +46,7 @@ while(my $seq = $io->next_seq()) {
 } 
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new();
+my $dba2 = Bio::EnsEMBL::Test::MultiTestDB->new('anopheles_atroparvus');
 Catalyst::Test->import('EnsEMBL::REST');
 
 # CDNA ID based lookup
@@ -411,6 +412,35 @@ FASTA
   is_json_POST($url,$body,$response,'POST ID sequence fetch with sequence trimming');
 
 }
+
+# Whole proteome dowload testing
+{
+  my $species = 'homo_superpuperens';
+  my $url = "/sequence/proteome/$species?";
+  action_check_code($url, 400, 'Return code for unavailable species should be 400');
+  action_raw_bad_regex($url, qr/Do not know anything about the species/, 'There\'s no available species with such name or core db for it');
+}
+{
+  my $species = 'homo_sapiens';
+  my $url = "/sequence/proteome/$species?";
+  action_check_code($url, 400, 'Return code for species with no meta.proteome_download_allowed');
+  action_raw_bad_regex($url, qr/Proteome download is not allowed for the species/, 'No proteome downloads if not allowed');
+}
+{
+  my $species = 'anopheles_atroparvus';
+  my $url = "/sequence/proteome/$species?";
+  my $fasta = fasta_GET($url, 'Getting whole proteome as a single fasta');
+  my $expected = <<'FASTA';
+>AATE007892-PA
+MSFARATQTSPGRSPATVPAPAAPKTGKGCAKPRANTKGRPEVITVTPPEGVSFLDIFRK
+VRQVKEVEDCVRKGSRILRDTAEMLLKRNVDAKAVFQRVKELAPKGSKVTLRLDTVRLQL
+RGIDMLAERGDVAKAMSGKVGEEIPEEDVTLQRYNRGDQRAFVRVPRRIANALLGERLVF
+GYTSCRVELAPPKPIERTNCGRCLLKGHLARSCKGPDRSARCRKCGCEGHKAAACSNKEK
+CLECGGPHTIGSAQCKNRHPNSQ
+FASTA
+  is($fasta, $expected, 'Getting whole proteome as a single fasta');
+}
+
 done_testing();
 
 __DATA__

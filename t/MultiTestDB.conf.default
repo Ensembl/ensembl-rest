@@ -22,6 +22,9 @@
     'ancestral_sequences' => { 
       'core' => 'Bio::EnsEMBL::DBSQL::DBAdaptor',
     },
+    'anopheles_atroparvus' => {
+      'core' => 'Bio::EnsEMBL::DBSQL::DBAdaptor',
+    },
 
     'multi' => {
       'ontology'  => 'Bio::EnsEMBL::DBSQL::OntologyDBAdaptor',

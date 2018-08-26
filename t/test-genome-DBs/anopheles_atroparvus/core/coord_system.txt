@@ -1,0 +1,4 @@
+1	1	contig	AatrE3	3	default_version,sequence_level
+2	1	scaffold	AatrE3	2	default_version
+3	1	chromosome	AatrE3	1	default_version
+6	1	supercontig	AatrE1	4	\N
