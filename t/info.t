@@ -75,8 +75,8 @@ is_json_GET(
     return $info_species;
   };
 
-  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37', strain => 'test_strain', strain_collection => 'human'} ]};
-  my $expected_hide_strain_info = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37'} ]};
+  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37', strain => 'test_strain', strain_collection => 'human', proteome_download_allowed => undef} ]};
+  my $expected_hide_strain_info = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37', proteome_download_allowed => undef} ]};
   my $expected_empty_list = {species => [ ]};
 
   eq_or_diff_data(
