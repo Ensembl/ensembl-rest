@@ -15,9 +15,6 @@
 # limitations under the License.
 #
 
-
-#!/bin/env perl
-
 use strict;
 use warnings;
 use Daemon::Control;
@@ -32,8 +29,6 @@ my $backlog    = $ENV{ENSEMBL_REST_BACKLOG} || 1024;
 my $status_file= $ENV{ENSEMBL_REST_STATUS} || "$root_dir/ensembl_rest.status";
 my $restart_interval = 1;
 my $max_requests=$ENV{ENSEMBL_REST_MAX_REQUESTS} || 10000;
-#my $access_log = "$root_dir/logs/access_log";
-#my $error_log  = "$root_dir/logs/error_log";
 my $pid_file   = $ENV{ENSEMBL_REST_PID} || "$root_dir/ensembl_rest.pid";
 my $init_config= $ENV{ENSEMBL_INIT_CONFIG} || '~/.bashrc';
 
