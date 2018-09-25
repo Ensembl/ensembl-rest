@@ -19,6 +19,8 @@ use strict;
 use warnings;
 use Daemon::Control;
 use FindBin qw($Bin);
+use File::Basename qw(dirname);
+use File::Path qw(make_path);
 use Fcntl ':mode';
 
 my $root_dir   = $ENV{ENSEMBL_REST_ROOT} || "$Bin/../../";
