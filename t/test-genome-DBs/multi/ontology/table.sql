@@ -27,7 +27,7 @@ CREATE TABLE `meta` (
   `species_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `key_value_idx` (`meta_key`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=42 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=43 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `ontology` (
   `ontology_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -48,7 +48,7 @@ CREATE TABLE `relation` (
   PRIMARY KEY (`relation_id`),
   UNIQUE KEY `child_parent_idx` (`child_term_id`,`parent_term_id`,`relation_type_id`,`intersection_of`,`ontology_id`),
   KEY `parent_idx` (`parent_term_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=14133 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=14141 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `relation_type` (
   `relation_type_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

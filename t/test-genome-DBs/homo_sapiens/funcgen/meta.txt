@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	94
+2	\N	schema_version	95
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -146,3 +146,30 @@
 718	\N	patch	patch_92_93_w.sql|Modify index name_exp_idx from table read_file_experimental_configuration
 719	\N	patch	patch_93_94_a.sql|schema_version
 720	\N	patch	patch_93_94_b.sql|Modify column display_label length from epigenome table
+721	\N	patch	patch_93_94_c.sql|Adds table segmentation_cell_table_ctcf
+722	\N	patch	patch_93_94_d.sql|Adds table segmentation_cell_table_without_ctcf
+723	\N	patch	patch_93_94_e.sql|Create transcription_factor table
+724	\N	patch	patch_93_94_f.sql|Create transcription_factor_complex table
+725	\N	patch	patch_93_94_g.sql|Create transcription_factor_complex_composition table
+726	\N	patch	patch_93_94_h.sql|Create binding_matrix_transcription_factor_complex table
+727	\N	patch	patch_93_94_i.sql|Modify motif_feature table
+728	\N	patch	patch_93_94_j.sql|Create motif_feature_peak table
+729	\N	patch	patch_93_94_k.sql|Create motif_feature_regulatory_feature table
+730	\N	patch	patch_93_94_l.sql|Modify binding_matrix_table
+731	\N	patch	patch_93_94_m.sql|Create binding_matrix_frequencies table
+732	\N	patch	patch_93_94_n.sql|Modify indices in motif_feature_peak table
+733	\N	patch	patch_93_94_o.sql|Add indices to motif_feature_regulatory_feature table
+734	\N	patch	patch_93_94_p.sql|Modify column display_label length from epigenome table
+735	\N	patch	patch_94_95_a.sql|schema_version
+736	\N	patch	patch_94_95_b.sql|update to segmentation state tables
+737	\N	patch	patch_94_95_c.sql|Update to alignment table
+738	\N	patch	patch_94_95_d.sql|Update to execution_plan table
+739	\N	patch	patch_94_95_e.sql|Update to regulatory_build_statistic table
+740	\N	patch	patch_94_95_f.sql|Update to experimental_group table
+741	\N	patch	patch_94_95_g.sql|segmentation table
+742	\N	patch	patch_94_95_h.sql|segmentation_cell_tables
+743	\N	patch	patch_94_95_i.sql|segmentation_statistic table
+744	\N	patch	patch_94_95_j.sql|segmentation_file table
+745	\N	patch	patch_94_95_k.sql|peak calling statistic table
+746	\N	patch	patch_94_95_l.sql|Modify length for column name from epigenome table
+747	\N	patch	patch_94_95_m.sql|drop obsolete tables
