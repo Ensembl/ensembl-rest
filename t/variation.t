@@ -105,6 +105,47 @@ my $expected_result = { rs142276873 => $expected_variation_1, rs67521280 => $exp
 
 is_json_POST($base,$post_data,$expected_result,"Try to POST list of variations");
 
+# Test population allele frequency with no allele_count
+  $id = 'COSM946275';
+  my $expected_pops_nc = {
+    'source' => 'http://cancer.sanger.ac.uk/cancergenome/projects/cosmic/',
+    'mappings' => [
+      {
+        'location' => '13:25744274-25744274',
+        'assembly_name' => 'GRCh37',
+        'end' => 25744274,
+        'seq_region_name' => '13',
+        'strand' => 1,
+        'coord_system' => 'chromosome',
+        'allele_string' => 'C/T',
+        'start' => 25744274
+     }
+    ],
+    'name' => 'COSM946275',
+    'MAF' => undef,
+    'ambiguity' => 'Y',
+    'populations' => [
+      {
+        'frequency' => '0.923077',
+        'population' => 'COSMIC:gene:FAM123A_ENST00000515384:tumour_site:endometrium',
+        'allele' => 'C',
+      },
+      {
+        'frequency' => '0.0769231',
+        'population' => 'COSMIC:gene:FAM123A_ENST00000515384:tumour_site:endometrium',
+        'allele' => 'T',
+     }
+    ],
+    'var_class' => 'somatic SNV',
+    'synonyms' => [],
+    'evidence' => [],
+    'ancestral_allele' => undef,
+    'most_severe_consequence' => 'missense_variant',
+    'minor_allele' => undef
+   };
+  $pops_json = json_GET("$base/$id?pops=1", "Population info");
+  cmp_deeply($pops_json, $expected_pops_nc, "Returning population information - no allele_count");
+
 # In test database the variant data for the publication PMID:22779046 PMC:3392070
 # is set to $publication_output
 my $publication_output = 

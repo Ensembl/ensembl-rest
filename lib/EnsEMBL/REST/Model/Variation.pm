@@ -330,7 +330,7 @@ sub pops_as_hash {
   my $population;
   $population->{frequency} = 0 + $allele->frequency(); # Add 0 to treat it as numeric (to avoid quoting)
   $population->{population} = $allele->population->name();
-  $population->{allele_count} = 0 + $allele->count(); # Add 0 to treat it as numeric (to avoid quoting)
+  $population->{allele_count} = 0 + $allele->count() if defined $allele->count(); # Add 0 to treat it as numeric (to avoid quoting)
   $population->{allele} = $allele->allele();
   $population->{submission_id} = $allele->subsnp() if $allele->subsnp();
 
