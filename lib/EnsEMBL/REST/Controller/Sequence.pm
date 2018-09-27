@@ -306,6 +306,12 @@ sub _process_feature {
   }
   # Anything else (like exon)
   else {
+    # Special case, it doesn't make sense to try and fetch coding sequence from an exon,
+    # we have no idea which transcript the exon is associated with. So throw an error.
+    if($object->isa('Bio::EnsEMBL::Exon') && (($type eq 'cds') || ($type eq 'protein'))) {
+      $c->go('ReturnError', 'custom', ["The type $type can not be use when retrieving an Exon"]);
+    }
+
     $slice = $object->feature_Slice();
   }
   

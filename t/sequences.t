@@ -232,6 +232,40 @@ Catalyst::Test->import('EnsEMBL::REST');
   );
 }
 
+# DNA via Exon id in FASTA
+{
+  my $id = 'ENSE00001271861';
+  my $url = "/sequence/id/${id}";
+  my $fasta = fasta_GET($url, 'Getting ENSE00001271861 in FASTA');
+  my $expected = <<'FASTA';
+>ENSE00001271861.1 chromosome:GRCh37:6:1080164:1080229:1
+CCTCAAATAAGAGCCACAAACGTGGAAGATATATCCAAAGGAACCAAATTAAAGGACTGG
+AGAAAG
+FASTA
+  is($fasta, $expected, 'ENSE00001271861 FASTA formatting');
+
+}
+
+# CDS via Exon id in FASTA; bad
+{
+  my $id = 'ENSE00001271861';
+  action_bad_regex(
+    '/sequence/id/'.$id.'?type=cds',
+    qr/can not be use when retrieving an Exon/,
+    'Attempting to get CDS on an Exon, that doesn\'t make sense'
+  );
+}
+
+# protein via Exon id in FASTA; bad
+{
+  my $id = 'ENSE00001271861';
+  action_bad_regex(
+    '/sequence/id/'.$id.'?type=protein',
+    qr/can not be use when retrieving an Exon/,
+    'Attempting to get protein on an Exon, that doesn\'t make sense'
+  );
+}
+
 # DNA Region; bad
 {
   my $region = '6:1..30001';
