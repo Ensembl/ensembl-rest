@@ -144,7 +144,9 @@ is_json_POST($base,$post_data,$expected_result,"Try to POST list of variations")
     'minor_allele' => undef
    };
   $pops_json = json_GET("$base/$id?pops=1", "Population info");
-  cmp_deeply($pops_json, $expected_pops_nc, "Returning population information - no allele_count");
+  cmp_deeply($pops_json->{'populations'},
+             bag(@{$expected_pops_nc->{'populations'}}),
+             "Returning population information - no allele_count");
 
 # In test database the variant data for the publication PMID:22779046 PMC:3392070
 # is set to $publication_output
