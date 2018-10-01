@@ -20,6 +20,16 @@ CREATE TABLE `allele_code` (
   UNIQUE KEY `allele_idx` (`allele`(1000))
 ) ENGINE=MyISAM AUTO_INCREMENT=188 DEFAULT CHARSET=latin1;
 
+CREATE TABLE `allele_synonym` (
+  `allele_synonym_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `variation_id` int(10) unsigned NOT NULL,
+  `hgvs_genomic` varchar(600) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`allele_synonym_id`),
+  UNIQUE KEY `variation_name_idx` (`variation_id`,`name`),
+  KEY `name_idx` (`name`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 CREATE TABLE `associate_study` (
   `study1_id` int(10) unsigned NOT NULL,
   `study2_id` int(10) unsigned NOT NULL,
@@ -168,7 +178,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=106 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=108 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -490,7 +500,7 @@ CREATE TABLE `submitter` (
   `submitter_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`submitter_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `submitter_handle` (
   `handle_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

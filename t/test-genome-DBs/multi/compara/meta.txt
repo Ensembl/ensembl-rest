@@ -1,4 +1,4 @@
-107	\N	schema_version	94
+112	\N	schema_version	95
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -92,3 +92,7 @@
 109	\N	patch	patch_93_94_a.sql|schema_version
 110	\N	patch	patch_93_94_b.sql|homology_description_not_null
 111	\N	patch	patch_93_94_c.sql|method_link_display_name
+113	\N	patch	patch_94_95_a.sql|schema_version
+114	\N	patch	patch_94_95_b.sql|remove_unused_indices
+115	\N	patch	patch_94_95_c.sql|genome_db_is_good_for_alignment
+116	\N	patch	patch_94_95_d.sql|node_type_within_species_speciation
