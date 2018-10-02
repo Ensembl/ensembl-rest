@@ -37,8 +37,10 @@ my $init_config= $ENV{ENSEMBL_INIT_CONFIG} || '~/.bashrc';
 my $log_root   = $ENV{ENSEMBL_LOG_ROOT} || "$root_dir/logs";
 my $pid_root   = dirname($pid_file);
 
-ensure_dir_exists($pid_root, 0755, 'PID root');
-ensure_dir_exists($log_root, 0755, 'log root');
+if ($ARGV[0] =~ /^(start|restart|foreground)$/) {
+  ensure_dir_exists($pid_root, 0755, 'PID root');
+  ensure_dir_exists($log_root, 0755, 'log root');
+}
 
 Daemon::Control->new(
   {
