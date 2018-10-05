@@ -1,0 +1,10 @@
+gene	3	196413
+exon	3	17401
+transcript	3	196413
+gene	2	52345
+exon	2	7096
+transcript	2	52345
+repeat_feature	3	30204
+repeat_feature	2	33629
+karyotype	3	3443692
+density_feature	3	291848

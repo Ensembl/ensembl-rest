@@ -154,6 +154,43 @@ sub region :Chained('get_species') PathPart('') ActionClass('REST') {
   }
 }
 
+sub proteome_GET {
+  my ($self, $c) = @_;
+  $c->request->params->{'multiple_sequences'} = 1;
+  try {
+    $self->_get_proteome_sequences($c);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  };
+  $self->_write($c);
+}
+
+sub proteome :Chained('/') PathPart('sequence/proteome') Args(1) ActionClass('REST'){
+  my ($self, $c, $species) = @_;
+  $c->stash()->{species} = $species;
+}
+
+sub _get_proteome_sequences {
+  my ($self, $c) = @_;
+  my $seq_stash = $c->stash()->{sequences};
+
+  my $species = $c->stash()->{species};
+  #check if bulk is allowed meta.bulk_download == 1 ie
+  my $proteins = $c->model('Lookup')->proteome($species) || [];
+
+  for my $protein (@$proteins) {
+    push @$seq_stash, {
+      id => $protein->{id},
+      molecule => 'protein',
+      query => $species,
+      seq => $protein->{seq},
+    };
+  }
+
+  $c->stash()->{sequences} = $seq_stash;
+}
+
 sub _get_region_sequence {
   my ($self, $c, $region) = @_;
   my $seq_stash = $c->stash()->{sequences};

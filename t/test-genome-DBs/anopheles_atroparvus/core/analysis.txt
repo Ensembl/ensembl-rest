@@ -1,0 +1,41 @@
+1	2018-05-11 15:00:28	vectorbase_maker	\N	\N	\N	vectorbase_maker	\N	\N	\N	Bio::EnsEMBL::EGPipeline::LoadGFF3::LoadGFF3	\N	\N	\N
+10	2018-05-21 10:13:37	dust	\N	\N	\N	dustmasker	\N	dustmasker	\N	Bio::EnsEMBL::Analysis::Runnable::DustMasker	\N	dust	low_complexity_region
+13	2018-05-21 10:13:39	repeatmask_repbase	repbase	\N	\N	RepeatMasker	4.0.5	RepeatMasker	 -nolow -gccalc  -species "Anopheles atroparvus"  -engine crossmatch -q 	Bio::EnsEMBL::Analysis::Runnable::RepeatMasker	\N	repeatmasker	repeat_region
+12	2018-05-21 10:13:37	trf	\N	\N	\N	trf	4.0	trf	2 5 7 80 10 40 500 -d -h	Bio::EnsEMBL::Analysis::Runnable::TRF	\N	trf	tandem_repeat
+11	2018-05-21 10:13:37	repeatmask_customlib	custom	\N	/nfs/production/panda/ensemblgenomes/development/hpedro/metazoa/atroparvus_production/results/anopheles_atroparvus.rm.li	RepeatMasker	4.0.5	RepeatMasker	 -nolow -gccalc  -lib "/nfs/production/panda/ensemblgenomes/development/hpedro/metazoa/atroparvus_production/results/anopheles_atroparvus.rm.lib"  -engine crossmatch 	Bio::EnsEMBL::Analysis::Runnable::RepeatMasker	\N	repeatmasker	repeat_region
+112	2018-07-30 16:38:06	cdd	CDD	3.16	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+127	2018-07-30 16:38:07	tmhmm	TMHMM	2.0c	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+137	2018-08-01 16:08:42	xrefchecksum	\N	\N	\N	xrefchecksum	\N	\N	\N	Bio::EnsEMBL::EGPipeline::Xref::LoadUniParc	\N	\N	\N
+138	2018-08-01 16:21:51	xrefuniparc	\N	\N	\N	xrefuniparc	\N	\N	\N	Bio::EnsEMBL::EGPipeline::Xref::LoadUniProt	\N	\N	\N
+141	2018-08-01 16:56:09	xref_sprot_blastp	sprot	\N	\N	blastp	\N	blastp	-word_size  3 -num_alignments 100000 -num_descriptions 100000 -lcase_masking -seg yes -num_threads 3	Bio::EnsEMBL::Analysis::Runnable::BlastEG	\N	\N	\N
+86	2018-07-23 21:06:27	xref_refseq_blastp	refseq_peptide	\N	\N	blastp	\N	blastp	-word_size  3 -num_alignments 100000 -num_descriptions 100000 -lcase_masking -seg yes -num_threads 3	Bio::EnsEMBL::Analysis::Runnable::BlastEG	\N	\N	\N
+87	2018-07-23 21:14:44	xref_refseq_blastn	refseq_dna	\N	\N	blastn	\N	blastn	-word_size 11 -num_alignments 100000 -num_descriptions 100000 -lcase_masking -num_threads 3	Bio::EnsEMBL::Analysis::Runnable::BlastEG	\N	\N	\N
+142	2018-08-02 12:30:33	xref_trembl_blastp	trembl	\N	\N	blastp	\N	blastp	-word_size  3 -num_alignments 100000 -num_descriptions 100000 -lcase_masking -seg yes -num_threads 3	Bio::EnsEMBL::Analysis::Runnable::BlastEG	\N	\N	\N
+140	2018-08-01 16:26:54	xrefuniprot	\N	\N	\N	xrefuniprot	\N	\N	\N	Bio::EnsEMBL::EGPipeline::Xref::LoadUniProtXrefs	\N	\N	\N
+89	2018-07-24 10:20:16	vb_community_annotation	\N	\N	\N	vb_community_annotation	\N	\N	\N	Bio::EnsEMBL::EGPipeline::Xref::LoadVBCommunityAnnotations	\N	\N	\N
+75	2018-06-21 00:00:00	shortnoncodingdensity	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+76	2018-06-21 00:00:00	longnoncodingdensity	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+77	2018-06-21 16:40:22	percentgc	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+78	2018-06-21 00:00:00	codingdensity	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+79	2018-06-21 16:57:10	pseudogenedensity	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+80	2018-06-21 16:57:29	percentagerepeat	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N
+111	2018-07-30 16:38:06	blastprodom	ProDom	2006.1	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+114	2018-07-30 16:38:06	hamap	HAMAP	2017_10	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+113	2018-07-30 16:38:06	gene3d	Gene3D	4.2.0	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+116	2018-07-30 16:38:07	pfam	Pfam	31.0	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+115	2018-07-30 16:38:06	hmmpanther	PANTHER	12.0	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+117	2018-07-30 16:38:07	pfscan	Prosite_profiles	2017_09	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+118	2018-07-30 16:38:07	pirsf	PIRSF	3.02	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+119	2018-07-30 16:38:07	prints	PRINTS	42.0	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+120	2018-07-30 16:38:07	scanprosite	Prosite_patterns	2017_09	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+121	2018-07-30 16:38:07	sfld	SFLD	3	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+122	2018-07-30 16:38:07	smart	Smart	7.1	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+123	2018-07-30 16:38:07	superfamily	SuperFamily	1.75	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+124	2018-07-30 16:38:07	tigrfam	TIGRfam	15.0	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+125	2018-07-30 16:38:07	mobidblite	MobiDBLite	1.0	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+128	2018-07-30 16:38:07	signalp	SignalP	4.1	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+126	2018-07-30 16:38:07	ncoils	ncoils	2.2.1	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+131	2018-07-30 16:38:09	interpro2pathway	InterPro2Pathway	\N	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+129	2018-07-30 16:38:07	interpro2go	InterPro2GO	\N	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+130	2018-07-30 16:38:09	seg	Seg	\N	\N	InterProScan	5.30-69.0	\N	\N	\N	\N	\N	\N
+139	2018-08-01 16:26:54	gouniprot	\N	\N	\N	gouniprot	\N	\N	\N	Bio::EnsEMBL::EGPipeline::Xref::LoadUniProtGO	\N	\N	\N
