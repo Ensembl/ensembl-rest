@@ -270,6 +270,8 @@ my $data = get_data();
 
   is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, restricted set");
   eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, restricted set");
+
+  action_bad("/alignment/$species/$region?method=EPO;species_set_group=birds;display_species_set=human", "no alignment available for this region");
 }
 
 #EPO, restricted species, phyloxml
