@@ -54,6 +54,11 @@ my $data = get_data();
   action_bad_regex("/alignment/block/region/$species/$region?method=wibble", qr/The method 'wibble' is not understood by this service/, "Using unsupported method causes an exception");
 }
 
+#Wrong method
+{
+  action_bad_regex("/alignment/block/region/$species/$region?method=SYNTENY", qr/The method 'SYNTENY' is not used for genome alignments/, "Using non-alignment method causes an exception");
+}
+
 #Wrong masking
 {
   action_bad_regex("/alignment/block/region/$species/$region?mask=wibble", qr/wibble/, "Using unsupported masking type causes an exception");
