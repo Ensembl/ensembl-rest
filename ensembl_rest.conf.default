@@ -173,6 +173,7 @@ jsonp=1
     vep_hgvs=AGT:c.803T>C
     vep_hgvs_two=9:g.22125504G>C
     vep_hgvs_three=ENST00000003084:c.1431_1433delTTC
+    vep_hgvs_four=ENSP00000401091.1:p.Tyr124Cys
 
     genomic_alignment_species=taeniopygia_guttata
     genomic_alignment_region=2:106040000-106040050:1
