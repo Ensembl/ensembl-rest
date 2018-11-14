@@ -77,6 +77,12 @@ my $data = get_data();
   action_bad_regex("/alignment/region/$species/$region?method=EPO;species_set=gallus_gallus;species_set=wibble", qr/wibble/, "Using unsupported species_set causes an exception");
 }
 
+# No alignment on this region
+{
+  my $region = '2:40000-41500';
+  action_bad("/alignment/$species/$region?method=EPO;species_set_group=birds", "no alignment available for this region");
+}
+
 #Small region EPO slice, tree, deprecated, json
 #curl 'http://127.0.0.1:3000/alignment/slice/region/taeniopygia_guttata/2:106040050-106040100:1?method=EPO;species_set_group=birds' -H 'Content-type:application/json'
 {
@@ -270,6 +276,8 @@ my $data = get_data();
 
   is(scalar(@{$json->[0]{alignments}}), $num_alignments, "number of EPO alignments, restricted set");
   eq_or_diff_data($json->[0]{alignments}[0], $data->{short_EPO}, "First EPO alignment, restricted set");
+
+  action_bad("/alignment/$species/$region?method=EPO;species_set_group=birds;display_species_set=human", "no alignment available for this region");
 }
 
 #EPO, restricted species, phyloxml
