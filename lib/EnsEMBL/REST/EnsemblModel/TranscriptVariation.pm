@@ -29,6 +29,7 @@ sub new {
   my $self = bless({}, $class);
   my $tva = $transcript_variant->get_all_alternate_TranscriptVariationAlleles->[0];
   $self->{translation_start} = $transcript_variant->translation_start;
+  $self->{translation_end} = $transcript_variant->translation_end;
   $self->{translation_id} = $transcript_variant->transcript->translation->stable_id;
   $self->{ID} = $proxy_vf->variation_name;
   $self->{type} = $transcript_variant->display_consequence;
@@ -104,6 +105,12 @@ sub translation_start {
   return $self->{'translation_start'};
 }
 
+sub translation_end {
+  my ($self, $translation_end) = @_;
+  $self->{'translation_end'} = $translation_end if defined $translation_end;
+  return $self->{'translation_end'};
+}
+
 sub parent {
   my ($self, $parent) = @_;
   $self->{'parent'} = $parent if defined $parent;
@@ -127,7 +134,7 @@ sub summary_as_hash {
   my $summary = {};
   $summary->{id} = $self->ID;
   $summary->{start} = $self->translation_start || 0;
-  $summary->{end} = $self->translation_start || 0;
+  $summary->{end} = $self->translation_end || 0;
   $summary->{translation} = $self->translation_id;
   $summary->{allele} = $self->allele;
   $summary->{type} = $self->type;
