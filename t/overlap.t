@@ -510,6 +510,16 @@ $base = '/overlap/translation';
     16, "16 somatic variations overlapping $id");
 }
 
+#Check that the protein start and end coordinates of a "long" variant (i.e. overlap more than 1 AA) are different
+{
+  my $id = 'ENSP00000370194';
+  my $json = json_GET("$base/$id?feature=transcript_variation;so_term=inframe_deletion", 'Ensembl deletion variant with so term');
+  my $expected_tv_start = 277;
+  eq_or_diff($json->[0]->{start}, $expected_tv_start, "Checking the protein start coordinates of the variant");
+  my $expected_tv_end = 283;
+  eq_or_diff($json->[0]->{end}, $expected_tv_end, "Checking the protein end coordinates of the variant");
+}
+
 #Check can we get the splice sites and exon boundaries of a translation
 {
   my $id = 'ENSP00000371073';
