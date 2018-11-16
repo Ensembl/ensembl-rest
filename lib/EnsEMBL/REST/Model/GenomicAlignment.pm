@@ -32,7 +32,6 @@ has 'context' => (is => 'ro', weak_ref => 1);
 
 my %allowed_values = (
   mask     => { map { $_, 1} qw(soft hard) },
-  method   => { map { $_, 1} qw(EPO EPO_LOW_COVERAGE PECAN LASTZ_NET BLASTZ_NET TRANSLATED_BLAT_NET CACTUS_HAL) },
   overlaps => { map { $_, 1} qw(none all restrict) },
 #  species_set_group => { map { $_, 1} qw(mammals amniotes fish birds) },
 );
@@ -47,10 +46,6 @@ sub get_alignment {
   my ($self, $slice) = @_;
   my $c = $self->context();
   my $alignments;
-
-  #Get method
-  my $method = $c->request->parameters->{method} || 'EPO';
-  Catalyst::Exception->throw("The method '$method' is not understood by this service") unless $allowed_values{method}{$method};
 
   #Get species_set
   my $species_set = $c->request->parameters->{species_set};
@@ -76,18 +71,25 @@ sub get_alignment {
 
   #Get the compara DBAdaptor
   $c->forward('get_adaptors');
+
+  #Get method
+  my $method_type = $c->request->parameters->{method} || 'EPO';
+  my $method = $c->stash->{method_adaptor}->fetch_by_type($method_type);
+  Catalyst::Exception->throw("The method '$method_type' is not understood by this service") unless $method;
+  my $method_is_alignment = $method->class =~ /^GenomicAlign/;
+  Catalyst::Exception->throw("The method '$method_type' is not used for genome alignments") unless $method_is_alignment;
   
   #Get method_link_species_set from method and species_set or species_set_group parameters
   my $mlss;
   if ($species_set_group) {
     $species_set_group =~ s/collection-//;
-    $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_species_set_name($method, $species_set_group);    
-    Catalyst::Exception->throw("No method_link_specices_set found for method ${method} and species_set_group ${species_set_group} ") if ! $mlss;
+    $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_species_set_name($method_type, $species_set_group);
+    Catalyst::Exception->throw("No method_link_specices_set found for method ${method_type} and species_set_group ${species_set_group} ") if ! $mlss;
   }
   if ($species_set) {
     $species_set = (ref($species_set) eq 'ARRAY') ? $species_set : [$species_set];
-    $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_registry_aliases($method, $species_set);
-    Catalyst::Exception->throw("No method_link_specices_set found for method ${method} and species_set " . join ",", @${species_set} ) if ! $mlss;
+    $mlss = $c->stash->{method_link_species_set_adaptor}->fetch_by_method_link_type_registry_aliases($method_type, $species_set);
+    Catalyst::Exception->throw("No method_link_specices_set found for method ${method_type} and species_set " . join ",", @${species_set} ) if ! $mlss;
   }
 
   #Get list of species to display
