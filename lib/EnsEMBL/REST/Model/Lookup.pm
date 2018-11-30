@@ -24,6 +24,7 @@ use namespace::autoclean;
 use Try::Tiny;
 use Catalyst::Exception;
 use Scalar::Util qw/weaken/;
+use Bio::EnsEMBL::DBSQL::AttributeAdaptor;
 
 extends 'Catalyst::Model';
 with 'Catalyst::Component::InstancePerContext';
@@ -258,6 +259,19 @@ sub find_object_by_stable_id {
   return $self->find_object($id, $species, $object_type, $db_type);
 }
 
+sub fetch_remarks_by_transcript {
+  my ($self, $object, $code) = @_;
+  my $object_id;
+  if (defined($object)) {
+    $object_id = $object->dbID();
+  }
+  my $c = $self->context();
+  my $db_type = $c->request->param('db_type') || 'core';
+  my $attribute_adaptor = $c->model('Registry')->get_adaptor($c->stash->{'species'}, $db_type, 'attribute');
+  my $results = $attribute_adaptor->fetch_all_by_Object($object_id, 'transcript', 'remark');
+  return $results;
+}
+
 sub find_object {
   my ($self, $id, $species, $object_type, $db_type) = @_;
   my $c = $self->context();
@@ -483,6 +497,7 @@ sub transcript_feature {
   my $transcript = $self->find_object($id, $species, 'Transcript', $db_type);
   $features = $self->features_as_hash($id, $species, 'Transcript', $db_type, $transcript);
   $features->{Exon} = $self->Exon($transcript, $species, $db_type);
+  $features->{Remarks} = $self->fetch_remarks_by_transcript($transcript);
   if ($transcript->translate) {
     my $translation = $transcript->translation;
     $features->{Translation} = $self->features_as_hash($translation->stable_id, $species, 'Translation', $db_type, $translation);
