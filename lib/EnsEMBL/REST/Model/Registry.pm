@@ -32,6 +32,7 @@ eval {
 };
 use feature 'switch';
 use CHI;
+use Try::Tiny;
 use Bio::EnsEMBL::Utils::Exception qw/throw/;
 
 extends 'Catalyst::Model';
@@ -135,9 +136,10 @@ sub _get_eqtl_adaptor {
 
   my ($self) = @_;
   my $eqtl_adaptors = {};
+  my $log = $self->log();
 
   if(! $self->eqtl_dbs) {
-    $self->log->debug("No EQTL database files defined. /eqtl endpoints will fail:\n");
+    $log->debug("No EQTL database files defined. /eqtl endpoints will fail:\n");
     return {}
   }
   # load if not loaded
@@ -148,7 +150,7 @@ sub _get_eqtl_adaptor {
     my $ensembl_species   = $self->get_alias($user_species);
     if(!$ensembl_species){
       my $msg = "Species $user_species is not available in Ensembl. Please consult your config file.";
-      $self->log->fatal($msg);
+      $log->fatal($msg);
       confess $msg;
     }
 
@@ -156,17 +158,22 @@ sub _get_eqtl_adaptor {
     my $var_a  = $self->get_DBAdaptor($ensembl_species, 'variation');
 
     my $file   = $self->eqtl_dbs->{$user_species};
-    my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(
-      -filename        => $file,
-      -core_db_adaptor => $core_a,
-      -var_db_adaptor  => $var_a,
-      );
 
-    if(ref($eqtl_a) ne 'Bio::EnsEMBL::HDF5::EQTLAdaptor'){
-      confess 'Could not get Bio::EnsEMBL::HDF5::EQTLAdaptor';
-    }
+    try {
+      my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(
+        -filename        => $file,
+        -core_db_adaptor => $core_a,
+        -var_db_adaptor  => $var_a,
+        );
 
-    $eqtl_adaptors->{$ensembl_species} = $eqtl_a;
+      if(ref($eqtl_a) ne 'Bio::EnsEMBL::HDF5::EQTLAdaptor'){
+        confess 'Could not get Bio::EnsEMBL::HDF5::EQTLAdaptor';
+      }
+
+      $eqtl_adaptors->{$ensembl_species} = $eqtl_a;
+    } catch {
+      $log->warn("Failed to create EQTLAdaptor for species '$user_species': $_");
+    };
   }
   return $eqtl_adaptors;
 }
