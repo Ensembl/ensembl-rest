@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	95
+2	\N	schema_version	96
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -173,3 +173,9 @@
 745	\N	patch	patch_94_95_k.sql|peak calling statistic table
 746	\N	patch	patch_94_95_l.sql|Modify length for column name from epigenome table
 747	\N	patch	patch_94_95_m.sql|drop obsolete tables
+748	\N	patch	patch_94_95_n.sql|add unique constrain on display_label column for epigenome table
+749	\N	patch	patch_95_96_a.sql|schema_version
+750	\N	patch	patch_95_96_b.sql|changed data type for regulatory build statistics
+751	\N	patch	patch_95_96_c.sql|make unique probe_id column from probe table
+752	\N	patch	patch_95_96_d.sql|add ReadFile to the enum of the ensembl_object_type
+753	\N	patch	patch_95_96_e.sql|
