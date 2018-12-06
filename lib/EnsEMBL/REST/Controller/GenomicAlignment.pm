@@ -52,6 +52,7 @@ sub get_adaptors :Private {
     my $species = $c->stash()->{species};
     my $compara_dba = $c->model('Registry')->get_best_compara_DBAdaptor($species, $c->request()->param('compara'), $self->default_compara());
 
+    my $ma = $compara_dba->get_MethodAdaptor();
     my $mlssa = $compara_dba->get_MethodLinkSpeciesSetAdaptor();
     my $gdba = $compara_dba->get_GenomeDBAdaptor();
     my $asa = $compara_dba->get_AlignSliceAdaptor();
@@ -62,6 +63,7 @@ sub get_adaptors :Private {
     
     $c->stash(
       compara_dba => $compara_dba,
+      method_adaptor => $ma,
       method_link_species_set_adaptor => $mlssa,
       genome_db_adaptor => $gdba,
       align_slice_adaptor => $asa,
