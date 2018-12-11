@@ -62,6 +62,10 @@ has 'lookup_dbname' => ( is => 'ro', isa => 'Str' );
 # Avoid initiation of the registry
 has 'skip_initation' => ( is => 'ro', isa => 'Bool' );
 
+# Avoid loading the registry - use if preloading with starman or plack
+# Lookup will still be built (this is the difference to skip_initiation)
+has 'skip_load'      => ( is => 'ro', isa => 'Bool' );
+
 # Connection settings
 has 'reconnect_interval'  => ( is => 'ro', isa => 'Num' );
 has 'disconnect_if_idle'  => ( is => 'ro', isa => 'Bool' );
@@ -91,7 +95,11 @@ sub _load_registry {
 
   my $load = 0;
 
-  if($self->file()) {
+  if ($self->skip_load) {
+    $log->info('Skipping registry load');
+    $load = 1;
+  }
+  elsif($self->file()) {
     no warnings 'once';
     local $Bio::EnsEMBL::Registry::NEW_EVAL = 1;
     $log->info('Using the file location '.$self->file());
