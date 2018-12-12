@@ -317,7 +317,7 @@ sub get_species {
   my ($self, $division, $strain_collection, $hide_strain_info) = @_;
   my $info = $self->_species_info();
   #have to force numerification again. It got lost ... somewhere
-  #filter by division (e.g.: ensembl)
+  #filter by division (e.g.: EnsemblVertebrates)
   return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{division}) eq lc($division) } @{$info}] if $division;
 
   #filter by strain_collection (e.g.: mouse)
@@ -376,7 +376,7 @@ sub _build_species_info {
         if(!$dba->is_multispecies() && $species !~ /Ancestral/) {
           my $csa = $dba->get_CoordSystemAdaptor();
           $release_lookup{$species} = $schema_version;
-          $division_lookup{$species} = $mc->get_division() || 'Ensembl';
+          $division_lookup{$species} = $mc->get_division() || 'EnsemblVertebrates';
           $common_lookup{$species} = $mc->get_common_name();
           $taxon_lookup{$species} = $mc->get_taxonomy_id();
           $display_lookup{$species} = $mc->get_display_name();
@@ -505,7 +505,7 @@ sub get_compara_name_for_species {
     my $mc = $self->get_adaptor($species, 'core', 'metacontainer');
     my $compara_group = 'multi';
     my $division = $mc->single_value_by_key('species.division');
-    if($division and $division ne 'Ensembl') {
+    if($division and $division ne 'EnsemblVertebrates') {
       $division =~ s/^Ensembl//;
       $compara_group = lc($division);
     }

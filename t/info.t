@@ -75,22 +75,22 @@ is_json_GET(
     return $info_species;
   };
 
-  my $expected = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37', strain => 'test_strain', strain_collection => 'human'} ]};
-  my $expected_hide_strain_info = {species => [ { division => 'Ensembl', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37'} ]};
+  my $expected = {species => [ { division => 'EnsemblVertebrates', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37', strain => 'test_strain', strain_collection => 'human'} ]};
+  my $expected_hide_strain_info = {species => [ { division => 'EnsemblVertebrates', name => 'homo_sapiens', 'accession' => 'GCA_000001405.9', common_name => 'human', display_name => 'Human', taxon_id => '9606', groups => ['core', 'funcgen', 'variation'], aliases => [], release => $core_schema_version, assembly => 'GRCh37'} ]};
   my $expected_empty_list = {species => [ ]};
 
   eq_or_diff_data(
     $get_species->('/info/species', 'Checking only DBA available is the test DBA'), $expected, 
     "/info/species | Checking only DBA available is the test DBA");
   eq_or_diff_data(
-    $get_species->('/info/species?division=Ensembl', q{Output is same as /info/species if specified 'Ensembl' division}), $expected, 
-    "/info/species?division=Ensembl | Output is same as /info/species if specified 'Ensembl' division");
+    $get_species->('/info/species?division=EnsemblVertebrates', q{Output is same as /info/species if specified 'EnsemblVertebrates' division}), $expected, 
+    "/info/species?division=EnsemblVertebrates | Output is same as /info/species if specified 'Ensembl' division");
   eq_or_diff_data(
-    $get_species->('/info/species?division=ensembl', q{Output is same as /info/species if specified 'ensembl' division}), $expected, 
-    "/info/species?division=ensembl | Output is same as /info/species if specified 'ensembl' division");
+    $get_species->('/info/species?division=ensemblvertebrates', q{Output is same as /info/species if specified 'ensemblvertebrates' division}), $expected, 
+    "/info/species?division=ensemblvertebrates | Output is same as /info/species if specified 'ensembl' division");
   eq_or_diff_data(
-    $get_species->('/info/species?division=EnsEMBL', q{Output is same as /info/species if specified 'EnsEMBL' division}), $expected, 
-    "/info/species?division=EnsEMBL | Output is same as /info/species if specified 'EnsEMBL' division");
+    $get_species->('/info/species?division=EnsEMBLvertebrates', q{Output is same as /info/species if specified 'EnsEMBLvertebrates' division}), $expected, 
+    "/info/species?division=EnsEMBLvertebrates | Output is same as /info/species if specified 'EnsEMBL' division");
   eq_or_diff_data(
     $get_species->('/info/species?hide_strain_info=1', q{Output do not have strain and strain_collection info}), $expected_hide_strain_info,
     "/info/species?hide_strain_info=1 | Output do not have strain and strain_collection info");
