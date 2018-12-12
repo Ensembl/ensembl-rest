@@ -181,7 +181,7 @@ jsonp=1
     genomic_alignment_species2=gallus_gallus
     genomic_alignment_pw_region=2:106041430-106041480:1
 
-    info_division=ensembl
+    info_division=EnsemblVertebrates
   </replacements>
 </Model::Documentation>
 
