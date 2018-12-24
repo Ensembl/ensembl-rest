@@ -489,7 +489,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=1074 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1076 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -543,7 +543,7 @@ CREATE TABLE `object_xref` (
   `linkage_annotation` varchar(255) DEFAULT NULL,
   `analysis_id` smallint(5) unsigned DEFAULT NULL,
   PRIMARY KEY (`object_xref_id`),
-  UNIQUE KEY `xref_idx` (`xref_id`,`ensembl_object_type`,`ensembl_id`,`analysis_id`),
+  UNIQUE KEY `xref_idx` (`xref_id`,`ensembl_object_type`,`ensembl_id`),
   KEY `analysis_idx` (`analysis_id`),
   KEY `ensembl_idx` (`ensembl_object_type`,`ensembl_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;

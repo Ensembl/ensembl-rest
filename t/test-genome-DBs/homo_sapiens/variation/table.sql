@@ -178,7 +178,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=108 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=109 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -561,7 +561,7 @@ CREATE TABLE `transcript_variation` (
   KEY `variation_feature_idx` (`variation_feature_id`),
   KEY `consequence_type_idx` (`consequence_types`),
   KEY `somatic_feature_idx` (`feature_stable_id`,`somatic`)
-) ENGINE=MyISAM AUTO_INCREMENT=290168552 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=490592250 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `translation_md5` (
   `translation_md5_id` int(11) NOT NULL AUTO_INCREMENT,

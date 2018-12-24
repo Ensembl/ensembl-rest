@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	95
+2	\N	schema_version	96
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -105,3 +105,4 @@
 105	\N	patch	patch_93_94_a.sql|schema version
 106	\N	patch	patch_94_95_a.sql|schema version
 107	\N	patch	patch_94_95_b.sql|create table to store allele synonyms
+108	\N	patch	patch_95_96_a.sql|schema_version
