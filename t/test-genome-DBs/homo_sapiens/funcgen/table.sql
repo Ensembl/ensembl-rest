@@ -144,8 +144,7 @@ CREATE TABLE `binding_matrix` (
   `source` varchar(20) NOT NULL,
   `stable_id` varchar(128) NOT NULL,
   PRIMARY KEY (`binding_matrix_id`),
-  UNIQUE KEY `name_idx` (`name`),
-  UNIQUE KEY `stable_id_idx` (`stable_id`)
+  UNIQUE KEY `name_idx` (`name`)
 ) ENGINE=MyISAM AUTO_INCREMENT=215 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `binding_matrix_frequencies` (
