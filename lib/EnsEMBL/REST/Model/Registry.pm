@@ -26,8 +26,7 @@ our $LOOKUP_AVAILABLE = 0;
 eval {
   require Bio::EnsEMBL::LookUp;
   require Bio::EnsEMBL::LookUp::RemoteLookUp;
-  require Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor;
-  require Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor;
+  require Bio::EnsEMBL::MetaData::DBSQL::MetaDataDBAdaptor;
   $LOOKUP_AVAILABLE = 1;
 };
 use feature 'switch';
@@ -246,33 +245,23 @@ sub _intern_db_connections {
 
 sub _build_lookup {
   my ($self) = @_;
+  
+  my %lookup_db = (
+    -USER   => $self->lookup_user(),
+    -PASS   => $self->lookup_pass(),
+    -HOST   => $self->lookup_host(),
+    -PORT   => $self->lookup_port(),
+    -DBNAME => $self->lookup_dbname()
+  );
 
-  my $info_db =
-	Bio::EnsEMBL::DBSQL::DBConnection->new(
-									   -USER   => $self->lookup_user(),
-									   -PASS   => $self->lookup_pass(),
-									   -HOST   => $self->lookup_host(),
-									   -PORT   => $self->lookup_port(),
-									   -DBNAME => $self->lookup_dbname()
-	);
+  my $mdba         = Bio::EnsEMBL::MetaData::DBSQL::MetaDataDBAdaptor->new(%lookup_db);
+  my $info_adaptor = $mdba->get_GenomeInfoAdaptor();
+  my $release      = $mdba->get_DataReleaseInfoAdaptor->fetch_by_ensembl_release($self->version());
+  
+  $info_adaptor->data_release($release);
 
-  $info_db->reconnect_when_lost(1);
+  my $lookup = Bio::EnsEMBL::LookUp::RemoteLookUp->new( %lookup_db, -ADAPTOR => $info_adaptor );
 
-  my $tax_dba =
-	Bio::EnsEMBL::DBSQL::TaxonomyDBAdaptor->new(
-										  -USER   => $self->lookup_user(),
-										  -PASS => $self->lookup_pass(),
-										  -HOST => $self->lookup_host(),
-										  -PORT => $self->lookup_port(),
-										  -DBNAME => 'ncbi_taxonomy' );
-  $tax_dba->dbc()->reconnect_when_lost(1);
-
-  my $lookup =
-	Bio::EnsEMBL::LookUp::RemoteLookUp->new(
-		   Bio::EnsEMBL::Utils::MetaData::DBSQL::GenomeInfoAdaptor->new(
-				 -DBC             => $info_db,
-				 TAXONOMY_ADAPTOR => $tax_dba->get_TaxonomyNodeAdaptor()
-		   ) );
   return $lookup;
 } ## end sub _build_lookup
 
@@ -369,7 +358,7 @@ sub _build_species_info {
     my $species_lc = ($species);
     push(@{$groups_lookup{$species_lc}}, $group);
 
-    if($group eq 'core' && $species !~ /Ancestral/) {
+    if($group eq 'core' && $species !~ /(Ancestral|DEFAULT)/) {
       push(@core_dbadaptors, $dba);
       my $dbc = $dba->dbc();
       my $db_key = sprintf(

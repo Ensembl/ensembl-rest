@@ -184,6 +184,11 @@ jsonp=1
     genomic_alignment_pw_region=2:106041430-106041480:1
 
     info_division=EnsemblVertebrates
+
+    # from eg...
+    genome_name=nanoarchaeum_equitans_kin4_m
+    division_name=EnsemblPlants
+    accession=U00096
   </replacements>
 </Model::Documentation>
 
