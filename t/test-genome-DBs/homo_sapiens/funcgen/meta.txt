@@ -178,4 +178,5 @@
 750	\N	patch	patch_95_96_b.sql|changed data type for regulatory build statistics
 751	\N	patch	patch_95_96_c.sql|make unique probe_id column from probe table
 752	\N	patch	patch_95_96_d.sql|add ReadFile to the enum of the ensembl_object_type
-753	\N	patch	patch_95_96_e.sql|
+753	\N	patch	patch_95_96_e.sql|Add description and release_version columns to regulatory_build table
+754	\N	patch	patch_95_96_f.sql|Modify binding_matrix_table
