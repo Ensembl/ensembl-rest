@@ -346,21 +346,6 @@ sub ensgen_version_GET {
   return;
 }
 
-sub genomes_all : Chained('/') PathPart('info/genomes') :
-  ActionClass('REST') : Args(0) { }
-
-sub genomes_all_GET {
-  my ( $self, $c ) = @_;
-  # lazy load the registry
-  $c->model('Registry')->_registry();
-  my $lookup = $c->model('Registry')->_lookup();
-  my $expand = $c->request->param('expand');
-  my @infos =
-  map { _expand_genome($_, $expand) } @{ $lookup->adaptor()->fetch_all() };
-  $self->status_ok( $c, entity => \@infos );
-  return;
-}
-
 sub genomes_name : Chained('/') PathPart('info/genomes') :
   ActionClass('REST') : Args(1) { }
 

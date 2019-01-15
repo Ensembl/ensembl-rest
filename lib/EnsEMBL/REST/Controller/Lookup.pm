@@ -145,31 +145,4 @@ sub _include_user_params {
   }
 }
 
-### The following methods were ported from EG REST...
-
-sub genome : Chained('/') PathPart('lookup/genome') :
-  ActionClass('REST') : Args(1) { }
-
-sub genome_GET {
-  my ( $self, $c, $genome ) = @_;
-  
-  my $level = $c->request->param( 'level' )||'gene';
-  my @biotypes = split(',',$c->request->param( 'biotypes' )||'');
-  my $xrefs = $c->request->param( 'xrefs')||'0';
-  $c->log()->info("Getting DBA for $genome (level=$level,xrefs=$xrefs,biotypes=".join(',',@biotypes).")");
-  my $dba = $c->model('Registry')->get_DBAdaptor( $genome, 'core', 1 );
-  $c->go( 'ReturnError', 'custom',
-      ["Could not fetch adaptor for $genome"] )
-  unless $dba;
-  $c->log()->info("Exporting genes for $genome");
-  my $genes = Bio::EnsEMBL::GenomeExporter::GenomeExporterBulk->export_genes($dba,\@biotypes,$level,$xrefs);
-  $c->log()
-  ->info(
-     "Finished exporting " . scalar(@$genes) . " genes for $genome" );
-  $self->status_ok( $c, entity => $genes );
-  return;
-}
-
-__PACKAGE__->meta->make_immutable;
-
 1;
