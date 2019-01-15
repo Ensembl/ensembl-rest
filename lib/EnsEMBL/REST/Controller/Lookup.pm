@@ -145,4 +145,6 @@ sub _include_user_params {
   }
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;
