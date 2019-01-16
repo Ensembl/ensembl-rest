@@ -129,7 +129,7 @@ $output = {
     },
     "threshold"       => 4.4,
     "name"            => "IRF4_AD_TCAAGG20NCG_NCGAAACCGAAACYN_m1_c3_Cell2013",
-    "max_element"     => 45331,
+    "max_position_sum" => 51719,
     "length"          => 15,
     "unit"            => "Frequencies",
     "elements_string" => "10448\t364\t350\t45331\t45331\t45331\t187\t27\t57\t45331\t45331\t45331\t829\t1377\t25202\t\n"
