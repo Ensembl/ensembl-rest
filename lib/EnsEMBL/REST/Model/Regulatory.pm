@@ -257,9 +257,8 @@ sub get_binding_matrix {
               . ' not found. Please check spelling.' );
     }
 
-    my $unit;
     if ( defined $c->request->param('unit') ) {
-        $unit = $c->request->param('unit');
+        my $unit = $c->request->param('unit');
         $unit = ucfirst(lc($unit));
         my $valid_units = VALID_UNITS;
         if ( !grep $_ eq $unit, @{$valid_units} ) {
@@ -267,33 +266,34 @@ sub get_binding_matrix {
                   . ' is not a valid BindingMatrix unit. List of valid units: '
                   . join( ",", @{$valid_units} ) );
         }
-    }
 
-    try {
-        my $converter = Bio::EnsEMBL::Funcgen::BindingMatrix::Converter->new();
+        try {
+            my $converter =
+                Bio::EnsEMBL::Funcgen::BindingMatrix::Converter->new();
 
-        if ( $unit eq PROBABILITIES ) {
-            $binding_matrix =
-              $converter->from_frequencies_to_probabilities($binding_matrix);
+            if ($unit eq PROBABILITIES) {
+                $binding_matrix =
+                    $converter
+                        ->from_frequencies_to_probabilities($binding_matrix);
+            }
+
+            if ($unit eq BITS) {
+                $binding_matrix =
+                    $converter->from_frequencies_to_bits($binding_matrix);
+            }
+
+            if ($unit eq WEIGHTS) {
+                $binding_matrix =
+                    $converter->from_frequencies_to_weights($binding_matrix);
+            }
         }
-
-        if ( $unit eq BITS ) {
-            $binding_matrix =
-              $converter->from_frequencies_to_bits($binding_matrix);
-        }
-
-        if ( $unit eq WEIGHTS ) {
-            $binding_matrix =
-              $converter->from_frequencies_to_weights($binding_matrix);
-        }
-    }
-    catch {
-        Catalyst::Exception->throw(
+        catch {
+            Catalyst::Exception->throw(
                 'Not possible to get the binding matrix with '
-              . $unit
-              . '. Please try a different unit' );
-    };
-
+                    . $unit
+                    . '. Please try a different unit');
+        };
+    }
 
     return $binding_matrix->summary_as_hash();
 }
