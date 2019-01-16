@@ -185,6 +185,10 @@ jsonp=1
 
     info_division=EnsemblVertebrates
 
+    biotype_name=protein_coding
+    biotype_group=coding
+    biotype_ot=gene
+
     # from eg...
     genome_name=nanoarchaeum_equitans_kin4_m
     division_name=EnsemblPlants
