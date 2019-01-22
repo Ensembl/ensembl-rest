@@ -22,13 +22,6 @@ package EnsEMBL::REST::Model::Registry;
 use Moose;
 use namespace::autoclean;
 require EnsEMBL::REST;
-our $LOOKUP_AVAILABLE = 0;
-eval {
-  require Bio::EnsEMBL::LookUp;
-  require Bio::EnsEMBL::LookUp::RemoteLookUp;
-  require Bio::EnsEMBL::MetaData::DBSQL::MetaDataDBAdaptor;
-  $LOOKUP_AVAILABLE = 1;
-};
 use feature 'switch';
 use CHI;
 use Try::Tiny;
@@ -60,10 +53,6 @@ has 'lookup_dbname' => ( is => 'ro', isa => 'Str' );
 
 # Avoid initiation of the registry
 has 'skip_initation' => ( is => 'ro', isa => 'Bool' );
-
-# Avoid loading the registry - use if preloading with starman or plack
-# Lookup will still be built (this is the difference to skip_initiation)
-has 'skip_load'      => ( is => 'ro', isa => 'Bool' );
 
 # Connection settings
 has 'reconnect_interval'  => ( is => 'ro', isa => 'Num' );
@@ -117,16 +106,6 @@ sub _load_registry {
     );
     $load = 1;
   }
-  if(defined $self->lookup_host() && defined $self->lookup_port() && defined $self->lookup_dbname() && defined $self->lookup_user()) {
-    if($LOOKUP_AVAILABLE) {
-      $log->info('User submitted EnsemblGenomes lookup information. Building from this');
-      $self->_lookup();
-      $load = 1;
-    }
-    else {
-      $log->error('You tried to use Bio::EnsEMBL::LookUp but this was not on your PERL5LIB');
-    }
-  }
 
   if(!$load) {
     confess "Cannot instantiate a registry; we have looked for configuration regarding a registry file, host information and ensembl genomes lookup. None were given. Please consult your configuration file and try again"
@@ -135,7 +114,6 @@ sub _load_registry {
   return $class;
 
 }
-has '_lookup' => ( is => 'rw', lazy => 1, builder => '_build_lookup');
 
 has '_species_info' => ( isa => 'ArrayRef', is => 'ro', lazy => 1, builder => '_build_species_info' );
 
@@ -242,29 +220,6 @@ sub _intern_db_connections {
   return;
 }
 
-
-sub _build_lookup {
-  my ($self) = @_;
-  
-  my %lookup_db = (
-    -USER   => $self->lookup_user(),
-    -PASS   => $self->lookup_pass(),
-    -HOST   => $self->lookup_host(),
-    -PORT   => $self->lookup_port(),
-    -DBNAME => $self->lookup_dbname()
-  );
-
-  my $mdba         = Bio::EnsEMBL::MetaData::DBSQL::MetaDataDBAdaptor->new(%lookup_db);
-  my $info_adaptor = $mdba->get_GenomeInfoAdaptor();
-  my $release      = $mdba->get_DataReleaseInfoAdaptor->fetch_by_ensembl_release($self->version());
-  
-  $info_adaptor->data_release($release);
-
-  my $lookup = Bio::EnsEMBL::LookUp::RemoteLookUp->new( %lookup_db, -ADAPTOR => $info_adaptor );
-
-  return $lookup;
-} ## end sub _build_lookup
-
 # Logic here is if we were told a compara name we use that
 # If not we query the species for the "best" compara (normally depends on division)
 # If no hit and the queried name was different from the default name then try that
@@ -358,7 +313,7 @@ sub _build_species_info {
     my $species_lc = ($species);
     push(@{$groups_lookup{$species_lc}}, $group);
 
-    if($group eq 'core' && $species !~ /(Ancestral|DEFAULT)/) {
+    if($group eq 'core' && $species !~ /Ancestral/) {
       push(@core_dbadaptors, $dba);
       my $dbc = $dba->dbc();
       my $db_key = sprintf(
@@ -590,6 +545,11 @@ sub get_eqtl_adaptor {
   my ($self, $species) = @_;
 
   return $self->_eqtl_adaptors->{$species};
+}
+
+sub get_genomeinfo_adaptor {
+  my ($self) = @_;
+  return $self->get_adaptor('multi', 'metadata', 'GenomeInfo');
 }
 
 __PACKAGE__->meta->make_immutable;
