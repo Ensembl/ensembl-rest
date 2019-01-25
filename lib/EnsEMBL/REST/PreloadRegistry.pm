@@ -11,7 +11,7 @@ You may obtain a copy of the License at
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+WITHinfo WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
@@ -32,7 +32,9 @@ use strict;
 use warnings;
 use Config::General qw(ParseConfig);
 use Bio::EnsEMBL::Registry;
+use EnsEMBL::REST::RegistryHelper;
 
+my $registry = 'Bio::EnsEMBL::Registry';
 my $config_file = $ENV{ENSEMBL_REST_CONFIG};
 
 unless ($config_file) {
@@ -43,45 +45,53 @@ unless (-f $config_file) {
   die "Failed to preload registry: cannot find REST server config at '$config_file'\n";
 }
 
-out("Using config file '$config_file'");
+info("Using config file '$config_file'");
 
 my %config = ParseConfig($config_file);
-my $reg    = $config{'Model::Registry'};
+my $reg_config = $config{'Model::Registry'};
 
 my @db_servers;
 
 # look for primary db server
-if ($reg->{host} && $reg->{user} && $reg->{port}) {
-  out("Using db host '$reg->{host}'");
+if ($reg_config->{host} && $reg_config->{user} && $reg_config->{port}) {
+  info("Using db host '$reg_config->{host}'");
   push @db_servers, {
-    -host => $reg->{host}, 
-    -user => $reg->{user}, 
-    -port => $reg->{port}
+    -host => $reg_config->{host}, 
+    -user => $reg_config->{user}, 
+    -port => $reg_config->{port}
   }; 
 }
 
 # look for other db servers (e.g. host_n)
-for my $key (sort keys %$reg) {
+for my $key (sort keys %$reg_config) {
   next unless $key =~ /^host_(\d+)$/;
   my $i = $1;
-  if ($reg->{"user_$i"} && $reg->{"port_$i"}) {
-    out("Using db host $i '" . $reg->{"host_$i"} . "'");
+  if ($reg_config->{"user_$i"} && $reg_config->{"port_$i"}) {
+    info("Using db host $i '" . $reg_config->{"host_$i"} . "'");
     push @db_servers, {
-      -host => $reg->{"host_$i"}, 
-      -user => $reg->{"user_$i"}, 
-      -port => $reg->{"port_$i"}
+      -host => $reg_config->{"host_$i"}, 
+      -user => $reg_config->{"user_$i"}, 
+      -port => $reg_config->{"port_$i"}
     }; 
   }
 }
 
-out('Registering dbs...');
+info('Registering dbs...');
 
-Bio::EnsEMBL::Registry->load_registry_from_multiple_dbs(@db_servers);
+$registry->load_registry_from_multiple_dbs(@db_servers);
 
-out('Done');
+info('Setting connection policies...');
+
+EnsEMBL::REST::RegistryHelper::set_connection_policies($reg_config);
+
+info('Building species info...');
+
+EnsEMBL::REST::RegistryHelper::build_species_info();
+
+info('Done');
 
 
-sub out {
+sub info {
   my $msg = shift;
   warn sprintf("[%s] %s\n", __PACKAGE__, $msg);
   return;
