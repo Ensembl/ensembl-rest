@@ -56,9 +56,11 @@ my @db_servers;
 if ($reg_config->{host} && $reg_config->{user} && $reg_config->{port}) {
   info("Using db host '$reg_config->{host}'");
   push @db_servers, {
-    -host => $reg_config->{host}, 
-    -user => $reg_config->{user}, 
-    -port => $reg_config->{port}
+    -HOST       => $reg_config->{host}, 
+    -USER       => $reg_config->{user}, 
+    -PORT       => $reg_config->{port},
+    -PASS       => $reg_config->{pass},
+    -DB_VERSION => $reg_config->{version},
   }; 
 }
 
@@ -69,9 +71,11 @@ for my $key (sort keys %$reg_config) {
   if ($reg_config->{"user_$i"} && $reg_config->{"port_$i"}) {
     info("Using db host $i '" . $reg_config->{"host_$i"} . "'");
     push @db_servers, {
-      -host => $reg_config->{"host_$i"}, 
-      -user => $reg_config->{"user_$i"}, 
-      -port => $reg_config->{"port_$i"}
+      -HOST       => $reg_config->{"host_$i"}, 
+      -USER       => $reg_config->{"user_$i"}, 
+      -PORT       => $reg_config->{"port_$i"},
+      -PASS       => $reg_config->{"pass_$i"},
+      -DB_VERSION => $reg_config->{"version_$i"},
     }; 
   }
 }
