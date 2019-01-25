@@ -175,7 +175,7 @@ sub build_species_info {
 }
 
 sub set_connection_policies {
-  my ($config, $log) = shift;
+  my ($config, $log) = @_;
   my $registry = 'Bio::EnsEMBL::Registry';
   
   $log && $log->info('Setting up connection policies');
@@ -207,7 +207,7 @@ sub set_connection_policies {
 }
 
 sub _intern_db_connections {
-  my ($config, $log) = shift;
+  my ($config, $log) = @_;
   my %single_connections;
   my $reconnect_interval = $config->{reconnect_interval} || 0;
   Catalyst::Utils::ensure_class_loaded('Bio::EnsEMBL::DBSQL::ProxyDBConnection');
