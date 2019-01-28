@@ -51,7 +51,7 @@ $compara_schema_version *= 1;
 
 # info/comparas
 is_json_GET(
-  '/info/comparas', { comparas => [ { name => 'multi', release => $compara_schema_version} ] }, "Comparas returns 1 DB"
+  '/info/comparas', { comparas => [ { name => 'vertebrates', release => $compara_schema_version} ] }, "Comparas returns 1 DB"
 );
 
 # info/data
