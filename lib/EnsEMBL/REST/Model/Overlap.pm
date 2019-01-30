@@ -372,7 +372,7 @@ sub constrained {
   my $c = $self->context();
   my $species_set = $c->request->parameters->{species_set} || 'mammals';
   my $compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
-  if ($compara_name eq 'vertebrates') { $compara_name = 'multi'; }
+  if (lc($compara_name) eq 'vertebrates') { $compara_name = 'multi'; }
   my $mlssa = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'MethodLinkSpeciesSet');
   Catalyst::Exception->throw("No adaptor found for compara Multi and adaptor MethodLinkSpeciesSet") if ! $mlssa;
   my $method_list = $mlssa->fetch_by_method_link_type_species_set_name('GERP_CONSTRAINED_ELEMENT', $species_set);

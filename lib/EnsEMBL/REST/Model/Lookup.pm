@@ -211,7 +211,7 @@ sub find_compara_methods {
   my $c = $self->context();
   #default is "multi"
   my $compara = $c->request->parameters->{compara} || $c->config->{'Controller::Compara'}->{default_compara} || 'multi';
-  if ($compara eq 'vertebrates') { $compara = 'multi'; }
+  if (lc($compara) eq 'vertebrates') { $compara = 'multi'; }
   my $reg = $c->model('Registry');
   my $compara_dba = $reg->get_DBAdaptor($compara, "compara");
   my $methods;
@@ -231,7 +231,7 @@ sub find_compara_species_sets {
   my $c = $self->context();
   #default is "multi"
   my $compara = $c->request->parameters->{compara} || $c->config->{'Controller::Compara'}->{default_compara} || 'multi';
-  if ($compara eq 'vertebrates') { $compara = 'multi'; }
+  if (lc($compara) eq 'vertebrates') { $compara = 'multi'; }
   my $reg = $c->model('Registry');
   my $compara_dba = $reg->get_DBAdaptor($compara, "compara");
 
