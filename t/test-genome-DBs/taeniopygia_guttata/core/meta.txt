@@ -239,3 +239,4 @@
 1295	\N	patch	patch_94_95_b.sql|vertebrate_division_rename
 1296	\N	patch	patch_94_95_c.sql|ox_key_update
 1297	\N	patch	patch_95_96_a.sql|schema_version
+1298	1	species.division	EnsemblVertebrates

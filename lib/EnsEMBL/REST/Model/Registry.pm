@@ -279,6 +279,9 @@ sub get_best_compara_DBAdaptor {
   my $compara_name = $request_compara_name || ($species ? $self->get_compara_name_for_species($species) : undef);
   my $dba;
   if ( $compara_name ) {
+    if (lc($compara_name) eq 'vertebrates') {
+      $compara_name = 'multi';
+    }
     $dba = $self->get_DBAdaptor($compara_name, 'compara', 'no alias check');
     if ( !$dba ) {
       throw "Cannot find a suitable compara database for the species $species. Try specifying a compara parameter";
@@ -489,6 +492,9 @@ sub get_comparas {
   foreach my $dba (@{$dbadaptors}) {
     my $name = $dba->species();
     my $mc = $self->get_adaptor($name, 'compara', 'metacontainer');
+    if (lc($name) eq 'multi') {
+      $name = 'vertebrates';
+    }
     my $info = {
       name => $name,
       release => $mc->get_schema_version(),
@@ -503,9 +509,9 @@ sub get_compara_name_for_species {
   my ($self, $species) = @_;
   if(! exists $self->compara_cache()->{$species}) {
     my $mc = $self->get_adaptor($species, 'core', 'metacontainer');
-    my $compara_group = 'multi';
+    my $compara_group = 'vertebrates';
     my $division = $mc->single_value_by_key('species.division');
-    if($division and $division ne 'EnsemblVertebrates') {
+    if($division) {
       $division =~ s/^Ensembl//;
       $compara_group = lc($division);
     }

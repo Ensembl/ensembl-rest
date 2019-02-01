@@ -25,7 +25,7 @@ require EnsEMBL::REST;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
 
-has 'default_compara' => ( is => 'ro', isa => 'Str', default => 'multi' );
+has 'default_compara' => ( is => 'ro', isa => 'Str', default => 'vertebrates' );
 has 'compara_base_dir_location' => ( is => 'ro', isa => 'Str' );
 has 'max_slice_length' => ( isa => 'Num', is => 'ro', default => 1e6);
 
