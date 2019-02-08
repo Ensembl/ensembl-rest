@@ -219,27 +219,36 @@ sub get_species {
   my ($self, $division, $strain_collection, $hide_strain_info) = @_;
   my $info = $self->_species_info();
   #have to force numerification again. It got lost ... somewhere
-  #filter by division (e.g.: EnsemblVertebrates)
-  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{division}) eq lc($division) } @{$info}] if $division;
-
-  #filter by strain_collection (e.g.: mouse)
-  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} grep { lc($_->{strain_collection}) eq lc($strain_collection) } @{$info}] if $strain_collection;
-
   #flag to show or hide strain info
-  if($hide_strain_info > 0){
+  if( $hide_strain_info > 0 ){
     my @hidden_keys = qw(strain strain_collection);
     my $new_info_list = [];
-    foreach my $inf(@{$info}){
-    my $new_info_hash = {};
-      foreach my $key(keys %$inf){
+    foreach my $inf ( @{$info} ) {
+      my $new_info_hash = {};
+      foreach my $key (keys %$inf){
         $new_info_hash->{$key} = $inf->{$key} unless grep {$_ eq $key} @hidden_keys;
       }
-    push (@$new_info_list, $new_info_hash);
+      push @$new_info_list, $new_info_hash;
     }
-    return $new_info_list;
+    $info = $new_info_list;
   }
-
-  return [ grep { $_ > 0 } map {$_->{release} += 0; $_} @{$info} ];
+  
+  my $filter;
+  my @subset = @{$info};
+  #filter by division (e.g.: EnsemblVertebrates, the default setting for info/species)
+  if ($division) {
+    @subset = grep { lc $_->{division} eq lc $division } @subset;
+  }
+  # This assumes one might specify strain collection AND division, but that may not be an issue
+  if ($strain_collection) {
+    @subset = grep { lc $_->{strain_collection} eq lc $strain_collection } @subset;
+  }
+  
+  return [
+    grep { $_ > 0 }
+    map { $_->{release} += 0; $_ }
+    @subset
+  ];
 }
 
 sub _build_species_info {
