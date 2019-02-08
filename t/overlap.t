@@ -1,5 +1,5 @@
 # Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-# Copyright [2016-2018] EMBL-European Bioinformatics Institute
+# Copyright [2016-2019] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -307,6 +307,7 @@ my $base = '/overlap/region/homo_sapiens';
     score => '7.391',
     seq_region_name => 1,
     start => 23034888,
+    transcription_factor_complex => 'IRF8,IRF9,IRF5,IRF4',
     strand => -1,
     stable_id => 'ENSM00000000001'
   }], 'Getting motif_feature as JSON');

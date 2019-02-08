@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
-# Copyright [2016-2018] EMBL-European Bioinformatics Institute
+# Copyright [2016-2019] EMBL-European Bioinformatics Institute
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,12 +53,14 @@ Daemon::Control->new(
     init_config  => $init_config,
     program      => $starman,
     program_args => [ 
-      '--backlog',    $backlog,
-      '--listen',     ":$port", 
-      '--workers',    $workers, 
-      '--max-requests',$max_requests,
-      '--status-file', $status_file,
-      '--interval',   $restart_interval,
+      '--backlog',      $backlog,
+      '--listen',       ":$port", 
+      '--workers',      $workers, 
+      '--max-requests', $max_requests,
+      '--status-file',  $status_file,
+      '--interval',     $restart_interval,
+      '-M',             'EnsEMBL::REST::PreloadRegistry',
+      '--preload-app',  
       $psgi_file 
     ],
     pid_file     => $pid_file,

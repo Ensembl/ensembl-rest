@@ -1,5 +1,5 @@
 # Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-# Copyright [2016-2018] EMBL-European Bioinformatics Institute
+# Copyright [2016-2019] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ use Test::Differences;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
+use Bio::EnsEMBL::Funcgen::BindingMatrix::Constants qw ( :all );
 
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
 Catalyst::Test->import('EnsEMBL::REST');
@@ -129,7 +130,7 @@ $output = {
     },
     "threshold"       => 4.4,
     "name"            => "IRF4_AD_TCAAGG20NCG_NCGAAACCGAAACYN_m1_c3_Cell2013",
-    "max_element"     => 45331,
+    "max_position_sum" => 51719,
     "length"          => 15,
     "unit"            => "Frequencies",
     "elements_string" => "10448\t364\t350\t45331\t45331\t45331\t187\t27\t57\t45331\t45331\t45331\t829\t1377\t25202\t\n"
@@ -143,5 +144,21 @@ $json = json_GET( $binding_matrix,
     'GET specific Binding Matrix with Frequencies units' );
 eq_or_diff( $json, $output,
     'GET specific Binding Matrix with Frequencies units' );
+
+my $binding_matrix_probabilities = $binding_matrix . ';unit=probabilities';
+$json= json_GET( $binding_matrix_probabilities,
+               'GET specific Binding Matrix with Probabilities units' );
+is($json->{unit}, PROBABILITIES,
+   'GET specific Binding Matrix with Probabilities units');
+
+my $binding_matrix_bits = $binding_matrix . ';unit=bits';
+$json= json_GET( $binding_matrix_bits,
+                 'GET specific Binding Matrix with Bits units' );
+is($json->{unit}, BITS, 'GET specific Binding Matrix with Bits units');
+
+my $binding_matrix_weights = $binding_matrix . ';unit=weights';
+$json= json_GET( $binding_matrix_weights,
+                 'GET specific Binding Matrix with Weights units' );
+is($json->{unit}, WEIGHTS, 'GET specific Binding Matrix with Weights units');
 
 done_testing();

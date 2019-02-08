@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016-2018] EMBL-European Bioinformatics Institute
+Copyright [2016-2019] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ my $CONTENT_TYPE_REGEX = qr/(?^:(?:text\/(?:javascript|xml)|application\/json))/
 my $FORMAT_LOOKUP = { full => 1, condensed => 1 };
 my $TYPE_TO_COMPARA_TYPE = { orthologues => 'ENSEMBL_ORTHOLOGUES', paralogues => 'ENSEMBL_PARALOGUES', projections => 'ENSEMBL_PROJECTIONS', all => ''};
 
-has default_compara => ( is => 'ro', isa => 'Str', default => 'multi' );
+has default_compara => ( is => 'ro', isa => 'Str', default => 'vertebrates' );
 
 sub get_adaptors :Private {
   my ($self, $c) = @_;

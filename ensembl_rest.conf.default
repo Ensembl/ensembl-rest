@@ -97,7 +97,9 @@ jsonp=1
   <replacements>
     gene_stable_id=ENSG00000157764
     gene_stable_id_2=ENSG00000248378
-    family_stable_id=PTHR15573
+    gene_stable_id_3=ENSG00000122435
+    gene_stable_id_4=ENSG00000161526
+    gene_stable_id_5=ENSG00000009950
     transcript_stable_id=ENST00000288602
     transcript_stable_id_2=ENST00000513398
     exon_stable_id=ENSE00001154485
@@ -108,6 +110,9 @@ jsonp=1
     
     gene_symbol=BRCA2
     gene_symbol2=BRAF
+    gene_symbol3=TRMT13
+    gene_symbol4=SAP30BP
+    gene_symbol5=MLXIPL
     gene_symbol_db=HGNC
     transcript_symbol_db=PDB
     
@@ -141,6 +146,7 @@ jsonp=1
     
     genetree_stable_id=ENSGT00390000003602
     compara_gene_stable_id=ENSG00000167664
+    family_stable_id=PTHR15573
     
     from_coord_system=GRCh37
     to_coord_system=GRCh38
@@ -149,7 +155,7 @@ jsonp=1
     cds_coordinates=1..1000
     translation_coordinates=100..300
 
-    regulation_id=ENSR00000099113
+    regulation_id=ENSR00000006733
 
     phenotype_region=9:22125500-22136000
 
@@ -165,14 +171,25 @@ jsonp=1
 
     variation_id_three=rs1042779
     variation_id_four=rs699
+    variation_id1=rs6792369
+    variation_id2=rs1042779
+
+    variation_pmid=26318936
+    variation_pmcid=PMC5002951
+
+    population_name=EUROPE
 
     ld_population_name=1000GENOMES:phase_3:KHV
     r2=0.85
     d_prime=1.0
+    window_size=500
+    ld_sequence_region=6:25837556..25843455
     
     vep_hgvs=AGT:c.803T>C
     vep_hgvs_two=9:g.22125504G>C
     vep_hgvs_three=ENST00000003084:c.1431_1433delTTC
+    vep_spdi=NC_000023.11:284252:C:G
+    vep_hgvs_four=ENSP00000401091.1:p.Tyr124Cys
 
     genomic_alignment_species=taeniopygia_guttata
     genomic_alignment_region=2:106040000-106040050:1
@@ -182,6 +199,16 @@ jsonp=1
     genomic_alignment_pw_region=2:106041430-106041480:1
 
     info_division=EnsemblVertebrates
+
+    biotype_name=protein_coding
+    biotype_group=coding
+    biotype_ot=gene
+
+    # from eg...
+    genome_name=nanoarchaeum_equitans_kin4_m
+    division_name=EnsemblPlants
+    accession=U00096
+    assembly_id=GCA_000005005.6
   </replacements>
 </Model::Documentation>
 

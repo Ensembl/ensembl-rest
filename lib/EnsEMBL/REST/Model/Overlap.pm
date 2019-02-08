@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016-2018] EMBL-European Bioinformatics Institute
+Copyright [2016-2019] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -372,6 +372,9 @@ sub constrained {
   my $c = $self->context();
   my $species_set = $c->request->parameters->{species_set} || 'mammals';
   my $compara_name = $c->model('Registry')->get_compara_name_for_species($c->stash()->{species});
+  if (lc($compara_name) eq 'vertebrates') {
+    $compara_name = 'multi';
+  }
   my $mlssa = $c->model('Registry')->get_adaptor($compara_name, 'compara', 'MethodLinkSpeciesSet');
   Catalyst::Exception->throw("No adaptor found for compara Multi and adaptor MethodLinkSpeciesSet") if ! $mlssa;
   my $method_list = $mlssa->fetch_by_method_link_type_species_set_name('GERP_CONSTRAINED_ELEMENT', $species_set);

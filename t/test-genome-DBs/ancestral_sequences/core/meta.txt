@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	95
+2	\N	schema_version	96
 3	\N	patch	patch_77_78_a.sql|schema_version
 4	\N	patch	patch_77_78_b.sql|source_column_increase
 5	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
@@ -52,3 +52,6 @@
 851	\N	patch	patch_93_94_c.sql|default_aln_type
 852	\N	patch	patch_94_95_a.sql|schema_version
 853	\N	patch	patch_94_95_b.sql|vertebrate_division_rename
+854	\N	patch	patch_94_95_c.sql|ox_key_update
+855	\N	patch	patch_95_96_a.sql|schema_version
+856	1	species.division	EnsemblVertebrates

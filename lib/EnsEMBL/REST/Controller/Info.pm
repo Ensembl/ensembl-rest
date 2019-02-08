@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016-2018] EMBL-European Bioinformatics Institute
+Copyright [2016-2019] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -94,10 +94,9 @@ sub species : Local : ActionClass('REST') :Args(0) { }
 
 sub species_GET :Local :Args(0) {
   my ($self, $c) = @_;
-  my $division = $c->request->param('division');
+  my $division = $c->request->param('division') // 'EnsemblVertebrates';
   my $strain_collection = $c->request->param('strain_collection');
-  my $hide_strain_info = $c->request->param('hide_strain_info');
-  $hide_strain_info = $hide_strain_info || 0;
+  my $hide_strain_info = $c->request->param('hide_strain_info') || 0;
   $self->status_ok($c, entity => { species => $c->model('Registry')->get_species($division, $strain_collection, $hide_strain_info)});
   return;
 }
@@ -329,6 +328,106 @@ sub consequence_types_GET {
   };
   $self->status_ok($c, entity => $consequence_types);
   return;
+}
+
+### The following methods were ported from EG REST...
+
+sub ensgen_version : Chained('/') PathPart('info/eg_version') :
+  ActionClass('REST') : Args(0) { }
+
+sub ensgen_version_GET {
+  my ( $self, $c ) = @_;
+  my $gidba = $c->model('Registry')->get_genomeinfo_adaptor;
+  $c->go('ReturnError', 'custom', ["Could not get genome info adaptor"]) unless defined $gidba;
+  $self->status_ok( $c, entity => { version => $gidba->data_release->ensembl_genomes_version } );
+  return;
+}
+
+sub genomes_name : Chained('/') PathPart('info/genomes') :
+  ActionClass('REST') : Args(1) { }
+
+sub genomes_name_GET {
+  my ( $self, $c, $name ) = @_;
+  my $expand = $c->request->param('expand');
+  my $gidba = $c->model('Registry')->get_genomeinfo_adaptor;
+  $c->go('ReturnError', 'custom', ["Could not get genome info adaptor"]) unless defined $gidba;
+  my $info = $gidba->fetch_by_any_name($name);
+  $c->go( 'ReturnError', 'custom', ["Genome $name not found"] ) unless defined $info;
+  $self->status_ok( $c, entity => _expand_genome($info, $expand) );
+  return;
+}
+
+sub divisions : Chained('/') PathPart('info/divisions') :
+  ActionClass('REST') : Args(0) { }
+
+sub divisions_GET {
+  my ( $self, $c ) = @_;
+  my $gidba = $c->model('Registry')->get_genomeinfo_adaptor;
+  $c->go('ReturnError', 'custom', ["Could not get genome info adaptor"]) unless defined $gidba;
+  $self->status_ok( $c, entity => $gidba->list_divisions );
+  return;
+}
+
+sub genomes_division : Chained('/') PathPart('info/genomes/division') :
+  ActionClass('REST') : Args(1) { }
+
+sub genomes_division_GET {
+  my ( $self, $c, $division ) = @_;
+  my $expand = $c->request->param('expand');
+  my $gidba = $c->model('Registry')->get_genomeinfo_adaptor;
+  $c->go('ReturnError', 'custom', ["Could not get genome info adaptor"]) unless defined $gidba;
+  my @infos = map { _expand_genome($_, $expand) } @{ $gidba->fetch_all_by_division($division) };
+  $self->status_ok( $c, entity => \@infos );
+  return;
+}
+
+sub genomes_assembly : Chained('/') PathPart('info/genomes/assembly') :
+  ActionClass('REST') : Args(1) { }
+
+sub genomes_assembly_GET {
+  my ( $self, $c, $acc ) = @_;
+  my $expand = $c->request->param('expand');
+  my $gidba = $c->model('Registry')->get_genomeinfo_adaptor;
+  $c->go('ReturnError', 'custom', ["Could not get genome info adaptor"]) unless defined $gidba;
+  my $info = $gidba->fetch_by_assembly_accession($acc);
+  $c->go( 'ReturnError', 'custom', ["Genome with assembly accession $acc not found"] ) unless defined $info;
+  $self->status_ok( $c, entity => _expand_genome($info, $expand));
+  return;
+}
+
+sub genomes_accession : Chained('/') PathPart('info/genomes/accession')
+  : ActionClass('REST') : Args(1) { }
+
+sub genomes_accession_GET {
+  my ( $self, $c, $acc ) = @_;
+  my $expand = $c->request->param('expand');
+  my $gidba = $c->model('Registry')->get_genomeinfo_adaptor;
+  $c->go('ReturnError', 'custom', ["Could not get genome info adaptor"]) unless defined $gidba;
+  my @infos  = map { _expand_genome($_, $expand) } @{ $gidba->fetch_all_by_sequence_accession($acc) };
+  $self->status_ok( $c, entity => \@infos );
+  return;
+}
+
+sub genomes_taxonomy : Chained('/') PathPart('info/genomes/taxonomy') :
+  ActionClass('REST') : Args(1) { }
+
+sub genomes_taxonomy_GET {
+  my ( $self, $c, $taxon ) = @_;
+  my $expand = $c->request->param('expand');
+  my $gidba = $c->model('Registry')->get_genomeinfo_adaptor;
+  $c->go('ReturnError', 'custom', ["Could not get genome info adaptor"]) unless defined $gidba;
+  my @infos = map { _expand_genome($_, $expand) } @{ $gidba->fetch_all_by_taxonomy_branch($taxon) };
+  $self->status_ok( $c, entity => \@infos );
+  return;
+}
+
+sub _expand_genome {
+  my ($genome, $expand) = @_;
+  return {
+    %{ $genome->to_hash($expand) },
+    %{ $genome->organism->to_hash() },
+    %{ $genome->assembly->to_hash() }
+  }
 }
 
 __PACKAGE__->meta->make_immutable;
