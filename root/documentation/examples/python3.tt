@@ -36,7 +36,7 @@ if not r.ok:
 decoded = r.json()
 print(repr(decoded))
 [% ELSE %]
-print r.text
+print(r.text)
 [% END -%]
 [% END %]
 </pre>
