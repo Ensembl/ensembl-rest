@@ -233,7 +233,6 @@ sub get_species {
     $info = $new_info_list;
   }
   
-  my $filter;
   my @subset = @{$info};
   #filter by division (e.g.: EnsemblVertebrates, the default setting for info/species)
   if ($division) {
