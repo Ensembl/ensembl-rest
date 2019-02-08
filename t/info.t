@@ -119,17 +119,17 @@ is_json_GET(
   eq_or_diff_data(
     $get_species->('/info/species?division=EnsemblVertebrates', q{Output is same as /info/species if specified 'EnsemblVertebrates' division}),
     $expected, 
-    "/info/species?division=EnsemblVertebrates | Output is same as /info/species if specified 'Ensembl' division"
+    "/info/species?division=EnsemblVertebrates | Output is same as /info/species if specified 'EnsemblVertebrates' division"
   );
   eq_or_diff_data(
     $get_species->('/info/species?division=ensemblvertebrates', q{Output is same as /info/species if specified 'ensemblvertebrates' division}),
     $expected, 
-    "/info/species?division=ensemblvertebrates | Output is same as /info/species if specified 'ensembl' division"
+    "/info/species?division=ensemblvertebrates | Output is same as /info/species if specified 'ensemblvertebrates' division"
   );
   eq_or_diff_data(
     $get_species->('/info/species?division=EnsEMBLvertebrates', q{Output is same as /info/species if specified 'EnsEMBLvertebrates' division}),
     $expected, 
-    "/info/species?division=EnsEMBLvertebrates | Output is same as /info/species if specified 'EnsEMBL' division"
+    "/info/species?division=EnsEMBLvertebrates | Output is same as /info/species if specified 'EnsEMBLvertebrates' division"
   );
   eq_or_diff_data(
     $get_species->('/info/species?hide_strain_info=1', q{Output does not have strain and strain_collection info}),
