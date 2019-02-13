@@ -38,6 +38,7 @@ before_install:
     - cd ../../
 
 install:
+    - export PERL5LIB=$PERL5LIB:$PWD/bioperl-live
     - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
     - cpanm -v --installdeps --with-recommends --notest .
     - cpanm -n Devel::Cover::Report::Coveralls
