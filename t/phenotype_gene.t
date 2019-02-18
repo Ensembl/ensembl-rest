@@ -177,6 +177,30 @@ my $gene_name='FOXF2';
   cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
 }
 
+#Get Variation phenotype features associated with gene for gene without gene symbol
+{
+  my $expected = 1;
+  my $gene = 'ENSG00000073614';
+  my $expected_data = [
+          {
+            Gene => 'ENSG00000073614',
+            attributes => {
+              external_reference => 'pubmed/17122850'
+            },
+            description => 'positive regulation of transcription from RNA polymerase II promoter',
+            location => '6:280129-389454',
+            source => 'GOA'
+          }
+        ];
+  my $ga = $dba->get_DBAdaptor("core")->get_GeneAdaptor();
+  my $geneObj = $ga->fetch_all_by_external_name($gene);
+  cmp_ok(scalar(@{$geneObj}), "==", 1, "Found 1 gene" );
+  cmp_ok($geneObj->[0]->stable_id , "eq",$gene, "Gene has correct stable id" );
+  is($geneObj->[0]->external_name, undef, "Gene external_name is undef" );
+  my $json = json_GET("$base/$gene?include_associated=1", 'Gene without a gene_symbol with 1 phenotype feature associated with a variant');
+  cmp_ok(scalar(@{$json}),"==", $expected, 'Gene without a gene_symbol with 1 phenotype association with variant found');
+  cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
+}
 
 #Get Gene phenotype features overlapping (eg. large structural variants)
 {
