@@ -137,7 +137,6 @@ sub build_species_info {
         $processed_db{$db_key} = 1;
       }
     }
-    $dba->dbc->db_handle->disconnect;
   }
 
   foreach my $dba (@core_dbadaptors) {
