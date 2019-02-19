@@ -47,12 +47,12 @@ unless (-f $config_file) {
 
 info("Using config file '$config_file'");
 
-my %config = ParseConfig($config_file);
+my %config = ParseConfig(-ConfigFile => $config_file, -ForceArray => 1);
 my $reg_config = $config{'Model::Registry'};
 
 my @db_servers;
 
-# look for primary db server
+# look for single-server db config
 if ($reg_config->{host} && $reg_config->{user} && $reg_config->{port}) {
   info("Using db host '$reg_config->{host}'");
   push @db_servers, {
@@ -64,18 +64,17 @@ if ($reg_config->{host} && $reg_config->{user} && $reg_config->{port}) {
   }; 
 }
 
-# look for other db servers (e.g. host_n)
-for my $key (sort keys %$reg_config) {
-  next unless $key =~ /^host_(\d+)$/;
-  my $i = $1;
-  if ($reg_config->{"user_$i"} && $reg_config->{"port_$i"}) {
-    info("Using db host $i '" . $reg_config->{"host_$i"} . "'");
+# look for multiple db server config
+if ($reg_config->{db_server}) {
+  my $servers = ref $reg_config->{db_server} eq 'ARRAY' ? $reg_config->{db_server} : [ $reg_config->{db_server} ];
+  foreach my $server (@$servers) {
+    info("Using db host '$server->{host}'");
     push @db_servers, {
-      -HOST       => $reg_config->{"host_$i"}, 
-      -USER       => $reg_config->{"user_$i"}, 
-      -PORT       => $reg_config->{"port_$i"},
-      -PASS       => $reg_config->{"pass_$i"},
-      -DB_VERSION => $reg_config->{"version_$i"},
+      -HOST       => $server->{host}, 
+      -USER       => $server->{user}, 
+      -PORT       => $server->{port},
+      -PASS       => $server->{pass},
+      -DB_VERSION => $server->{version},
     }; 
   }
 }
