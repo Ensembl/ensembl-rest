@@ -197,19 +197,19 @@ is_json_GET(
 {
   my $groups_json = json_GET('/info/biotypes/groups', 'Get the list biotype groups');
   is(ref($groups_json), 'ARRAY', 'Array wanted from endpoint');
-  cmp_ok(scalar(@{$groups_json}), '==', 8, 'Ensuring we have the right number of biotype groups');
-  is(shift @{$groups_json}, 'LRG', 'first group is LRG');
-  is(pop @{$groups_json}, 'undefined', 'last group is undefined')
+  cmp_ok(scalar(@{$groups_json}), '==', 2, 'Ensuring we have the right number of biotype groups');
+  is(shift @{$groups_json}, 'coding', 'first group is coding');
+  is(pop @{$groups_json}, 'snoncoding', 'last group is snoncoding')
 }
 
 # /info/biotypes/groups/:group
 {
   my $biotypes_json = json_GET('/info/biotypes/groups/coding', 'Get the list of coding biotypes');
   is(ref($biotypes_json), 'ARRAY', 'Array wanted from endpoint');
-  cmp_ok(scalar(@{$biotypes_json}), '==', 33, 'Ensuring we have the right number of biotypes of group coding');
+  cmp_ok(scalar(@{$biotypes_json}), '==', 2, 'Ensuring we have the right number of biotypes of group coding');
   my $biotype = shift @{$biotypes_json};
   is(ref($biotype), 'HASH', 'Biotypes represented by Hashes');
-  my $expected = { name => 'IG_C_gene', biotype_group => 'coding', object_type => 'gene', so_acc => 'SO:0001217'};
+  my $expected = { name => 'protein_coding', biotype_group => 'coding', object_type => 'gene', so_acc => 'SO:0001217', so_term => 'protein_coding_gene'};
   eq_or_diff_data($biotype, $expected, 'Checking internal contents of biotype hash as expected');
   action_bad_regex('/info/biotypes/groups/fake_group', qr/biotypes not found for group/, 'No matches for provided group error');
   action_bad_regex('/info/biotypes/groups/coding/aaa', qr/biotypes not found for group coding and object_type/, 'No matches for provided object_type error');
