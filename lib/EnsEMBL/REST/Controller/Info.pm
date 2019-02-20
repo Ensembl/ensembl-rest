@@ -351,7 +351,7 @@ sub genomes_name_GET {
   my $expand = $c->request->param('expand');
   my $gidba = $c->model('Registry')->get_genomeinfo_adaptor;
   $c->go('ReturnError', 'custom', ["Could not get genome info adaptor"]) unless defined $gidba;
-  my $info = $gidba->fetch_by_any_name($name);
+  my ($info) = @{ $gidba->fetch_by_any_name($name) };
   $c->go( 'ReturnError', 'custom', ["Genome $name not found"] ) unless defined $info;
   $self->status_ok( $c, entity => _expand_genome($info, $expand) );
   return;
