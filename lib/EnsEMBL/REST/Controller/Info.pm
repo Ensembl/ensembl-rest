@@ -90,17 +90,6 @@ sub data_GET :Args(0) {
   return;
 }
 
-sub species : Local : ActionClass('REST') :Args(0) { }
-
-sub species_GET :Local :Args(0) {
-  my ($self, $c) = @_;
-  my $division = $c->request->param('division') // 'EnsemblVertebrates';
-  my $strain_collection = $c->request->param('strain_collection');
-  my $hide_strain_info = $c->request->param('hide_strain_info') || 0;
-  $self->status_ok($c, entity => { species => $c->model('Registry')->get_species($division, $strain_collection, $hide_strain_info)});
-  return;
-}
-
 sub comparas : Local : ActionClass('REST') :Args(0) { }
 
 sub comparas_GET :Local :Args(0) {
