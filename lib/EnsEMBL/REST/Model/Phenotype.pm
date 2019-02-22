@@ -254,7 +254,7 @@ sub fetch_features_by_gene {
   my @phenotype_features;
   while (my $g = shift@{$genes}){
     my @pfs = @{$phenfeat_ad->fetch_all_by_Gene($g)};
-    if ($include_assoc) {
+    if ($include_assoc && $g->external_name) {
       my @pfs_assoc = @{$phenfeat_ad-> fetch_all_by_associated_gene($g->external_name())};
       push @pfs, @pfs_assoc;
     }
