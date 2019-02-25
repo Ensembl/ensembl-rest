@@ -114,6 +114,7 @@ CREATE TABLE `biotype` (
   `description` text,
   `biotype_group` enum('coding','pseudogene','snoncoding','lnoncoding','mnoncoding','LRG','undefined','no_group') DEFAULT NULL,
   `so_acc` varchar(64) DEFAULT NULL,
+  `so_term` varchar(1023) DEFAULT NULL,
   PRIMARY KEY (`biotype_id`),
   UNIQUE KEY `name_type_idx` (`name`,`object_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -489,7 +490,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=425 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=428 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,

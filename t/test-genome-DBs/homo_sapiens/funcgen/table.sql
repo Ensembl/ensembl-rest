@@ -389,7 +389,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=754 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=758 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -502,6 +502,7 @@ CREATE TABLE `peak_calling` (
   `epigenome_id` int(10) unsigned DEFAULT NULL,
   `experiment_id` int(10) unsigned DEFAULT NULL,
   `control_alignment_id` int(23) unsigned DEFAULT NULL,
+  `used_for_regulatory_build` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`peak_calling_id`),
   UNIQUE KEY `peak_calling_id_idx` (`peak_calling_id`),
   UNIQUE KEY `peak_calling_name_unique` (`name`)
@@ -685,9 +686,9 @@ CREATE TABLE `regulatory_activity` (
 
 CREATE TABLE `regulatory_build` (
   `regulatory_build_id` int(4) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
+  `name` text,
   `release_version` int(11) DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `version` varchar(50) DEFAULT NULL,
   `initial_release_date` varchar(50) DEFAULT NULL,
   `last_annotation_update` varchar(50) DEFAULT NULL,

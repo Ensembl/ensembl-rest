@@ -106,13 +106,14 @@ sub fetch_biotypes_by_name {
 
 sub to_hash {
   my ($self, $biotype) = @_;
-  my $c = $self->context();
-  my $biotype_hash;
 
-  $biotype_hash->{name} = $biotype->name;
-  $biotype_hash->{biotype_group} = $biotype->biotype_group;
-  $biotype_hash->{object_type} = $biotype->object_type;
-  $biotype_hash->{so_acc} = $biotype->so_acc;
+  my $biotype_hash = {
+    name          => $biotype->name,
+    biotype_group => $biotype->biotype_group,
+    object_type   => $biotype->object_type,
+    so_acc        => $biotype->so_acc,
+    so_term       => $biotype->so_term,
+  };
 
   return $biotype_hash;
 }
