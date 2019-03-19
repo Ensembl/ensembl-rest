@@ -66,7 +66,7 @@ sub get_beacon {
   $beacon->{id} = 'Ensembl ' . $db_assembly;
   $beacon->{name} = 'EBI - Ensembl ' . $db_assembly;
 
-  $beacon->{apiVersion} = 'v0.3.0';
+  $beacon->{apiVersion} = 'v1.0.0';
   $beacon->{organization} =  $self->get_beacon_organization($db_meta);
   $beacon->{description} = 'Human variant data from the Ensembl database';
   $beacon->{version} = $schema_version;
