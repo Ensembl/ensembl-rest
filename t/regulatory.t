@@ -41,10 +41,14 @@ my $epigenomes_all = '/regulatory/species/homo_sapiens/epigenome?content-type=ap
 $output = [
   {
     description   => 'REMC Epigenome (Class2) for Lung',
-    display_label => 'Lung',                                         
-    efo_accession => undef,                                          
+    short_name    => 'Lung',                                         
+    efo_accession => undef,
+    encode_accession => undef,
+    epirr_accession => undef,
+    full_name => undef,                                           
     gender        => 'female',                                              
-    name          => 'Lung' 
+    name          => 'Lung',
+    search_terms => undef,  
   },
 ];
 $json = json_GET($epigenomes_all,'GET list of all epigenomes');
