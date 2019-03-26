@@ -64,6 +64,92 @@ is_json_GET(
   '/info/ping', { ping => 1 }, "ping responds"
 );
 
+# info/species
+{
+  my $get_species = sub {
+    my ($url, $msg) = @_;
+    my $info_species = json_GET($url, $msg);
+    foreach my $species (@{$info_species->{species}}) {
+      $species->{groups} = [sort @{$species->{groups}}];
+    }
+    return $info_species;
+  };
+
+  my $expected = {
+    species => [
+      {
+        division => 'EnsemblVertebrates',
+        name => 'homo_sapiens',
+        accession => 'GCA_000001405.9',
+        common_name => 'human',
+        display_name => 'Human',
+        taxon_id => '9606',
+        groups => ['core', 'funcgen', 'variation'],
+        aliases => [],
+        release => $core_schema_version,
+        assembly => 'GRCh37',
+        strain => 'test_strain',
+        strain_collection => 'human'
+      }
+    ]
+  };
+  my $expected_hide_strain_info = {
+    species => [
+      { 
+        division => 'EnsemblVertebrates',
+        name => 'homo_sapiens',
+        accession => 'GCA_000001405.9',
+        common_name => 'human',
+        display_name => 'Human',
+        taxon_id => '9606',
+        groups => ['core', 'funcgen', 'variation'],
+        aliases => [],
+        release => $core_schema_version,
+        assembly => 'GRCh37'
+      }
+    ]
+  };
+  my $expected_empty_list = {species => [ ]};
+
+  eq_or_diff_data(
+    $get_species->('/info/species', 'Checking only DBA available is the test DBA'),
+    $expected, 
+    "/info/species | Checking only DBA available is the test DBA"
+  );
+  eq_or_diff_data(
+    $get_species->('/info/species?division=EnsemblVertebrates', q{Output is same as /info/species if specified 'EnsemblVertebrates' division}),
+    $expected, 
+    "/info/species?division=EnsemblVertebrates | Output is same as /info/species if specified 'EnsemblVertebrates' division"
+  );
+  eq_or_diff_data(
+    $get_species->('/info/species?division=ensemblvertebrates', q{Output is same as /info/species if specified 'ensemblvertebrates' division}),
+    $expected, 
+    "/info/species?division=ensemblvertebrates | Output is same as /info/species if specified 'ensemblvertebrates' division"
+  );
+  eq_or_diff_data(
+    $get_species->('/info/species?division=EnsEMBLvertebrates', q{Output is same as /info/species if specified 'EnsEMBLvertebrates' division}),
+    $expected, 
+    "/info/species?division=EnsEMBLvertebrates | Output is same as /info/species if specified 'EnsEMBLvertebrates' division"
+  );
+  eq_or_diff_data(
+    $get_species->('/info/species?hide_strain_info=1', q{Output does not have strain and strain_collection info}),
+    $expected_hide_strain_info,
+    "/info/species?hide_strain_info=1 | Output does not have strain and strain_collection info"
+  );
+  eq_or_diff_data(
+    $get_species->('/info/species?strain_collection=human', q{Output is same as /info/species if specified 'human' strain_collection}),
+    $expected,
+    "/info/species?strain_collection=human | Output is same as /info/species if specified 'human' strain_collection"
+  );
+  eq_or_diff_data(
+    $get_species->('/info/species?strain_collection=bogus', q{Output is empty list for unknown collection }),
+    $expected_empty_list,
+    "/info/species?hide_strain_info=1 | Output is empty list"
+  );
+
+  is_json_GET('/info/species?division=wibble', $expected_empty_list, 'Bogus division results in no results');
+}
+
 # /info/software
 is_json_GET(
   '/info/software', { release => $VERSION }, "software reports current version $VERSION"
