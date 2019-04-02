@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	96
+2	\N	schema_version	97
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -106,3 +106,10 @@
 106	\N	patch	patch_94_95_a.sql|schema version
 107	\N	patch	patch_94_95_b.sql|create table to store allele synonyms
 108	\N	patch	patch_95_96_a.sql|schema_version
+109	\N	patch	patch_95_96_b.sql|modify index on variation_synonym
+110	\N	patch	patch_95_96_c.sql|add new entries to the failed_description table
+111	\N	patch	patch_95_96_d.sql|create table to store failed variation features
+112	\N	patch	patch_95_96_e.sql|Rename motif_name to binding_matrix_stable_id.
+113	\N	patch	patch_96_97_a.sql|schema version
+114	\N	patch	patch_96_97_b.sql|move ancestral allele column to variation_feature
+115	\N	patch	patch_96_97_c.sql|add an unique index on the name column

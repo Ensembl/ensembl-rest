@@ -1,126 +1,126 @@
-1874445	27506	86442404	86442404	1	1748253	T/C	rs2299222	1	\N	1	intron_variant		2	0	C	0.0399449	87	1	\N	\N	1
-3416243	27520	25997105	25997105	1	2979980	C/A	rs4492973	1	\N	1	intergenic_variant		2	0	C	0.0528007	115	1	\N	\N	1
-4279031	27522	37954967	37954967	1	3776807	G/A	rs6129257	1	\N	1	downstream_gene_variant		2	0	\N	\N	\N	1	\N	\N	1
-5296660	27508	45411130	45411130	1	4770800	T/A	rs7569578	1	\N	1	non_coding_transcript_variant,intron_variant,downstream_gene_variant		2	0	A	0.164371	358	1	\N	\N	1
-5423644	27524	103937974	103937974	1	4897829	C/A	rs7698608	1	\N	1	NMD_transcript_variant,5_prime_UTR_variant,intron_variant,downstream_gene_variant		2	0	C	0.448577	977	1	\N	\N	1
-6390520	27517	48845481	48845481	1	5808764	C/T	rs9882584	1	\N	1	intron_variant		2	0	C	0.293388	639	1	\N	\N	1
-6711141	27508	192191539	192191539	1	6106976	T/C	rs10193249	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
-8616242	27525	120500599	120500599	1	7930418	G/A	rs12360064	1	\N	1	non_coding_transcript_variant,NMD_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
-9795856	27524	32305409	32305409	1	9051025	G/A	rs17081232	1	\N	1	intergenic_variant		2	0	A	0.244261	532	1	\N	\N	1
-10891016	27506	146988289	146988289	1	10089212	G/A	rs34490520	1	\N	1	intron_variant		2	0	A	0.0224977	49	0.997766971588135	\N	\N	1
-15275234	27504	6303493	6303493	1	14128071	-/GT	rs67521280	1	\N	1	intergenic_variant	1	14	0	\N	\N	\N	0.978519976139069	\N	\N	1
-20835079	27517	190713344	190713344	1	18671529	T/A	rs77284492	1	\N	1	intergenic_variant		2	0	A	0.0119376	26	1	\N	\N	1
-27164692	27515	1239146	1239146	1	24098261	G/A	rs114402518	1	\N	1	intergenic_variant		2	0	A	0.00918274	20	1	\N	\N	1
-29136727	27523	34381884	34381884	1	25992950	C/G	rs117161559	1	\N	1	intergenic_variant		2	0	G	0.00688705	15	1	\N	\N	1
-29558567	27506	117232346	117232346	1	26469702	C/T	rs121908760	1	\N	1	stop_gained,downstream_gene_variant		2	0	\N	\N	\N	1	pathogenic	\N	1
-30157455	27525	49973686	49973686	1	27085574	C/T	rs138574806	1	\N	1	intron_variant		2	0	T	0.000918274	2	1	\N	\N	1
-33303674	27512	23821095	23821095	1	30220007	G/A	rs142276873	1	\N	1	NMD_transcript_variant,intron_variant		2	0	A	0.123049	268	1	\N	\N	1
-42630412	27509	56744087	56744087	1	39404961	C/T	rs182218163	1	\N	1	NMD_transcript_variant,intron_variant,upstream_gene_variant		2	0	T	0.000459137	1	1	\N	\N	1
-43836173	27516	112994601	112994601	1	40717093	C/T	rs183531458	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	T	0.000604595	1	1	\N	\N	1
-67490013	1000859905	112994552	112994552	1	40717093	C/T	rs183531458	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	T	0.000604595	0	1	\N	\N	1
-44015884	27521	41312074	41312074	1	40763453	A/C	rs183577856	1	\N	1	non_coding_transcript_variant,NMD_transcript_variant,intron_variant,upstream_gene_variant		2	0	C	0.000918274	2	1	\N	\N	1
-44269065	27515	88478741	88478741	1	41158182	A/G	rs183972897	1	\N	1	intergenic_variant		2	0	G	0.00137741	3	1	\N	\N	1
-47294881	27523	60403074	60403074	1	44132876	G/A/T	rs186950277	1	\N	1	intergenic_variant		2	0	A	0.00137741	3	1	\N	\N	1
-47662734	27514	4742369	4742369	1	44527501	C/T	rs187345249	1	\N	1	downstream_gene_variant,upstream_gene_variant		2	0	T	0.000459137	1	1	\N	\N	1
-52711238	27508	139024149	139024149	1	49574443	A/G	rs192396716	1	\N	1	intergenic_variant		2	0	G	0.000459137	1	1	\N	\N	1
-59652493	27512	40228819	40228819	1	56515594	A/G	rs371163522	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
-60267168	27514	66344873	66344873	1	57137110	G/A	rs371828972	1	\N	1	intergenic_variant		2	0	\N	\N	\N	1	\N	\N	1
-61197138	27513	41490275	41490275	1	57993427	G/A	rs372745831	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
-65177138	27508	140957003	140957003	1	61997151	C/G	rs377040510	1	\N	1	intergenic_variant		2	0	\N	\N	\N	1	\N	\N	1
-69175964	27513	25744274	25744274	1	63646321	C/T	COSM946275	1	\N	26	missense_variant,downstream_gene_variant		2	1	\N	\N	\N	\N	\N	\N	1
-1	27515	1000013	1000013	1	1	G/C/T/A	tmp__	1	\N	1	intergenic_variant	24	1	1	\N	\N	\N	\N	\N	\N	1
-2	27515	1001893	1001893	1	1	T/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-3	27515	1002722	1002722	1	1	A/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-4	27515	1005279	1005282	1	1	TCTC/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-5	27515	1005400	1005401	1	1	CG/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-6	27515	1006379	1006378	1	1	-/G	tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
-7	27515	1012604	1012607	1	1	GTGC/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-8	27515	1017022	1017022	1	1	C/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-9	27515	1017596	1017602	1	1	ATATAAG/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-10	27515	1020726	1020725	1	1	-/CCCA	tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
-11	27515	1034103	1034102	1	1	-/GA	tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
-12	27515	1034577	1034576	1	1	-/TG	tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
-13	27515	1036483	1036484	1	1	AA/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-14	27515	1047081	1047082	1	1	CT/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-15	27515	1057556	1057566	1	1	GTGTCACACAT/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-16	27515	1058037	1058039	1	1	CTT/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-17	27515	1058038	1058040	1	1	TTG/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-18	27515	1060917	1060920	1	1	ATCT/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-19	27515	1062193	1062192	1	1	-/AC	tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
-20	27515	1062445	1062452	1	1	AACAACAC/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-21	27515	1062621	1062624	1	1	ATAC/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-22	27515	1062641	1062640	1	1	-/AT	tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
-23	27515	1069174	1069177	1	1	TCTG/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-24	27515	1069178	1069181	1	1	TCTT/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-25	27515	1069372	1069375	1	1	ATGT/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-26	27515	1071046	1071047	1	1	CC/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-27	27515	1082829	1082831	1	1	ATG/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-28	27515	1084925	1084924	1	1	-/GCT	tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
-29	27515	1089831	1089834	1	1	CCTG/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-30	27515	1089958	1089957	1	1	-/CTTCTACC	tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
-31	27515	1097196	1097198	1	1	GAA/-	tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
-25645582	27516	215944	215944	1	22769929	G/T	rs112920828	2	\N	1	missense_variant,downstream_gene_variant	1,14,38,39,54,63	2	0	T	0.0390266	85	1	\N	367,372	1
-32555761	27516	215863	215863	1	29481851	C/T	rs141404099	2	\N	1	missense_variant,downstream_gene_variant	1,14,38,63	2	0	T	0.000459137	1	1	\N	367,372	1
-33632484	27516	208208	208208	1	30546437	C/T	rs142663151	2	\N	1	missense_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	368,372	1
-34739892	27516	215945	215945	1	31614057	C/T	rs143927211	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	368,372	1
-35487179	27516	215828	215828	1	32414306	C/G	rs144874603	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	367,372	1
-35532580	27516	209812	209812	1	32458275	C/T	rs144926719	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	T	0.000918274	2	1	\N	367,372	1
-37524982	27516	215957	215957	1	34447159	C/T	rs147285778	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	T	0.000459137	1	1	\N	367,372	1
-37917835	27516	208200	208200	1	34829679	A/G	rs147740131	2	\N	1	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	1,14,19,21,24,26,38,63	2	0	A	0.000459137	1	1	\N	367,370,372	1
-39894114	27516	209875	209875	1	36815073	C/T	rs150100016	2	\N	1	synonymous_variant,downstream_gene_variant	1,19,20,21,24,63	2	0	T	0.00137741	3	1	\N	367,370,372	1
-40618588	27516	209836	209836	1	37504733	C/G/T	rs150920187	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	G	0.000459137	1	1	\N	367,372	1
-54706022	27516	200920	200920	1	51558777	C/G	rs200625439	2	\N	1	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant	1	2	0	G	0.000459137	1	1	\N	\N	1
-55388543	27516	209873	209873	1	52266830	A/T	rs201374642	2	\N	1	missense_variant,downstream_gene_variant	1	2	0	A	0.000459137	1	1	\N	\N	1
-56177659	27516	208197	208197	1	52992076	A/G	rs202143213	2	\N	1	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	1,14,38	2	0	\N	\N	\N	1	\N	367,368	1
-56896901	27516	215811	215811	1	53666904	A/G	rs368117410	2	\N	1	missense_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	372	1
-58288298	27516	207352	207352	1	55054864	A/G	rs369600742	2	\N	1	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	372	1
-58510769	27516	208186	208186	1	55394947	A/C/G	rs369964265	2	\N	1	synonymous_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	367,372	1
-59653258	27516	215795	215795	1	56250357	A/G	rs370879507	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	372	1
-60537319	27516	215818	215818	1	57376793	C/T	rs372085744	2	\N	1	missense_variant,downstream_gene_variant	1,24,63	2	0	\N	\N	\N	1	\N	372	1
-64041529	27516	208176	208175	1	60905601	-/A	rs375868381	2	\N	1	frameshift_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant,feature_elongation	1	10	0	\N	\N	\N	1	\N	\N	1
-69649377	27516	205423	205423	1	64119759	T/G	COSM300988	1	\N	26	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649378	27516	205453	205453	1	64119760	G/T	COSM756564	1	\N	26	coding_sequence_variant,stop_gained,non_coding_transcript_variant,non_coding_transcript_exon_variant,incomplete_terminal_codon_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649379	27516	205491	205491	1	64119761	G/A	COSM1119124	1	\N	26	synonymous_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649380	27516	205502	205502	1	64119762	C/T	COSM1119126	1	\N	26	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649381	27516	207318	207318	1	64119763	C/T	COSM1119128	1	\N	26	synonymous_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649383	27516	208264	208264	1	64119765	C/T	COSM1557311	1	\N	26	synonymous_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649384	27516	209780	209780	1	64119766	C/T	COSM457241	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649385	27516	215781	215781	1	64119767	G/A	COSM756556	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649386	27516	215782	215782	1	64119768	G/A	COSM756554	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649387	27516	215818	215818	1	64119769	C/T	COSM1490785	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649388	27516	215849	215849	1	64119770	G/A	COSM1119150	1	\N	26	synonymous_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649389	27516	215875	215875	1	64119771	C/T	COSM612304	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649390	27516	215942	215942	1	64119772	C/T	COSM1119152	1	\N	26	synonymous_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649391	27516	215973	215973	1	64119773	G/A	COSM1119154	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649392	27516	215978	215978	1	64119774	C/G	COSM756553	1	\N	26	synonymous_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-69649393	27516	215988	215988	1	64119775	C/A	COSM1119156	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
-1004334	27518	22124504	22124504	1	936135	A/T	rs1333047	1	\N	1	downstream_gene_variant,regulatory_region_variant	7,8,14,15,19,20,21,22,23,24,25,26,27,28,32,40,41,42,43,44,47,50,51,52,53,54,56,57	2	0	A	0.341598	744	1	\N	367,368,369,370,371	1
-35833166	27518	22124605	22124605	1	32633975	C/A	rs145134970	1	\N	1	downstream_gene_variant,regulatory_region_variant	19,22,27	2	0	A	0.00183655	4	1	\N	370	1
-7080648	27518	22124630	22124630	1	6499767	A/G	rs10757279	1	\N	1	downstream_gene_variant,regulatory_region_variant	7,14,15,16,19,20,21,22,23,24,25,26,27,28,32,47,50,53,54,56,57	2	0	G	0.426079	928	1	\N	367,368,370,371	1
-3854101	27518	22124744	22124744	1	3379920	C/G	rs4977575	1	\N	1	downstream_gene_variant,regulatory_region_variant	7,14,15,16,19,20,21,22,23,24,25,26,27,28,32,40,41,42,43,44,47,50,51,52,53,54,55,56,57,58	2	0	C	0.342516	746	1	\N	367,368,369,370	1
-39192405	27518	22124894	22124894	1	35985982	G/A	rs149114363	1	\N	1	downstream_gene_variant,regulatory_region_variant	19,20	2	0	A	0.000459137	1	1	\N	370	1
-41595814	27518	22125019	22125019	1	38517888	A/C	rs181330262	1	\N	1	downstream_gene_variant,regulatory_region_variant	19,22	2	0	C	0.000459137	1	1	\N	370	1
-16772659	27518	22125032	22125032	1	15292318	A/G	rs72655407	1	\N	1	downstream_gene_variant,regulatory_region_variant	7,14,19,20,22,23,28	2	0	G	0.00275482	6	1	\N	367,368,370	1
-17456993	27518	22125040	22125040	1	15939031	G/A	rs73443203	1	\N	1	downstream_gene_variant,regulatory_region_variant	8,14,19,20,24,25,32	2	0	A	0.00688705	15	1	\N	367,368,370	1
-17630119	27518	22125056	22125056	1	16102185	G/A	rs73650062	1	\N	1	downstream_gene_variant,regulatory_region_variant	8,14,19,20,24,25	2	0	A	0.00596878	13	1	\N	367,368,370	1
-43872550	27518	22125161	22125161	1	40768405	C/T	rs183582810	1	\N	1	downstream_gene_variant	19,23	2	0	T	0.000459137	1	1	\N	370	1
-23343178	27518	22125266	22125266	1	20641511	C/G	rs79944118	1	\N	1	downstream_gene_variant	8,14,19,20,21,24,25	2	0	G	0.00505051	11	1	\N	367,370	1
-48560775	27518	22125342	22125342	1	45448905	T/A	rs188267508	1	\N	1	downstream_gene_variant	19,22	2	0	A	0.000918274	2	1	\N	370	1
-1004335	27518	22125347	22125347	1	936136	A/C	rs1333048	1	\N	1	downstream_gene_variant	3,6,7,9,10,12,14,15,16,19,20,21,22,23,24,25,26,27,28,32,38,39,40,41,42,43,44,47,48,50,54,56,57	2	0	C	0.454086	989	1	\N	367,368,369,370,371	1
-25692836	27518	22125476	22125476	1	22784039	C/T	rs112935422	1	\N	1	downstream_gene_variant	19,21,23,28	2	0	T	0.00413223	9	1	\N	367,370	1
-1004336	27518	22125503	22125503	1	936137	G/C	rs1333049	1	\N	1	downstream_gene_variant	2,3,6,7,9,10,12,14,15,16,19,20,21,22,23,24,25,26,27,28,32,38,39,40,41,42,43,44,47,48,50,54,56,57	2	0	C	0.433425	944	1	pathogenic,other,protective	367,368,369,370,371	1
-32751511	27518	22125517	22125517	1	29674364	C/A	rs141631698	1	\N	1	downstream_gene_variant	19,20	2	0	A	0.000918274	2	1	\N	370	1
-41228939	27518	22125533	22125533	1	38148693	A/G	rs180960747	1	\N	1	downstream_gene_variant	19,22	2	0	G	0.000918274	2	1	\N	370	1
-17630121	27518	22125585	22125585	1	16102186	A/G	rs73650063	1	\N	1	downstream_gene_variant	7,8,14,19,20,21,24,25,26	2	0	G	0.0206612	45	1	\N	367,368,370	1
-30070853	27518	22125618	22125618	1	26999456	T/G	rs138473131	1	\N	1	downstream_gene_variant	19,20	2	0	G	0.000459137	1	1	\N	370	1
-47540216	27518	22125717	22125717	1	44426212	T/C	rs187243869	1	\N	1	downstream_gene_variant	19,22	2	0	C	0.000918274	2	1	\N	370	1
-52325828	27518	22125803	22125803	1	49174309	T/C	rs191996219	1	\N	1	downstream_gene_variant	19,22	2	0	C	0.000459137	1	1	\N	370	1
-41978263	27518	22125881	22125881	1	38798524	A/G	rs181611157	1	\N	1	downstream_gene_variant	19,21,26	2	0	G	0.000918274	2	1	\N	370	1
-47311671	27518	22125892	22125892	1	44149082	T/C	rs186966498	1	\N	1	downstream_gene_variant	19,20	2	0	C	0.000918274	2	1	\N	370	1
-34801924	27518	22125896	22125896	1	31703565	C/G	rs144033269	1	\N	1	downstream_gene_variant	19,20	2	0	G	0.000918274	2	1	\N	370	1
-1004337	27518	22125913	22125913	1	936138	C/T	rs1333050	1	\N	1	downstream_gene_variant	4,5,7,8,14,15,19,20,21,22,23,24,25,26,27,28,32,33,34,35,36,37,40,41,42,43,44,47,49,50,52,54,56,57	2	0	T	0.492195	1072	1	\N	367,368,369,370,371	1
-50479416	27518	22126241	22126241	1	47382962	A/C	rs190203239	1	\N	1	intergenic_variant	19,22	2	0	C	0.000459137	1	1	\N	370	1
-43233569	27518	22126336	22126336	1	39982579	A/G	rs182796288	1	\N	1	intergenic_variant	19,20	2	0	G	0.000459137	1	1	\N	370	1
-126836726	27515	1102318	1102318	1	128171301	G/A	rs137980927	1	\N	1	missense_variant	2,14,42,50,51,52,53,54	2	0	A	0.00119808	6	1		\N	1
-133838856	27515	1742744	1742761	1	133885303	TCCCGGACACTATGGACC/-	rs768052375	1	\N	1	inframe_deletion	\N	12	0	\N	\N	\N	1	368	\N	1
-135041170	27515	1102081	1102081	1	136372537	C/T	rs147768956	1	\N	1	missense_variant	42,48,50,51,52,53,54	2	0	T	0.00299521	15	1		\N	1
+1874445	27506	86442404	86442404	1	1748253	T/C	\N	rs2299222	1	\N	1	intron_variant		2	0	C	0.0399449	87	1	\N	\N	1
+3416243	27520	25997105	25997105	1	2979980	C/A	\N	rs4492973	1	\N	1	intergenic_variant		2	0	C	0.0528007	115	1	\N	\N	1
+4279031	27522	37954967	37954967	1	3776807	G/A	\N	rs6129257	1	\N	1	downstream_gene_variant		2	0	\N	\N	\N	1	\N	\N	1
+5296660	27508	45411130	45411130	1	4770800	T/A	\N	rs7569578	1	\N	1	non_coding_transcript_variant,intron_variant,downstream_gene_variant		2	0	A	0.164371	358	1	\N	\N	1
+5423644	27524	103937974	103937974	1	4897829	C/A	\N	rs7698608	1	\N	1	NMD_transcript_variant,5_prime_UTR_variant,intron_variant,downstream_gene_variant		2	0	C	0.448577	977	1	\N	\N	1
+6390520	27517	48845481	48845481	1	5808764	C/T	\N	rs9882584	1	\N	1	intron_variant		2	0	C	0.293388	639	1	\N	\N	1
+6711141	27508	192191539	192191539	1	6106976	T/C	\N	rs10193249	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
+8616242	27525	120500599	120500599	1	7930418	G/A	\N	rs12360064	1	\N	1	non_coding_transcript_variant,NMD_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
+9795856	27524	32305409	32305409	1	9051025	G/A	\N	rs17081232	1	\N	1	intergenic_variant		2	0	A	0.244261	532	1	\N	\N	1
+10891016	27506	146988289	146988289	1	10089212	G/A	\N	rs34490520	1	\N	1	intron_variant		2	0	A	0.0224977	49	0.997766971588135	\N	\N	1
+15275234	27504	6303493	6303493	1	14128071	-/GT	\N	rs67521280	1	\N	1	intergenic_variant	1	14	0	\N	\N	\N	0.978519976139069	\N	\N	1
+20835079	27517	190713344	190713344	1	18671529	T/A	\N	rs77284492	1	\N	1	intergenic_variant		2	0	A	0.0119376	26	1	\N	\N	1
+27164692	27515	1239146	1239146	1	24098261	G/A	\N	rs114402518	1	\N	1	intergenic_variant		2	0	A	0.00918274	20	1	\N	\N	1
+29136727	27523	34381884	34381884	1	25992950	C/G	\N	rs117161559	1	\N	1	intergenic_variant		2	0	G	0.00688705	15	1	\N	\N	1
+29558567	27506	117232346	117232346	1	26469702	C/T	\N	rs121908760	1	\N	1	stop_gained,downstream_gene_variant		2	0	\N	\N	\N	1	pathogenic	\N	1
+30157455	27525	49973686	49973686	1	27085574	C/T	\N	rs138574806	1	\N	1	intron_variant		2	0	T	0.000918274	2	1	\N	\N	1
+33303674	27512	23821095	23821095	1	30220007	G/A	G	rs142276873	1	\N	1	NMD_transcript_variant,intron_variant		2	0	A	0.123049	268	1	\N	\N	1
+42630412	27509	56744087	56744087	1	39404961	C/T	\N	rs182218163	1	\N	1	NMD_transcript_variant,intron_variant,upstream_gene_variant		2	0	T	0.000459137	1	1	\N	\N	1
+43836173	27516	112994601	112994601	1	40717093	C/T	\N	rs183531458	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	T	0.000604595	1	1	\N	\N	1
+67490013	1000859905	112994552	112994552	1	40717093	C/T	\N	rs183531458	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	T	0.000604595	0	1	\N	\N	1
+44015884	27521	41312074	41312074	1	40763453	A/C	\N	rs183577856	1	\N	1	non_coding_transcript_variant,NMD_transcript_variant,intron_variant,upstream_gene_variant		2	0	C	0.000918274	2	1	\N	\N	1
+44269065	27515	88478741	88478741	1	41158182	A/G	\N	rs183972897	1	\N	1	intergenic_variant		2	0	G	0.00137741	3	1	\N	\N	1
+47294881	27523	60403074	60403074	1	44132876	G/A/T	\N	rs186950277	1	\N	1	intergenic_variant		2	0	A	0.00137741	3	1	\N	\N	1
+47662734	27514	4742369	4742369	1	44527501	C/T	\N	rs187345249	1	\N	1	downstream_gene_variant,upstream_gene_variant		2	0	T	0.000459137	1	1	\N	\N	1
+52711238	27508	139024149	139024149	1	49574443	A/G	\N	rs192396716	1	\N	1	intergenic_variant		2	0	G	0.000459137	1	1	\N	\N	1
+59652493	27512	40228819	40228819	1	56515594	A/G	\N	rs371163522	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
+60267168	27514	66344873	66344873	1	57137110	G/A	\N	rs371828972	1	\N	1	intergenic_variant		2	0	\N	\N	\N	1	\N	\N	1
+61197138	27513	41490275	41490275	1	57993427	G/A	\N	rs372745831	1	\N	1	non_coding_transcript_variant,intron_variant		2	0	\N	\N	\N	1	\N	\N	1
+65177138	27508	140957003	140957003	1	61997151	C/G	\N	rs377040510	1	\N	1	intergenic_variant		2	0	\N	\N	\N	1	\N	\N	1
+69175964	27513	25744274	25744274	1	63646321	C/T	\N	COSM946275	1	\N	26	missense_variant,downstream_gene_variant		2	1	\N	\N	\N	\N	\N	\N	1
+1	27515	1000013	1000013	1	1	G/C/T/A		tmp__	1	\N	1	intergenic_variant	24	1	1	\N	\N	\N	\N	\N	\N	1
+2	27515	1001893	1001893	1	1	T/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+3	27515	1002722	1002722	1	1	A/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+4	27515	1005279	1005282	1	1	TCTC/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+5	27515	1005400	1005401	1	1	CG/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+6	27515	1006379	1006378	1	1	-/G		tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
+7	27515	1012604	1012607	1	1	GTGC/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+8	27515	1017022	1017022	1	1	C/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+9	27515	1017596	1017602	1	1	ATATAAG/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+10	27515	1020726	1020725	1	1	-/CCCA		tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
+11	27515	1034103	1034102	1	1	-/GA		tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
+12	27515	1034577	1034576	1	1	-/TG		tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
+13	27515	1036483	1036484	1	1	AA/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+14	27515	1047081	1047082	1	1	CT/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+15	27515	1057556	1057566	1	1	GTGTCACACAT/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+16	27515	1058037	1058039	1	1	CTT/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+17	27515	1058038	1058040	1	1	TTG/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+18	27515	1060917	1060920	1	1	ATCT/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+19	27515	1062193	1062192	1	1	-/AC		tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
+20	27515	1062445	1062452	1	1	AACAACAC/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+21	27515	1062621	1062624	1	1	ATAC/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+22	27515	1062641	1062640	1	1	-/AT		tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
+23	27515	1069174	1069177	1	1	TCTG/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+24	27515	1069178	1069181	1	1	TCTT/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+25	27515	1069372	1069375	1	1	ATGT/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+26	27515	1071046	1071047	1	1	CC/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+27	27515	1082829	1082831	1	1	ATG/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+28	27515	1084925	1084924	1	1	-/GCT		tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
+29	27515	1089831	1089834	1	1	CCTG/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+30	27515	1089958	1089957	1	1	-/CTTCTACC		tmp__	1	\N	1	intergenic_variant	24	9	0	\N	\N	\N	\N	\N	\N	1
+31	27515	1097196	1097198	1	1	GAA/-		tmp__	1	\N	1	intergenic_variant	24	11	0	\N	\N	\N	\N	\N	\N	1
+25645582	27516	215944	215944	1	22769929	G/T	G	rs112920828	2	\N	1	missense_variant,downstream_gene_variant	1,14,38,39,54,63	2	0	T	0.0390266	85	1	\N	367,372	1
+32555761	27516	215863	215863	1	29481851	C/T	C	rs141404099	2	\N	1	missense_variant,downstream_gene_variant	1,14,38,63	2	0	T	0.000459137	1	1	\N	367,372	1
+33632484	27516	208208	208208	1	30546437	C/T	C	rs142663151	2	\N	1	missense_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	368,372	1
+34739892	27516	215945	215945	1	31614057	C/T	C	rs143927211	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	368,372	1
+35487179	27516	215828	215828	1	32414306	C/G	C	rs144874603	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	367,372	1
+35532580	27516	209812	209812	1	32458275	C/T	C	rs144926719	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	T	0.000918274	2	1	\N	367,372	1
+37524982	27516	215957	215957	1	34447159	C/T	C	rs147285778	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	T	0.000459137	1	1	\N	367,372	1
+37917835	27516	208200	208200	1	34829679	A/G	G	rs147740131	2	\N	1	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	1,14,19,21,24,26,38,63	2	0	A	0.000459137	1	1	\N	367,370,372	1
+39894114	27516	209875	209875	1	36815073	C/T	C	rs150100016	2	\N	1	synonymous_variant,downstream_gene_variant	1,19,20,21,24,63	2	0	T	0.00137741	3	1	\N	367,370,372	1
+40618588	27516	209836	209836	1	37504733	C/G/T	C	rs150920187	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	G	0.000459137	1	1	\N	367,372	1
+54706022	27516	200920	200920	1	51558777	C/G	C	rs200625439	2	\N	1	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant	1	2	0	G	0.000459137	1	1	\N	\N	1
+55388543	27516	209873	209873	1	52266830	A/T	T	rs201374642	2	\N	1	missense_variant,downstream_gene_variant	1	2	0	A	0.000459137	1	1	\N	\N	1
+56177659	27516	208197	208197	1	52992076	A/G	A	rs202143213	2	\N	1	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	1,14,38	2	0	\N	\N	\N	1	\N	367,368	1
+56896901	27516	215811	215811	1	53666904	A/G	G	rs368117410	2	\N	1	missense_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	372	1
+58288298	27516	207352	207352	1	55054864	A/G	G	rs369600742	2	\N	1	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	372	1
+58510769	27516	208186	208186	1	55394947	A/C/G	G	rs369964265	2	\N	1	synonymous_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	367,372	1
+59653258	27516	215795	215795	1	56250357	A/G	G	rs370879507	2	\N	1	synonymous_variant,downstream_gene_variant	1,63	2	0	\N	\N	\N	1	\N	372	1
+60537319	27516	215818	215818	1	57376793	C/T	C	rs372085744	2	\N	1	missense_variant,downstream_gene_variant	1,24,63	2	0	\N	\N	\N	1	\N	372	1
+64041529	27516	208176	208175	1	60905601	-/A	\N	rs375868381	2	\N	1	frameshift_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant,feature_elongation	1	10	0	\N	\N	\N	1	\N	\N	1
+69649377	27516	205423	205423	1	64119759	T/G	T	COSM300988	1	\N	26	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649378	27516	205453	205453	1	64119760	G/T	G	COSM756564	1	\N	26	coding_sequence_variant,stop_gained,non_coding_transcript_variant,non_coding_transcript_exon_variant,incomplete_terminal_codon_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649379	27516	205491	205491	1	64119761	G/A	G	COSM1119124	1	\N	26	synonymous_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649380	27516	205502	205502	1	64119762	C/T	C	COSM1119126	1	\N	26	missense_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649381	27516	207318	207318	1	64119763	C/T	C	COSM1119128	1	\N	26	synonymous_variant,non_coding_transcript_variant,non_coding_transcript_exon_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649383	27516	208264	208264	1	64119765	C/T	C	COSM1557311	1	\N	26	synonymous_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649384	27516	209780	209780	1	64119766	C/T	C	COSM457241	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649385	27516	215781	215781	1	64119767	G/A	G	COSM756556	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649386	27516	215782	215782	1	64119768	G/A	G	COSM756554	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649387	27516	215818	215818	1	64119769	C/T	C	COSM1490785	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649388	27516	215849	215849	1	64119770	G/A	G	COSM1119150	1	\N	26	synonymous_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649389	27516	215875	215875	1	64119771	C/T	C	COSM612304	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649390	27516	215942	215942	1	64119772	C/T	C	COSM1119152	1	\N	26	synonymous_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649391	27516	215973	215973	1	64119773	G/A	G	COSM1119154	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649392	27516	215978	215978	1	64119774	C/G	C	COSM756553	1	\N	26	synonymous_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+69649393	27516	215988	215988	1	64119775	C/A	C	COSM1119156	1	\N	26	missense_variant,downstream_gene_variant	9,17	2	1	\N	\N	\N	\N	\N	\N	1
+1004334	27518	22124504	22124504	1	936135	A/T	T	rs1333047	1	\N	1	downstream_gene_variant,regulatory_region_variant	7,8,14,15,19,20,21,22,23,24,25,26,27,28,32,40,41,42,43,44,47,50,51,52,53,54,56,57	2	0	A	0.341598	744	1	\N	367,368,369,370,371	1
+35833166	27518	22124605	22124605	1	32633975	C/A	\N	rs145134970	1	\N	1	downstream_gene_variant,regulatory_region_variant	19,22,27	2	0	A	0.00183655	4	1	\N	370	1
+7080648	27518	22124630	22124630	1	6499767	A/G	\N	rs10757279	1	\N	1	downstream_gene_variant,regulatory_region_variant	7,14,15,16,19,20,21,22,23,24,25,26,27,28,32,47,50,53,54,56,57	2	0	G	0.426079	928	1	\N	367,368,370,371	1
+3854101	27518	22124744	22124744	1	3379920	C/G	\N	rs4977575	1	\N	1	downstream_gene_variant,regulatory_region_variant	7,14,15,16,19,20,21,22,23,24,25,26,27,28,32,40,41,42,43,44,47,50,51,52,53,54,55,56,57,58	2	0	C	0.342516	746	1	\N	367,368,369,370	1
+39192405	27518	22124894	22124894	1	35985982	G/A	\N	rs149114363	1	\N	1	downstream_gene_variant,regulatory_region_variant	19,20	2	0	A	0.000459137	1	1	\N	370	1
+41595814	27518	22125019	22125019	1	38517888	A/C	\N	rs181330262	1	\N	1	downstream_gene_variant,regulatory_region_variant	19,22	2	0	C	0.000459137	1	1	\N	370	1
+16772659	27518	22125032	22125032	1	15292318	A/G	\N	rs72655407	1	\N	1	downstream_gene_variant,regulatory_region_variant	7,14,19,20,22,23,28	2	0	G	0.00275482	6	1	\N	367,368,370	1
+17456993	27518	22125040	22125040	1	15939031	G/A	\N	rs73443203	1	\N	1	downstream_gene_variant,regulatory_region_variant	8,14,19,20,24,25,32	2	0	A	0.00688705	15	1	\N	367,368,370	1
+17630119	27518	22125056	22125056	1	16102185	G/A	\N	rs73650062	1	\N	1	downstream_gene_variant,regulatory_region_variant	8,14,19,20,24,25	2	0	A	0.00596878	13	1	\N	367,368,370	1
+43872550	27518	22125161	22125161	1	40768405	C/T	\N	rs183582810	1	\N	1	downstream_gene_variant	19,23	2	0	T	0.000459137	1	1	\N	370	1
+23343178	27518	22125266	22125266	1	20641511	C/G	\N	rs79944118	1	\N	1	downstream_gene_variant	8,14,19,20,21,24,25	2	0	G	0.00505051	11	1	\N	367,370	1
+48560775	27518	22125342	22125342	1	45448905	T/A	\N	rs188267508	1	\N	1	downstream_gene_variant	19,22	2	0	A	0.000918274	2	1	\N	370	1
+1004335	27518	22125347	22125347	1	936136	A/C	\N	rs1333048	1	\N	1	downstream_gene_variant	3,6,7,9,10,12,14,15,16,19,20,21,22,23,24,25,26,27,28,32,38,39,40,41,42,43,44,47,48,50,54,56,57	2	0	C	0.454086	989	1	\N	367,368,369,370,371	1
+25692836	27518	22125476	22125476	1	22784039	C/T	\N	rs112935422	1	\N	1	downstream_gene_variant	19,21,23,28	2	0	T	0.00413223	9	1	\N	367,370	1
+1004336	27518	22125503	22125503	1	936137	G/C	\N	rs1333049	1	\N	1	downstream_gene_variant	2,3,6,7,9,10,12,14,15,16,19,20,21,22,23,24,25,26,27,28,32,38,39,40,41,42,43,44,47,48,50,54,56,57	2	0	C	0.433425	944	1	pathogenic,other,protective	367,368,369,370,371	1
+32751511	27518	22125517	22125517	1	29674364	C/A	\N	rs141631698	1	\N	1	downstream_gene_variant	19,20	2	0	A	0.000918274	2	1	\N	370	1
+41228939	27518	22125533	22125533	1	38148693	A/G	\N	rs180960747	1	\N	1	downstream_gene_variant	19,22	2	0	G	0.000918274	2	1	\N	370	1
+17630121	27518	22125585	22125585	1	16102186	A/G	\N	rs73650063	1	\N	1	downstream_gene_variant	7,8,14,19,20,21,24,25,26	2	0	G	0.0206612	45	1	\N	367,368,370	1
+30070853	27518	22125618	22125618	1	26999456	T/G	\N	rs138473131	1	\N	1	downstream_gene_variant	19,20	2	0	G	0.000459137	1	1	\N	370	1
+47540216	27518	22125717	22125717	1	44426212	T/C	\N	rs187243869	1	\N	1	downstream_gene_variant	19,22	2	0	C	0.000918274	2	1	\N	370	1
+52325828	27518	22125803	22125803	1	49174309	T/C	\N	rs191996219	1	\N	1	downstream_gene_variant	19,22	2	0	C	0.000459137	1	1	\N	370	1
+41978263	27518	22125881	22125881	1	38798524	A/G	\N	rs181611157	1	\N	1	downstream_gene_variant	19,21,26	2	0	G	0.000918274	2	1	\N	370	1
+47311671	27518	22125892	22125892	1	44149082	T/C	\N	rs186966498	1	\N	1	downstream_gene_variant	19,20	2	0	C	0.000918274	2	1	\N	370	1
+34801924	27518	22125896	22125896	1	31703565	C/G	\N	rs144033269	1	\N	1	downstream_gene_variant	19,20	2	0	G	0.000918274	2	1	\N	370	1
+1004337	27518	22125913	22125913	1	936138	C/T	\N	rs1333050	1	\N	1	downstream_gene_variant	4,5,7,8,14,15,19,20,21,22,23,24,25,26,27,28,32,33,34,35,36,37,40,41,42,43,44,47,49,50,52,54,56,57	2	0	T	0.492195	1072	1	\N	367,368,369,370,371	1
+50479416	27518	22126241	22126241	1	47382962	A/C	\N	rs190203239	1	\N	1	intergenic_variant	19,22	2	0	C	0.000459137	1	1	\N	370	1
+43233569	27518	22126336	22126336	1	39982579	A/G	\N	rs182796288	1	\N	1	intergenic_variant	19,20	2	0	G	0.000459137	1	1	\N	370	1
+126836726	27515	1102318	1102318	1	128171301	G/A	G	rs137980927	1	\N	1	missense_variant	2,14,42,50,51,52,53,54	2	0	A	0.00119808	6	1		\N	1
+133838856	27515	1742744	1742761	1	133885303	TCCCGGACACTATGGACC/-	\N	rs768052375	1	\N	1	inframe_deletion		12	0	\N	\N	\N	1	likely pathogenic,pathogenic,drug response,other	\N	1
+135041170	27515	1102081	1102081	1	136372537	C/T	C	rs147768956	1	\N	1	missense_variant	42,48,50,51,52,53,54	2	0	T	0.00299521	15	1		\N	1
