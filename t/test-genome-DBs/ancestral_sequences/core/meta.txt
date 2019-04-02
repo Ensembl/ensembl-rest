@@ -57,3 +57,6 @@
 856	1	species.division	EnsemblVertebrates
 857	\N	patch	patch_96_97_a.sql|schema_version
 858	\N	patch	patch_96_97_b.sql|biotype_so_term
+859	\N	patch	patch_96_97_c.sql|rnaproduct_tables
+860	\N	patch	patch_96_97_d.sql|add_object_type_rnaproduct
+861	\N	patch	patch_96_97_e.sql|add_stable_id_event_type_rnaproduct

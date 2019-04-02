@@ -1,4 +1,4 @@
-112	\N	schema_version	96
+118	\N	schema_version	97
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -97,3 +97,4 @@
 115	\N	patch	patch_94_95_c.sql|genome_db_is_good_for_alignment
 116	\N	patch	patch_94_95_d.sql|node_type_within_species_speciation
 117	\N	patch	patch_95_96_a.sql|schema_version
+119	\N	patch	patch_96_97_a.sql|schema_version
