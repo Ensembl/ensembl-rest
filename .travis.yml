@@ -1,8 +1,8 @@
 language: "perl"
 
 perl:
-  - "5.26"
-  - "5.14"
+  - '5.26'
+  - '5.14'
 
 sudo: false
 
@@ -12,7 +12,15 @@ addons:
     - unzip
 
 env:
+  - COVERALLS=true
   - COVERALLS=false
+
+matrix:
+  exclude:
+  - perl: '5.26'
+    env: COVERALLS=false
+  - perl: '5.14'
+    env: COVERALLS=true
 
 before_install:
     - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
