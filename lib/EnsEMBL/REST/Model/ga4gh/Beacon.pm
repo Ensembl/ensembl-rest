@@ -63,10 +63,10 @@ sub get_beacon {
   }
 
   # Unique identifier of the Beacon
-  $beacon->{id} = 'Ensembl ' . $db_assembly;
-  $beacon->{name} = 'EBI - Ensembl ' . $db_assembly;
+  $beacon->{id} = 'ensembl';
+  $beacon->{name} = 'EBI - Ensembl';
 
-  $beacon->{apiVersion} = 'v0.3.0';
+  $beacon->{apiVersion} = 'v1.0.1';
   $beacon->{organization} =  $self->get_beacon_organization($db_meta);
   $beacon->{description} = 'Human variant data from the Ensembl database';
   $beacon->{version} = $schema_version;
@@ -112,7 +112,7 @@ sub get_beacon_organization {
   my $logoURL; 
 
   # Unique identifier of the organization
-  $organization->{id} = "ebi";
+  $organization->{id} = "ebi-ensembl";
   $organization->{name} = "EMBL European Bioinformatics Institute";
   $organization->{description} = $description;
   $organization->{address} = $address;
@@ -246,8 +246,8 @@ sub get_beacon_error {
   my ($self, $error_code, $message) = @_;
  
   my $error = {
-                "errorCode" => $error_code,
-                "message"   => $message,
+                "errorCode"    => $error_code,
+                "errorMessage" => $message,
               };
   return $error;
 }

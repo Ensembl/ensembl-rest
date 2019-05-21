@@ -112,7 +112,7 @@ sub _check_parameters {
 
   my @required_fields = qw/referenceName start referenceBases alternateBases assemblyId/;
   foreach my $key (@required_fields) {
-    $c->go( 'ReturnError', 'custom', [ "Cannot find ($key) key in your request" ] )
+    $c->go( 'ReturnError', 'custom', [ "Missing mandatory parameter $key" ] )
       unless (exists $parameters->{$key});
   }
    
@@ -130,16 +130,16 @@ sub _check_parameters {
   #    deal with structural variant
   #    chromosome MT
   $c->go( 'ReturnError', 'custom', [ "Invalid referenceName" ])
-    unless ($parameters->{referenceName} =~ /^([1-9]|1[0-9]|2[012]|X|Y)$/i);
+    unless ($parameters->{referenceName} =~ /^([1-9]|1[0-9]|2[012]|X|Y|MT)$/i);
  
   $c->go( 'ReturnError', 'custom', [ "Invalid start" ])
     unless $parameters->{start} =~ /^\d+$/;
 
   $c->go( 'ReturnError', 'custom', [ "Invalid referenceBases" ])
-    unless ($parameters->{referenceBases} =~ /^[AGCTN]+$/i);
+    unless ($parameters->{referenceBases} =~ /^([AGCT]+|N)$/i);
   
   $c->go( 'ReturnError', 'custom', [ "Invalid alternateBases" ])
-    unless ($parameters->{alternateBases} =~ /^[AGCTN]+$/i);
+    unless ($parameters->{alternateBases} =~ /^([AGCT]+|N)$/i);
   
   $c->go( 'ReturnError', 'custom', [ "Invalid assemblyId" ])
    unless ($parameters->{assemblyId} =~ /^(GRCh38|GRCh37)$/i);
