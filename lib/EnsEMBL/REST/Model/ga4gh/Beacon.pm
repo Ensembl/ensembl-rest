@@ -26,7 +26,7 @@ use Catalyst::Exception;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences); 
 
-# use Data::Dumper;
+use Data::Dumper;
 
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
@@ -153,11 +153,12 @@ sub get_beacon_dataset {
 sub beacon_query {
  
   my ($self, $data) = @_;
-
   my $beaconAlleleResponse;
   my $beaconError;
 
   my $beacon = $self->get_beacon();
+
+  $beaconError = $self->check_parameters($data), "\n";
 
   my $beaconAlleleRequest = $self->get_beacon_allele_request($data);
   
@@ -172,7 +173,7 @@ sub beacon_query {
 
   $beaconAlleleResponse->{beaconId} = $beacon->{id};
   $beaconAlleleResponse->{exists} = undef;
-  $beaconAlleleResponse->{error} = undef;
+  $beaconAlleleResponse->{error} = $beaconError;
   $beaconAlleleResponse->{alleleRequest} = $beaconAlleleRequest;
   $beaconAlleleResponse->{datasetAlleleResponses} = undef;
 
@@ -182,43 +183,84 @@ sub beacon_query {
   
   my $assemblyId = $data->{assemblyId};
   if (uc($db_assembly) ne uc($assemblyId)) {
-      $beaconError = $self->get_beacon_error(100, "Assembly (" .
-                                                  $assemblyId . ") not available");
+      $beaconError = $self->get_beacon_error(400, "User provided assemblyId (" .
+                                                  $assemblyId . ") does not match with dataset assembly (" . $db_assembly . ")");
       $beaconAlleleResponse->{error} = $beaconError;
       return $beaconAlleleResponse;
   }
-  
-  # Check allele exists
-  my $reference_name = $data->{referenceName};
-  my $start = $data->{start};
-  my $ref_allele = $data->{referenceBases};
-  my $alt_allele = $data->{alternateBases};
+ 
+  # check variant if only all parameters are valid
+  if(!defined($beaconError)){ 
+    # Check allele exists 
+    my $reference_name = $data->{referenceName};
+    my $start = $data->{start};
+    my $ref_allele = $data->{referenceBases};
+    my $alt_allele = $data->{alternateBases};
 
-  # Currently assumes only 1 dataset
-  # TODO Multiple dataset - for each dataset
-  # check variant exists and report exists overall
-  #
-  my $dataset = $self->get_beacon_dataset($db_meta);
+    # Currently assumes only 1 dataset
+    # TODO Multiple dataset - for each dataset
+    # check variant exists and report exists overall
+    #
+    my $dataset = $self->get_beacon_dataset($db_meta);
 
-  my ($exists, $dataset_response)  = $self->variant_exists($reference_name,
+    my ($exists, $dataset_response)  = $self->variant_exists($reference_name,
                                        $start,
                                        $ref_allele,
                                        $alt_allele,
                                        $incl_ds_response, $dataset);
 
-  my $exists_JSON = $exists;
-  if ($exists) {
-    $exists_JSON = JSON::true;
-  } else {
-    $exists_JSON = JSON::false;
+    my $exists_JSON = $exists;
+    if ($exists) {
+      $exists_JSON = JSON::true;
+    } else {
+      $exists_JSON = JSON::false;
+    }
+    $beaconAlleleResponse->{exists} = $exists_JSON;
+    if ($incl_ds_response) {
+      $beaconAlleleResponse->{datasetAlleleResponses} = [$dataset_response];
+    }
   }
-  $beaconAlleleResponse->{exists} = $exists_JSON;
-  if ($incl_ds_response) {
-    $beaconAlleleResponse->{datasetAlleleResponses} = [$dataset_response];
-  }
-
   return $beaconAlleleResponse;				
   
+}
+
+sub check_parameters {
+  my ($self, $parameters) = @_;
+  my $error = undef;
+
+  my @required_fields = qw/referenceName start referenceBases alternateBases assemblyId/;
+  foreach my $key (@required_fields) {
+    return $self->get_beacon_error('400', "Missing mandatory parameter $key")
+      unless (exists $parameters->{$key});
+  }
+
+  my @optional_fields = qw/content-type callback datasetIds includeDatasetResponses/;
+
+  my %allowed_fields = map { $_ => 1 } @required_fields,  @optional_fields;
+
+  for my $key (keys %$parameters) {
+    return $self->get_beacon_error('400', "Invalid parameter $key")
+      unless (exists $allowed_fields{$key});
+  }
+
+  if($parameters->{referenceName} !~ /^([1-9]|1[0-9]|2[012]|X|Y|MT)$/i){
+    $error = $self->get_beacon_error('400', "Invalid referenceName");
+  }
+  elsif($parameters->{start} !~ /^\d+$/){
+    $error = $self->get_beacon_error('400', "Invalid start");
+  }
+  elsif($parameters->{referenceBases} !~ /^[AGCTN]+$/i){
+    $error = $self->get_beacon_error('400', "Invalid referenceBases");
+  }
+  elsif($parameters->{alternateBases} !~ /^[AGCTN]+$/i){
+    $error = $self->get_beacon_error('400', "Invalid alternateBases");
+  }
+  elsif($parameters->{assemblyId} !~ /^(GRCh38|GRCh37)$/i){
+    $error = $self->get_beacon_error('400', "Invalid assemblyId");
+  }
+
+  return $error; 
+   
 }
 
 # Get beacon_allele_request
