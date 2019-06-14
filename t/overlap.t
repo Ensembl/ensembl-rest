@@ -301,7 +301,7 @@ my $base = '/overlap/region/homo_sapiens';
 {
   my $region = '1:23034888..23034896';
   cmp_deeply(json_GET("$base/$region?feature=motif","Get motif_feature"), [{
-    binding_matrix => 'IRF4_AD_TCAAGG20NCG_NCGAAACCGAAACYN_m1_c3_Cell2013',
+    binding_matrix_stable_id => 'ENSPFM0001',
     end => 23034896,
     feature_type => 'motif',
     score => '7.391',
