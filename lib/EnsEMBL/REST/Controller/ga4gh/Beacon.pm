@@ -29,6 +29,8 @@ use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
+use Data::Dumper;
+
 =pod
 
 GET requests: /ga4gh/beacon
@@ -77,16 +79,13 @@ sub beacon_query: Path('query') ActionClass('REST')  {}
 sub beacon_query_GET {
   my ($self, $c) = @_;
 
-  # $self->_check_parameters($c, $c->request->parameters);
-
   my $beacon_allele_response;
   
   try {
     $beacon_allele_response = $c->model('ga4gh::Beacon')->beacon_query($c->request->parameters);
+
     # if(!defined($beacon_allele_response->{exists})){
-      # print "NOT DEFINED!!\n";
       # $c->response->status(400);
-      # print Dumper($c->response), "\n";
     # }  
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
@@ -98,7 +97,6 @@ sub beacon_query_GET {
 sub beacon_query_POST {
   my ($self, $c) = @_;
   
-  # $self->_check_parameters($c, $c->request->data);
   my $beacon_allele_response;
 
   try {
