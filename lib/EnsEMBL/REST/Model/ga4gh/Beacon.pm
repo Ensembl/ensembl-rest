@@ -252,6 +252,8 @@ sub check_parameters {
       unless (exists $allowed_fields{$key});
   }
 
+  # Note: Does not 
+  #   allow a * that is VCF spec for ALT
   if($parameters->{referenceName} !~ /^([1-9]|1[0-9]|2[012]|X|Y|MT)$/i){
     $error = $self->get_beacon_error('400', "Invalid referenceName");
   }

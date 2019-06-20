@@ -29,8 +29,6 @@ use Bio::EnsEMBL::Utils::Scalar qw/check_ref/;
 require EnsEMBL::REST;
 EnsEMBL::REST->turn_on_config_serialisers(__PACKAGE__);
 
-use Data::Dumper;
-
 =pod
 
 GET requests: /ga4gh/beacon
@@ -83,10 +81,6 @@ sub beacon_query_GET {
   
   try {
     $beacon_allele_response = $c->model('ga4gh::Beacon')->beacon_query($c->request->parameters);
-
-    # if(!defined($beacon_allele_response->{exists})){
-      # $c->response->status(400);
-    # }  
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
@@ -106,46 +100,6 @@ sub beacon_query_POST {
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $beacon_allele_response);
-}
-
-sub _check_parameters {
-  my ($self, $c, $parameters) = @_;
-  # $c->log->debug("in check parameters");
-  # $c->log->debug(Dumper($parameters));
-
-  my @required_fields = qw/referenceName start referenceBases alternateBases assemblyId/;
-  foreach my $key (@required_fields) {
-    $c->go( 'ReturnError', 'custom', [ "Missing mandatory parameter $key" ] )
-      unless (exists $parameters->{$key});
-  }
-   
-  my @optional_fields = qw/content-type callback datasetIds includeDatasetResponses/;
-  
-  my %allowed_fields = map { $_ => 1 } @required_fields,  @optional_fields;
-
-  for my $key (keys %$parameters) {
-    $c->go( 'ReturnError', 'custom', [ "Invalid key ($key) in your request" ] )
-      unless (exists $allowed_fields{$key}); 
-  }
-
-  # Note: Does not 
-  #    allow a * that is VCF spec for ALT
-  #    deal with structural variant
-  #    chromosome MT
-  $c->go( 'ReturnError', 'custom', [ "Invalid referenceName" ])
-    unless ($parameters->{referenceName} =~ /^([1-9]|1[0-9]|2[012]|X|Y|MT)$/i);
- 
-  $c->go( 'ReturnError', 'custom', [ "Invalid start" ])
-    unless $parameters->{start} =~ /^\d+$/;
-
-  $c->go( 'ReturnError', 'custom', [ "Invalid referenceBases" ])
-    unless ($parameters->{referenceBases} =~ /^[AGCTN]+$/i);
-  
-  $c->go( 'ReturnError', 'custom', [ "Invalid alternateBases" ])
-    unless ($parameters->{alternateBases} =~ /^[AGCTN]+$/i);
-  
-  $c->go( 'ReturnError', 'custom', [ "Invalid assemblyId" ])
-    unless ($parameters->{assemblyId} =~ /^(GRCh38|GRCh37)$/i);
 }
 
 __PACKAGE__->meta->make_immutable;
