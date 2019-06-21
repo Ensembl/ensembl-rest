@@ -391,7 +391,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=762 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=764 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -415,7 +415,7 @@ CREATE TABLE `mirna_target_feature` (
   `analysis_id` smallint(10) unsigned DEFAULT NULL,
   `gene_stable_id` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`mirna_target_feature_id`),
-  UNIQUE KEY `unique_idx` (`accession`,`gene_stable_id`,`seq_region_start`,`seq_region_end`),
+  UNIQUE KEY `unique_idx` (`accession`,`gene_stable_id`,`seq_region_start`,`seq_region_end`,`evidence`,`method`),
   KEY `feature_type_idx` (`feature_type_id`),
   KEY `seq_region_idx` (`seq_region_id`,`seq_region_start`)
 ) ENGINE=MyISAM AUTO_INCREMENT=316842 DEFAULT CHARSET=latin1 MAX_ROWS=100000000;
