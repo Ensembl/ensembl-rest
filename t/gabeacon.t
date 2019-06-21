@@ -44,7 +44,7 @@ my $q_base = $base . '/query';
 # For tests setting assembly to GRCh37 as that is the assembly
 # in the test database
 my $assemblyId = "GRCh37";
-my $beaconId = "Ensembl " . $assemblyId;
+my $beaconId = "ensembl";
 my $datasetId = "Ensembl ". $schema_version;
 my $externalURL = "http://grch37.ensembl.org/Homo_sapiens/Variation/Explore?v="; 
 my $dataset_response;
@@ -56,7 +56,7 @@ my $unavailable_assembly = "GRCh38";
 my $beacon_json = json_GET('/ga4gh/beacon/', 'Get the beacon representation');
 is(ref($beacon_json), 'HASH', 'HASH wanted from endpoint');
 cmp_ok(keys(%{$beacon_json}), '==', 13, 'Check beacon has correct number of fields');
-cmp_ok($beacon_json->{id}, 'eq', "Ensembl ". $assemblyId, 'Beacon id');
+cmp_ok($beacon_json->{id}, 'eq', $beaconId, 'Beacon id');
 cmp_ok($beacon_json->{version}, '==', $schema_version, 'Version');
 
 # Is there at least one dataset
@@ -69,12 +69,7 @@ is(ref($beacon_json->{organization}), 'HASH', 'Organization should be a hash');
 cmp_ok(keys(%{$beacon_json->{organization}}), '==', 8, 'Check organization has correct number of fields');
 
 # POST checks 
-# Check for missing paramters
 my $json;
-my $bad_post1 = '{"referenceNamex": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
-                 '"assemblyId" : "' . $assemblyId . '" }'; 
-
-action_bad_post($q_base, $bad_post1, qr/Cannot find/, 'Throw bad request at endpoint' );
 
 # TODO Check for extra parameters
 
@@ -85,6 +80,8 @@ my $post_data1 = '{"referenceName": "7", "start" : 86442403, "referenceBases": "
 my $allele_request = {
   "referenceName" => "7",
   "start" => "86442403",
+  "end" => undef,
+  "variantType" => undef,
   "referenceBases" => "T",
   "alternateBases" => "C",
   "assemblyId" => $assemblyId,
@@ -96,7 +93,7 @@ my $expected_data1 = {
   "exists" => JSON::true,
   "error" => undef,
   "alleleRequest" => $allele_request,
-  "datasetAlleleResponses" => undef
+  "datasetAlleleResponses" => undef,
 };
 
 $json = json_POST( $q_base , $post_data1, 'POST dataset - 1 entry' );
@@ -104,11 +101,13 @@ eq_or_diff($json, $expected_data1, "GA4GH Beacon query - variant at location");
 
 # Found variant with includeDataSetResponses true
 my $post_data1_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
-                  '"assemblyId" : "' . $assemblyId . '", "includeDatasetResponses":"true"}'; 
+                  '"assemblyId" : "' . $assemblyId . '", "includeDatasetResponses":"ALL"}'; 
 
 $allele_request = {
   "referenceName" => "7",
   "start" => "86442403",
+  "end" => undef,
+  "variantType" => undef,
   "referenceBases" => "T",
   "alternateBases" => "C",
   "assemblyId" => $assemblyId,
@@ -141,11 +140,13 @@ eq_or_diff($json, $expected_data1_ds, "GA4GH Beacon ds 1 - variant exists - data
 
 # Found variant with includeDataSetResponses false
 $post_data1_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
-                  '"assemblyId" : "' . $assemblyId . '", "includeDatasetResponses":"false"}'; 
+                  '"assemblyId" : "' . $assemblyId . '", "includeDatasetResponses":"NONE"}'; 
 
 $allele_request = {
   "referenceName" => "7",
   "start" => "86442403",
+  "end" => undef,
+  "variantType" => undef,
   "referenceBases" => "T",
   "alternateBases" => "C",
   "assemblyId" => $assemblyId,
@@ -171,6 +172,8 @@ $post_data1_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases": "
 $allele_request = {
   "referenceName" => "7",
   "start" => "86442403",
+  "end" => undef,
+  "variantType" => undef,
   "referenceBases" => "T",
   "alternateBases" => "C",
   "assemblyId" => $assemblyId,
@@ -197,6 +200,8 @@ my $post_data2 = '{"referenceName": "7", "start" : 86442403, "referenceBases": "
 $allele_request = {
   "referenceName" => "7",
   "start" => "86442403",
+  "end" => undef,
+  "variantType" => undef,
   "referenceBases" => "C",
   "alternateBases" => "T",
   "assemblyId" => $assemblyId,
@@ -218,11 +223,13 @@ eq_or_diff($json, $expected_data2, "GA4GH Beacon query - variant at location - a
 # Test with includeDatasetResponses
 # Variant not found  with includeDataSetResponses true
 my $post_data2_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases": "C", "alternateBases": "T",' .
-                  '"assemblyId" : "' . $assemblyId . '", "includeDatasetResponses":"true"}'; 
+                  '"assemblyId" : "' . $assemblyId . '", "includeDatasetResponses":"ALL"}'; 
 
 $allele_request = {
   "referenceName" => "7",
   "start" => "86442403",
+  "end" => undef,
+  "variantType" => undef,
   "referenceBases" => "C",
   "alternateBases" => "T",
   "assemblyId" => $assemblyId,
@@ -260,6 +267,8 @@ my $post_data3 = '{"referenceName": "7", "start" : 86442405, "referenceBases": "
 $allele_request = {
   "referenceName" => "7",
   "start" => "86442405",
+  "end" => undef,
+  "variantType" => undef,
   "referenceBases" => "T",
   "alternateBases" => "C",
   "assemblyId" => $assemblyId,
@@ -294,8 +303,10 @@ my $post_data4 = '{"referenceName": "7", "start" : 86442405, "referenceBases": "
 $allele_request = {
   "referenceName" => "7",
   "start" => "86442405",
+  "end" => undef,
   "referenceBases" => "T",
   "alternateBases" => "C",
+  "variantType" => undef,
   "assemblyId" => $unavailable_assembly,
   "datasetIds" => undef,
   "includeDatasetResponses" => undef };
@@ -303,8 +314,8 @@ $allele_request = {
 my $expected_data4 = {
   "beaconId" => $beaconId,
   "exists" => undef,
-  "error" => { "errorCode" => 100,
-               "message" => "Assembly ($unavailable_assembly) not available"
+  "error" => { "errorCode" => 400,
+               "errorMessage" => "User provided assemblyId ($unavailable_assembly) does not match with dataset assembly ($assemblyId)"
              },
   "alleleRequest" => $allele_request,
   "datasetAlleleResponses" => undef
@@ -312,6 +323,89 @@ my $expected_data4 = {
 
 $json = json_POST($q_base, $post_data4, 'POST dataset - 4 entry' );
 eq_or_diff($json, $expected_data4, "GA4GH Beacon query - assembly not available");
+
+# Testing for missing parameter 
+my $post_data5 = '{"referenceNamex": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
+                   '"assemblyId" : "' . $assemblyId . '" }';
+
+$allele_request = {
+  "referenceName" => undef,
+  "start" => "86442403",
+  "end" => undef,
+  "referenceBases" => "T",
+  "alternateBases" => "C",
+  "variantType" => undef,
+  "assemblyId" => $assemblyId,
+  "datasetIds" => undef,
+  "includeDatasetResponses" => undef };
+
+my $expected_data5 = {
+  "beaconId" => $beaconId,
+  "exists" => undef,
+  "error" => { "errorCode" => 400,
+               "errorMessage" => "Missing mandatory parameter referenceName"
+             },
+  "alleleRequest" => $allele_request,
+  "datasetAlleleResponses" => undef
+};
+
+
+$json = json_POST($q_base, $post_data5, 'POST dataset - 5 entry' );
+eq_or_diff($json, $expected_data5, "GA4GH Beacon query - missing parameter");
+
+# Testing invalid parameter
+my $post_data6 = '{"referenceName": "7", "start" : 86442403, "variantType" : "SNV", "referenceBases": "T", "alternateBases": "C",' .
+                   '"assemblyId" : "' . $assemblyId . '" }';
+
+$allele_request = {
+  "referenceName" => "7",
+  "start" => "86442403",
+  "end" => undef,
+  "variantType" => "SNV",
+  "referenceBases" => "T",
+  "alternateBases" => "C",
+  "assemblyId" => $assemblyId,
+  "datasetIds" => undef,
+  "includeDatasetResponses" => undef };
+
+my $expected_data6 = {
+  "beaconId" => $beaconId,
+  "exists" => undef,
+  "error" => { "errorCode" => 400,
+               "errorMessage" => "Invalid parameter variantType"
+             },
+  "alleleRequest" => $allele_request,
+  "datasetAlleleResponses" => undef
+};
+
+$json = json_POST( $q_base , $post_data6, 'POST dataset - 6 invalid parameter' );
+eq_or_diff($json, $expected_data6, "GA4GH Beacon query - invalid parameter");
+
+# Testing CNV 
+my $post_data7 = '{"referenceName": "8", "start" : 7803890, "end" : 7823439, "variantType" : "CNV", "referenceBases": "N", ' .
+                   '"assemblyId" : "' . $assemblyId . '" }';
+
+$allele_request = {
+  "referenceName" => "8",
+  "start" => "7803890",
+  "end" => "7823439",
+  "variantType" => "CNV",
+  "referenceBases" => "N",
+  "alternateBases" => undef,
+  "assemblyId" => $assemblyId,
+  "datasetIds" => undef,
+  "includeDatasetResponses" => undef };
+
+my $expected_data7 = {
+  "beaconId" => $beaconId,
+  "exists" => JSON::true,
+  "error" => undef,
+  "alleleRequest" => $allele_request,
+  "datasetAlleleResponses" => undef
+};
+
+$json = json_POST( $q_base , $post_data7, 'POST dataset - 7 structural variant' );
+eq_or_diff($json, $expected_data7, "GA4GH Beacon query - structural variant");
 
 # GET checks
 # GET and POST return the same data
@@ -323,7 +417,8 @@ my $uri;
 
 # Check for missing paramters
 $uri = $get_base_uri . ";referenceNamex=7;start=86442403;referenceBases=T;alternateBases=C;assemblyId=$assemblyId";
-action_bad($uri, 'Bad request at endpoint' );
+$json = json_GET($uri, 'GET dataset 5 - missing parameter');
+eq_or_diff($json, $expected_data5, "GA4GH Beacon query - missing parameter");
 
 # Example GET ga4gh/beacon/query?content-type=application/json;referenceBases=A;alternateBases=G;assemblyId=GRCh37;referenceName=15;start=20538669
 # Testing for a variant that exists at a given location
@@ -332,7 +427,7 @@ $json = json_GET($uri_1, 'GET dataset - 1 entry');
 eq_or_diff($json, $expected_data1, "GA4GH Beacon query - variant at location");
 
 # Testing with an includeDataSetResponses
-my $uri_ds_1 = $get_base_uri . ";referenceName=7;start=86442403;referenceBases=T;alternateBases=C;assemblyId=$assemblyId;includeDatasetResponses=true";
+my $uri_ds_1 = $get_base_uri . ";referenceName=7;start=86442403;referenceBases=T;alternateBases=C;assemblyId=$assemblyId;includeDatasetResponses=ALL";
 $json = json_GET($uri_ds_1, 'GET dataset - 1 entry with dataset response');
 eq_or_diff($json, $expected_data1_ds, "GA4GH Beacon query - variant exists - dataset response");
 
@@ -342,7 +437,7 @@ $json = json_GET($uri_2, 'GET dataset - 2 entry');
 eq_or_diff($json, $expected_data2, "GA4GH Beacon query - variant at location");
 
 # Testing with an includeDataSetResponses
-my $uri_ds_2 = $get_base_uri . ";referenceName=7;start=86442403;referenceBases=C;alternateBases=T;assemblyId=$assemblyId;includeDatasetResponses=true";
+my $uri_ds_2 = $get_base_uri . ";referenceName=7;start=86442403;referenceBases=C;alternateBases=T;assemblyId=$assemblyId;includeDatasetResponses=ALL";
 $json = json_GET($uri_ds_2, 'GET dataset - 2 entry');
 eq_or_diff($json, $expected_data2_ds, "GA4GH Beacon query - no variant - dataset response");
 
@@ -355,5 +450,14 @@ eq_or_diff($json, $expected_data3, "GA4GH Beacon query - variant at location");
 my $uri_4 = $get_base_uri . ";referenceName=7;start=86442405;referenceBases=T;alternateBases=C;assemblyId=$unavailable_assembly";
 $json = json_GET($uri_4, 'GET dataset - unavailable assembly');
 eq_or_diff($json, $expected_data4, "GA4GH Beacon query - unavailable assembly");
-done_testing();
 
+# Testing invalid parameter
+my $uri_5 = $get_base_uri . ";referenceName=7;start=86442403;variantType=SNV;referenceBases=T;alternateBases=C;assemblyId=$assemblyId";
+$json = json_GET($uri_5, 'GET dataset 6 - invalid parameter');
+eq_or_diff($json, $expected_data6, "GA4GH Beacon query - invalid parameter");
+
+my $uri_6 = $get_base_uri . ";referenceName=8;start=7803890;end=7823439;variantType=CNV;referenceBases=N;assemblyId=$assemblyId";
+$json = json_GET($uri_6, 'GET dataset 7 - structural variant');
+eq_or_diff($json, $expected_data7, "GA4GH Beacon query - structural variant");
+
+done_testing();
