@@ -32,7 +32,7 @@ before_install:
     - echo "ENSEMBL_BRANCH=$ENSEMBL_BRANCH"
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-test.git
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl.git
-    - git clone --branch master --depth 1 https://github.com/Ensembl/ensembl-hdf5.git
+    - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-hdf5.git
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-compara.git
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-variation.git
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-vep.git
