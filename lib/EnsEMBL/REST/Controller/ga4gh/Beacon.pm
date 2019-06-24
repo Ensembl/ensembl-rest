@@ -77,8 +77,6 @@ sub beacon_query: Path('query') ActionClass('REST')  {}
 sub beacon_query_GET {
   my ($self, $c) = @_;
 
-  $self->_check_parameters($c, $c->request->parameters);
-
   my $beacon_allele_response;
   
   try {
@@ -93,7 +91,6 @@ sub beacon_query_GET {
 sub beacon_query_POST {
   my ($self, $c) = @_;
   
-  $self->_check_parameters($c, $c->request->data);
   my $beacon_allele_response;
 
   try {
@@ -103,46 +100,6 @@ sub beacon_query_POST {
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $beacon_allele_response);
-}
-
-sub _check_parameters {
-  my ($self, $c, $parameters) = @_;
-  # $c->log->debug("in check parameters");
-  # $c->log->debug(Dumper($parameters));
-
-  my @required_fields = qw/referenceName start referenceBases alternateBases assemblyId/;
-  foreach my $key (@required_fields) {
-    $c->go( 'ReturnError', 'custom', [ "Cannot find ($key) key in your request" ] )
-      unless (exists $parameters->{$key});
-  }
-   
-  my @optional_fields = qw/content-type callback datasetIds includeDatasetResponses/;
-  
-  my %allowed_fields = map { $_ => 1 } @required_fields,  @optional_fields;
-
-  for my $key (keys %$parameters) {
-    $c->go( 'ReturnError', 'custom', [ "Invalid key ($key) in your request" ] )
-      unless (exists $allowed_fields{$key}); 
-  }
-
-  # Note: Does not 
-  #    allow a * that is VCF spec for ALT
-  #    deal with structural variant
-  #    chromosome MT
-  $c->go( 'ReturnError', 'custom', [ "Invalid referenceName" ])
-    unless ($parameters->{referenceName} =~ /^([1-9]|1[0-9]|2[012]|X|Y)$/i);
- 
-  $c->go( 'ReturnError', 'custom', [ "Invalid start" ])
-    unless $parameters->{start} =~ /^\d+$/;
-
-  $c->go( 'ReturnError', 'custom', [ "Invalid referenceBases" ])
-    unless ($parameters->{referenceBases} =~ /^[AGCTN]+$/i);
-  
-  $c->go( 'ReturnError', 'custom', [ "Invalid alternateBases" ])
-    unless ($parameters->{alternateBases} =~ /^[AGCTN]+$/i);
-  
-  $c->go( 'ReturnError', 'custom', [ "Invalid assemblyId" ])
-   unless ($parameters->{assemblyId} =~ /^(GRCh38|GRCh37)$/i);
 }
 
 __PACKAGE__->meta->make_immutable;
