@@ -263,7 +263,6 @@ CREATE TABLE `gene_tree_root_attr` (
   `taxonomic_coverage` float DEFAULT NULL,
   `ratio_species_genes` float DEFAULT NULL,
   `model_name` varchar(40) DEFAULT NULL,
-  `division` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`root_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -452,7 +451,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=120 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=123 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,

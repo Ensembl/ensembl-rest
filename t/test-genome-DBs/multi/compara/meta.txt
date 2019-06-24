@@ -1,4 +1,4 @@
-118	\N	schema_version	97
+120	\N	schema_version	98
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -98,3 +98,5 @@
 116	\N	patch	patch_94_95_d.sql|node_type_within_species_speciation
 117	\N	patch	patch_95_96_a.sql|schema_version
 119	\N	patch	patch_96_97_a.sql|schema_version
+121	\N	patch	patch_97_98_a.sql|schema_version
+122	\N	patch	patch_97_98_b.sql|division_name

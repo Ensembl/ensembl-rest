@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	97
+2	\N	schema_version	98
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -187,3 +187,5 @@
 759	\N	patch	patch_96_97_e.sql|Update mirna_target_feature
 760	\N	patch	patch_96_97_f.sql|Add search_terms and full_name columns to epigenome table, rename display_label column to short_name and change description to TEXT
 761	\N	patch	patch_96_97_g.sql|Modify column in regulatory_activity
+762	\N	patch	patch_97_98_a.sql|schema_version
+763	\N	patch	patch_97_98_b.sql|Update unique constraint in mirna_target_feature table
