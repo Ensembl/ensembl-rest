@@ -19,7 +19,6 @@ requires 'Catalyst::View::JSON';
 requires 'Catalyst::View::TT';
 requires 'JSON::XS';
 requires 'JSON';
-requires 'YAML';
 requires 'YAML::XS';
 requires 'YAML::Syck';
 requires 'URI::Find';
