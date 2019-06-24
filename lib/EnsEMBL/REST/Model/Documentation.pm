@@ -30,7 +30,7 @@ use File::Spec;
 use Hash::Merge qw/merge/;
 use Log::Log4perl;
 use JSON;
-use YAML qw//;
+use YAML::XS;
 use Scalar::Util qw/weaken/;
 use EnsEMBL::REST::EnsemblModel::Endpoint;
 
