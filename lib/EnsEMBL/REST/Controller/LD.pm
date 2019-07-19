@@ -43,7 +43,7 @@ sub id_GET {
   try {
     $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_variation_name($id, $population_name);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;    
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $LDFeatureContainer);
@@ -55,11 +55,11 @@ sub region_GET {
   my ($self, $c, $region, $population_name) = @_;
   unless ($population_name) {$c->go('ReturnError', 'custom', ["A population name is required for this endpoint. Use GET /info/variation/populations/:species?filter=LD to retrieve a list of all populations with LD data."]);}
   my $LDFeatureContainer;
-  my $slice = $c->model('Lookup')->find_slice($region);
   try {
+    my $slice = $c->model('Lookup')->find_slice($region);
     $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_slice($slice, $population_name);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $LDFeatureContainer);
@@ -74,7 +74,7 @@ sub pairwise_GET {
   try {
     $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_pairwise($id1, $id2);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', []) if $_ =~ /STACK/;    
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;    
     $c->go('ReturnError', 'custom', [qq{$_}]);
   };
   $self->status_ok($c, entity => $LDFeatureContainer);
