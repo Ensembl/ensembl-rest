@@ -199,6 +199,15 @@ cmp_bag($json, $expected_output, "Example region, population, r2");
 $ld_region_get = '/ld/homo_sapiens/region/9:22125265..23125505/1000GENOMES:phase_1_ASW?r2=0.5';
 action_bad($ld_region_get, 'Specified region is too large');
 
+$ld_region_get = '/ld/homo_sapiens/region/6:28510120..28610120/1000GENOMES:phase_1_ASW?r2=0.5';
+action_bad($ld_region_get, 'Specified region overlaps MHC region');
+# partially overlaps beginning of MHC region
+$ld_region_get = '/ld/homo_sapiens/region/6:28410120..28610120/1000GENOMES:phase_1_ASW?r2=0.5';
+action_bad($ld_region_get, 'Specified region overlaps MHC region');
+# partially overlaps end of MHC region
+$ld_region_get = '/ld/homo_sapiens/region/6:33438354..33458354/1000GENOMES:phase_1_ASW?r2=0.5';
+action_bad($ld_region_get, 'Specified region overlaps MHC region');
+
 # tests for ld/:species/pairwise
 
 $expected_output = 
