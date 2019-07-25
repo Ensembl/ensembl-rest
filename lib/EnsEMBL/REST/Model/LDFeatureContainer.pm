@@ -81,6 +81,10 @@ sub fetch_LDFeatureContainer_variation_name {
 sub fetch_LDFeatureContainer_slice {
   my ($self, $slice, $population_name) = @_;
   Catalyst::Exception->throw("No region given. Please specify a region to retrieve from this service.") if ! $slice;
+  if (slice_overlaps_mhc_region($slice)) {
+    my $mhc_region = get_mhc_region($slice);
+    Catalyst::Exception->throw("Specified region overlaps MHC region $mhc_region and can therefore not be greater than 10KB.") if ($slice->length > 10_000);
+  }
   Catalyst::Exception->throw("Specified region is too large. Maximum allowed size for region is 500KB.") if ($slice->length > 500_000);
   my $c = $self->context();
   my $species = $c->stash->{species};
@@ -107,7 +111,7 @@ sub fetch_LDFeatureContainer_slice {
     my $start = $slice->start;
     my $end = $slice->end;
     $c->log->error("LD endpoint for region $chrom:$start-$end $population_name caused an error: $_");
-    Catalyst::Exception->throw("LD computaion for region $chrom:$start-$end $population_name caused an error.");
+    Catalyst::Exception->throw("LD computation for region $chrom:$start-$end $population_name caused an error.");
   };
   return $self->to_array($ldfc)
 }
@@ -218,6 +222,38 @@ sub to_array {
   }
   return \@LDFC_array;
 }
+
+my $mhc_regions = {
+  GRCh37 => {chrom => 6, start => 28_477_797, end => 33_448_354},
+  GRCh38 => {chrom => 6, start => 28_510_120, end => 33_480_577},
+};
+
+sub slice_overlaps_mhc_region {
+  my $slice = shift;
+  my $assembly = $slice->coord_system->version;
+  return 0 unless (defined $mhc_regions->{$assembly});
+  my $chrom = $slice->seq_region_name;
+  if ($mhc_regions->{$assembly}->{chrom} == $chrom) {
+    my $mhc_start = $mhc_regions->{$assembly}->{start};
+    my $mhc_end = $mhc_regions->{$assembly}->{end};
+    my $start = $slice->start;
+    my $end = $slice->end;
+    # complete overlap
+    return 1 if ($start >= $mhc_start && $end <= $mhc_end); 
+    # partial overlap
+    return 1 if ($start > $mhc_start && $start < $mhc_end);
+    return 1 if ($end > $mhc_start && $end < $mhc_end);
+  } 
+  return 0; 
+}
+
+sub get_mhc_region {
+  my $slice = shift;
+  my $assembly = $slice->coord_system->version;
+  return '' unless (defined $mhc_regions->{$assembly});
+  return $mhc_regions->{$assembly}->{chrom} . ':' . $mhc_regions->{$assembly}->{start} . '-' .  $mhc_regions->{$assembly}->{end};
+}
+
 
 with 'EnsEMBL::REST::Role::Content';
 
