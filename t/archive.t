@@ -26,6 +26,7 @@ BEGIN {
 
 use Test::More;
 use Test::Differences;
+use Test::Warnings;
 use Catalyst::Test ();
 use Bio::EnsEMBL::Test::MultiTestDB;
 use Bio::EnsEMBL::Test::TestUtils;
