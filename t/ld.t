@@ -23,7 +23,6 @@ BEGIN {
   $ENV{CATALYST_CONFIG} = "$Bin/../ensembl_rest_testing.conf";
   $ENV{ENS_REST_LOG4PERL} = "$Bin/../log4perl_testing.conf";
 }
-
 use Test::More;
 use Test::Differences;
 use Test::Deep;
@@ -207,6 +206,35 @@ action_bad($ld_region_get, 'Specified region overlaps MHC region');
 # partially overlaps end of MHC region
 $ld_region_get = '/ld/homo_sapiens/region/6:33438354..33458354/1000GENOMES:phase_1_ASW?r2=0.5';
 action_bad($ld_region_get, 'Specified region overlaps MHC region');
+
+$expected_output = 
+[
+  {
+    'variation1' => 'rs2394878',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.055426',
+    'variation2' => 'rs9263513',
+    'd_prime' => '0.999822'
+  },
+  {
+    'variation1' => 'rs562436031',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.059741',
+    'variation2' => 'rs9263513',
+    'd_prime' => '0.999944'
+  },
+  {
+    'variation1' => 'rs2394878',
+    'population_name' => '1000GENOMES:phase_1_ASW',
+    'r2' => '0.621954',
+    'variation2' => 'rs562436031',
+    'd_prime' => '0.949649'
+  }
+];
+
+$ld_region_get = '/ld/homo_sapiens/region/6:31066584..31066717/1000GENOMES:phase_1_ASW';
+$json = json_GET($ld_region_get, 'GET LD data in MHC region');
+cmp_bag($json, $expected_output, "LD data in MHC region");
 
 # tests for ld/:species/pairwise
 
