@@ -80,12 +80,18 @@ sub fetch_LDFeatureContainer_variation_name {
 
 sub fetch_LDFeatureContainer_slice {
   my ($self, $slice, $population_name) = @_;
-  Catalyst::Exception->throw("No region given. Please specify a region to retrieve from this service.") if ! $slice;
+  if (! $slice) {
+    Catalyst::Exception->throw("No region given. Please specify a region to retrieve from this service.");
+  }
   if (slice_overlaps_mhc_region($slice)) {
     my $mhc_region = get_mhc_region($slice);
-    Catalyst::Exception->throw("Specified region overlaps MHC region $mhc_region and can therefore not be greater than 10KB.") if ($slice->length > 10_000);
+    if ($slice->length > 10_000) {
+      Catalyst::Exception->throw("Specified region overlaps MHC region $mhc_region and can therefore not be greater than 10KB.");
+    }
   }
-  Catalyst::Exception->throw("Specified region is too large. Maximum allowed size for region is 500KB.") if ($slice->length > 500_000);
+  if ($slice->length > 500_000) {
+    Catalyst::Exception->throw("Specified region is too large. Maximum allowed size for region is 500KB.");
+  }
   my $c = $self->context();
   my $species = $c->stash->{species};
 
