@@ -43,8 +43,8 @@ sub id_GET {
   try {
     $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_variation_name($id, $population_name);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;    
-    $c->go('ReturnError', 'custom', [qq{$_}]);
+    $c->go('ReturnError', 'from_ensembl', [ qq{$_} ]) if $_ =~ /STACK/;    
+    $c->go('ReturnError', 'custom', [ qq{$_} ]);
   };
   $self->status_ok($c, entity => $LDFeatureContainer);
 }
@@ -59,8 +59,8 @@ sub region_GET {
     my $slice = $c->model('Lookup')->find_slice($region);
     $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_slice($slice, $population_name);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', [qq{$_}]);
+    $c->go('ReturnError', 'from_ensembl', [ qq{$_} ]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [ qq{$_} ]);
   };
   $self->status_ok($c, entity => $LDFeatureContainer);
 }
@@ -74,8 +74,8 @@ sub pairwise_GET {
   try {
     $LDFeatureContainer = $c->model('LDFeatureContainer')->fetch_LDFeatureContainer_pairwise($id1, $id2);
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;    
-    $c->go('ReturnError', 'custom', [qq{$_}]);
+    $c->go('ReturnError', 'from_ensembl', [ qq{$_} ]) if $_ =~ /STACK/;    
+    $c->go('ReturnError', 'custom', [ qq{$_} ]);
   };
   $self->status_ok($c, entity => $LDFeatureContainer);
 }
