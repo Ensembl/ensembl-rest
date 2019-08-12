@@ -6,6 +6,7 @@
       "assembly": "GRCh37",
       "type": "local",
       "filename_template": "ld.vcf.gz",
+      "strict_name_match": 1,
       "chromosomes": [ "9" ],
       "sample_prefix": "1000GENOMES:phase_1:"
     }
