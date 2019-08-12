@@ -256,7 +256,7 @@ sub slice_overlaps_mhc_region {
 sub get_mhc_region {
   my $slice = shift;
   my $assembly = $slice->coord_system->version;
-  return '' unless (defined $mhc_regions->{$assembly});
+  return q{} unless (defined $mhc_regions->{$assembly});
   return $mhc_regions->{$assembly}->{chrom} . ':' . $mhc_regions->{$assembly}->{start} . '-' .  $mhc_regions->{$assembly}->{end};
 }
 
