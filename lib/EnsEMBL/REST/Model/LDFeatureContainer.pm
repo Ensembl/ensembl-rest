@@ -43,8 +43,8 @@ sub _get_LDFeatureContainerAdaptor {
   try {
     $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
   } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', [qq{$_}]);
+    $c->go('ReturnError', 'from_ensembl', [ qq{$_} ]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [ qq{$_} ]);
     $c->log->error("LD endpoint caused an error: $_");
   };
   Catalyst::Exception->throw("Cannot compute LD for species: $species. The species doesn't have a variation database.") if (!$ldfca);
