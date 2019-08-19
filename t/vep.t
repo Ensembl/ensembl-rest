@@ -636,6 +636,12 @@ $json = json_GET($vep_hgvs_get,'GET Ambiguity flag with HGVS notation');
 eq_or_diff($json, $vep_output, 'VEP Ambiguity Flag GET');
 
 
+# test transcript version flag
+$vep_hgvs_get = '/vep/homo_sapiens/hgvs/6:g.1102327G>T?content-type=application/json&transcript_version=1';
+$json = json_GET($vep_hgvs_get,'GET consequences with transcript_version option');
+$vep_output->[0]->{transcript_consequences}->[0]->{transcript_id} = 'ENST00000314040.1';
+cmp_bag($json, $vep_output, 'VEP transcript version test');
+
 
 my $body = '{ "blurb" : "stink" }';
 # Test malformed messages

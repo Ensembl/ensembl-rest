@@ -50,6 +50,7 @@ has valid_user_params => (
     variant_class
     minimal
     vcf_string
+    transcript_version
 
     everything
     appris
