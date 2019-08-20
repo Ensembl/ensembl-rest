@@ -66,6 +66,7 @@ has valid_user_params => (
     phastCons
     distance
     ambiguity
+    mane
 
     pick
     pick_allele
