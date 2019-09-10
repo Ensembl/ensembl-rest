@@ -49,6 +49,7 @@ has valid_user_params => (
     failed
     variant_class
     minimal
+    vcf_string
 
     everything
     appris
