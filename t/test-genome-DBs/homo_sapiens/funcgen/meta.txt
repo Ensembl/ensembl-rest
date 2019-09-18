@@ -190,3 +190,4 @@
 762	\N	patch	patch_97_98_a.sql|schema_version
 763	\N	patch	patch_97_98_b.sql|Update unique constraint in mirna_target_feature table
 764	\N	patch	patch_98_99_a.sql|schema_version
+765	\N	patch	patch_98_99_b.sql|update datetime default value
