@@ -151,6 +151,7 @@ sub _get_eqtl_adaptor {
         -filename        => $file,
         -core_db_adaptor => $core_a,
         -var_db_adaptor  => $var_a,
+        -read_only       => 1,
         );
 
       if(ref($eqtl_a) ne 'Bio::EnsEMBL::HDF5::EQTLAdaptor'){
