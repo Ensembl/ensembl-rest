@@ -115,3 +115,6 @@
 115	\N	patch	patch_96_97_c.sql|add an unique index on the name column
 116	\N	patch	patch_97_98_a.sql|schema version
 117	\N	patch	patch_98_99_a.sql|schema_version
+118	\N	patch	patch_98_99_b.sql|Add the column data_source_attrib in the table variation_citation
+119	\N	patch	patch_98_99_c.sql|Increase the size of the title and doi columns in the publication table
+120	\N	patch	patch_98_99_d.sql|add key data_source_attrib
