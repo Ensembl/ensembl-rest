@@ -514,7 +514,9 @@ sub variant_exists {
   # Get datasets specified in the input
   foreach my $dataset_id (@{$dataset_ids_list}) {
     my $variation_set = $variation_set_adaptor->fetch_by_short_name($dataset_id);
-    $variation_set_list{$variation_set->dbID()} = $variation_set;
+    if ($variation_set) {
+      $variation_set_list{$variation_set->dbID()} = $variation_set;
+    }
   }
 
   my $variation_features = $variation_feature_adaptor->fetch_all_by_Slice($slice);
