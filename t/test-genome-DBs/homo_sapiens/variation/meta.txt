@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	98
+2	\N	schema_version	99
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -114,3 +114,7 @@
 114	\N	patch	patch_96_97_b.sql|move ancestral allele column to variation_feature
 115	\N	patch	patch_96_97_c.sql|add an unique index on the name column
 116	\N	patch	patch_97_98_a.sql|schema version
+117	\N	patch	patch_98_99_a.sql|schema_version
+118	\N	patch	patch_98_99_b.sql|Add the column data_source_attrib in the table variation_citation
+119	\N	patch	patch_98_99_c.sql|Increase the size of the title and doi columns in the publication table
+120	\N	patch	patch_98_99_d.sql|add key data_source_attrib

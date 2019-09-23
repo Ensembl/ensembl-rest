@@ -346,8 +346,8 @@ sub find_object_location {
   }
 
   if($log->is_debug()) {
-    if(@captures && $captures[0]) {
-      $log->debug(sprintf('Found %s, %s and %s', @captures));
+    if(@captures && $captures[2]) {
+      $log->debug(sprintf('Found %s, %s and %s', @captures[0..2]));
     }
     else {
       $log->debug('Found no ID');

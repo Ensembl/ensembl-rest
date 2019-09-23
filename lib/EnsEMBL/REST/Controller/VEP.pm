@@ -49,6 +49,8 @@ has valid_user_params => (
     failed
     variant_class
     minimal
+    vcf_string
+    transcript_version
 
     everything
     appris
@@ -66,6 +68,7 @@ has valid_user_params => (
     phastCons
     distance
     ambiguity
+    mane
 
     pick
     pick_allele

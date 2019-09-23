@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	98
+2	\N	schema_version	99
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -189,3 +189,5 @@
 761	\N	patch	patch_96_97_g.sql|Modify column in regulatory_activity
 762	\N	patch	patch_97_98_a.sql|schema_version
 763	\N	patch	patch_97_98_b.sql|Update unique constraint in mirna_target_feature table
+764	\N	patch	patch_98_99_a.sql|schema_version
+765	\N	patch	patch_98_99_b.sql|update datetime default value

@@ -33,6 +33,8 @@ use Bio::EnsEMBL::Test::TestUtils;
 use Catalyst::Test();
 use JSON;
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homo_sapiens');
+my $chicken = Bio::EnsEMBL::Test::MultiTestDB->new('gallus_gallus');
+
 my $multi = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 Catalyst::Test->import('EnsEMBL::REST');
 
@@ -198,6 +200,7 @@ cmp_bag($json, $expected_output, "Example region, population, r2");
 $ld_region_get = '/ld/homo_sapiens/region/9:22125265..23125505/1000GENOMES:phase_1_ASW?r2=0.5';
 action_bad($ld_region_get, 'Specified region is too large');
 
+
 $ld_region_get = '/ld/homo_sapiens/region/6:28510120..28610120/1000GENOMES:phase_1_ASW?r2=0.5';
 action_bad($ld_region_get, 'Specified region overlaps MHC region');
 # partially overlaps beginning of MHC region
@@ -235,6 +238,10 @@ $expected_output =
 $ld_region_get = '/ld/homo_sapiens/region/6:31066584..31066717/1000GENOMES:phase_1_ASW';
 $json = json_GET($ld_region_get, 'GET LD data in MHC region');
 cmp_bag($json, $expected_output, "LD data in MHC region");
+
+$ld_region_get = '/ld/gallus_gallus/region/2:106040050-106040100/1000GENOMES:phase_1_ASW?r2=0.5';
+action_bad($ld_region_get, "The species doesn't have a variation database");
+
 
 # tests for ld/:species/pairwise
 

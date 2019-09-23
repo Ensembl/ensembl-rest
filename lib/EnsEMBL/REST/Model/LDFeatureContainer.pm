@@ -33,13 +33,38 @@ sub build_per_context_instance {
   return $self->new({ context => $c, %$self, @args });
 }
 
+# This will deal with errors caused when using unsupported species e.g. fly or species without a variation database e.g. gorilla  
+sub _get_LDFeatureContainerAdaptor {
+  my $self = shift;
+  my $c = $self->context();
+  my $species = $c->stash->{species};
+
+  my $ldfca;
+  try {
+    $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [ qq{$_} ]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [ qq{$_} ]);
+    $c->log->error("LD endpoint caused an error: $_");
+  };
+  Catalyst::Exception->throw("Cannot compute LD for species: $species. The species doesn't have a variation database.") if (!$ldfca);
+  my $ld_config = $c->config->{'Model::LDFeatureContainer'};
+  if ($ld_config && $ld_config->{use_vcf}) {
+    $ldfca->db->use_vcf($ld_config->{use_vcf});
+    $ldfca->db->vcf_config_file($ld_config->{vcf_config});
+    $ldfca->db->vcf_root_dir($ld_config->{dir}) if (defined $ld_config->{dir});
+  }
+  return $ldfca;
+}
+
 sub fetch_LDFeatureContainer_variation_name {
   my ($self, $variation_name, $population_name) = @_;
   my $c = $self->context();
   my $species = $c->stash->{species};
 
+  my $ldfca = $self->_get_LDFeatureContainerAdaptor();
   my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
-  my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
+
   my $vf_attribs = $c->request->param('attribs');
   my $window_size = $c->request->param('window_size') || 500; # default is 500KB
   Catalyst::Exception->throw("window_size needs to be a value between 0 and 500.") if (!looks_like_number($window_size));
@@ -49,12 +74,6 @@ sub fetch_LDFeatureContainer_variation_name {
   my $max_snp_distance = ($window_size / 2) * 1000;
   $ldfca->max_snp_distance($max_snp_distance);
 
-  my $ld_config = $c->config->{'Model::LDFeatureContainer'};
-  if ($ld_config && $ld_config->{use_vcf}) {
-    $ldfca->db->use_vcf($ld_config->{use_vcf});
-    $ldfca->db->vcf_config_file($ld_config->{vcf_config});
-    $ldfca->db->vcf_root_dir($ld_config->{dir}) if (defined $ld_config->{dir});
-  }
   my $variation = $va->fetch_by_name($variation_name);
   Catalyst::Exception->throw("Could not fetch variation object for id: $variation_name.") if ! $variation;
   my @vfs = grep { $_->slice->is_reference } @{$variation->get_all_VariationFeatures()};
@@ -95,14 +114,7 @@ sub fetch_LDFeatureContainer_slice {
   my $c = $self->context();
   my $species = $c->stash->{species};
 
-  my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
-
-  my $ld_config = $c->config->{'Model::LDFeatureContainer'};
-  if ($ld_config && $ld_config->{use_vcf}) {
-    $ldfca->db->use_vcf($ld_config->{use_vcf});
-    $ldfca->db->vcf_config_file($ld_config->{vcf_config});
-    $ldfca->db->vcf_root_dir($ld_config->{dir}) if (defined $ld_config->{dir});
-  }
+  my $ldfca = $self->_get_LDFeatureContainerAdaptor();
 
   my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');     
   my $population = $pa->fetch_by_name($population_name);
@@ -127,16 +139,9 @@ sub fetch_LDFeatureContainer_pairwise {
   my $c = $self->context();
   my $species = $c->stash->{species};
 
+  my $ldfca = $self->_get_LDFeatureContainerAdaptor();
   my $va = $c->model('Registry')->get_adaptor($species, 'Variation', 'Variation');
-  my $ldfca = $c->model('Registry')->get_adaptor($species, 'Variation', 'LDFeatureContainer');
   my $pa = $c->model('Registry')->get_adaptor($species, 'Variation', 'Population');
-
-  my $ld_config = $c->config->{'Model::LDFeatureContainer'};
-  if ($ld_config && $ld_config->{use_vcf}) {
-    $ldfca->db->use_vcf($ld_config->{use_vcf});
-    $ldfca->db->vcf_config_file($ld_config->{vcf_config});
-    $ldfca->db->vcf_root_dir($ld_config->{dir}) if (defined $ld_config->{dir});
-  }
 
   my @vfs_pair = ();
   foreach my $variation_name ($variation_name1, $variation_name2) {
