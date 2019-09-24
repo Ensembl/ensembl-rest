@@ -604,7 +604,7 @@ sub variant_exists {
     my %datasets;
     # HIT - returns only datasets that have the queried variant
     # If has a list of datasets to query and a variant was found then print dataset response
-    if ($incl_ds_response == 2 && $has_dataset == 1 && $vf_found) {
+    if ($incl_ds_response == 2 && $has_dataset && $vf_found) {
       foreach my $dataset_id (keys %variation_set_list) {
         if (exists $dataset_var_found{$dataset_id}) {
           my $response = get_dataset_allele_response($dataset_var_found{$dataset_id}, $assemblyId, 1, $vf_found, $error, $sv);
@@ -620,7 +620,7 @@ sub variant_exists {
     }
     # HIT - returns only datasets that have the queried variant
     # If it does not have a list of datasets then it the dataset response is going to be based on all available datasets
-    elsif ($incl_ds_response == 2 && $has_dataset == 0 && $vf_found) {
+    elsif ($incl_ds_response == 2 && $has_dataset && $vf_found) {
       foreach my $dataset_id (keys %dataset_var_found) {
         my $response = get_dataset_allele_response($dataset_var_found{$dataset_id}, $assemblyId, 1, $vf_found, $error, $sv);
         push (@dataset_response, $response);
@@ -630,7 +630,7 @@ sub variant_exists {
     # ALL - returns all datasets even those that don't have the queried variant
     # If there is a list of datasets then dataset response returns all of them, if not then returns all available datasets
     elsif ($incl_ds_response == 1) {
-      %datasets = $has_dataset == 1 ? %variation_set_list : %available_datasets;
+      %datasets = $has_dataset ? %variation_set_list : %available_datasets;
       my $found_in_dataset = $vf_found ? 1 : 0;
       foreach my $dataset_id (keys %datasets) {
         if (exists $dataset_var_found{$dataset_id}) {
@@ -643,7 +643,7 @@ sub variant_exists {
         }
       }
       # Variant wasn't found in any of the input datasets
-      if ($has_dataset == 1) {
+      if ($has_dataset) {
         my @intersection = grep { exists $dataset_var_found{$_} } keys %variation_set_list;
         if (scalar(@intersection) == 0) {
           $found = 0;
@@ -654,7 +654,7 @@ sub variant_exists {
     # Same as HIT but only the datasets that don't have the variant are returned
     elsif ($incl_ds_response == 3) {
       $found = 0;
-      %datasets = $has_dataset == 1 ? %variation_set_list : %available_datasets;
+      %datasets = $has_dataset ? %variation_set_list : %available_datasets;
       foreach my $dataset_id (keys %datasets) {
         if (!exists $dataset_var_found{$dataset_id}) {
           my $response = get_dataset_allele_response($datasets{$dataset_id}, $assemblyId, 0, $vf_found, $error, $sv);
