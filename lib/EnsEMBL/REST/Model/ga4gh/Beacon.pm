@@ -620,7 +620,7 @@ sub variant_exists {
     }
     # HIT - returns only datasets that have the queried variant
     # If it does not have a list of datasets then it the dataset response is going to be based on all available datasets
-    elsif ($incl_ds_response == 2 && $has_dataset && $vf_found) {
+    elsif ($incl_ds_response == 2 && !$has_dataset && $vf_found) {
       foreach my $dataset_id (keys %dataset_var_found) {
         my $response = get_dataset_allele_response($dataset_var_found{$dataset_id}, $assemblyId, 1, $vf_found, $error, $sv);
         push (@dataset_response, $response);
