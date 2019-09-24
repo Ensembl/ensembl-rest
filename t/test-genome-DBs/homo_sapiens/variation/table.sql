@@ -609,7 +609,7 @@ CREATE TABLE `variation_citation` (
   `variation_id` int(10) unsigned NOT NULL,
   `publication_id` int(10) unsigned NOT NULL,
   `data_source_attrib` set('610','611','612') DEFAULT NULL,
-  PRIMARY KEY (`variation_id`,`publication_id`)
+  PRIMARY KEY (`variation_id`,`publication_id`),
   KEY `data_source_attrib_idx` (`data_source_attrib`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
