@@ -61,11 +61,17 @@ sub get_beacon {
   }
 
   # Unique identifier of the Beacon
-  $beacon->{id} = 'ensembl';
-  $beacon->{name} = 'EBI - Ensembl';
+  my $beacon_id = 'ensembl';
+  my $beacon_name = 'EBI - Ensembl';
+  if ($db_assembly) {
+    $beacon_id = $beacon_id . '.' . lc $db_assembly;
+    $beacon_name = $beacon_name . ' ' . $db_assembly;
+  }
+  $beacon->{id} = $beacon_id;
+  $beacon->{name} = $beacon_name;
 
   $beacon->{apiVersion} = 'v1.0.1';
-  $beacon->{organization} =  $self->get_beacon_organization($db_meta);
+  $beacon->{organization} =  $self->get_beacon_organization();
   $beacon->{description} = 'Human variant data from the Ensembl database';
   $beacon->{version} = $schema_version;
 
@@ -73,7 +79,7 @@ sub get_beacon {
   $beacon->{alternativeUrl} = $altURL;
   $beacon->{createDateTime} = undef;
   $beacon->{updateDateTime} = undef;
-  $beacon->{datasets} = [$self->get_beacon_dataset($db_meta)];
+  $beacon->{datasets} = $self->get_beacon_all_datasets($db_meta);
   $beacon->{sampleAlleleRequests} = undef;
   $beacon->{info} = undef;
   
@@ -83,7 +89,7 @@ sub get_beacon {
 
 # returns ga4gh BeaconOrganization
 sub get_beacon_organization {
-  my ($self, $db_meta) = @_;
+  my ($self) = @_;
 
   my $organization;
   
@@ -110,7 +116,7 @@ sub get_beacon_organization {
   my $logoURL; 
 
   # Unique identifier of the organization
-  $organization->{id} = "ebi-ensembl";
+  $organization->{id} = "ebi";
   $organization->{name} = "EMBL European Bioinformatics Institute";
   $organization->{description} = $description;
   $organization->{address} = $address;
@@ -121,52 +127,94 @@ sub get_beacon_organization {
   return $organization;
 }
 
-sub get_beacon_dataset {
-  my ($self, $db_meta) = @_;
+# Get list of all available datasets (Beacon Datasets)
+sub get_beacon_all_datasets {
+  my ($self, $db_meta, @variation_set_list) = @_; 
 
-  my $dataset;
-  
+  my @beacon_datasets;
+
+  my $c = $self->context(); 
+
+  my $variation_set_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationset');
+
+  if(!@variation_set_list) {
+    @variation_set_list = @{$variation_set_adaptor->fetch_all()};
+  }
+
+  foreach my $dataset (@variation_set_list) {
+    my $beacon_dataset = $self->get_beacon_dataset($db_meta, $dataset); 
+    push(@beacon_datasets, $beacon_dataset); 
+  }
+
+  return \@beacon_datasets; 
+
+}
+
+# Get a VariationSet and return a Beacon Dataset 
+sub get_beacon_dataset {
+  my ($self, $db_meta, $dataset) = @_;
+
+  my $beacon_dataset;
+
   my $db_assembly = $db_meta->{assembly};
-  my $schema_version = $db_meta->{schema_version};
   my $externalURL = 'http://www.ensembl.org';
   if ($db_assembly eq 'GRCh37') {
     $externalURL = 'http://grch37.ensembl.org';
   }
 
-  $dataset->{id} = join(" ", 'Ensembl', $schema_version);
-  $dataset->{name} = join(" ", 'Ensembl', $schema_version);
-  $dataset->{description} = "Human variant data from the Ensembl database";
-  $dataset->{assemblyId} = $db_assembly;
-  $dataset->{createDateTime} = undef;
-  $dataset->{updateDateTime} = undef;
-  $dataset->{version} = $schema_version;
-  $dataset->{variantCount} = undef;
-  $dataset->{callCount} = undef;
-  $dataset->{sampleCount} =  undef;
-  $dataset->{externalUrl} = $externalURL; 
-  $dataset->{info} = undef;
-  return $dataset;
+  $beacon_dataset->{id} = $dataset->short_name();
+  $beacon_dataset->{name} = $dataset->name();
+  $beacon_dataset->{description} = $dataset->description();
+  $beacon_dataset->{assemblyId} = $db_assembly;
+  $beacon_dataset->{createDateTime} = undef;
+  $beacon_dataset->{updateDateTime} = undef;
+  $beacon_dataset->{version} = $db_meta->{schema_version};
+  $beacon_dataset->{variantCount} = undef;
+  $beacon_dataset->{callCount} = undef;
+  $beacon_dataset->{sampleCount} =  undef;
+  $beacon_dataset->{externalUrl} = $externalURL; 
+  $beacon_dataset->{info} = undef;
+  return $beacon_dataset;
 }
 
 sub beacon_query {
- 
+
   my ($self, $data) = @_;
   my $beaconAlleleResponse;
   my $beaconError;
 
   my $beacon = $self->get_beacon();
- 
+
   $beaconError = $self->check_parameters($data); 
 
   my $beaconAlleleRequest = $self->get_beacon_allele_request($data);
-  
-  my $incl_ds_response = 0;
+
+  # includeDatasetResponses can be:
+  # ALL returns all datasets even those that don't have the queried variant
+  # HIT returns only datasets that have the queried variant
+  # MISS means opposite to HIT value, only datasets that don't have the queried variant
+  # NONE don't return datasets response
+  my $incl_ds_response = 0; #NONE
   if (exists $data->{includeDatasetResponses}) {
     if ($data->{includeDatasetResponses} eq 'ALL') {
-	$incl_ds_response = 1;
-    } elsif ($data->{includeDatasetResponses} eq 'NONE') {
-        $incl_ds_response = 0;
+      $incl_ds_response = 1;
     }
+    elsif ($data->{includeDatasetResponses} eq 'HIT') {
+      $incl_ds_response = 2;
+    }
+    elsif ($data->{includeDatasetResponses} eq 'MISS') {
+      $incl_ds_response = 3;
+    }
+  }
+
+  # Check if there is dataset ids in the input
+  # Get list of dataset ids
+  my $has_dataset = 0;
+  my @dataset_ids_list;
+
+  if (exists $data->{datasetIds}) {
+    $has_dataset = 1;
+    @dataset_ids_list = split(',', $data->{datasetIds});
   }
 
   $beaconAlleleResponse->{beaconId} = $beacon->{id};
@@ -176,9 +224,8 @@ sub beacon_query {
   $beaconAlleleResponse->{datasetAlleleResponses} = undef;
 
   # Check assembly requested is assembly of DB
-  my $db_meta = $self->fetch_db_meta();
-  my $db_assembly = $db_meta->{'assembly'};
-  
+  my $db_assembly = $self->get_assembly();
+
   my $assemblyId = $data->{assemblyId};
   if (uc($db_assembly) ne uc($assemblyId)) {
       $beaconError = $self->get_beacon_error(400, "User provided assemblyId (" .
@@ -188,28 +235,34 @@ sub beacon_query {
   }
  
   # check variant if only all parameters are valid
-  if(!defined($beaconError)){ 
+  if(!defined($beaconError)){
     # Check allele exists 
     my $reference_name = $data->{referenceName};
-    my $start = $data->{start};
-    my $end = $data->{end} ? $data->{end} : $data->{start}; 
     my $ref_allele = $data->{referenceBases};
     my $alt_allele = $data->{alternateBases} ? $data->{alternateBases} : $data->{variantType};
 
-    # Currently assumes only 1 dataset
-    # TODO Multiple dataset - for each dataset
+    # SNV or small indels have a start (or start-end)
+    # Structural variants can have start-end or startMin/startMax-endMin/endMax
+    my $start = $data->{start} ? $data->{start} : $data->{startMin};
+    my $start_max = $data->{startMax} ? $data->{startMax} : $start;
+
+    my $end;
+    if($data->{end}) {
+      $end = $data->{end}; 
+    }
+    elsif($data->{endMax}) {
+      $end = $data->{endMax};
+    }
+    else{
+      $end = $start;
+    }
+    my $end_min = $data->{endMin} ? $data->{endMin} : $end;
+
+    # Multiple dataset
     # check variant exists and report exists overall
-    #
-    my $dataset = $self->get_beacon_dataset($db_meta);
+    my ($exists, $dataset_response)  = $self->variant_exists($reference_name,$start,$start_max,$end,$end_min,$ref_allele,$alt_allele,$incl_ds_response, $assemblyId, \@dataset_ids_list, $has_dataset);
 
-    my ($exists, $dataset_response)  = $self->variant_exists($reference_name,
-                                       $start,
-                                       $end,
-                                       $ref_allele,
-                                       $alt_allele,
-                                       $incl_ds_response, $dataset);
-
-    my $exists_JSON = $exists;
+    my $exists_JSON;
     if ($exists) {
       $exists_JSON = JSON::true;
     } else {
@@ -217,25 +270,36 @@ sub beacon_query {
     }
     $beaconAlleleResponse->{exists} = $exists_JSON;
     if ($incl_ds_response) {
-      $beaconAlleleResponse->{datasetAlleleResponses} = [$dataset_response];
+      $beaconAlleleResponse->{datasetAlleleResponses} = $dataset_response;
     }
   }
-  return $beaconAlleleResponse;				
-  
+  return $beaconAlleleResponse;
+
 }
 
 sub check_parameters {
   my ($self, $parameters) = @_;
+
   my $error = undef;
 
-  my @required_fields = qw/referenceName start referenceBases assemblyId/;
+  my @required_fields = qw/referenceName referenceBases assemblyId/;
 
   if($parameters->{'alternateBases'}){
     push(@required_fields, 'alternateBases');
+    push(@required_fields, 'start');
   }
-  elsif($parameters->{'variantType'}){
+  else{
     push(@required_fields, 'variantType');
-    push(@required_fields, 'end');
+    if($parameters->{'start'}){ 
+      push(@required_fields, 'start');
+      push(@required_fields, 'end'); 
+    }
+    else{
+      push(@required_fields, 'startMin');
+      push(@required_fields, 'startMax');
+      push(@required_fields, 'endMin');
+      push(@required_fields, 'endMax');
+    }
   }
 
   foreach my $key (@required_fields) {
@@ -257,16 +321,28 @@ sub check_parameters {
   if($parameters->{referenceName} !~ /^([1-9]|1[0-9]|2[012]|X|Y|MT)$/i){
     $error = $self->get_beacon_error('400', "Invalid referenceName");
   }
-  elsif($parameters->{start} !~ /^\d+$/){
+  elsif(defined($parameters->{start}) && $parameters->{start} !~ /^\d+$/){
     $error = $self->get_beacon_error('400', "Invalid start");
   }
   elsif(defined($parameters->{end}) && $parameters->{end} !~ /^\d+$/){
     $error = $self->get_beacon_error('400', "Invalid end");
   }
-  elsif($parameters->{referenceBases} !~ /^[AGCTN]+$/i){
+  elsif(defined($parameters->{startMin}) && $parameters->{startMin} !~ /^\d+$/){
+    $error = $self->get_beacon_error('400', "Invalid startMin");
+  }
+  elsif(defined($parameters->{startMax}) && $parameters->{startMax} !~ /^\d+$/){
+    $error = $self->get_beacon_error('400', "Invalid startMax");
+  }
+  elsif(defined($parameters->{endMin}) && $parameters->{endMin} !~ /^\d+$/){
+    $error = $self->get_beacon_error('400', "Invalid endMin");
+  }
+  elsif(defined($parameters->{endMax}) && $parameters->{endMax} !~ /^\d+$/){
+    $error = $self->get_beacon_error('400', "Invalid endMax");
+  }
+  elsif($parameters->{referenceBases} !~ /^([AGCT]+|N)$/i){
     $error = $self->get_beacon_error('400', "Invalid referenceBases");
   }
-  elsif(defined($parameters->{alternateBases}) && $parameters->{alternateBases} !~ /^[AGCTN]+$/i){
+  elsif(defined($parameters->{alternateBases}) && $parameters->{alternateBases} !~ /^([AGCT]+|N)$/i){
     $error = $self->get_beacon_error('400', "Invalid alternateBases");
   }
   elsif(defined($parameters->{variantType}) && $parameters->{variantType} !~ /^(DEL|INS|CNV|DUP|INV|DUP\:TANDEM)$/i){
@@ -275,9 +351,12 @@ sub check_parameters {
   elsif($parameters->{assemblyId} !~ /^(GRCh38|GRCh37)$/i){
     $error = $self->get_beacon_error('400', "Invalid assemblyId");
   }
+  elsif(defined($parameters->{includeDatasetResponses}) && $parameters->{includeDatasetResponses} eq ''){
+    $error = $self->get_beacon_error('400', "Invalid includeDatasetResponses");
+  }
 
   return $error; 
-   
+ 
 }
 
 # Get beacon_allele_request
@@ -285,18 +364,34 @@ sub get_beacon_allele_request {
   my ($self, $data) = @_;
   my $beaconAlleleRequest;
 
-  for my $field (qw/referenceName start referenceBases alternateBases variantType end assemblyId/) {
-      $beaconAlleleRequest->{$field} = $data->{$field};
+  for my $field (qw/referenceName start referenceBases alternateBases variantType assemblyId/) {
+    $beaconAlleleRequest->{$field} = $data->{$field};
   }
+
+  if (exists $data->{end}) {
+    $beaconAlleleRequest->{end} = $data->{end};
+  }
+  if (exists $data->{startMin}) {
+    $beaconAlleleRequest->{startMin} = $data->{startMin};
+  }
+  if (exists $data->{startMax}) {
+    $beaconAlleleRequest->{startMax} = $data->{startMax};
+  }
+  if (exists $data->{endMin}) {
+    $beaconAlleleRequest->{endMin} = $data->{endMin};
+  }
+  if (exists $data->{endMax}) {
+    $beaconAlleleRequest->{endMax} = $data->{endMax};
+  }
+
   $beaconAlleleRequest->{datasetIds} = undef;
+  if (exists $data->{datasetIds}) {
+    $beaconAlleleRequest->{datasetIds} = $data->{datasetIds};
+  }
 
   $beaconAlleleRequest->{includeDatasetResponses} = undef;
   if (exists $data->{includeDatasetResponses}) {
-    if ($data->{includeDatasetResponses} eq 'ALL') {
-  	$beaconAlleleRequest->{includeDatasetResponses} = JSON::true;
-    } elsif ($data->{includeDatasetResponses} eq 'NONE') {
-  	$beaconAlleleRequest->{includeDatasetResponses} = JSON::false;
-    }
+    $beaconAlleleRequest->{includeDatasetResponses} = $data->{includeDatasetResponses};
   }
   return $beaconAlleleRequest;
 }
@@ -320,7 +415,7 @@ sub get_assembly {
 # Fetch required meta info 
 # TODO place in utilities
 sub fetch_db_meta {
-  my ($self)  = @_;
+  my ($self) = @_;
 
   # my $c = $self->context();-
   # $c->log()->info("for info");
@@ -352,27 +447,37 @@ sub fetch_db_meta {
 # TODO  parameter for species
 # TODO  use assemblyID
 # Assembly not taken to account, assembly of REST machine
-# TODO Report by individul datasets - only 1 currently
 sub variant_exists {
-  my ($self, $reference_name, $start, $end, $ref_allele, 
-           $alt_allele, $incl_ds_response, $dataset) = @_;
+  my ($self, $reference_name, $start, $start_max, $end, $end_min, $ref_allele, 
+           $alt_allele, $incl_ds_response, $assemblyId, $dataset_ids_list, $has_dataset) = @_;
 
   my $c = $self->context();
  
-  my $sv = 0;  
+  my $sv = 0;
   my $found = 0;
   my $vf_found;
+  # Dataset error is always undef - there's no errors to be raised
+  # Improve in the future
   my $error;
-  my $dataset_response;
+  my @dataset_response;
+
+  # Datasets were variation was found
+  my %dataset_var_found;
+  # All available databases
+  my %available_datasets;
+  # Datasets specified in the input
+  my %variation_set_list;
 
   my $slice_step = 5;
 
   # Position provided is zero-based
-  my $start_pos  = $start + 1; 
-  my $end_pos  = $end + 1; 
+  my $start_pos = $start + 1;
+  my $end_pos = $end + 1;
+  my $start_max_pos = $start_max + 1;
+  my $end_min_pos = $end_min + 1;
   my $chromosome = $reference_name;
 
-  # Reference bases for this variant (starting from start). 
+  # Reference bases for this variant (starting from start).
   # Accepted values: see the REF field in VCF 4.2 specification 
   # (http://samtools.github.io/hts-specs/VCFv4.2.pdf)
 
@@ -391,13 +496,30 @@ sub variant_exists {
     $sv = 1; 
   }
 
-  if($sv == 1){
+  if($sv == 1) {
     $variation_feature_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'StructuralVariationFeature'); 
   }
   else{
     $variation_feature_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationFeature');
   }
-  my $variation_features  = $variation_feature_adaptor->fetch_all_by_Slice($slice);
+
+  my $variation_set_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationset');
+
+  # Get all available datasets
+  my $variation_set = $variation_set_adaptor->fetch_all();
+  foreach my $set (@$variation_set) {
+    $available_datasets{$set->dbID()} = $set;
+  }
+
+  # Get datasets specified in the input
+  foreach my $dataset_id (@{$dataset_ids_list}) {
+    my $variation_set = $variation_set_adaptor->fetch_by_short_name($dataset_id);
+    if ($variation_set) {
+      $variation_set_list{$variation_set->dbID()} = $variation_set;
+    }
+  }
+
+  my $variation_features = $variation_feature_adaptor->fetch_all_by_Slice($slice);
 
   if (! scalar(@$variation_features)) {
     return (0);
@@ -419,9 +541,19 @@ sub variant_exists {
         next;
     }
 
-    # Precise match for all types of variants 
-    if (($seq_region_start != $new_start) && ($seq_region_end != $new_end)) {
-        next;
+    # Precise match for snv or small indels - end does not make a difference 
+    if ($sv == 0 && ($seq_region_start != $new_start) && ($seq_region_end != $new_end)) {
+      next;
+    }
+    # Match for structural variants
+    if($sv == 1){
+      next unless ($seq_region_start >= $new_start && $seq_region_start <= $start_max_pos && $seq_region_end >= $end_min_pos && $seq_region_end <= $new_end);
+    }
+
+    # All datasets where variant was found
+    my $datasets_found = $vf->get_all_VariationSets();
+    foreach my $set (@$datasets_found) {
+      $dataset_var_found{$set->dbID()} = $set;
     }
 
     # Variant is a SNV
@@ -469,47 +601,118 @@ sub variant_exists {
   }
 
   if ($incl_ds_response) {
-    $dataset_response = get_dataset_allele_response($dataset, $found, $vf_found, $error);
+    my %datasets;
+    # HIT - returns only datasets that have the queried variant
+    # If has a list of datasets to query and a variant was found then print dataset response
+    if ($incl_ds_response == 2 && $has_dataset && $vf_found) {
+      foreach my $dataset_id (keys %variation_set_list) {
+        if (exists $dataset_var_found{$dataset_id}) {
+          my $response = get_dataset_allele_response($dataset_var_found{$dataset_id}, $assemblyId, 1, $vf_found, $error, $sv);
+          push (@dataset_response, $response);
+        }
+      }
+
+      # Variant wasn't found in any of the input datasets
+      my @intersection = grep { exists $dataset_var_found{$_} } keys %variation_set_list;
+      if (scalar(@intersection) == 0) {
+        $found = 0;
+      }
+    }
+    # HIT - returns only datasets that have the queried variant
+    # If it does not have a list of datasets then it the dataset response is going to be based on all available datasets
+    elsif ($incl_ds_response == 2 && !$has_dataset && $vf_found) {
+      foreach my $dataset_id (keys %dataset_var_found) {
+        my $response = get_dataset_allele_response($dataset_var_found{$dataset_id}, $assemblyId, 1, $vf_found, $error, $sv);
+        push (@dataset_response, $response);
+      }
+    }
+
+    # ALL - returns all datasets even those that don't have the queried variant
+    # If there is a list of datasets then dataset response returns all of them, if not then returns all available datasets
+    elsif ($incl_ds_response == 1) {
+      %datasets = $has_dataset ? %variation_set_list : %available_datasets;
+      my $found_in_dataset = $vf_found ? 1 : 0;
+      foreach my $dataset_id (keys %datasets) {
+        if (exists $dataset_var_found{$dataset_id}) {
+          my $response = get_dataset_allele_response($dataset_var_found{$dataset_id}, $assemblyId, $found_in_dataset, $vf_found, $error, $sv);
+          push (@dataset_response, $response);
+        }
+        else {
+          my $response = get_dataset_allele_response($datasets{$dataset_id}, $assemblyId, 0, $vf_found, $error, $sv);
+          push (@dataset_response, $response);
+        }
+      }
+      # Variant wasn't found in any of the input datasets
+      if ($has_dataset) {
+        my @intersection = grep { exists $dataset_var_found{$_} } keys %variation_set_list;
+        if (scalar(@intersection) == 0) {
+          $found = 0;
+        }
+      }
+    }
+    # MISS - means opposite to HIT value, only datasets that don't have the queried variant
+    # Same as HIT but only the datasets that don't have the variant are returned
+    elsif ($incl_ds_response == 3) {
+      $found = 0;
+      %datasets = $has_dataset ? %variation_set_list : %available_datasets;
+      foreach my $dataset_id (keys %datasets) {
+        if (!exists $dataset_var_found{$dataset_id}) {
+          my $response = get_dataset_allele_response($datasets{$dataset_id}, $assemblyId, 0, $vf_found, $error, $sv);
+          push (@dataset_response, $response);
+        }
+        else {
+          $found = 1;
+        }
+      }
+    }
   }
-  return ($found, $dataset_response);
+
+  return ($found,\@dataset_response);
 }
 
 # Returns a BeaconDatasetAlleleResponse for a
 # variant feature
 # Assumes that it exists
 sub get_dataset_allele_response {
-  my ($dataset, $found, $vf, $error) = @_;
- 
+  my ($dataset, $assemblyId, $found, $vf, $error, $sv) = @_;
+
   my $ds_response;
+    $ds_response->{'datasetId'} = $dataset->short_name();
+    $ds_response->{'exists'} = undef;
+    $ds_response->{'error'} = undef;
+    $ds_response->{'frequency'} = undef;
+    $ds_response->{'variantCount'} = undef;
+    $ds_response->{'callCount'} = undef;
+    $ds_response->{'sampleCount'} = undef;
+    $ds_response->{'note'} = undef;
+    $ds_response->{'externalUrl'} = undef;
+    $ds_response->{'info'} = undef;
 
-  $ds_response->{'datasetId'} = $dataset->{id};
-  $ds_response->{'exists'} = undef;
-  $ds_response->{'error'} = undef;
-  $ds_response->{'frequency'} = undef
-  $ds_response->{'variantCount'} = undef;
-  $ds_response->{'callCount'} = undef;
-  $ds_response->{'sampleCount'} = undef;
-  $ds_response->{'note'} = undef;
-  $ds_response->{'externalUrl'} = undef;
-  $ds_response->{'info'} = undef;
+    # Change 
+    if (! defined $found) {
+      $ds_response->{'error'} = $error;
+      return $ds_response;
+    }
+    if ($found == 0) {
+      $ds_response->{'exists'} = JSON::false;
+      return $ds_response;
+    }
 
-  if (! defined $found) {
-    $ds_response->{'error'} = $error;
-    return $ds_response;
-  }
-  if (! $found) {
-    $ds_response->{'exists'} = JSON::false;
-    return $ds_response;
-  }
- 
-  $ds_response->{'exists'} = JSON::true;
- 
-  my $externalURL = "http://www.ensembl.org";
-  if ($dataset->{assemblyId} eq 'GRCh37') {
-    $externalURL = "http://grch37.ensembl.org";
-  }
-  $externalURL .= "/Homo_sapiens/Variation/Explore?v=" . $vf->name();
-  $ds_response->{'externalUrl'} = $externalURL;
+    $ds_response->{'exists'} = JSON::true;
+
+    my $externalURL = "http://www.ensembl.org";
+    if ($assemblyId eq 'GRCh37') {
+      $externalURL = "http://grch37.ensembl.org";
+    }
+
+    if($sv == 1 && defined $vf) {
+      $externalURL .= "/Homo_sapiens/StructuralVariation/Explore?sv=" . $vf->variation_name();
+    }
+    elsif($sv == 0 && defined $vf) {
+      $externalURL .= "/Homo_sapiens/Variation/Explore?v=" . $vf->name();
+    }
+    $ds_response->{'externalUrl'} = $externalURL;
+
   return $ds_response;
 }
 
