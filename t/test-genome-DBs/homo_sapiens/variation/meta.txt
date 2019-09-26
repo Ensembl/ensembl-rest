@@ -118,3 +118,4 @@
 118	\N	patch	patch_98_99_b.sql|Add the column data_source_attrib in the table variation_citation
 119	\N	patch	patch_98_99_c.sql|Increase the size of the title and doi columns in the publication table
 120	\N	patch	patch_98_99_d.sql|add key data_source_attrib
+121	\N	patch	patch_98_99_e.sql|Fix attrib ids in table variation_citation
