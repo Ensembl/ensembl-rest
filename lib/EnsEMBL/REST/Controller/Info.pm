@@ -320,8 +320,11 @@ sub consequence_types: Path('variation/consequence_types') Args(0) ActionClass('
 sub consequence_types_GET {
   my ($self, $c) = @_;
   my $consequence_types;
+
+  my $rank = $c->request->param('rank');
+
   try {
-    $consequence_types = $c->model('Variation')->fetch_consequence_types();
+    $consequence_types = $c->model('Variation')->fetch_consequence_types($rank);
   } catch {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
     $c->go('ReturnError', 'custom', [qq{$_}]);

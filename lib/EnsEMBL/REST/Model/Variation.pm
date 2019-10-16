@@ -465,20 +465,26 @@ sub fetch_population_infos {
 }
 
 sub fetch_consequence_types {
-  my ($self) = @_;
+  my ($self, $rank) = @_;
 
   my @consequence_types = ();
 
   my $oc;
   foreach my $key(keys %OVERLAP_CONSEQUENCES) {
     $oc = $OVERLAP_CONSEQUENCES{$key};
-    push @consequence_types,
-        {
-          SO_term => $oc->SO_term,
-          SO_accession => $oc->SO_accession,
-          label => $oc->label,
-          description =>  $oc->description
-        }
+
+    my $so_hash = {
+      SO_term => $oc->SO_term,
+      SO_accession => $oc->SO_accession,
+      label => $oc->label,
+      description => $oc->description
+    };
+
+    if ($rank) {
+      $so_hash->{'consequence_ranking'} = $oc->rank;
+    }
+
+    push @consequence_types, $so_hash;
  }
   return \@consequence_types;
 }
