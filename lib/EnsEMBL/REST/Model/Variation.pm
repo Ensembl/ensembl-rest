@@ -473,25 +473,18 @@ sub fetch_consequence_types {
   foreach my $key(keys %OVERLAP_CONSEQUENCES) {
     $oc = $OVERLAP_CONSEQUENCES{$key};
 
-    if (defined $rank && $rank == 1) {
-        push @consequence_types,
-          {
-            SO_term => $oc->SO_term,
-            SO_accession => $oc->SO_accession,
-            label => $oc->label,
-            description =>  $oc->description,
-            consequence_ranking => $oc->rank
-          }
+    my $so_hash = {
+      SO_term => $oc->SO_term,
+      SO_accession => $oc->SO_accession,
+      label => $oc->label,
+      description => $oc->description
+    };
+
+    if ($rank) {
+      $so_hash->{'consequence_ranking'} = $oc->rank;
     }
-    else {
-      push @consequence_types,
-        {
-          SO_term => $oc->SO_term,
-          SO_accession => $oc->SO_accession,
-          label => $oc->label,
-          description =>  $oc->description
-        }
-    }
+
+    push @consequence_types, $so_hash;
  }
   return \@consequence_types;
 }
