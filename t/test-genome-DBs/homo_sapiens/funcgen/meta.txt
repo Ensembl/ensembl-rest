@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	99
+2	\N	schema_version	100
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -191,3 +191,6 @@
 763	\N	patch	patch_97_98_b.sql|Update unique constraint in mirna_target_feature table
 764	\N	patch	patch_98_99_a.sql|schema_version
 765	\N	patch	patch_98_99_b.sql|update datetime default value
+766	\N	patch	patch_99_100_a.sql|schema_version
+767	\N	patch	patch_99_100_b.sql|rename so_name to so_term
+768	\N	patch	patch_99_100_c.sql|remove default values from text data type
