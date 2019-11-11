@@ -354,6 +354,18 @@ jsonp=1
    vcf_config = __path_to(vcf_config.json)__
 </Model::Variation>
 
+<Model::Compara>
+  species_set_group = mammals
+  method            = EPO
+  no_branch_lengths = 0
+  compact           = 1
+  aligned           = 1
+  cigar_line        = 1
+  format            = full
+  sequence          = protein
+  type              = all
+</Model::Compara>
+
 <Model::LDFeatureContainer>
    use_vcf = 1
    vcf_config = __path_to(vcf_config.json)__
