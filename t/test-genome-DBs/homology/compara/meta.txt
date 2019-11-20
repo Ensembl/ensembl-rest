@@ -58,3 +58,4 @@
 77	\N	patch	patch_97_98_b.sql|division_name
 78	\N	patch	patch_98_99_a.sql|schema_version
 80	\N	patch	patch_99_100_a.sql|schema_version
+81	\N	patch	patch_99_100_b.sql|homology_id_64-bits
