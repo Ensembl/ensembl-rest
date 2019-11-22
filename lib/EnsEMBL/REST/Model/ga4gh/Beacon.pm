@@ -553,8 +553,6 @@ sub variant_exists {
         next;
     }
 
-    print "$start_pos-$end_pos, $new_start-$new_end\n";
-
     # Precise match for snv or small indels - end does not make a difference
     if ($sv == 0 && ($seq_region_start != $start_pos) && ($seq_region_end != $end_pos)) {
       next;
@@ -757,9 +755,9 @@ sub get_dataset_allele_response {
         }
 
         # Checks if dataset_id is one of the datasets where variant is found
-        # If it's not found then dataset response won't include variant
-        my %x = %{$variant_dt};
-        my $datasets = $x{$var_name};
+        # If it's not found then dataset response won't include this variant
+        my %var_dataset = %{$variant_dt};
+        my $datasets = $var_dataset{$var_name};
         my $contains = contains_value($dataset_id, $datasets);
         if($contains) {
           $count += 1;
