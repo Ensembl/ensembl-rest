@@ -151,9 +151,16 @@ jsonp=1
     ontology_term_id=GO:0005667
     ontology_term_name=transcription factor complex
     
-    compara=multi
+    compara=vertebrates
     compara_method=EPO
     compara_method_type=GenomicAlign
+    compara_hom_format=full
+    compara_hom_type=all
+    compara_aligned=1
+    compara_sequence=protein
+    compara_cigar_line=1
+    compara_species_set_group=mammals
+    compara_compact=1
     
     genetree_stable_id=ENSGT00390000003602
     compara_gene_stable_id=ENSG00000173786
@@ -353,6 +360,18 @@ jsonp=1
    use_vcf    = 1
    vcf_config = __path_to(vcf_config.json)__
 </Model::Variation>
+
+<Model::Compara>
+  species_set_group = mammals
+  method            = EPO
+  no_branch_lengths = 0
+  compact           = 1
+  aligned           = 1
+  cigar_line        = 1
+  format            = full
+  sequence          = protein
+  type              = all
+</Model::Compara>
 
 <Model::LDFeatureContainer>
    use_vcf = 1
