@@ -93,15 +93,15 @@ sub get_beacon_organization {
 
   my $organization;
  
-  my $description = "The European Bioinformatics Institute (EMBL-EBI)"
-                    . " is part of EMBL, an international, innovative" 
-                    . " and interdisciplinary research organisation funded"
-                    . " by 26 member states and two associate member states"
-                    . " to provide the infrastructure needed to share data"
-                    . " openly in the life sciences.";
+  my $description = "The European Bioinformatics Institute (EMBL-EBI)
+                      is part of EMBL, an international, innovative
+                      and interdisciplinary research organisation funded
+                      by 26 member states and two associate member states
+                      to provide the infrastructure needed to share data
+                      openly in the life sciences.";
 
-  my $address = "EMBL-EBI, Wellcome Genome Campus, Hinxton, "
-                . "Cambridgeshire, CB10 1SD, UK";
+  my $address = "EMBL-EBI, Wellcome Genome Campus, Hinxton,
+                  Cambridgeshire, CB10 1SD, UK";
 
   # The welcome URL depends on the assembly requested
   #my $db_assembly = $db_meta->{assembly};
@@ -371,23 +371,23 @@ sub get_beacon_allele_request {
   }
 
   if (exists $data->{start}) {
-    $beaconAlleleRequest->{start} = $data->{start} + 0;
+    $beaconAlleleRequest->{start} = int($data->{start});
   }
 
   if (exists $data->{end}) {
-    $beaconAlleleRequest->{end} = $data->{end} + 0;
+    $beaconAlleleRequest->{end} = int($data->{end});
   }
   if (exists $data->{startMin}) {
-    $beaconAlleleRequest->{startMin} = $data->{startMin} + 0;
+    $beaconAlleleRequest->{startMin} = int($data->{startMin});
   }
   if (exists $data->{startMax}) {
-    $beaconAlleleRequest->{startMax} = $data->{startMax} + 0;
+    $beaconAlleleRequest->{startMax} = int($data->{startMax});
   }
   if (exists $data->{endMin}) {
-    $beaconAlleleRequest->{endMin} = $data->{endMin} + 0;
+    $beaconAlleleRequest->{endMin} = int($data->{endMin});
   }
   if (exists $data->{endMax}) {
-    $beaconAlleleRequest->{endMax} = $data->{endMax} + 0;
+    $beaconAlleleRequest->{endMax} = int($data->{endMax});
   }
 
   $beaconAlleleRequest->{datasetIds} = undef;
@@ -465,12 +465,12 @@ sub variant_exists {
   # List of variants found - response includes all variants found between startMin and endMax
   my @vf_found;
 
-  # Dataset error is always undef - there's no errors to be raised
+  # Dataset error is always undef - there are no errors to be raised
   # Improve in the future
   my $error;
   my @dataset_response;
 
-  # Datasets were variation was found
+  # Datasets where variation was found
   # Dataset id => dataset object
   my %dataset_var_found;
   # All available databases
@@ -564,13 +564,16 @@ sub variant_exists {
 
     # Variant is a SNV
     if ($sv == 0) {
-    $ref_allele_string = $vf->ref_allele_string();
-    $alt_alleles = $vf->alt_alleles();
+      $ref_allele_string = $vf->ref_allele_string();
+      $alt_alleles = $vf->alt_alleles();
 
-    # Some ins/del have allele string 'G/-', others have TG/T
-    # trim sequence doesn't always work
-    if ((uc($ref_allele_string) eq uc($ref_allele) || (uc($ref_allele_string) eq uc($new_ref)))
-      && (grep(/^$alt_allele$/i, @{$alt_alleles}) || grep(/^$new_alt$/i, @{$alt_alleles}))) {
+      my $contains_alt = contains_value($alt_allele, $alt_alleles);
+      my $contains_new_alt = contains_value($new_alt, $alt_alleles);
+
+      # Some ins/del have allele string 'G/-', others have TG/T
+      # trim sequence doesn't always work
+      if ( (uc($ref_allele_string) eq uc($ref_allele) || (uc($ref_allele_string) eq uc($new_ref)))
+      && ($contains_alt || $contains_new_alt) ) {
         $found = 1;
 
         # Checks datasets only for variants that match
@@ -594,21 +597,22 @@ sub variant_exists {
       # There's more than one term for each type - use a list of SO terms
       # CNV =~ DEL or DUP 
       my %terms = (
-        'INS'    => 'insertion',
-        'INS:ME' => 'mobile_element_insertion',
-        'DEL'    => 'deletion',
-        'DEL:ME' => 'mobile_element_deletion',
-        'CNV'    => 'copy_number_variation,copy_number_gain,copy_number_loss,deletion,duplication',
-        'DUP'    => 'duplication',
-        'INV'    => 'inversion',
-        'DUP:TANDEM' => 'tandem_duplication'
+        'INS'    => ['insertion'],
+        'INS:ME' => ['mobile_element_insertion'],
+        'DEL'    => ['deletion'],
+        'DEL:ME' => ['mobile_element_deletion'],
+        'CNV'    => ['copy_number_variation','copy_number_gain','copy_number_loss','deletion','duplication'],
+        'DUP'    => ['duplication'],
+        'INV'    => ['inversion'],
+        'DUP:TANDEM' => ['tandem_duplication']
       );
 
-      my $vf_so_term;
       $so_term = defined $terms{$alt_allele} ? $terms{$alt_allele} : $alt_allele;
-      $vf_so_term = $vf->class_SO_term();
+      my $vf_so_term = $vf->class_SO_term();
 
-      if ($so_term =~ /$vf_so_term/) {
+      my $contains_so_term = contains_value($vf_so_term, $so_term);
+
+      if ($contains_so_term) {
         $found = 1;
 
         # Checks datasets only for variants that match
@@ -778,12 +782,14 @@ sub get_dataset_allele_response {
 sub contains_value {
   my ($value, $array) = @_;
 
-  my $related; 
-  foreach my $i ($array){ 
-    if (grep $_ eq $value, @{$i}) { $related = 1; } 
+  my $related;
+  foreach my $i ($array) {
+    if(grep { $_ eq $value } @{$i}) {
+      return 1;
+    }
   }
 
-  return $related; 
+  return $related;
 }
 
 with 'EnsEMBL::REST::Role::Content';
