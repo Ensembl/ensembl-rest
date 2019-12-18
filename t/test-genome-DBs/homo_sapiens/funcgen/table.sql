@@ -57,7 +57,7 @@ CREATE TABLE `analysis` (
   `program` varchar(80) DEFAULT NULL,
   `program_version` varchar(40) DEFAULT NULL,
   `program_file` varchar(80) DEFAULT NULL,
-  `parameters` text DEFAULT NULL,
+  `parameters` text,
   `module` varchar(80) DEFAULT NULL,
   `module_version` varchar(40) DEFAULT NULL,
   `gff_source` varchar(40) DEFAULT NULL,
@@ -68,10 +68,10 @@ CREATE TABLE `analysis` (
 
 CREATE TABLE `analysis_description` (
   `analysis_id` smallint(5) unsigned NOT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `display_label` varchar(255) NOT NULL,
   `displayable` tinyint(1) NOT NULL DEFAULT 1,
-  `web_data` text DEFAULT NULL,
+  `web_data` text,
   UNIQUE KEY `analysis_idx` (`analysis_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -186,7 +186,7 @@ CREATE TABLE `chance` (
   `pcr_amplification_bias_in_Input_coverage_of_1_percent_of_genome` double DEFAULT NULL,
   `path` varchar(512) DEFAULT NULL,
   `run_failed` tinyint(1) DEFAULT 0,
-  `error_message` text DEFAULT NULL,
+  `error_message` text,
   PRIMARY KEY (`chance_id`),
   UNIQUE KEY `signal_control_alignment_unique` (`signal_alignment_id`,`control_alignment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -207,11 +207,11 @@ CREATE TABLE `epigenome` (
   `epigenome_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(120) NOT NULL,
   `short_name` varchar(120) NOT NULL,
-  `description` mediumtext DEFAULT NULL,
+  `description` mediumtext,
   `production_name` varchar(120) DEFAULT NULL,
   `gender` enum('male','female','hermaphrodite','mixed','unknown') DEFAULT 'unknown',
-  `search_terms` mediumtext DEFAULT NULL,
-  `full_name` mediumtext DEFAULT NULL,
+  `search_terms` mediumtext,
+  `full_name` mediumtext,
   PRIMARY KEY (`epigenome_id`),
   UNIQUE KEY `name_idx` (`name`),
   UNIQUE KEY `short_name_idx` (`short_name`)
@@ -262,7 +262,7 @@ CREATE TABLE `external_db` (
   `type` enum('ARRAY','ALT_TRANS','ALT_GENE','MISC','LIT','PRIMARY_DB_SYNONYM','ENSEMBL') DEFAULT NULL,
   `secondary_db_name` varchar(255) DEFAULT NULL,
   `secondary_db_table` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   PRIMARY KEY (`external_db_id`),
   UNIQUE KEY `db_name_release_idx` (`db_name`,`db_release`)
 ) ENGINE=MyISAM AUTO_INCREMENT=50834 DEFAULT CHARSET=latin1 AVG_ROW_LENGTH=80;
@@ -319,7 +319,7 @@ CREATE TABLE `fastqc` (
   `adapter_content` enum('PASS','WARN','FAIL') DEFAULT NULL,
   `kmer_content` enum('PASS','WARN','FAIL') DEFAULT NULL,
   `run_failed` tinyint(1) DEFAULT 0,
-  `error_message` text DEFAULT NULL,
+  `error_message` text,
   PRIMARY KEY (`fastqc_id`),
   UNIQUE KEY `read_file_id_unique` (`read_file_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -368,7 +368,7 @@ CREATE TABLE `identity_xref` (
   `xref_end` int(11) DEFAULT NULL,
   `ensembl_start` int(11) DEFAULT NULL,
   `ensembl_end` int(11) DEFAULT NULL,
-  `cigar_line` text DEFAULT NULL,
+  `cigar_line` text,
   `score` double DEFAULT NULL,
   `evalue` double DEFAULT NULL,
   PRIMARY KEY (`object_xref_id`)
@@ -391,7 +391,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=771 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=774 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -538,7 +538,7 @@ CREATE TABLE `phantom_peak` (
   `rsc` double DEFAULT NULL,
   `quality_tag` int(14) DEFAULT NULL,
   `run_failed` tinyint(1) DEFAULT 0,
-  `error_message` text DEFAULT NULL,
+  `error_message` text,
   PRIMARY KEY (`phantom_peak_id`),
   UNIQUE KEY `alignment_id_unique` (`alignment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -656,8 +656,8 @@ CREATE TABLE `read_file` (
   `file_size` bigint(20) DEFAULT NULL,
   `read_length` int(10) DEFAULT NULL,
   `md5sum` varchar(45) DEFAULT NULL,
-  `file` text DEFAULT NULL,
-  `notes` text DEFAULT NULL,
+  `file` text,
+  `notes` text,
   PRIMARY KEY (`read_file_id`),
   UNIQUE KEY `read_file_id_idx` (`read_file_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5568 DEFAULT CHARSET=latin1;
@@ -687,9 +687,9 @@ CREATE TABLE `regulatory_activity` (
 
 CREATE TABLE `regulatory_build` (
   `regulatory_build_id` int(4) unsigned NOT NULL AUTO_INCREMENT,
-  `name` text DEFAULT NULL,
+  `name` text,
   `release_version` int(11) DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `version` varchar(50) DEFAULT NULL,
   `initial_release_date` varchar(50) DEFAULT NULL,
   `last_annotation_update` varchar(50) DEFAULT NULL,
@@ -881,7 +881,7 @@ CREATE TABLE `xref` (
   `dbprimary_acc` varchar(512) NOT NULL,
   `display_label` varchar(512) NOT NULL,
   `version` varchar(10) DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `info_type` enum('NONE','PROJECTION','MISC','DEPENDENT','DIRECT','SEQUENCE_MATCH','INFERRED_PAIR','PROBE','UNMAPPED','COORDINATE_OVERLAP','CHECKSUM') NOT NULL DEFAULT 'NONE',
   `info_text` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`xref_id`),
