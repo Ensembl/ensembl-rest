@@ -104,13 +104,25 @@ sub region : Chained("get_species") PathPart("") Args(1) ActionClass('REST') {
 
     #Set aligned option (default from config)
     my $compara_defaults = $c->config->{'Model::Compara'};
-    $c->stash->{"aligned"} = (defined $c->request()->param('aligned')) ? $c->request()->param('aligned') : $compara_defaults->{aligned}; 
+    if ( defined $c->request()->param('aligned') ) {
+        $c->stash->{"aligned"} = $c->request()->param('aligned');
+    } else {
+        $c->stash->{"aligned"} = $compara_defaults->{aligned};
+    }
 
     #Set compact option (default from config)
-    $c->stash->{"compact"} = (defined $c->request->param('compact')) ? $c->request->param('compact') : $compara_defaults->{compact};
+    if ( defined $c->request->param('compact') ) {
+        $c->stash->{"compact"} = $c->request->param('compact');
+    } else {
+        $c->stash->{"compact"} = $compara_defaults->{compact};
+    }
 
     #Set no branch lengths option (default 0, ie display branch lengths)
-    $c->stash->{"no_branch_lengths"} = (defined $c->request->param('no_branch_lengths')) ? $c->request->param('no_branch_lengths') : $compara_defaults->{no_branch_lengths};
+    if ( defined $c->request->param('no_branch_lengths') ) {
+        $c->stash->{"no_branch_lengths"} = $c->request->param('no_branch_lengths');
+    } else {
+        $c->stash->{"no_branch_lengths"} = $compara_defaults->{no_branch_lengths};
+    }
 
     #Never give branch lengths for pairwise, even if requested
     $c->go("ReturnError", "custom", ["no alignment available for this region"]) if !$alignments;
