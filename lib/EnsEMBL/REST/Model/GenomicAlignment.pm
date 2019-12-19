@@ -47,6 +47,9 @@ sub get_alignment {
   my $c = $self->context();
   my $alignments;
 
+  # set defaults as per config file
+  my $compara_defaults = $c->config->{'Model::Compara'};
+
   #Get species_set
   my $species_set = $c->request->parameters->{species_set};
 
@@ -55,7 +58,8 @@ sub get_alignment {
 
   #set default species_set_group only if species_set hasn't been set
   unless ($species_set || $species_set_group) {
-    $species_set_group = 'mammals';
+    $species_set_group = $compara_defaults->{species_set_group};
+    $species_set = $compara_defaults->{species_set} unless $species_set_group;
   }
 
   #Check that both $species_set and $species_set_group have not been set
@@ -73,7 +77,7 @@ sub get_alignment {
   $c->forward('get_adaptors');
 
   #Get method
-  my $method_type = $c->request->parameters->{method} || 'EPO';
+  my $method_type = $c->request->parameters->{method} || $compara_defaults->{method};
   my $method = $c->stash->{method_adaptor}->fetch_by_type($method_type);
   Catalyst::Exception->throw("The method '$method_type' is not understood by this service") unless $method;
   my $method_is_alignment = $method->class =~ /^GenomicAlign/;

@@ -125,13 +125,16 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   #Get the compara DBAdaptor
   $c->forward('get_adaptors');
   
+  # get defaults from config
+  my $compara_defaults = $c->config->{'Model::Compara'};
+
   # Sort out the encoder
-  my $format = $c->request->param('format') || 'full';
+  my $format = $c->request->param('format') || $compara_defaults->{format};
   my $target = $FORMAT_LOOKUP->{$format};
   $c->go('ReturnError', 'custom', [qq{The format '$format' is not an understood encoding}]) unless $target;
   
   #Sort out the type of response
-  my $user_type = $c->request->param('type') || 'all';
+  my $user_type = $c->request->param('type') || $compara_defaults->{type};
   my $method_link_type= $TYPE_TO_COMPARA_TYPE->{lc($user_type)};
   $c->go('ReturnError', 'custom', [qq{The type '$user_type' is not a known available type}]) unless defined $method_link_type;
   $c->stash(method_link_type => $method_link_type);
@@ -179,13 +182,16 @@ sub get_orthologs : Args(0) ActionClass('REST') {
 sub get_orthologs_GET {
   my ( $self, $c ) = @_;
 
+  # get defaults from config
+  my $compara_defaults = $c->config->{'Model::Compara'};
+
   if($self->is_content_type($c, $CONTENT_TYPE_REGEX)) {
-    my $format          = $c->request->param('format') || 'full';
-    my $sequence_param  = $c->request->param('sequence') || 'protein';
+    my $format          = $c->request->param('format') || $compara_defaults->{format};
+    my $sequence_param  = $c->request->param('sequence') || $compara_defaults->{sequence};
     my $seq_type        = $sequence_param eq 'protein' ? undef : 'cds';
     my $no_seq          = $sequence_param eq 'none' ? 1 : 0;
-    my $aligned         = $c->request->param('aligned') // 1;
-    my $cigar_line      = $c->request->param('cigar_line') // 1;
+    my $aligned         = $c->request->param('aligned') // $compara_defaults->{aligned};
+    my $cigar_line      = $c->request->param('cigar_line') // $compara_defaults->{cigar_line};
 
     try {
       foreach my $ref (@{$c->stash->{homology_data}}) {

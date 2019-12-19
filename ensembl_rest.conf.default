@@ -92,7 +92,17 @@ jsonp=1
   #How long examples stay in the backend caches before being expired; default is 1hr in seconds. 
   #Expire depends on the type of CHI cache configured in Plugin::Cache section
   # example_expire_time=3600
-  
+ 
+  # compara end-points had to be taken down for grch37 for e100 as part of removal of non-human resources
+  # so maintain and replace a different conf file for documentation
+  # change in response object/removal of actual end-points to be handled from haproxy/load balancer
+  # removing/commenting this section will lead to processing of both conf files and 
+  # use of merged values if keys overlap between the two conf files
+  # meant mainly for deployment and to be enabled in grch37.conf under rest_private repo
+  #<conf_replacements>
+  #  compara.conf=compara_grch37.conf
+  #</conf_replacements>
+
   #Used to control the parameters used in examples. Please edit as you see fit for your infrastructure
   <replacements>
     gene_stable_id=ENSG00000157764
@@ -114,6 +124,7 @@ jsonp=1
     gene_symbol4=SAP30BP
     gene_symbol5=MLXIPL
     gene_symbol_db=HGNC
+    gene_symbol_compara37=CNP
     transcript_symbol_db=PDB
     
     prediction_transcript_stable_id=GENSCAN00000000001
@@ -140,12 +151,19 @@ jsonp=1
     ontology_term_id=GO:0005667
     ontology_term_name=transcription factor complex
     
-    compara=multi
+    compara=vertebrates
     compara_method=EPO
     compara_method_type=GenomicAlign
+    compara_hom_format=full
+    compara_hom_type=all
+    compara_aligned=1
+    compara_sequence=protein
+    compara_cigar_line=1
+    compara_species_set_group=mammals
+    compara_compact=1
     
     genetree_stable_id=ENSGT00390000003602
-    compara_gene_stable_id=ENSG00000167664
+    compara_gene_stable_id=ENSG00000173786
     family_stable_id=PTHR15573
     
     from_coord_system=GRCh37
@@ -342,6 +360,18 @@ jsonp=1
    use_vcf    = 1
    vcf_config = __path_to(vcf_config.json)__
 </Model::Variation>
+
+<Model::Compara>
+  species_set_group = mammals
+  method            = EPO
+  no_branch_lengths = 0
+  compact           = 1
+  aligned           = 1
+  cigar_line        = 1
+  format            = full
+  sequence          = protein
+  type              = all
+</Model::Compara>
 
 <Model::LDFeatureContainer>
    use_vcf = 1
