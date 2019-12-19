@@ -559,7 +559,8 @@ sub variant_exists {
     }
     # Match for structural variants
     if($sv == 1){
-      next unless ($seq_region_start >= $start_pos && $seq_region_start <= $start_max_pos && $seq_region_end >= $end_min_pos && $seq_region_end <= $end_pos);
+      next if ($seq_region_start < $start_pos || $seq_region_start > $start_max_pos
+              || $seq_region_end < $end_min_pos || $seq_region_end > $end_pos);
     }
 
     # Variant is a SNV
@@ -742,10 +743,9 @@ sub get_dataset_allele_response {
       $externalURL = "http://grch37.ensembl.org";
     }
 
-    my $count = 0;
+    my @urls;
 
     if($vf) {
-      my $url = '';
       my $var_name;
       my $delimiter;
       foreach my $variant (@{$vf}) {
@@ -764,15 +764,15 @@ sub get_dataset_allele_response {
         my $datasets = $var_dataset{$var_name};
         my $contains = contains_value($dataset_id, $datasets);
         if($contains) {
-          $count += 1;
-          $url .= ', ' . $externalURL . "/Homo_sapiens/" . $delimiter . $var_name;
+          my $url_tmp = $externalURL . "/Homo_sapiens/" . $delimiter . $var_name;
+          push @urls, $url_tmp;
         }
       }
-      $url =~ s/, //;
+      my $url = join(',', @urls);
       $externalURL = $url;
     }
 
-    $ds_response->{'variantCount'} = $count;
+    $ds_response->{'variantCount'} = scalar @urls;
 
     $ds_response->{'externalUrl'} = $externalURL;
 
