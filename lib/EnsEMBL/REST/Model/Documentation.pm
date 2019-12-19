@@ -217,9 +217,9 @@ sub _find_conf {
     if($_ =~ /\.conf$/) {
 	if(exists($conf_replacements->{$_}) && defined($conf_replacements->{$_})){
 	  $log->debug("Replacement conf file found: $_ will be replaced with $conf_replacements->{$_}");
-	  $full_path = $File::Find::dir.File::Spec->catfile('','').$conf_replacements->{$_};
+	  $full_path = $File::Find::dir.File::Spec->catfile('', $conf_replacements->{$_});
 	}
-        unless (grep(/^$full_path/, @conf)) { push(@conf,$full_path); }
+	unless (grep {/^$full_path/} @conf) { push(@conf,$full_path); }
     }
   }, $path);
   return [sort @conf];
