@@ -81,7 +81,7 @@ CREATE TABLE `compressed_genotype_var` (
 
 CREATE TABLE `coord_system` (
   `coord_system_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `species_id` int(10) unsigned NOT NULL DEFAULT '1',
+  `species_id` int(10) unsigned NOT NULL DEFAULT 1,
   `name` varchar(40) NOT NULL,
   `version` varchar(255) DEFAULT NULL,
   `rank` int(11) NOT NULL,
@@ -180,7 +180,7 @@ CREATE TABLE `individual_type` (
 
 CREATE TABLE `meta` (
   `meta_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `species_id` int(10) unsigned DEFAULT '1',
+  `species_id` int(10) unsigned DEFAULT 1,
   `meta_key` varchar(40) NOT NULL,
   `meta_value` varchar(255) NOT NULL,
   PRIMARY KEY (`meta_id`),
@@ -234,7 +234,7 @@ CREATE TABLE `phenotype_feature` (
   `study_id` int(11) unsigned DEFAULT NULL,
   `type` enum('Gene','Variation','StructuralVariation','SupportingStructuralVariation','QTL','RegulatoryFeature') DEFAULT NULL,
   `object_id` varchar(255) DEFAULT NULL,
-  `is_significant` tinyint(1) unsigned DEFAULT '1',
+  `is_significant` tinyint(1) unsigned DEFAULT 1,
   `seq_region_id` int(11) unsigned DEFAULT NULL,
   `seq_region_start` int(11) unsigned DEFAULT NULL,
   `seq_region_end` int(11) unsigned DEFAULT NULL,
@@ -568,7 +568,7 @@ CREATE TABLE `transcript_variation` (
   `polyphen_score` float DEFAULT NULL,
   `sift_prediction` enum('tolerated','deleterious','tolerated - low confidence','deleterious - low confidence') DEFAULT NULL,
   `sift_score` float DEFAULT NULL,
-  `display` int(1) DEFAULT '1',
+  `display` int(1) DEFAULT 1,
   PRIMARY KEY (`transcript_variation_id`),
   KEY `variation_feature_idx` (`variation_feature_id`),
   KEY `consequence_type_idx` (`consequence_types`),
@@ -594,7 +594,7 @@ CREATE TABLE `variation` (
   `minor_allele_count` int(10) unsigned DEFAULT NULL,
   `clinical_significance` set('uncertain significance','not provided','benign','likely benign','likely pathogenic','pathogenic','drug response','histocompatibility','other','confers sensitivity','risk factor','association','protective') DEFAULT NULL,
   `evidence_attribs` set('367','368','369','370','371','372','418','421','573','585') DEFAULT NULL,
-  `display` int(1) DEFAULT '1',
+  `display` int(1) DEFAULT 1,
   PRIMARY KEY (`variation_id`),
   UNIQUE KEY `name` (`name`),
   KEY `source_idx` (`source_id`)
@@ -639,7 +639,7 @@ CREATE TABLE `variation_feature` (
   `alignment_quality` double DEFAULT NULL,
   `clinical_significance` set('uncertain significance','not provided','benign','likely benign','likely pathogenic','pathogenic','drug response','histocompatibility','other','confers sensitivity','risk factor','association','protective') DEFAULT NULL,
   `evidence_attribs` set('367','368','369','370','371','372','418','421','573','585') DEFAULT NULL,
-  `display` int(1) DEFAULT '1',
+  `display` int(1) DEFAULT 1,
   PRIMARY KEY (`variation_feature_id`),
   KEY `pos_idx` (`seq_region_id`,`seq_region_start`,`seq_region_end`),
   KEY `variation_idx` (`variation_id`),
