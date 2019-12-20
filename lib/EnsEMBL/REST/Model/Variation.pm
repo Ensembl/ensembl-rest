@@ -189,6 +189,7 @@ sub vf_as_hash {
   $variation_feature->{coord_system} = $vf->coord_system_name;
   $variation_feature->{assembly_name} = $vf->slice->coord_system->version;
   $variation_feature->{allele_string} = $vf->allele_string;
+  $variation_feature->{ancestral_allele} = $vf->ancestral_allele;
 
   return $variation_feature;
 }
