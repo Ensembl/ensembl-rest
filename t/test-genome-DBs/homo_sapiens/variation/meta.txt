@@ -120,3 +120,5 @@
 120	\N	patch	patch_98_99_d.sql|add key data_source_attrib
 121	\N	patch	patch_98_99_e.sql|Fix attrib ids in table variation_citation
 122	\N	patch	patch_99_100_a.sql|schema version
+123	\N	patch	patch_99_100_b.sql|add frequency to structural variation
+124	\N	patch	patch_99_100_c.sql|add class_attrib_id column to phenotype
