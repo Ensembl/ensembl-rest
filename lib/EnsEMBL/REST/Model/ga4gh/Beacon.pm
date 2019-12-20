@@ -93,15 +93,11 @@ sub get_beacon_organization {
 
   my $organization;
  
-  my $description = "The European Bioinformatics Institute (EMBL-EBI)
-                      is part of EMBL, an international, innovative
-                      and interdisciplinary research organisation funded
-                      by 26 member states and two associate member states
-                      to provide the infrastructure needed to share data
-                      openly in the life sciences.";
+  my $description = "The European Bioinformatics Institute (EMBL-EBI) is part of EMBL, an international, innovative "
+                      . "and interdisciplinary research organisation funded by 26 member states and two associate member states "
+                      . "to provide the infrastructure needed to share data openly in the life sciences.";
 
-  my $address = "EMBL-EBI, Wellcome Genome Campus, Hinxton,
-                  Cambridgeshire, CB10 1SD, UK";
+  my $address = "EMBL-EBI, Wellcome Genome Campus, Hinxton, Cambridgeshire, CB10 1SD, UK";
 
   # The welcome URL depends on the assembly requested
   #my $db_assembly = $db_meta->{assembly};
@@ -782,14 +778,13 @@ sub get_dataset_allele_response {
 sub contains_value {
   my ($value, $array) = @_;
 
-  my $related;
   foreach my $i ($array) {
     if(grep { $_ eq $value } @{$i}) {
       return 1;
     }
   }
 
-  return $related;
+  return;
 }
 
 with 'EnsEMBL::REST::Role::Content';
