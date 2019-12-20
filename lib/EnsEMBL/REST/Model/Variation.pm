@@ -150,7 +150,6 @@ sub to_hash {
   $variation_hash->{ambiguity} = $variation->ambig_code;
   $variation_hash->{synonyms} = $variation->get_all_synonyms;
   $variation_hash->{failed} = $variation->failed_description if $variation->is_failed;
-  $variation_hash->{ancestral_allele} = $variation->ancestral_allele;
   $variation_hash->{var_class} = $variation->var_class;
   $variation_hash->{most_severe_consequence} = $variation->display_consequence;
   $variation_hash->{MAF} = $variation->minor_allele_frequency;
