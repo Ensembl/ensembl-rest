@@ -1,4 +1,4 @@
-124	\N	schema_version	100
+127	\N	schema_version	101
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -103,3 +103,4 @@
 123	\N	patch	patch_98_99_a.sql|schema_version
 125	\N	patch	patch_99_100_a.sql|schema_version
 126	\N	patch	patch_99_100_b.sql|homology_id_64-bits
+128	\N	patch	patch_100_101_a.sql|schema_version
