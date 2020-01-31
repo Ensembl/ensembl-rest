@@ -98,10 +98,12 @@ jsonp=1
   # change in response object/removal of actual end-points to be handled from haproxy/load balancer
   # removing/commenting this section will lead to processing of both conf files and 
   # use of merged values if keys overlap between the two conf files
-  # meant mainly for deployment and to be enabled in grch37.conf under rest_private repo
-  #<conf_replacements>
-  #  compara.conf=compara_grch37.conf
-  #</conf_replacements>
+  # meant mainly for deployment and to be enabled in conf files under rest_private repo
+  # for grch38 deployment, compara_grch37.conf = compara.conf
+  # for grch37 deployment, compara.conf = compara_grch37.conf
+  <conf_replacements>
+    compara_grch37.conf=compara.conf
+  </conf_replacements>
 
   #Used to control the parameters used in examples. Please edit as you see fit for your infrastructure
   <replacements>
