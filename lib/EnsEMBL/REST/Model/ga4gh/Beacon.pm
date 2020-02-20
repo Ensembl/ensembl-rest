@@ -26,8 +26,26 @@ use Catalyst::Exception;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences); 
 
+use Data::Dumper;
+
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
+
+# structural variants SO terms
+# There's more than one term for each type - use a list of SO terms
+# CNV =~ DEL or DUP
+has 'sv_so_terms' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
+  return {
+    'INS'    => ['insertion'],
+    'INS:ME' => ['mobile_element_insertion'],
+    'DEL'    => ['deletion'],
+    'DEL:ME' => ['mobile_element_deletion'],
+    'CNV'    => ['copy_number_variation','copy_number_gain','copy_number_loss','deletion','duplication'],
+    'DUP'    => ['duplication'],
+    'INV'    => ['inversion'],
+    'DUP:TANDEM' => ['tandem_duplication']
+  };
+});
 
 has 'context' => (is => 'ro',  weak_ref => 1);
 
@@ -207,11 +225,9 @@ sub beacon_query {
 
   # Check if there is dataset ids in the input
   # Get list of dataset ids
-  my $has_dataset = 0;
   my @dataset_ids_list;
 
   if (exists $data->{datasetIds}) {
-    $has_dataset = 1;
     @dataset_ids_list = split(',', $data->{datasetIds});
   }
 
@@ -234,31 +250,37 @@ sub beacon_query {
  
   # check variant if only all parameters are valid
   if(!defined($beaconError)){
+    my %input_coord;
     # Check allele exists 
-    my $reference_name = $data->{referenceName};
-    my $ref_allele = $data->{referenceBases};
-    my $alt_allele = $data->{alternateBases} ? $data->{alternateBases} : $data->{variantType};
+    $input_coord{'reference_name'} = $data->{referenceName};
+    $input_coord{'ref_allele'} = $data->{referenceBases};
+    $input_coord{'alt_allele'} = $data->{alternateBases} ? $data->{alternateBases} : $data->{variantType};
 
     # SNV or small indels have a start
     # Structural variants can have start-end or startMin/startMax-endMin/endMax
-    my $start = $data->{start} ? $data->{start} : $data->{startMin};
-    my $start_max = $data->{startMax} ? $data->{startMax} : $start;
+    $input_coord{'start'} = $data->{start} ? $data->{start} : $data->{startMin};
+    $input_coord{'start_max'} = $data->{startMax} ? $data->{startMax} : $input_coord{'start'};
 
     my $end;
     if($data->{end}) {
-      $end = $data->{end}; 
+      $input_coord{'end'} = $data->{end};
     }
     elsif($data->{endMax}) {
-      $end = $data->{endMax};
+      $input_coord{'end'} = $data->{endMax};
     }
     else{
-      $end = $start;
+      $input_coord{'end'} = $input_coord{'start'};
     }
-    my $end_min = $data->{endMin} ? $data->{endMin} : $end;
+    $input_coord{'end_min'} = $data->{endMin} ? $data->{endMin} : $input_coord{'end'};
 
     # Multiple dataset
     # check variant exists and report exists overall
-    my ($exists, $dataset_response)  = $self->variant_exists($reference_name,$start,$start_max,$end,$end_min,$ref_allele,$alt_allele,$incl_ds_response, $assemblyId, \@dataset_ids_list, $has_dataset);
+    my ($exists, $dataset_response)  = $self->variant_exists(\%input_coord, $incl_ds_response, $assemblyId, \@dataset_ids_list);
+
+    ### 57 ###
+    # $self->variant_exists_snv($reference_name,$start,$start_max,$end,$end_min,$ref_allele,$alt_allele,$incl_ds_response,$assemblyId,\@dataset_ids_list);
+
+    ### 57 ###
 
     my $exists_JSON;
     if ($exists) {
@@ -314,6 +336,8 @@ sub check_parameters {
       unless (exists $allowed_fields{$key});
   }
 
+  my %so_terms = %{$self->sv_so_terms()};
+
   # Note: Does not 
   #   allow a * that is VCF spec for ALT
   if($parameters->{referenceName} !~ /^([1-9]|1[0-9]|2[012]|X|Y|MT)$/i){
@@ -343,7 +367,7 @@ sub check_parameters {
   elsif(defined($parameters->{alternateBases}) && $parameters->{alternateBases} !~ /^([AGCT]+|N)$/i){
     $error = $self->get_beacon_error('400', "Invalid alternateBases");
   }
-  elsif(defined($parameters->{variantType}) && $parameters->{variantType} !~ /^(DEL|DEL\:ME|INS|INS\:ME|CNV|DUP|INV|DUP\:TANDEM)$/i){
+  elsif(defined($parameters->{variantType}) && !defined($so_terms{$parameters->{variantType}})){
     $error = $self->get_beacon_error('400', "Invalid variantType");
   }
   elsif($parameters->{assemblyId} !~ /^(GRCh38|GRCh37)$/i){
@@ -450,8 +474,12 @@ sub fetch_db_meta {
 # TODO  use assemblyID
 # Assembly not taken to account, assembly of REST machine
 sub variant_exists {
-  my ($self, $reference_name, $start, $start_max, $end, $end_min, $ref_allele, 
-           $alt_allele, $incl_ds_response, $assemblyId, $dataset_ids_list, $has_dataset) = @_;
+  my ($self, $input_coords, $incl_ds_response, $assemblyId, $dataset_ids_list) = @_;
+
+  my %input_coord = %{$input_coords};
+
+  my $ref_allele = $input_coord{'ref_allele'};
+  my $alt_allele = $input_coord{'alt_allele'};
 
   my $c = $self->context();
  
@@ -479,11 +507,10 @@ sub variant_exists {
   my $slice_step = 5;
 
   # Position provided is zero-based
-  my $start_pos = $start + 1;
-  my $end_pos = $end + 1;
-  my $start_max_pos = $start_max + 1;
-  my $end_min_pos = $end_min + 1;
-  my $chromosome = $reference_name;
+  my $start_pos = $input_coord{'start'} + 1;
+  my $end_pos = $input_coord{'end'} + 1;
+  my $start_max_pos = $input_coord{'start_max'} + 1;
+  my $end_min_pos = $input_coord{'end_min'} + 1;
 
   # Reference bases for this variant (starting from start).
   # Accepted values: see the REF field in VCF 4.2 specification 
@@ -494,13 +521,22 @@ sub variant_exists {
 
   my $slice_start = $start_pos - $slice_step;
   my $slice_end   = $end_pos + $slice_step;
+  my $reference_name = $input_coord{'reference_name'};
 
   my $slice_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'core', 'slice');
-  my $slice = $slice_adaptor->fetch_by_region('chromosome', $chromosome, $slice_start, $slice_end);
+  my $slice = $slice_adaptor->fetch_by_region('chromosome', $reference_name, $slice_start, $slice_end);
+
+  # Datasets from input
+  my $has_dataset = 0;
+  if(scalar @$dataset_ids_list > 0) {
+    $has_dataset = 1;
+  }
 
   my $variation_feature_adaptor; 
 
-  if($alt_allele =~ /DEL|INS|CNV|DUP|INV|DUP:TANDEM|INS:ME|DEL:ME/){
+  my %terms = %{$self->sv_so_terms()};
+
+  if(defined($terms{$alt_allele})){
     $sv = 1; 
   }
 
@@ -590,20 +626,6 @@ sub variant_exists {
     }
     # Variant is a SV 
     else {
-      # convert to SO term
-      # There's more than one term for each type - use a list of SO terms
-      # CNV =~ DEL or DUP 
-      my %terms = (
-        'INS'    => ['insertion'],
-        'INS:ME' => ['mobile_element_insertion'],
-        'DEL'    => ['deletion'],
-        'DEL:ME' => ['mobile_element_deletion'],
-        'CNV'    => ['copy_number_variation','copy_number_gain','copy_number_loss','deletion','duplication'],
-        'DUP'    => ['duplication'],
-        'INV'    => ['inversion'],
-        'DUP:TANDEM' => ['tandem_duplication']
-      );
-
       $so_term = defined $terms{$alt_allele} ? $terms{$alt_allele} : $alt_allele;
       my $vf_so_term = $vf->class_SO_term();
 
