@@ -710,7 +710,7 @@ my $motif_feature_consequences = [
   'strand' => -1,
   'motif_score_change' => '-0.067',
   'impact' => 'MODIFIER',
-  'transcription_factors' => 'TEAD4::PITX1'
+  'transcription_factors' => ['TEAD4::PITX1']
 },
 {
   'binding_matrix' => 'ENSPFM0546',
@@ -725,7 +725,7 @@ my $motif_feature_consequences = [
   'strand' => 1,
   'motif_score_change' => '-0.044',
   'impact' => 'MODIFIER',
-  'transcription_factors' => 'TEAD4::FOXI1'
+  'transcription_factors' => ['TEAD4::FOXI1']
 }];
 my $regulatory_feature_consequences = [
 {
