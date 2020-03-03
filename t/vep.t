@@ -23,7 +23,7 @@ BEGIN {
   $ENV{CATALYST_CONFIG} = "$Bin/../ensembl_rest_testing.conf";
   $ENV{ENS_REST_LOG4PERL} = "$Bin/../log4perl_testing.conf";
 }
-use Data::Dumper;
+
 use Test::More;
 use Test::Differences;
 use Test::Deep;
@@ -748,11 +748,7 @@ my $regulatory_feature_consequences = [
 }];
 
 $json = json_GET($vep_get_regulation,'GET vep regulation data');
-#print STDERR Dumper $json, "\n";
 cmp_bag($json->[0]->{regulatory_feature_consequences}, $regulatory_feature_consequences, 'VEP regulatory_feature_consequences');
 cmp_bag($json->[0]->{motif_feature_consequences}, $motif_feature_consequences, 'VEP motif_feature_consequences');
-
-
-
 
 done_testing();
