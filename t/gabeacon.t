@@ -565,7 +565,7 @@ my $uri_4 = $get_base_uri . ";referenceName=7;start=86442405;referenceBases=T;al
 $json = json_GET($uri_4, 'GET dataset - unavailable assembly');
 eq_or_diff($json, $expected_data4, "GA4GH Beacon query - unavailable assembly");
 
-# Testing invalid parameter
+# Testing invalid parameter - SNV
 my $uri_5 = $get_base_uri . ";referenceName=7;start=86442403;variantType=SNV;referenceBases=T;alternateBases=C;assemblyId=$assemblyId";
 $json = json_GET($uri_5, 'GET dataset 6 - invalid parameter');
 eq_or_diff($json, $expected_data6, "GA4GH Beacon query - invalid parameter");
@@ -580,9 +580,51 @@ my $uri_7 = $get_base_uri . ";referenceName=8;startMin=7803800;startMax=7803900;
 $json = json_GET($uri_7, 'GET dataset 7 - structural variant range query');
 eq_or_diff($json, $expected_data8, "GA4GH Beacon query - structural variant range query");
 
-# Testing an insertion
+# Testing a small insertion - SNV
 my $uri_8 = $get_base_uri . ";referenceName=11;start=6303492;referenceBases=T;alternateBases=GT;assemblyId=$assemblyId";
 $json = json_GET($uri_8, 'GET dataset 8 - insertion query');
 eq_or_diff($json, $expected_data9, "GA4GH Beacon query - insertion query");
+
+# Testing different CNVs in datasets
+# There's two variants in this region but only one in dataset '1kg_eur_com'
+# Dataset Response should only report one variant
+my $allele_request_cnv = {
+  "referenceName" => "8",
+  "start" => undef,
+  "startMin" => "7803800",
+  "startMax" => "7806000",
+  "endMin" => "7823400",
+  "endMax" => "7825400",
+  "variantType" => "CNV",
+  "referenceBases" => "N",
+  "alternateBases" => undef,
+  "assemblyId" => $assemblyId,
+  "datasetIds" => "1kg_eur_com",
+  "includeDatasetResponses" => "HIT" };
+
+my $dataset_response_cnv = {
+   "exists" => JSON::true,
+   "externalUrl" => "http://grch37.ensembl.org/Homo_sapiens/StructuralVariation/Explore?sv=esv93078",
+   "error" => undef,
+   "frequency" => undef,
+   "variantCount" => "1",
+   "callCount" => undef,
+   "sampleCount" => undef,
+   "note" => undef,
+   "datasetId" => "1kg_eur_com",
+   "info" => undef,
+};
+
+my $expected_data_ds_cnv = {
+  "beaconId" => $beaconId,
+  "exists" => JSON::true,
+  "error" => undef,
+  "alleleRequest" => $allele_request_cnv,
+  "datasetAlleleResponses" => [$dataset_response_cnv]
+};
+
+my $uri_ds_cnv = $get_base_uri . ";referenceName=8;startMin=7803800;startMax=7806000;endMin=7823400;endMax=7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId;includeDatasetResponses=HIT;datasetIds=1kg_eur_com";
+$json = json_GET($uri_ds_cnv, 'GET dataset - CNV dataset');
+eq_or_diff($json, $expected_data_ds_cnv, "GA4GH Beacon query - CNV variant exists in one dataset - dataset response HIT");
 
 done_testing();
