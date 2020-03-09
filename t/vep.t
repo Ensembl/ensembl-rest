@@ -698,8 +698,7 @@ my $vep_get_regulation = '/vep/homo_sapiens/hgvs/7:g.86689450N>C?content-type=ap
 $json = json_GET($vep_get_regulation,'GET vcf_string');
 my $motif_feature_consequences = [
 {
-  'binding_matrix' => 'ENSPFM0572',
-  'motif_name' => 'ENSM00532703671',
+  'motif_name' => 'ENSPFM0572',
   'motif_feature_id' => 'ENSM00532703671',
   'variant_allele' => 'C',
   'high_inf_pos' => 'N',
@@ -713,8 +712,7 @@ my $motif_feature_consequences = [
   'transcription_factors' => ['TEAD4::PITX1']
 },
 {
-  'binding_matrix' => 'ENSPFM0546',
-  'motif_name' => 'ENSM00531327245',
+  'motif_name' => 'ENSPFM0546',
   'motif_feature_id' => 'ENSM00531327245',
   'variant_allele' => 'C',
   'high_inf_pos' => 'N',
