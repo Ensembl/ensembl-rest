@@ -1,5 +1,5 @@
 # Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-# Copyright [2016-2019] EMBL-European Bioinformatics Institute
+# Copyright [2016-2020] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ my $base = '/variation/homo_sapiens';
   my $id = 'rs142276873';
   my $json = json_GET("$base/$id", 'Variation feature');
   #is(scalar(@$json), 1, '1 variation feature returned');
-  my $expected_variation_1 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.123049', minor_allele => 'A', ambiguity => 'R', var_class => 'SNP', synonyms => [], evidence => ['Multiple_observations','1000Genomes'], ancestral_allele => 'G', most_severe_consequence => 'intron_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"18:23821095-23821095", "strand" => 1, "start" => 23821095, "end" => 23821095, "seq_region_name" => "18", "coord_system" => "chromosome","allele_string"=>"G/A"}]};
+  my $expected_variation_1 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.123049', minor_allele => 'A', ambiguity => 'R', var_class => 'SNP', synonyms => [], evidence => ['Multiple_observations','1000Genomes'], most_severe_consequence => 'intron_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"18:23821095-23821095", "strand" => 1, "start" => 23821095, "end" => 23821095, "seq_region_name" => "18", "coord_system" => "chromosome","allele_string"=>"G/A", "ancestral_allele" => "G"}]};
   cmp_deeply($json, $expected_variation_1, "Checking the result from the variation endpoint");
 
 # Include phenotype information
@@ -53,7 +53,7 @@ my $base = '/variation/homo_sapiens';
 
 # Include genotyping chips information
   $id = 'rs7698608';
-  my $expected_variation_3 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.448577', minor_allele => 'C', ambiguity => 'M', var_class => 'SNP', synonyms => bag(qw/rs60248177 rs17215092/), evidence => [], ancestral_allele => undef, most_severe_consequence => '5_prime_UTR_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"4:103937974-103937974", "strand" => 1, "start" => 103937974, "end" => 103937974, "seq_region_name" => "4", "coord_system" => "chromosome","allele_string"=>"C/A"}]};
+  my $expected_variation_3 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.448577', minor_allele => 'C', ambiguity => 'M', var_class => 'SNP', synonyms => bag(qw/rs60248177 rs17215092/), evidence => [], most_severe_consequence => '5_prime_UTR_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"4:103937974-103937974", "strand" => 1, "start" => 103937974, "end" => 103937974, "seq_region_name" => "4", "coord_system" => "chromosome","allele_string"=>"C/A","ancestral_allele" => undef}]};
   $json = json_GET("$base/$id", 'Variation feature');
   cmp_deeply($json, $expected_variation_3, "Checking the result from the variation endpoint");
 
@@ -74,7 +74,7 @@ my $base = '/variation/homo_sapiens';
 
 # Get additional genotype information
   $id = 'rs67521280';
-  my $expected_variation_2 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => undef, minor_allele => undef, failed => 'None of the variant alleles match the reference allele;Mapped position is not compatible with reported alleles', ambiguity => undef, var_class => 'indel', synonyms => [], evidence => [], ancestral_allele => undef, most_severe_consequence => 'intergenic_variant', mappings => [{"assembly_name" => "GRCh37", "location"=> "11:6303493-6303493", "strand" => 1, "start" => 6303493, "end" => 6303493, "seq_region_name" => "11", "coord_system" => "chromosome","allele_string"=>"-/GT"}] };
+  my $expected_variation_2 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => undef, minor_allele => undef, failed => 'None of the variant alleles match the reference allele;Mapped position is not compatible with reported alleles', ambiguity => undef, var_class => 'indel', synonyms => [], evidence => [], most_severe_consequence => 'intergenic_variant', mappings => [{"assembly_name" => "GRCh37", "location"=> "11:6303493-6303493", "strand" => 1, "start" => 6303493, "end" => 6303493, "seq_region_name" => "11", "coord_system" => "chromosome","allele_string"=>"-/GT", "ancestral_allele" => undef}] };
   my $expected_genotype = { %{$expected_variation_2}, 
   genotypes => [{genotype => "GT|GT", gender => "Male", sample => "J. CRAIG VENTER", submission_id => 'ss95559393'}] };
   my $genotype_json = json_GET("$base/$id?genotypes=1", "Genotype info");
@@ -118,7 +118,8 @@ is_json_POST($base,$post_data,$expected_result,"Try to POST list of variations")
         'strand' => 1,
         'coord_system' => 'chromosome',
         'allele_string' => 'C/T',
-        'start' => 25744274
+        'start' => 25744274,
+        'ancestral_allele' => undef,
      }
     ],
     'name' => 'COSM946275',
@@ -139,7 +140,6 @@ is_json_POST($base,$post_data,$expected_result,"Try to POST list of variations")
     'var_class' => 'somatic SNV',
     'synonyms' => [],
     'evidence' => [],
-    'ancestral_allele' => undef,
     'most_severe_consequence' => 'missense_variant',
     'minor_allele' => undef
    };
@@ -164,7 +164,8 @@ my $publication_output =
         "strand" => 1,
         "coord_system" => "chromosome",
         "allele_string" => "C/A",
-        "start" => 103937974 
+        "start" => 103937974, 
+        "ancestral_allele" => undef,
       }
     ],
     "name" => "rs7698608",
@@ -179,7 +180,6 @@ my $publication_output =
     "evidence" => 
       [
       ],
-    "ancestral_allele" => undef,
     "minor_allele" => "C",
     "most_severe_consequence" => "5_prime_UTR_variant"
   }
@@ -210,7 +210,6 @@ my $publication_output =
   is($variants_json->[0]->{MAF},$publication_output->[0]->{MAF} ,'PMID MAF key'); # Interestingly these are not numerically equal under certain testing conditions...
   is($variants_json->[0]->{ambiguity}, $publication_output->[0]->{ambiguity} ,'PMID ambiguity key');
   is($variants_json->[0]->{var_class}, $publication_output->[0]->{var_class} ,'PMID source key');
-  ok(!$variants_json->[0]->{ancestral_allele},'PMID ancestral_allele key not set');
   is($variants_json->[0]->{minor_allele}, $publication_output->[0]->{minor_allele} ,'PMID minor_allele key');
   is($variants_json->[0]->{most_severe_consequence}, $publication_output->[0]->{most_severe_consequence} ,'PMID most_severe_consequence key');
 
@@ -249,7 +248,6 @@ my $publication_output =
   is($variants_json->[0]->{MAF},$publication_output->[0]->{MAF} ,'PMID MAF key');
   is($variants_json->[0]->{ambiguity}, $publication_output->[0]->{ambiguity} ,'PMID ambiguity key');
   is($variants_json->[0]->{var_class}, $publication_output->[0]->{var_class} ,'PMID source key');
-  ok(!$variants_json->[0]->{ancestral_allele},'PMID ancestral_allele key not set');
   is($variants_json->[0]->{minor_allele}, $publication_output->[0]->{minor_allele} ,'PMID minor_allele key');
   is($variants_json->[0]->{most_severe_consequence}, $publication_output->[0]->{most_severe_consequence} ,'PMID most_severe_consequence key');
  

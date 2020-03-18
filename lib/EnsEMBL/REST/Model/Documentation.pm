@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016-2019] EMBL-European Bioinformatics Institute
+Copyright [2016-2020] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -53,6 +53,10 @@ has 'example_expire_time' => ( is => 'ro', isa => 'Int', lazy => 1, default => 3
 has 'replacements' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub {{}});
 
 has 'paths' => ( is => 'ro', isa => 'ArrayRef' );
+
+# in case we want to over-write any documentation conf for the endpoints
+# these conf do not get rid of the end-point on the server
+has 'conf_replacements' => ( is => 'ro', isa => 'HashRef', lazy => 1, default => sub {{}});
 
 # Overwrite the default behaviours of Hash::Merge described here:
 #   http://search.cpan.org/~rehsack/Hash-Merge-0.200/lib/Hash/Merge.pm#BUILT-IN_BEHAVIORS
@@ -200,6 +204,7 @@ sub _find_conf {
   my $log = $c->log();
   $log->debug('Looking for CFGs in the directory '.$path) if $log->is_debug();
 
+  my $conf_replacements = $self->conf_replacements();
   #If path is not absolute then
   if(! File::Spec->file_name_is_absolute($path)) {
     $path = $c->path_to($path);
@@ -207,9 +212,14 @@ sub _find_conf {
   }
   my @conf;
   find(sub {
-    $log->debug($_);
+    
+    my $full_path =  $File::Find::name;
     if($_ =~ /\.conf$/) {
-      push(@conf, $File::Find::name);
+	if(exists($conf_replacements->{$_}) && defined($conf_replacements->{$_})){
+	  $log->debug("Replacement conf file found: $_ will be replaced with $conf_replacements->{$_}");
+	  $full_path = $File::Find::dir.File::Spec->catfile('', $conf_replacements->{$_});
+	}
+	unless (grep {/^$full_path/} @conf) { push(@conf,$full_path); }
     }
   }, $path);
   return [sort @conf];

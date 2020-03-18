@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016-2019] EMBL-European Bioinformatics Institute
+Copyright [2016-2020] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -150,7 +150,6 @@ sub to_hash {
   $variation_hash->{ambiguity} = $variation->ambig_code;
   $variation_hash->{synonyms} = $variation->get_all_synonyms;
   $variation_hash->{failed} = $variation->failed_description if $variation->is_failed;
-  $variation_hash->{ancestral_allele} = $variation->ancestral_allele;
   $variation_hash->{var_class} = $variation->var_class;
   $variation_hash->{most_severe_consequence} = $variation->display_consequence;
   $variation_hash->{MAF} = $variation->minor_allele_frequency;
@@ -190,6 +189,7 @@ sub vf_as_hash {
   $variation_feature->{coord_system} = $vf->coord_system_name;
   $variation_feature->{assembly_name} = $vf->slice->coord_system->version;
   $variation_feature->{allele_string} = $vf->allele_string;
+  $variation_feature->{ancestral_allele} = $vf->ancestral_allele;
 
   return $variation_feature;
 }

@@ -28,7 +28,7 @@ CREATE TABLE `analysis` (
   `program` varchar(80) DEFAULT NULL,
   `program_version` varchar(40) DEFAULT NULL,
   `program_file` varchar(80) DEFAULT NULL,
-  `parameters` text DEFAULT NULL,
+  `parameters` text,
   `module` varchar(80) DEFAULT NULL,
   `module_version` varchar(40) DEFAULT NULL,
   `gff_source` varchar(40) DEFAULT NULL,
@@ -39,10 +39,10 @@ CREATE TABLE `analysis` (
 
 CREATE TABLE `analysis_description` (
   `analysis_id` smallint(5) unsigned NOT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `display_label` varchar(255) NOT NULL,
-  `displayable` tinyint(1) NOT NULL DEFAULT 1,
-  `web_data` text DEFAULT NULL,
+  `displayable` tinyint(1) NOT NULL DEFAULT '1',
+  `web_data` text,
   UNIQUE KEY `analysis_idx` (`analysis_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -82,12 +82,12 @@ CREATE TABLE `associated_group` (
 
 CREATE TABLE `associated_xref` (
   `associated_xref_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `object_xref_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `xref_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `object_xref_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `xref_id` int(10) unsigned NOT NULL DEFAULT '0',
   `source_xref_id` int(10) unsigned DEFAULT NULL,
   `condition_type` varchar(128) DEFAULT NULL,
   `associated_group_id` int(10) unsigned DEFAULT NULL,
-  `rank` int(10) unsigned DEFAULT 0,
+  `rank` int(10) unsigned DEFAULT '0',
   PRIMARY KEY (`associated_xref_id`),
   UNIQUE KEY `object_associated_source_type_idx` (`object_xref_id`,`xref_id`,`source_xref_id`,`condition_type`,`associated_group_id`),
   KEY `associated_source_idx` (`source_xref_id`),
@@ -100,7 +100,7 @@ CREATE TABLE `attrib_type` (
   `attrib_type_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(20) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
-  `description` text DEFAULT NULL,
+  `description` text,
   PRIMARY KEY (`attrib_type_id`),
   UNIQUE KEY `code_idx` (`code`)
 ) ENGINE=MyISAM AUTO_INCREMENT=387 DEFAULT CHARSET=latin1;
@@ -111,7 +111,7 @@ CREATE TABLE `biotype` (
   `object_type` enum('gene','transcript') NOT NULL DEFAULT 'gene',
   `db_type` set('cdna','core','coreexpressionatlas','coreexpressionest','coreexpressiongnf','funcgen','otherfeatures','rnaseq','variation','vega','presite','sangervega') NOT NULL DEFAULT 'core',
   `attrib_type_id` int(11) DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `biotype_group` enum('coding','pseudogene','snoncoding','lnoncoding','mnoncoding','LRG','undefined','no_group') DEFAULT NULL,
   `so_acc` varchar(64) DEFAULT NULL,
   `so_term` varchar(1023) DEFAULT NULL,
@@ -121,7 +121,7 @@ CREATE TABLE `biotype` (
 
 CREATE TABLE `coord_system` (
   `coord_system_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `species_id` int(10) unsigned NOT NULL DEFAULT 1,
+  `species_id` int(10) unsigned NOT NULL DEFAULT '1',
   `name` varchar(40) NOT NULL,
   `version` varchar(255) DEFAULT NULL,
   `rank` int(11) NOT NULL,
@@ -137,9 +137,9 @@ CREATE TABLE `data_file` (
   `coord_system_id` int(10) unsigned NOT NULL,
   `analysis_id` smallint(5) unsigned NOT NULL,
   `name` varchar(100) NOT NULL,
-  `version_lock` tinyint(1) NOT NULL DEFAULT 0,
-  `absolute` tinyint(1) NOT NULL DEFAULT 0,
-  `url` text DEFAULT NULL,
+  `version_lock` tinyint(1) NOT NULL DEFAULT '0',
+  `absolute` tinyint(1) NOT NULL DEFAULT '0',
+  `url` text,
   `file_type` enum('BAM','BAMCOV','BIGBED','BIGWIG','VCF') DEFAULT NULL,
   PRIMARY KEY (`data_file_id`),
   UNIQUE KEY `df_unq_idx` (`coord_system_id`,`analysis_id`,`name`,`file_type`),
@@ -182,23 +182,23 @@ CREATE TABLE `ditag` (
   `ditag_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `type` varchar(30) NOT NULL,
-  `tag_count` smallint(6) unsigned NOT NULL DEFAULT 1,
+  `tag_count` smallint(6) unsigned NOT NULL DEFAULT '1',
   `sequence` tinytext NOT NULL,
   PRIMARY KEY (`ditag_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `ditag_feature` (
   `ditag_feature_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `ditag_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `ditag_pair_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `seq_region_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `seq_region_start` int(10) unsigned NOT NULL DEFAULT 0,
-  `seq_region_end` int(10) unsigned NOT NULL DEFAULT 0,
-  `seq_region_strand` tinyint(1) NOT NULL DEFAULT 0,
-  `analysis_id` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `hit_start` int(10) unsigned NOT NULL DEFAULT 0,
-  `hit_end` int(10) unsigned NOT NULL DEFAULT 0,
-  `hit_strand` tinyint(1) NOT NULL DEFAULT 0,
+  `ditag_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `ditag_pair_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `seq_region_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `seq_region_start` int(10) unsigned NOT NULL DEFAULT '0',
+  `seq_region_end` int(10) unsigned NOT NULL DEFAULT '0',
+  `seq_region_strand` tinyint(1) NOT NULL DEFAULT '0',
+  `analysis_id` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `hit_start` int(10) unsigned NOT NULL DEFAULT '0',
+  `hit_end` int(10) unsigned NOT NULL DEFAULT '0',
+  `hit_strand` tinyint(1) NOT NULL DEFAULT '0',
   `cigar_line` tinytext NOT NULL,
   `ditag_side` enum('F','L','R') NOT NULL,
   PRIMARY KEY (`ditag_feature_id`),
@@ -227,7 +227,7 @@ CREATE TABLE `dna_align_feature` (
   `score` double DEFAULT NULL,
   `evalue` double DEFAULT NULL,
   `perc_ident` float DEFAULT NULL,
-  `cigar_line` text DEFAULT NULL,
+  `cigar_line` text,
   `external_db_id` int(10) unsigned DEFAULT NULL,
   `hcoverage` double DEFAULT NULL,
   `align_type` enum('ensembl','cigar','vulgar','mdtag') DEFAULT 'ensembl',
@@ -257,8 +257,8 @@ CREATE TABLE `exon` (
   `seq_region_strand` tinyint(2) NOT NULL,
   `phase` tinyint(2) NOT NULL,
   `end_phase` tinyint(2) NOT NULL,
-  `is_current` tinyint(1) NOT NULL DEFAULT 1,
-  `is_constitutive` tinyint(1) NOT NULL DEFAULT 0,
+  `is_current` tinyint(1) NOT NULL DEFAULT '1',
+  `is_constitutive` tinyint(1) NOT NULL DEFAULT '0',
   `stable_id` varchar(128) DEFAULT NULL,
   `version` smallint(5) unsigned DEFAULT NULL,
   `created_date` datetime DEFAULT NULL,
@@ -284,10 +284,10 @@ CREATE TABLE `external_db` (
   `status` enum('KNOWNXREF','KNOWN','XREF','PRED','ORTH','PSEUDO') NOT NULL,
   `priority` int(11) NOT NULL,
   `db_display_name` varchar(255) DEFAULT NULL,
-  `type` enum('ARRAY','ALT_TRANS','ALT_GENE','MISC','LIT','PRIMARY_DB_SYNONYM','ENSEMBL') DEFAULT NULL,
+  `type` enum('ARRAY','ALT_TRANS','ALT_GENE','MISC','LIT','PRIMARY_DB_SYNONYM','ENSEMBL') NOT NULL,
   `secondary_db_name` varchar(255) DEFAULT NULL,
   `secondary_db_table` varchar(255) DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   PRIMARY KEY (`external_db_id`),
   UNIQUE KEY `db_name_db_release_idx` (`db_name`,`db_release`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -309,8 +309,8 @@ CREATE TABLE `gene` (
   `seq_region_strand` tinyint(2) NOT NULL,
   `display_xref_id` int(10) unsigned DEFAULT NULL,
   `source` varchar(40) NOT NULL,
-  `description` text DEFAULT NULL,
-  `is_current` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text,
+  `is_current` tinyint(1) NOT NULL DEFAULT '1',
   `canonical_transcript_id` int(10) unsigned NOT NULL,
   `stable_id` varchar(128) DEFAULT NULL,
   `version` smallint(5) unsigned DEFAULT NULL,
@@ -326,11 +326,11 @@ CREATE TABLE `gene` (
 
 CREATE TABLE `gene_archive` (
   `gene_stable_id` varchar(128) NOT NULL,
-  `gene_version` smallint(6) NOT NULL DEFAULT 1,
+  `gene_version` smallint(6) NOT NULL DEFAULT '1',
   `transcript_stable_id` varchar(128) NOT NULL,
-  `transcript_version` smallint(6) NOT NULL DEFAULT 1,
+  `transcript_version` smallint(6) NOT NULL DEFAULT '1',
   `translation_stable_id` varchar(128) DEFAULT NULL,
-  `translation_version` smallint(6) NOT NULL DEFAULT 1,
+  `translation_version` smallint(6) NOT NULL DEFAULT '1',
   `peptide_archive_id` int(10) unsigned DEFAULT NULL,
   `mapping_session_id` int(10) unsigned NOT NULL,
   KEY `peptide_archive_id_idx` (`peptide_archive_id`),
@@ -340,8 +340,8 @@ CREATE TABLE `gene_archive` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `gene_attrib` (
-  `gene_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `gene_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   UNIQUE KEY `gene_attribx` (`gene_id`,`attrib_type_id`,`value`(500)),
   KEY `type_val_idx` (`attrib_type_id`,`value`(40)),
@@ -352,8 +352,8 @@ CREATE TABLE `gene_attrib` (
 CREATE TABLE `genome_statistics` (
   `genome_statistics_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `statistic` varchar(128) NOT NULL,
-  `value` bigint(11) unsigned NOT NULL DEFAULT 0,
-  `species_id` int(10) unsigned DEFAULT 1,
+  `value` bigint(11) unsigned NOT NULL DEFAULT '0',
+  `species_id` int(10) unsigned DEFAULT '1',
   `attrib_type_id` int(10) unsigned DEFAULT NULL,
   `timestamp` datetime DEFAULT NULL,
   PRIMARY KEY (`genome_statistics_id`),
@@ -368,7 +368,7 @@ CREATE TABLE `identity_xref` (
   `xref_end` int(11) DEFAULT NULL,
   `ensembl_start` int(11) DEFAULT NULL,
   `ensembl_end` int(11) DEFAULT NULL,
-  `cigar_line` text DEFAULT NULL,
+  `cigar_line` text,
   `score` double DEFAULT NULL,
   `evalue` double DEFAULT NULL,
   PRIMARY KEY (`object_xref_id`)
@@ -391,7 +391,7 @@ CREATE TABLE `intron_supporting_evidence` (
   `hit_name` varchar(100) NOT NULL,
   `score` decimal(10,3) DEFAULT NULL,
   `score_type` enum('NONE','DEPTH') DEFAULT 'NONE',
-  `is_splice_canonical` tinyint(1) NOT NULL DEFAULT 0,
+  `is_splice_canonical` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`intron_supporting_evidence_id`),
   UNIQUE KEY `analysis_id` (`analysis_id`,`seq_region_id`,`seq_region_start`,`seq_region_end`,`seq_region_strand`,`hit_name`),
   KEY `seq_region_idx` (`seq_region_id`,`seq_region_start`)
@@ -420,8 +420,8 @@ CREATE TABLE `mapping_session` (
   `new_db_name` varchar(80) NOT NULL DEFAULT '',
   `old_release` varchar(5) NOT NULL DEFAULT '',
   `new_release` varchar(5) NOT NULL DEFAULT '',
-  `old_assembly` varchar(20) NOT NULL DEFAULT '',
-  `new_assembly` varchar(20) NOT NULL DEFAULT '',
+  `old_assembly` varchar(80) NOT NULL DEFAULT '',
+  `new_assembly` varchar(80) NOT NULL DEFAULT '',
   `created` datetime NOT NULL,
   PRIMARY KEY (`mapping_session_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -484,13 +484,13 @@ CREATE TABLE `marker_synonym` (
 
 CREATE TABLE `meta` (
   `meta_id` int(11) NOT NULL AUTO_INCREMENT,
-  `species_id` int(10) unsigned DEFAULT 1,
+  `species_id` int(10) unsigned DEFAULT '1',
   `meta_key` varchar(40) NOT NULL,
   `meta_value` varchar(255) NOT NULL,
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=1306 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1310 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -500,8 +500,8 @@ CREATE TABLE `meta_coord` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `misc_attrib` (
-  `misc_feature_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `misc_feature_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   UNIQUE KEY `misc_attribx` (`misc_feature_id`,`attrib_type_id`,`value`(500)),
   KEY `type_val_idx` (`attrib_type_id`,`value`(40)),
@@ -511,17 +511,17 @@ CREATE TABLE `misc_attrib` (
 
 CREATE TABLE `misc_feature` (
   `misc_feature_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `seq_region_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `seq_region_start` int(10) unsigned NOT NULL DEFAULT 0,
-  `seq_region_end` int(10) unsigned NOT NULL DEFAULT 0,
-  `seq_region_strand` tinyint(4) NOT NULL DEFAULT 0,
+  `seq_region_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `seq_region_start` int(10) unsigned NOT NULL DEFAULT '0',
+  `seq_region_end` int(10) unsigned NOT NULL DEFAULT '0',
+  `seq_region_strand` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`misc_feature_id`),
   KEY `seq_region_idx` (`seq_region_id`,`seq_region_start`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `misc_feature_misc_set` (
-  `misc_feature_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `misc_set_id` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `misc_feature_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `misc_set_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`misc_feature_id`,`misc_set_id`),
   KEY `reverse_idx` (`misc_set_id`,`misc_feature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -550,7 +550,7 @@ CREATE TABLE `object_xref` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `ontology_xref` (
-  `object_xref_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `object_xref_id` int(10) unsigned NOT NULL DEFAULT '0',
   `source_xref_id` int(10) unsigned DEFAULT NULL,
   `linkage_type` varchar(3) DEFAULT NULL,
   UNIQUE KEY `object_source_type_idx` (`object_xref_id`,`source_xref_id`,`linkage_type`(1)),
@@ -643,7 +643,7 @@ CREATE TABLE `protein_align_feature` (
   `seq_region_id` int(10) unsigned NOT NULL,
   `seq_region_start` int(10) unsigned NOT NULL,
   `seq_region_end` int(10) unsigned NOT NULL,
-  `seq_region_strand` tinyint(1) NOT NULL DEFAULT 1,
+  `seq_region_strand` tinyint(1) NOT NULL DEFAULT '1',
   `hit_start` int(10) NOT NULL,
   `hit_end` int(10) NOT NULL,
   `hit_name` varchar(40) NOT NULL,
@@ -651,7 +651,7 @@ CREATE TABLE `protein_align_feature` (
   `score` double DEFAULT NULL,
   `evalue` double DEFAULT NULL,
   `perc_ident` float DEFAULT NULL,
-  `cigar_line` text DEFAULT NULL,
+  `cigar_line` text,
   `external_db_id` int(10) unsigned DEFAULT NULL,
   `hcoverage` double DEFAULT NULL,
   `align_type` enum('ensembl','cigar','vulgar','mdtag') DEFAULT 'ensembl',
@@ -675,9 +675,9 @@ CREATE TABLE `protein_feature` (
   `score` double DEFAULT NULL,
   `evalue` double DEFAULT NULL,
   `perc_ident` float DEFAULT NULL,
-  `external_data` text DEFAULT NULL,
-  `hit_description` text DEFAULT NULL,
-  `cigar_line` text DEFAULT NULL,
+  `external_data` text,
+  `hit_description` text,
+  `cigar_line` text,
   `align_type` enum('ensembl','cigar','cigarplus','vulgar','mdtag') DEFAULT NULL,
   PRIMARY KEY (`protein_feature_id`),
   UNIQUE KEY `aln_idx` (`translation_id`,`hit_name`,`seq_start`,`seq_end`,`hit_start`,`hit_end`),
@@ -691,7 +691,7 @@ CREATE TABLE `repeat_consensus` (
   `repeat_name` varchar(255) NOT NULL,
   `repeat_class` varchar(100) NOT NULL,
   `repeat_type` varchar(40) NOT NULL,
-  `repeat_consensus` text DEFAULT NULL,
+  `repeat_consensus` text,
   PRIMARY KEY (`repeat_consensus_id`),
   KEY `name` (`repeat_name`),
   KEY `class` (`repeat_class`),
@@ -704,7 +704,7 @@ CREATE TABLE `repeat_feature` (
   `seq_region_id` int(10) unsigned NOT NULL,
   `seq_region_start` int(10) unsigned NOT NULL,
   `seq_region_end` int(10) unsigned NOT NULL,
-  `seq_region_strand` tinyint(1) NOT NULL DEFAULT 1,
+  `seq_region_strand` tinyint(1) NOT NULL DEFAULT '1',
   `repeat_start` int(10) NOT NULL,
   `repeat_end` int(10) NOT NULL,
   `repeat_consensus_id` int(10) unsigned NOT NULL,
@@ -734,8 +734,8 @@ CREATE TABLE `rnaproduct` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `rnaproduct_attrib` (
-  `rnaproduct_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `rnaproduct_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   UNIQUE KEY `rnaproduct_attribx` (`rnaproduct_id`,`attrib_type_id`,`value`(500)),
   KEY `type_val_idx` (`attrib_type_id`,`value`(40)),
@@ -747,7 +747,7 @@ CREATE TABLE `rnaproduct_type` (
   `rnaproduct_type_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(20) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL DEFAULT '',
-  `description` text DEFAULT NULL,
+  `description` text,
   PRIMARY KEY (`rnaproduct_type_id`),
   UNIQUE KEY `code_idx` (`code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -763,8 +763,8 @@ CREATE TABLE `seq_region` (
 ) ENGINE=MyISAM AUTO_INCREMENT=154673 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `seq_region_attrib` (
-  `seq_region_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `seq_region_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   UNIQUE KEY `region_attribx` (`seq_region_id`,`attrib_type_id`,`value`(500)),
   KEY `type_val_idx` (`attrib_type_id`,`value`(40)),
@@ -809,18 +809,18 @@ CREATE TABLE `stable_id_event` (
   `old_version` smallint(6) DEFAULT NULL,
   `new_stable_id` varchar(128) DEFAULT NULL,
   `new_version` smallint(6) DEFAULT NULL,
-  `mapping_session_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `mapping_session_id` int(10) unsigned NOT NULL DEFAULT '0',
   `type` enum('gene','transcript','translation','rnaproduct') NOT NULL,
-  `score` float NOT NULL DEFAULT 0,
+  `score` float NOT NULL DEFAULT '0',
   UNIQUE KEY `uni_idx` (`mapping_session_id`,`old_stable_id`,`new_stable_id`,`type`),
   KEY `new_idx` (`new_stable_id`),
   KEY `old_idx` (`old_stable_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `supporting_feature` (
-  `exon_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `exon_id` int(10) unsigned NOT NULL DEFAULT '0',
   `feature_type` enum('dna_align_feature','protein_align_feature') DEFAULT NULL,
-  `feature_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `feature_id` int(10) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `all_idx` (`exon_id`,`feature_type`,`feature_id`),
   KEY `feature_idx` (`feature_type`,`feature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=80;
@@ -836,8 +836,8 @@ CREATE TABLE `transcript` (
   `display_xref_id` int(10) unsigned DEFAULT NULL,
   `source` varchar(40) NOT NULL DEFAULT 'ensembl',
   `biotype` varchar(40) NOT NULL,
-  `description` text DEFAULT NULL,
-  `is_current` tinyint(1) NOT NULL DEFAULT 1,
+  `description` text,
+  `is_current` tinyint(1) NOT NULL DEFAULT '1',
   `canonical_translation_id` int(10) unsigned DEFAULT NULL,
   `stable_id` varchar(128) DEFAULT NULL,
   `version` smallint(5) unsigned DEFAULT NULL,
@@ -853,8 +853,8 @@ CREATE TABLE `transcript` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `transcript_attrib` (
-  `transcript_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `transcript_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   UNIQUE KEY `transcript_attribx` (`transcript_id`,`attrib_type_id`,`value`(500)),
   KEY `type_val_idx` (`attrib_type_id`,`value`(40)),
@@ -872,9 +872,9 @@ CREATE TABLE `transcript_intron_supporting_evidence` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `transcript_supporting_feature` (
-  `transcript_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `transcript_id` int(10) unsigned NOT NULL DEFAULT '0',
   `feature_type` enum('dna_align_feature','protein_align_feature') DEFAULT NULL,
-  `feature_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `feature_id` int(10) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `all_idx` (`transcript_id`,`feature_type`,`feature_id`),
   KEY `feature_idx` (`feature_type`,`feature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 MAX_ROWS=100000000 AVG_ROW_LENGTH=80;
@@ -896,8 +896,8 @@ CREATE TABLE `translation` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `translation_attrib` (
-  `translation_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `translation_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `attrib_type_id` smallint(5) unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   UNIQUE KEY `translation_attribx` (`translation_id`,`attrib_type_id`,`value`(500)),
   KEY `type_val_idx` (`attrib_type_id`,`value`(40)),
@@ -914,7 +914,7 @@ CREATE TABLE `unmapped_object` (
   `unmapped_reason_id` int(10) unsigned NOT NULL,
   `query_score` double DEFAULT NULL,
   `target_score` double DEFAULT NULL,
-  `ensembl_id` int(10) unsigned DEFAULT 0,
+  `ensembl_id` int(10) unsigned DEFAULT '0',
   `ensembl_object_type` enum('RawContig','Transcript','Gene','Translation') DEFAULT 'RawContig',
   `parent` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`unmapped_object_id`),
@@ -937,7 +937,7 @@ CREATE TABLE `xref` (
   `dbprimary_acc` varchar(512) NOT NULL,
   `display_label` varchar(512) NOT NULL,
   `version` varchar(10) DEFAULT NULL,
-  `description` text DEFAULT NULL,
+  `description` text,
   `info_type` enum('NONE','PROJECTION','MISC','DEPENDENT','DIRECT','SEQUENCE_MATCH','INFERRED_PAIR','PROBE','UNMAPPED','COORDINATE_OVERLAP','CHECKSUM') NOT NULL DEFAULT 'NONE',
   `info_text` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`xref_id`),

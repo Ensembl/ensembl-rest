@@ -1,7 +1,7 @@
 =head1 LICENSE
 
 Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-Copyright [2016-2019] EMBL-European Bioinformatics Institute
+Copyright [2016-2020] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ sub get_alignment {
   #set default species_set_group only if species_set hasn't been set
   unless ($species_set || $species_set_group) {
     $species_set_group = $compara_defaults->{species_set_group};
+    $species_set = $compara_defaults->{species_set} unless $species_set_group;
   }
 
   #Check that both $species_set and $species_set_group have not been set

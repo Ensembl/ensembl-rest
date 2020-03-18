@@ -1,5 +1,5 @@
 # Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
-# Copyright [2016-2019] EMBL-European Bioinformatics Institute
+# Copyright [2016-2020] EMBL-European Bioinformatics Institute
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ $dataset_response = {
    "exists" => JSON::true,
    "error" => undef,
    "frequency" => undef,
-   "variantCount" => undef,
+   "variantCount" => 1,
    "callCount" => undef,
    "sampleCount" => undef,
    "note" => undef,
@@ -497,6 +497,25 @@ my $expected_data8 = {
   "datasetAlleleResponses" => undef
 };
 
+my $allele_request_2 = {
+  "referenceName" => "11",
+  "start" => "6303492",
+  "variantType" => undef,
+  "referenceBases" => "T",
+  "alternateBases" => "GT",
+  "assemblyId" => $assemblyId,
+  "datasetIds" => undef,
+  "includeDatasetResponses" => undef
+};
+
+my $expected_data9 = {
+  "beaconId" => $beaconId,
+  "exists" => JSON::true,
+  "error" => undef,
+  "alleleRequest" => $allele_request_2,
+  "datasetAlleleResponses" => undef
+};
+
 # GET checks
 # GET and POST return the same data
 # TODO - re-structure tests
@@ -560,5 +579,10 @@ eq_or_diff($json, $expected_data7, "GA4GH Beacon query - structural variant");
 my $uri_7 = $get_base_uri . ";referenceName=8;startMin=7803800;startMax=7803900;endMin=7825300;endMax=7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId";
 $json = json_GET($uri_7, 'GET dataset 7 - structural variant range query');
 eq_or_diff($json, $expected_data8, "GA4GH Beacon query - structural variant range query");
+
+# Testing an insertion
+my $uri_8 = $get_base_uri . ";referenceName=11;start=6303492;referenceBases=T;alternateBases=GT;assemblyId=$assemblyId";
+$json = json_GET($uri_8, 'GET dataset 8 - insertion query');
+eq_or_diff($json, $expected_data9, "GA4GH Beacon query - insertion query");
 
 done_testing();

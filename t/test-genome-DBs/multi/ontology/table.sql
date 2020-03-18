@@ -14,7 +14,7 @@ CREATE TABLE `closure` (
   `subparent_term_id` int(10) unsigned DEFAULT NULL,
   `distance` tinyint(3) unsigned NOT NULL,
   `ontology_id` int(10) unsigned NOT NULL,
-  `confident_relationship` tinyint(1) NOT NULL DEFAULT 0,
+  `confident_relationship` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`closure_id`),
   UNIQUE KEY `child_parent_idx` (`child_term_id`,`parent_term_id`,`subparent_term_id`,`ontology_id`),
   KEY `parent_subparent_idx` (`parent_term_id`,`subparent_term_id`)
@@ -27,7 +27,7 @@ CREATE TABLE `meta` (
   `species_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `key_value_idx` (`meta_key`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=47 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=49 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `ontology` (
   `ontology_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -43,7 +43,7 @@ CREATE TABLE `relation` (
   `child_term_id` int(10) unsigned NOT NULL,
   `parent_term_id` int(10) unsigned NOT NULL,
   `relation_type_id` int(10) unsigned NOT NULL,
-  `intersection_of` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `intersection_of` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `ontology_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`relation_id`),
   UNIQUE KEY `child_parent_idx` (`child_term_id`,`parent_term_id`,`relation_type_id`,`intersection_of`,`ontology_id`),
@@ -79,12 +79,12 @@ CREATE TABLE `synonym` (
 CREATE TABLE `term` (
   `term_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ontology_id` int(10) unsigned NOT NULL,
-  `subsets` text DEFAULT NULL,
+  `subsets` text,
   `accession` varchar(64) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `definition` text DEFAULT NULL,
-  `is_root` int(11) NOT NULL DEFAULT 0,
-  `is_obsolete` int(11) NOT NULL DEFAULT 0,
+  `definition` text,
+  `is_root` int(11) NOT NULL DEFAULT '0',
+  `is_obsolete` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`term_id`),
   UNIQUE KEY `accession_idx` (`accession`),
   UNIQUE KEY `ontology_acc_idx` (`ontology_id`,`accession`),
