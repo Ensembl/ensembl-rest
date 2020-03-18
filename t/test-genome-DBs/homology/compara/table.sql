@@ -321,7 +321,7 @@ CREATE TABLE `genomic_align_block` (
   `length` int(10) NOT NULL,
   `group_id` bigint(20) unsigned DEFAULT NULL,
   `level_id` tinyint(2) unsigned NOT NULL DEFAULT '0',
-  `direction` int(1) unsigned DEFAULT NULL,
+  `direction` tinyint(1) unsigned DEFAULT NULL,
   PRIMARY KEY (`genomic_align_block_id`),
   KEY `method_link_species_set_id` (`method_link_species_set_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -688,4 +688,3 @@ CREATE TABLE `synteny_region` (
   PRIMARY KEY (`synteny_region_id`),
   KEY `method_link_species_set_id` (`method_link_species_set_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
