@@ -45,7 +45,7 @@ CREATE TABLE `constrained_element` (
 
 CREATE TABLE `dnafrag` (
   `dnafrag_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `length` int(11) NOT NULL DEFAULT '0',
+  `length` int(10) unsigned NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
   `genome_db_id` int(10) unsigned NOT NULL,
   `coord_system_name` varchar(40) NOT NULL DEFAULT '',
@@ -283,7 +283,7 @@ CREATE TABLE `genome_db` (
   `has_karyotype` tinyint(1) NOT NULL DEFAULT '0',
   `is_good_for_alignment` tinyint(1) NOT NULL DEFAULT '0',
   `genome_component` varchar(5) DEFAULT NULL,
-  `strain_name` varchar(40) DEFAULT NULL,
+  `strain_name` varchar(100) DEFAULT NULL,
   `display_name` varchar(255) DEFAULT NULL,
   `locator` varchar(400) DEFAULT NULL,
   `first_release` smallint(5) unsigned DEFAULT NULL,
@@ -319,6 +319,7 @@ CREATE TABLE `genomic_align_block` (
   `length` int(10) NOT NULL,
   `group_id` bigint(20) unsigned DEFAULT NULL,
   `level_id` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `direction` int(1) unsigned DEFAULT NULL,
   PRIMARY KEY (`genomic_align_block_id`),
   KEY `method_link_species_set_id` (`method_link_species_set_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=6410000010711 DEFAULT CHARSET=latin1;
@@ -329,8 +330,8 @@ CREATE TABLE `genomic_align_tree` (
   `root_id` bigint(20) unsigned NOT NULL DEFAULT '0',
   `left_index` int(10) NOT NULL DEFAULT '0',
   `right_index` int(10) NOT NULL DEFAULT '0',
-  `left_node_id` bigint(10) DEFAULT NULL,
-  `right_node_id` bigint(10) DEFAULT NULL,
+  `left_node_id` bigint(20) unsigned DEFAULT NULL,
+  `right_node_id` bigint(20) unsigned DEFAULT NULL,
   `distance_to_parent` double NOT NULL DEFAULT '1',
   PRIMARY KEY (`node_id`),
   KEY `parent_id` (`parent_id`),
@@ -451,7 +452,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=129 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=134 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -477,7 +478,6 @@ CREATE TABLE `method_link_species_set` (
 
 CREATE TABLE `method_link_species_set_attr` (
   `method_link_species_set_id` int(10) unsigned NOT NULL,
-  `n_goc_null` int(11) DEFAULT NULL,
   `n_goc_0` int(11) DEFAULT NULL,
   `n_goc_25` int(11) DEFAULT NULL,
   `n_goc_50` int(11) DEFAULT NULL,
@@ -539,8 +539,8 @@ CREATE TABLE `peptide_align_feature` (
   `hgenome_db_id` int(10) unsigned DEFAULT NULL,
   `qstart` int(10) NOT NULL DEFAULT '0',
   `qend` int(10) NOT NULL DEFAULT '0',
-  `hstart` int(11) NOT NULL DEFAULT '0',
-  `hend` int(11) NOT NULL DEFAULT '0',
+  `hstart` int(10) unsigned NOT NULL DEFAULT '0',
+  `hend` int(10) unsigned NOT NULL DEFAULT '0',
   `score` double(16,4) NOT NULL DEFAULT '0.0000',
   `evalue` double NOT NULL,
   `align_length` int(10) NOT NULL,
