@@ -3,7 +3,7 @@
 10	PECAN	GenomicAlignBlock.multiple_alignment	Mercator-Pecan
 11	GERP_CONSTRAINED_ELEMENT	ConstrainedElement.constrained_element	GERP Constrained Elements
 13	EPO	GenomicAlignTree.ancestral_alignment	EPO
-14	EPO_LOW_COVERAGE	GenomicAlignTree.tree_alignment	EPO-Low-Coverage
+14	EPO_EXTENDED	GenomicAlignTree.tree_alignment	EPO-Extended
 16	LASTZ_NET	GenomicAlignBlock.pairwise_alignment	LastZ
 19	LASTZ_PATCH	GenomicAlignBlock.pairwise_alignment	LastZ-path
 101	SYNTENY	SyntenyRegion.synteny	synteny
