@@ -319,3 +319,6 @@
 370	419	1000Genomes
 371	419	Cited
 372	419	ESP
+373	55	non_specified
+374	55	tumour
+375	55	trait

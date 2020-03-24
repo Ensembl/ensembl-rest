@@ -30,3 +30,4 @@
 52	pubmed_id	PubMed ID	PubMed identifier
 53	submitter_id	Submitter_ID	ID for data submitter
 54	review_status	ClinVar review_status	ClinVar review_status for assertion
+55	phenotype_type	Phenotype type	Type of the phenotype information
