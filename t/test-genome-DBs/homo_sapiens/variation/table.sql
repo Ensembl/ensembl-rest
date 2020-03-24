@@ -186,7 +186,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=125 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=127 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -611,7 +611,7 @@ CREATE TABLE `variation_attrib` (
 CREATE TABLE `variation_citation` (
   `variation_id` int(10) unsigned NOT NULL,
   `publication_id` int(10) unsigned NOT NULL,
-  `data_source_attrib` set('615','616','617') DEFAULT NULL,
+  ` data_source_attrib SET('615','616','617','618','619','620') DEFAULT NULL,
   PRIMARY KEY (`variation_id`,`publication_id`),
   KEY `data_source_attrib_idx` (`data_source_attrib`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
