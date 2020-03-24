@@ -693,4 +693,60 @@ $vep_output = [{
 $json = json_GET($vep_vcf_string_get,'GET vcf_string');
 cmp_bag($json, $vep_output, 'VEP alleles in VCF format');
 
+# test return values for motif_feature_consequences and regulatory_feature_consequences 
+my $vep_get_regulation = '/vep/homo_sapiens/hgvs/7:g.86689450N>C?content-type=application/json&vcf_string=1';
+$json = json_GET($vep_get_regulation,'GET vcf_string');
+my $motif_feature_consequences = [
+{
+  'motif_name' => 'ENSPFM0572',
+  'motif_feature_id' => 'ENSM00532703671',
+  'variant_allele' => 'C',
+  'high_inf_pos' => 'N',
+  'consequence_terms' => [
+    'TF_binding_site_variant'
+  ],
+  'motif_pos' => 7,
+  'strand' => -1,
+  'motif_score_change' => '-0.067',
+  'impact' => 'MODIFIER',
+  'transcription_factors' => ['TEAD4::PITX1']
+},
+{
+  'motif_name' => 'ENSPFM0546',
+  'motif_feature_id' => 'ENSM00531327245',
+  'variant_allele' => 'C',
+  'high_inf_pos' => 'N',
+  'consequence_terms' => [
+    'TF_binding_site_variant'
+  ],
+  'motif_pos' => 1,
+  'strand' => 1,
+  'motif_score_change' => '-0.044',
+  'impact' => 'MODIFIER',
+  'transcription_factors' => ['TEAD4::FOXI1']
+}];
+my $regulatory_feature_consequences = [
+{
+  'consequence_terms' => [
+    'regulatory_region_variant'
+  ],
+  'variant_allele' => 'C',
+  'regulatory_feature_id' => 'ENSR00000214751',
+  'impact' => 'MODIFIER',
+  'biotype' => 'promoter'
+},
+{
+  'consequence_terms' => [
+    'regulatory_region_variant'
+  ],
+  'variant_allele' => 'C',
+  'regulatory_feature_id' => 'ENSR00001402282',
+  'impact' => 'MODIFIER',
+  'biotype' => 'CTCF_binding_site'
+}];
+
+$json = json_GET($vep_get_regulation,'GET vep regulation data');
+cmp_bag($json->[0]->{regulatory_feature_consequences}, $regulatory_feature_consequences, 'VEP regulatory_feature_consequences');
+cmp_bag($json->[0]->{motif_feature_consequences}, $motif_feature_consequences, 'VEP motif_feature_consequences');
+
 done_testing();
