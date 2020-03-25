@@ -179,7 +179,7 @@ my $gene_name='FOXF2';
 
 #Get Variation phenotype features associated with gene for gene without gene symbol
 {
-  my $expected = 1;
+  my $expected = 2;
   my $gene = 'ENSG00000073614';
   my $expected_data = [
           {
@@ -188,6 +188,12 @@ my $gene_name='FOXF2';
               external_reference => 'pubmed/17122850'
             },
             description => 'positive regulation of transcription from RNA polymerase II promoter',
+            location => '6:280129-389454',
+            source => 'GOA'
+          },
+          {
+            Gene => 'ENSG00000073614',
+            description => 'ClinVar: phenotype not specified',
             location => '6:280129-389454',
             source => 'GOA'
           }

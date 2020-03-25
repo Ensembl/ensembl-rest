@@ -3,3 +3,4 @@
 3	\N	\N	BRUGADA SYNDROME	375
 57633	NULL	NULL	positive regulation of transcription from RNA polymerase II promoter	375
 58138	NULL	NULL	soft palate development	375
+4	\N	\N	ClinVar: phenotype not specified	373
