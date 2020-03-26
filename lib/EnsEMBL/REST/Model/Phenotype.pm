@@ -36,6 +36,36 @@ sub build_per_context_instance {
   return $self->new({ context => $c, %$self, @args });
 }
 
+sub build_phenotype_class_type_opt {
+  my ($self, $phenotype_class) = @_;
+
+  my $c = $self->context();
+
+  my $exclude_tumour = $c->request->parameters->{exclude_tumour};
+  my $exclude_non_specified = $c->request->parameters->{exclude_non_specified};
+  my $trait = $c->request->parameters->{trait};
+  my $tumour = $c->request->parameters->{tumour};
+  my $non_specified = $c->request->parameters->{non_specified};
+
+  #if multiple parameters option attached: the most inclusive option will be reported
+  $phenotype_class =~ s/tumour// if $exclude_tumour;
+  $phenotype_class =~ s/non_specified// if $exclude_non_specified;
+
+  $phenotype_class = "trait" if $trait && !$tumour && !$non_specified;
+  $phenotype_class = "tumour" if $tumour && !$trait && !$non_specified;
+  $phenotype_class = "non_specified" if $non_specified && !$trait && !$tumour;
+
+  if ($trait || $tumour || $non_specified){
+    $phenotype_class = "";
+    $phenotype_class .= "trait," if $trait;
+    $phenotype_class .= "tumour," if $tumour;
+    $phenotype_class .= "non_specified," if $non_specified;
+    chop($phenotype_class);
+  }
+  $phenotype_class =~ s/,,/,/;
+  return $phenotype_class;
+}
+
 =head fetch_by_accession
 
 fetch phenotype features by phenotype ontology accession
@@ -164,7 +194,12 @@ sub fetch_features_by_region {
   my $include_pubmedid = $c->request->parameters->{include_pubmed_id};
   my $include_reviewstatus = $c->request->parameters->{include_review_status};
 
+  my $default_pheno_classes = $phenfeat_ad->use_phenotype_classes();
+  my $pheno_class_type = $self->build_phenotype_class_type_opt($default_pheno_classes);
+  $phenfeat_ad->use_phenotype_classes($pheno_class_type);
+
   my $pfs = $phenfeat_ad->fetch_all_by_Slice_with_ontology_accession($slice, $pf_type);
+  $phenfeat_ad->use_phenotype_classes($default_pheno_classes);
 
   my %record_data;
   my %phenotype_data;
@@ -245,6 +280,10 @@ sub fetch_features_by_gene {
   my $include_pubmedid = $c->request->parameters->{include_pubmed_id};
   my $include_reviewstatus = $c->request->parameters->{include_review_status};
 
+  my $default_pheno_classes = $phenfeat_ad->use_phenotype_classes();
+  my $pheno_class_type = $self->build_phenotype_class_type_opt($default_pheno_classes);
+  $phenfeat_ad->use_phenotype_classes($pheno_class_type);
+
   my $genes = $gene_ad->fetch_all_by_external_name($gene);
 
   if (scalar @{$genes} == 0){
@@ -263,6 +302,8 @@ sub fetch_features_by_gene {
       my @pfs_overlap = @{$phenfeat_ad->fetch_all_by_Slice($gene_specific_slice)};
       push @pfs, @pfs_overlap;
     }
+    # revert phenotype class selection on adaptor
+    $phenfeat_ad->use_phenotype_classes($default_pheno_classes);
     @pfs = uniq @pfs;
 
     while (my $pf = shift @pfs){
