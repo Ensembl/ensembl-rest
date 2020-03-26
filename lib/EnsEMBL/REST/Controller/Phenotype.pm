@@ -173,6 +173,12 @@ sub _check_req_params {
     if(ref $params->{$p} eq 'HASH') {
       $c->go('ReturnError', 'from_ensembl', ["Hash in req_param not implemented"]);
     }
+    if ($params->{non_specified} && $params->{exclude_non_specified}){
+      $c->go('ReturnError', 'custom', ["Invalid option combination 'non_specified=1,exclude_non_specified=1' supplied"]);
+    }
+    if ($params->{tumour} && $params->{exclude_tumour}){
+      $c->go('ReturnError', 'custom', ["Invalid option combination 'tumour=1,exclude_tumour=1' supplied"]);
+    }
   }
 }
 

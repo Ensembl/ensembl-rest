@@ -206,6 +206,14 @@ my $gene_name='FOXF2';
   my $json = json_GET("$base/$gene?include_associated=1", 'Gene without a gene_symbol with 1 phenotype feature associated with a variant');
   cmp_ok(scalar(@{$json}),"==", $expected, 'Gene without a gene_symbol with 1 phenotype association with variant found');
   cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
+
+  my $json2 = json_GET("$base/$gene?include_associated=1;exclude_non_specified=1", 'Gene without a gene_symbol with 1 phenotype feature associated with a variant - exclude_non_specified');
+  cmp_ok(scalar(@{$json2}),"==", $expected -1, 'Gene without a gene_symbol with 1 phenotype association with variant found - exclude_non_specified');
+  cmp_bag($json2, [$expected_data->[0]], "Checking the result content from the phenotype/gene REST call - exclude_non_specified");
+
+  my $bad_fetch = "$base/$gene?exclude_non_specified=1;non_specified=1";
+  action_bad($bad_fetch,"Invalid option combination 'non_specified=1,exclude_non_specified=1' supplied");
+
 }
 
 #Get Gene phenotype features overlapping (eg. large structural variants)
