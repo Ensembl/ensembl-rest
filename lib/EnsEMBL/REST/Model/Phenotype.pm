@@ -199,7 +199,6 @@ sub fetch_features_by_region {
   $phenfeat_ad->use_phenotype_classes($pheno_class_type);
 
   my $pfs = $phenfeat_ad->fetch_all_by_Slice_with_ontology_accession($slice, $pf_type);
-  $phenfeat_ad->use_phenotype_classes($default_pheno_classes);
 
   my %record_data;
   my %phenotype_data;
@@ -248,7 +247,7 @@ sub fetch_features_by_region {
     my $entry = { 'id' => $id, 'phenotype_associations' => $record_data{$id}};
     push @phenotype_features, $entry;
   }
-
+  $phenfeat_ad->use_phenotype_classes($default_pheno_classes);
   return \@phenotype_features;
 }
 
@@ -302,8 +301,6 @@ sub fetch_features_by_gene {
       my @pfs_overlap = @{$phenfeat_ad->fetch_all_by_Slice($gene_specific_slice)};
       push @pfs, @pfs_overlap;
     }
-    # revert phenotype class selection on adaptor
-    $phenfeat_ad->use_phenotype_classes($default_pheno_classes);
     @pfs = uniq @pfs;
 
     while (my $pf = shift @pfs){
@@ -339,6 +336,8 @@ sub fetch_features_by_gene {
       push @phenotype_features, \%summary_new;
     }
   }
+  # revert phenotype class selection on adaptor
+  $phenfeat_ad->use_phenotype_classes($default_pheno_classes);
   return \@phenotype_features;
 }
 
