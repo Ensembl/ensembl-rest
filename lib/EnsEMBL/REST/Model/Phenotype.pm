@@ -37,21 +37,20 @@ sub build_per_context_instance {
 }
 
 sub build_phenotype_class_type_opt {
-  my ($self, $phenotype_class) = @_;
+  my $self = shift ;
 
   my $c = $self->context();
 
-  my $trait = $c->request->parameters->{trait};
-  my $tumour = $c->request->parameters->{tumour};
-  my $non_specified = $c->request->parameters->{non_specified};
+  my $trait = $c->request->parameters->{trait} // 1;
+  my $tumour = $c->request->parameters->{tumour} // 1;
+  my $non_specified = $c->request->parameters->{non_specified} // 1;
 
-  if ($trait || $tumour || $non_specified){
-    $phenotype_class = "";
-    $phenotype_class .= "trait," if $trait;
-    $phenotype_class .= "tumour," if $tumour;
-    $phenotype_class .= "non_specified," if $non_specified;
-    chop($phenotype_class);
-  }
+  my @select_class;
+  push(@select_class, "trait") if $trait;
+  push(@select_class, "tumour") if $tumour;
+  push(@select_class, "non_specified") if $non_specified;
+  my $phenotype_class = join(",", @select_class);
+
   return $phenotype_class;
 }
 
@@ -183,8 +182,7 @@ sub fetch_features_by_region {
   my $include_pubmedid = $c->request->parameters->{include_pubmed_id};
   my $include_reviewstatus = $c->request->parameters->{include_review_status};
 
-  my $default_pheno_classes = $phenfeat_ad->use_phenotype_classes();
-  my $pheno_class_type = $self->build_phenotype_class_type_opt($default_pheno_classes);
+  my $pheno_class_type = $self->build_phenotype_class_type_opt();
   $phenfeat_ad->use_phenotype_classes($pheno_class_type);
 
   my $pfs = $phenfeat_ad->fetch_all_by_Slice_with_ontology_accession($slice, $pf_type);
@@ -236,7 +234,6 @@ sub fetch_features_by_region {
     my $entry = { 'id' => $id, 'phenotype_associations' => $record_data{$id}};
     push @phenotype_features, $entry;
   }
-  $phenfeat_ad->use_phenotype_classes($default_pheno_classes);
   return \@phenotype_features;
 }
 
@@ -268,8 +265,7 @@ sub fetch_features_by_gene {
   my $include_pubmedid = $c->request->parameters->{include_pubmed_id};
   my $include_reviewstatus = $c->request->parameters->{include_review_status};
 
-  my $default_pheno_classes = $phenfeat_ad->use_phenotype_classes();
-  my $pheno_class_type = $self->build_phenotype_class_type_opt($default_pheno_classes);
+  my $pheno_class_type = $self->build_phenotype_class_type_opt();
   $phenfeat_ad->use_phenotype_classes($pheno_class_type);
 
   my $genes = $gene_ad->fetch_all_by_external_name($gene);
@@ -325,8 +321,6 @@ sub fetch_features_by_gene {
       push @phenotype_features, \%summary_new;
     }
   }
-  # revert phenotype class selection on adaptor
-  $phenfeat_ad->use_phenotype_classes($default_pheno_classes);
   return \@phenotype_features;
 }
 
