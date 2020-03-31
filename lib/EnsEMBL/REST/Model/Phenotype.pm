@@ -41,19 +41,9 @@ sub build_phenotype_class_type_opt {
 
   my $c = $self->context();
 
-  my $exclude_tumour = $c->request->parameters->{exclude_tumour};
-  my $exclude_non_specified = $c->request->parameters->{exclude_non_specified};
   my $trait = $c->request->parameters->{trait};
   my $tumour = $c->request->parameters->{tumour};
   my $non_specified = $c->request->parameters->{non_specified};
-
-  #if multiple parameters option attached: the most inclusive option will be reported
-  $phenotype_class =~ s/tumour// if $exclude_tumour;
-  $phenotype_class =~ s/non_specified// if $exclude_non_specified;
-
-  $phenotype_class = "trait" if $trait && !$tumour && !$non_specified;
-  $phenotype_class = "tumour" if $tumour && !$trait && !$non_specified;
-  $phenotype_class = "non_specified" if $non_specified && !$trait && !$tumour;
 
   if ($trait || $tumour || $non_specified){
     $phenotype_class = "";
@@ -62,7 +52,6 @@ sub build_phenotype_class_type_opt {
     $phenotype_class .= "non_specified," if $non_specified;
     chop($phenotype_class);
   }
-  $phenotype_class =~ s/,,/,/;
   return $phenotype_class;
 }
 
