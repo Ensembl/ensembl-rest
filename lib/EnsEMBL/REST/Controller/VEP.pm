@@ -69,6 +69,8 @@ has valid_user_params => (
     distance
     ambiguity
     mane
+    shift_3prime
+    shift_genomic
 
     pick
     pick_allele
