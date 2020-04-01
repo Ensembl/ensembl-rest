@@ -179,7 +179,7 @@ my $gene_name='FOXF2';
 
 #Get Variation phenotype features associated with gene for gene without gene symbol
 {
-  my $expected = 1;
+  my $expected = 2;
   my $gene = 'ENSG00000073614';
   my $expected_data = [
           {
@@ -188,6 +188,12 @@ my $gene_name='FOXF2';
               external_reference => 'pubmed/17122850'
             },
             description => 'positive regulation of transcription from RNA polymerase II promoter',
+            location => '6:280129-389454',
+            source => 'GOA'
+          },
+          {
+            Gene => 'ENSG00000073614',
+            description => 'ClinVar: phenotype not specified',
             location => '6:280129-389454',
             source => 'GOA'
           }
@@ -200,6 +206,11 @@ my $gene_name='FOXF2';
   my $json = json_GET("$base/$gene?include_associated=1", 'Gene without a gene_symbol with 1 phenotype feature associated with a variant');
   cmp_ok(scalar(@{$json}),"==", $expected, 'Gene without a gene_symbol with 1 phenotype association with variant found');
   cmp_bag($json, $expected_data, "Checking the result content from the phenotype/gene REST call");
+
+  my $json2 = json_GET("$base/$gene?include_associated=1;non_specified=0", 'Gene without a gene_symbol with 1 phenotype feature associated with a variant - remove non_specified');
+  cmp_ok(scalar(@{$json2}),"==", $expected -1, 'Gene without a gene_symbol with 1 phenotype association with variant found - exclude_non_specified');
+  cmp_bag($json2, [$expected_data->[0]], "Checking the result content from the phenotype/gene REST call - exclude_non_specified");
+
 }
 
 #Get Gene phenotype features overlapping (eg. large structural variants)
