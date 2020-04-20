@@ -1,4 +1,4 @@
-127	\N	schema_version	101
+134	\N	schema_version	102
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -109,3 +109,4 @@
 131	\N	patch	patch_100_101_d.sql|gat.node_ids
 132	\N	patch	patch_100_101_e.sql|positive_int
 133	\N	patch	patch_100_101_f.sql|gab.direction
+135	\N	patch	patch_101_102_a.sql|schema_version
