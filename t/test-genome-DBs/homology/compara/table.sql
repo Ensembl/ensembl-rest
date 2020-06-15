@@ -1,6 +1,6 @@
 CREATE TABLE `CAFE_gene_family` (
   `cafe_gene_family_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `root_id` int(10) unsigned NOT NULL,
+  `root_id` bigint(20) unsigned NOT NULL,
   `lca_id` bigint(20) unsigned NOT NULL,
   `gene_tree_root_id` int(10) unsigned NOT NULL,
   `pvalue_avg` double(5,4) DEFAULT NULL,
@@ -226,7 +226,7 @@ CREATE TABLE `gene_tree_root` (
   `tree_type` enum('clusterset','supertree','tree') NOT NULL,
   `clusterset_id` varchar(20) NOT NULL DEFAULT 'default',
   `method_link_species_set_id` int(10) unsigned NOT NULL,
-  `species_tree_root_id` int(10) unsigned DEFAULT NULL,
+  `species_tree_root_id` bigint(20) unsigned DEFAULT NULL,
   `gene_align_id` int(10) unsigned DEFAULT NULL,
   `ref_root_id` int(10) unsigned DEFAULT NULL,
   `stable_id` varchar(40) DEFAULT NULL,
