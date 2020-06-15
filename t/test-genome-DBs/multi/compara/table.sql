@@ -198,9 +198,9 @@ CREATE TABLE `gene_tree_node` (
 CREATE TABLE `gene_tree_node_attr` (
   `node_id` int(10) unsigned NOT NULL,
   `node_type` enum('duplication','dubious','speciation','sub-speciation','gene_split') DEFAULT NULL,
+  `species_tree_node_id` bigint(20) unsigned DEFAULT NULL,
   `bootstrap` tinyint(3) unsigned DEFAULT NULL,
   `duplication_confidence_score` double(5,4) DEFAULT NULL,
-  `species_tree_node_id` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`node_id`),
   KEY `species_tree_node_id` (`species_tree_node_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
@@ -619,10 +619,10 @@ CREATE TABLE `species_tree_node` (
   `genome_db_id` int(10) unsigned DEFAULT NULL,
   `node_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`node_id`),
-  KEY `parent_id` (`parent_id`),
-  KEY `root_id` (`root_id`,`left_index`),
   KEY `taxon_id` (`taxon_id`),
-  KEY `genome_db_id` (`genome_db_id`)
+  KEY `genome_db_id` (`genome_db_id`),
+  KEY `parent_id` (`parent_id`),
+  KEY `root_id` (`root_id`,`left_index`)
 ) ENGINE=MyISAM AUTO_INCREMENT=501315726 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `species_tree_node_attr` (
