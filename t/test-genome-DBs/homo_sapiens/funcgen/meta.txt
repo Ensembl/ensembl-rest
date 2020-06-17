@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	101
+2	\N	schema_version	102
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -197,3 +197,5 @@
 772	\N	patch	patch_99_100_d.sql|update type column on external_db table
 773	\N	patch	patch_99_100_e.sql|Make some foreign keys not mandatory
 774	\N	patch	patch_100_101_a.sql|schema_version
+775	\N	patch	patch_101_102_a.sql|schema_version
+776	\N	patch	patch_101_102_b.sql|Drop underlying_structure table
