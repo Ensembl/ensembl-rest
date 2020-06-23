@@ -1,6 +1,6 @@
 
 requires 'Catalyst';
-requires 'Mojo';
+requires 'Mojolicious', '<= 8.43';
 requires 'Catalyst::Devel';
 
 requires 'Catalyst::Runtime';
