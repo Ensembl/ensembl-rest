@@ -93,7 +93,7 @@ jsonp=1
   #Expire depends on the type of CHI cache configured in Plugin::Cache section
   # example_expire_time=3600
  
-  # compara end-points had to be taken down for grch37 for e100 as part of removal of non-human resources
+  # compara and ensembl genomes end-points had to be taken down for grch37 for e100 as part of removal of non-human resources
   # so maintain and replace a different conf file for documentation
   # change in response object/removal of actual end-points to be handled from haproxy/load balancer
   # removing/commenting this section will lead to processing of both conf files and 
@@ -103,6 +103,7 @@ jsonp=1
   # for grch37 deployment, compara.conf = compara_grch37.conf
   <conf_replacements>
     compara_grch37.conf=compara.conf
+    info_grch37.conf=info.conf
   </conf_replacements>
 
   #Used to control the parameters used in examples. Please edit as you see fit for your infrastructure
