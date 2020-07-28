@@ -1,4 +1,4 @@
-134	\N	schema_version	102
+138	\N	schema_version	103
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -112,3 +112,4 @@
 135	\N	patch	patch_101_102_a.sql|schema_version
 136	\N	patch	patch_101_102_b.sql|enum_other
 137	\N	patch	patch_101_102_c.sql|stn_node_id_bigint
+139	\N	patch	patch_102_103_a.sql|schema_version
