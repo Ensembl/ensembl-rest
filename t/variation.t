@@ -265,40 +265,42 @@ $base = '/variant_recoder/homo_sapiens';
 
 my $exp = [
   {
-    'hgvsp' => [
-      'ENSP00000371073.2:p.Asp22Glu',
-      'ENSP00000371079.3:p.Asp22Glu',
-      'ENSP00000381976.1:p.Asp22Glu',
-      'ENSP00000399510.1:p.Asp22Glu',
-      'ENSP00000400904.1:p.Asp22Glu',
-      'ENSP00000394848.2:p.Asp22Glu',
-      'ENSP00000408558.1:p.Asp22Glu',
-      'ENSP00000412018.1:p.Asp22Glu',
-      'ENSP00000405307.1:p.Asp22Glu',
-      'ENSP00000414181.1:p.Asp22Glu'
-    ],
-    'hgvsc' => [
-      'ENST00000381657.2:c.66C>G',
-      'ENST00000381663.3:c.66C>G',
-      'ENST00000399012.1:c.66C>G',
-      'ENST00000415337.1:c.66C>G',
-      'ENST00000429181.1:c.66C>G',
-      'ENST00000430923.2:c.66C>G',
-      'ENST00000443019.1:c.66C>G',
-      'ENST00000445062.1:c.66C>G',
-      'ENST00000447472.1:c.66C>G',
-      'ENST00000448477.1:c.66C>G',
-      'ENST00000484611.2:n.158C>G'
-    ],
-    'id' => [
-      'rs200625439'
-    ],
-    'hgvsg' => [
-      'X:g.200920C>G'
-    ],
-    'spdi' => [
-      'X:200919:C:G'
-    ]
+    'G' => {
+      'hgvsp' => [
+        'ENSP00000371073.2:p.Asp22Glu',
+        'ENSP00000371079.3:p.Asp22Glu',
+        'ENSP00000381976.1:p.Asp22Glu',
+        'ENSP00000399510.1:p.Asp22Glu',
+        'ENSP00000400904.1:p.Asp22Glu',
+        'ENSP00000394848.2:p.Asp22Glu',
+        'ENSP00000408558.1:p.Asp22Glu',
+        'ENSP00000412018.1:p.Asp22Glu',
+        'ENSP00000405307.1:p.Asp22Glu',
+        'ENSP00000414181.1:p.Asp22Glu'
+      ],
+      'hgvsc' => [
+        'ENST00000381657.2:c.66C>G',
+        'ENST00000381663.3:c.66C>G',
+        'ENST00000399012.1:c.66C>G',
+        'ENST00000415337.1:c.66C>G',
+        'ENST00000429181.1:c.66C>G',
+        'ENST00000430923.2:c.66C>G',
+        'ENST00000443019.1:c.66C>G',
+        'ENST00000445062.1:c.66C>G',
+        'ENST00000447472.1:c.66C>G',
+        'ENST00000448477.1:c.66C>G',
+        'ENST00000484611.2:n.158C>G'
+      ],
+      'spdi' => [
+        'X:200919:C:G'
+      ],
+      'id' => [
+        'rs200625439'
+      ],
+      'hgvsg' => [
+        'X:g.200920C>G'
+      ]
+    }
   }
 ];
 
@@ -308,7 +310,7 @@ for my $input(qw(
   X:g.200920C>G
   X:200919:C:G
 )) {
-  $exp->[0]->{input} = $input;
+  $exp->[0]->{'G'}->{input} = $input;
   is_deeply(
     json_GET("$base/$input", "variant_recoder - $input"),
     $exp,
@@ -317,16 +319,24 @@ for my $input(qw(
 }
 
 # protein input can resolve to multiple HGVSg
+
+$json = json_GET("$base/ENSP00000371073.2:p.Asp22Glu", "variant_recoder - multi");
+my @hgvsg_ids = ();
+foreach my $allele (keys %{$json->[0]}) {
+  push @hgvsg_ids, @{$json->[0]->{$allele}->{hgvsg}};
+}
+
 is_deeply(
-  [sort map {@{$_->{hgvsg}}} @{json_GET("$base/ENSP00000371073.2:p.Asp22Glu", "variant_recoder - multi")}],
+  [sort @hgvsg_ids],
   ['X:g.200920C>A', 'X:g.200920C>G'],
   'variant_recoder - GET - multi'
 );
 
 # restrict fields
 my $expf = dclone($exp);
-delete($expf->[0]->{$_}) for qw(hgvsc hgvsp);
-$expf->[0]->{input} = 'rs200625439';
+delete($expf->[0]->{G}->{$_}) for qw(hgvsc hgvsp);
+$expf->[0]->{G}->{input} = 'rs200625439';
+
 is_deeply(
   json_GET("$base/rs200625439?fields=hgvsg,id,spdi", "variant_recoder - restrict fields"),
   $expf,
@@ -339,35 +349,37 @@ action_bad_regex('/variant_recoder/dave', qr/Can not find internal name for spec
 action_bad_regex("$base/dave", qr/No variant found/, 'error - var not found');
 
 # POST
-$exp->[0]->{input} = 'rs200625439';
+$exp->[0]->{G}->{input} = 'rs200625439';
 my $exp2 = [
-  {
-    'hgvsp' => [
-      'ENSP00000371073.2:p.Arg146Cys',
-      'ENSP00000371079.3:p.Arg146Cys',
-      'ENSP00000381976.1:p.Arg146Cys',
-      'ENSP00000399510.1:p.Arg146Cys',
-      'ENSP00000394848.2:p.Arg146Cys',
-      'ENSP00000405307.1:p.Arg146Cys'
-    ],
-    'hgvsc' => [
-      'ENST00000381657.2:c.436C>T',
-      'ENST00000381663.3:c.436C>T',
-      'ENST00000399012.1:c.436C>T',
-      'ENST00000415337.1:c.436C>T',
-      'ENST00000430923.2:c.436C>T',
-      'ENST00000447472.1:c.436C>T'
-    ],
-    'input' => 'rs142663151',
-    'id' => [
-      'rs142663151'
-    ],
-    'hgvsg' => [
-      'X:g.208208C>T'
-    ],
-    'spdi' => [
-      'X:208207:C:T'
-    ]
+  { 
+    'T' => {
+      'hgvsp' => [
+        'ENSP00000371073.2:p.Arg146Cys',
+        'ENSP00000371079.3:p.Arg146Cys',
+        'ENSP00000381976.1:p.Arg146Cys',
+        'ENSP00000399510.1:p.Arg146Cys',
+        'ENSP00000394848.2:p.Arg146Cys',
+        'ENSP00000405307.1:p.Arg146Cys'
+      ],
+      'hgvsc' => [
+        'ENST00000381657.2:c.436C>T',
+        'ENST00000381663.3:c.436C>T',
+        'ENST00000399012.1:c.436C>T',
+        'ENST00000415337.1:c.436C>T',
+        'ENST00000430923.2:c.436C>T',
+        'ENST00000447472.1:c.436C>T'
+      ],
+      'input' => 'rs142663151',
+      'id' => [
+        'rs142663151'
+      ],
+      'hgvsg' => [
+        'X:g.208208C>T'
+      ],
+      'spdi' => [
+        'X:208207:C:T'
+      ]
+    }
   }
 ];
 
@@ -380,8 +392,9 @@ is_json_POST(
 
 # restrict fields
 my $expf2 = dclone($exp2);
-delete($expf2->[0]->{$_}) for qw(hgvsc hgvsp);
-
+foreach my $allele (keys %{$expf2->[0]}) {
+  delete($expf2->[0]->{$allele}->{$_}) for qw(hgvsc hgvsp);
+}
 is_json_POST(
   $base,
   '{"ids" : ["rs200625439", "rs142663151"], "fields": "hgvsg,id,spdi"}',
