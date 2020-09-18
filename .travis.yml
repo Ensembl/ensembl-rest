@@ -29,7 +29,7 @@ matrix:
 
 before_install:
     - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
-    - export ENSEMBL_BRANCH='master'
+    - export ENSEMBL_BRANCH='release/103'
     - if [[ $TRAVIS_BRANCH =~ ^release\/[0-9]+$ ]]; then export ENSEMBL_BRANCH=$TRAVIS_BRANCH; fi
     - echo "ENSEMBL_BRANCH=$ENSEMBL_BRANCH"
     - git clone --branch $ENSEMBL_BRANCH --depth 1 https://github.com/Ensembl/ensembl-test.git
