@@ -77,10 +77,11 @@ sub get_beacon {
   }
 
   # Unique identifier of the Beacon
-  my $beacon_id = 'ensembl';
+  my $beacon_id = 'org.ensembl.rest';
   my $beacon_name = 'EBI - Ensembl';
   if ($db_assembly) {
-    $beacon_id = $beacon_id . '.' . lc $db_assembly;
+    # beacon id for grch38 is 'org.ensembl.rest' and for grch37 is 'org.ensembl.rest.grch37'
+    $beacon_id = $beacon_id . '.' . lc $db_assembly if($db_assembly eq 'GRCh37');
     $beacon_name = $beacon_name . ' ' . $db_assembly;
   }
   $beacon->{id} = $beacon_id;
