@@ -68,7 +68,7 @@ sub get_beacon {
 
   my $welcomeURL = 'http://rest.ensembl.org';
   if ($db_assembly eq 'GRCh37') {
-    $welcomeURL = 'http://grch37.ensembl.org';
+    $welcomeURL = 'http://grch37.rest.ensembl.org';
   }
 
   my $altURL = 'http://www.ensembl.org';
