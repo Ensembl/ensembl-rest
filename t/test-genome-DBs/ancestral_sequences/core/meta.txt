@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	103
+2	\N	schema_version	104
 3	\N	patch	patch_77_78_a.sql|schema_version
 4	\N	patch	patch_77_78_b.sql|source_column_increase
 5	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
@@ -68,3 +68,4 @@
 867	\N	patch	patch_100_101_a.sql|schema_version
 868	\N	patch	patch_101_102_a.sql|schema_version
 869	\N	patch	patch_102_103_a.sql|schema_version
+870	\N	patch	patch_103_104_a.sql|schema_version
