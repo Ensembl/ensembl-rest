@@ -66,21 +66,22 @@ sub get_beacon {
   my $db_assembly = $db_meta->{assembly} || '';
   my $schema_version = $db_meta->{schema_version} || '';
 
-  my $welcomeURL = 'http://rest.ensembl.org';
+  my $welcomeURL = 'https://rest.ensembl.org';
   if ($db_assembly eq 'GRCh37') {
-    $welcomeURL = 'http://grch37.ensembl.org';
+    $welcomeURL = 'https://grch37.rest.ensembl.org';
   }
 
-  my $altURL = 'http://www.ensembl.org';
+  my $altURL = 'https://www.ensembl.org';
   if ($db_assembly eq 'GRCh37') {
-    $altURL = 'http://grch37.ensembl.org';
+    $altURL = 'https://grch37.ensembl.org';
   }
 
   # Unique identifier of the Beacon
-  my $beacon_id = 'ensembl';
+  my $beacon_id = 'org.ensembl.rest';
   my $beacon_name = 'EBI - Ensembl';
   if ($db_assembly) {
-    $beacon_id = $beacon_id . '.' . lc $db_assembly;
+    # beacon id for grch38 is 'org.ensembl.rest' and for grch37 is 'org.ensembl.rest.grch37'
+    $beacon_id = $beacon_id . '.' . lc $db_assembly if($db_assembly eq 'GRCh37');
     $beacon_name = $beacon_name . ' ' . $db_assembly;
   }
   $beacon->{id} = $beacon_id;
@@ -171,9 +172,9 @@ sub get_beacon_dataset {
   my $beacon_dataset;
 
   my $db_assembly = $db_meta->{assembly};
-  my $externalURL = 'http://www.ensembl.org';
+  my $externalURL = 'https://www.ensembl.org';
   if ($db_assembly eq 'GRCh37') {
-    $externalURL = 'http://grch37.ensembl.org';
+    $externalURL = 'https://grch37.ensembl.org';
   }
 
   $beacon_dataset->{id} = $dataset->short_name();
@@ -749,9 +750,9 @@ sub get_dataset_allele_response {
 
     $ds_response->{'exists'} = JSON::true;
 
-    my $externalURL = "http://www.ensembl.org";
+    my $externalURL = "https://www.ensembl.org";
     if ($assemblyId eq 'GRCh37') {
-      $externalURL = "http://grch37.ensembl.org";
+      $externalURL = "https://grch37.ensembl.org";
     }
 
     my @urls;

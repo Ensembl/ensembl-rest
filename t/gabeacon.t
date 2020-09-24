@@ -44,9 +44,9 @@ my $q_base = $base . '/query';
 # For tests setting assembly to GRCh37 as that is the assembly
 # in the test database
 my $assemblyId = "GRCh37";
-my $beaconId = "ensembl.grch37";
+my $beaconId = "org.ensembl.rest.grch37";
 my $datasetId = "Ensembl ". $schema_version;
-my $externalURL = "http://grch37.ensembl.org/Homo_sapiens/Variation/Explore?v="; 
+my $externalURL = "https://grch37.ensembl.org/Homo_sapiens/Variation/Explore?v="; 
 my $dataset_response;
 
 # To check error handling for assembly differnent to DB
@@ -604,7 +604,7 @@ my $allele_request_cnv = {
 
 my $dataset_response_cnv = {
    "exists" => JSON::true,
-   "externalUrl" => "http://grch37.ensembl.org/Homo_sapiens/StructuralVariation/Explore?sv=esv93078",
+   "externalUrl" => "https://grch37.ensembl.org/Homo_sapiens/StructuralVariation/Explore?sv=esv93078",
    "error" => undef,
    "frequency" => undef,
    "variantCount" => "1",
