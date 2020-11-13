@@ -32,6 +32,7 @@ requires 'Readonly::XS';
 requires 'DBD::SQLite';
 requires 'List::MoreUtils';
 requires 'Try::Tiny';
+requires 'Starman';
 
 # Transient dependencies from Ensembl
 requires 'Parse::RecDescent';
