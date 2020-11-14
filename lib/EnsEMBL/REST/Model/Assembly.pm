@@ -54,7 +54,6 @@ sub fetch_info {
   $assembly_info{coord_system_versions} = $csa->get_all_versions();
   $assembly_info{default_coord_system_version} = $gc->get_version();
   $assembly_info{assembly_accession} = $gc->get_accession();
-  $assembly_info{base_pairs} = $gc->get_total_length();
   $assembly_info{golden_path} = $gc->get_ref_length();
 
   return \%assembly_info;
