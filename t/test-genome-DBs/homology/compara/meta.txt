@@ -69,3 +69,4 @@
 91	\N	patch	patch_101_102_b.sql|enum_other
 92	\N	patch	patch_101_102_c.sql|stn_node_id_bigint
 94	\N	patch	patch_102_103_a.sql|schema_version
+95	\N	patch	patch_102_103_b.sql|clusterset_id_varchar30
