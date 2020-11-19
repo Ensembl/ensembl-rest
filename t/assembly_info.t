@@ -1,12 +1,12 @@
-# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute 
+# Copyright [1999-2015] Wellcome Trust Sanger Institute and the EMBL-European Bioinformatics Institute
 # Copyright [2016-2020] EMBL-European Bioinformatics Institute
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,9 +33,9 @@ Catalyst::Test->import('EnsEMBL::REST');
 
 is_json_GET(
   '/info/assembly/homo_sapiens',
-  { 
-    'assembly_name' => 'GRCh37.p8', 
-    'assembly_date' => '2009-02', 
+  {
+    'assembly_name' => 'GRCh37.p8',
+    'assembly_date' => '2009-02',
     top_level_region => [
      {coord_system => 'chromosome', name => '6', length => 171115067},
      {coord_system => 'chromosome', name => 'X', length => 155270560}],
@@ -47,7 +47,6 @@ is_json_GET(
     coord_system_versions => [qw/GRCh37 NCBI36 NCBI35 NCBI34/ ],
     default_coord_system_version => 'GRCh37',
     assembly_accession => 'GCA_000001405.9',
-    'base_pairs' => '3554996726',
     'golden_path' => '3096649726'
   },
   'Checking output of info'
