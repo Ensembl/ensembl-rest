@@ -25,6 +25,10 @@ _If applicable, describe any possible undesirable consequence of the changes._
 
 ### Testing
 
+note to submitters and reviewers: documentation-only changes may reflect
+changes in other repos that can result in new or different output from
+REST endpoints. In turn, these may require new tests or changes to existing tests.
+
 _Have you added/modified unit tests to test the changes?_
 
 _If so, do the tests pass/fail?_
