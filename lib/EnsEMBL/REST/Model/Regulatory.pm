@@ -141,7 +141,7 @@ sub get_probeset_info {
 
   # Transcript / Gene information
   if($flag_transcript == 1 || $flag_gene == 1){
-    my $transript_mappings  = $ps->fetch_all_ProbeSetTranscriptMappings();
+    my $transript_mappings  = $ps->get_all_ProbeSetTranscriptMappings();
     $result->{transcripts} = $self->_lookup_transcript_gene($transript_mappings, $flag_gene);
   }
 
@@ -181,7 +181,7 @@ sub get_probe_info {
 
   # Linked transcripts
   if($flag_transcript == 1 || $flag_gene == 1){
-    my $transript_mappings   = $probe->fetch_all_ProbeTranscriptMappings;
+    my $transript_mappings   = $probe->get_all_ProbeTranscriptMappings;
     $features->{transcripts} = $self->_lookup_transcript_gene($transript_mappings, $flag_gene);
   }
 
