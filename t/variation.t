@@ -402,6 +402,79 @@ is_json_POST(
   'variant_recoder - POST - restrict fields'
 );
 
+# test options vcf_string and var_synonyms
+my $exp_options = [
+  {
+    'T' => {
+      'hgvsp' => [
+        'ENSP00000371073.2:p.Arg146Cys',
+        'ENSP00000371079.3:p.Arg146Cys',
+        'ENSP00000381976.1:p.Arg146Cys',
+        'ENSP00000399510.1:p.Arg146Cys',
+        'ENSP00000394848.2:p.Arg146Cys',
+        'ENSP00000405307.1:p.Arg146Cys'
+      ],
+      'hgvsc' => [
+        'ENST00000381657.2:c.436C>T',
+        'ENST00000381663.3:c.436C>T',
+        'ENST00000399012.1:c.436C>T',
+        'ENST00000415337.1:c.436C>T',
+        'ENST00000430923.2:c.436C>T',
+        'ENST00000447472.1:c.436C>T'
+      ],
+      'input' => 'rs142663151',
+      'id' => [
+        'rs142663151'
+      ],
+      'hgvsg' => [
+        'X:g.208208C>T'
+      ],
+      'spdi' => [
+        'X:208207:C:T'
+      ],
+      'vcf_string' => [
+        'X-208208-C-T'
+      ],
+    }
+  }
+];
+
+my $exp_options_2 = [
+  {
+    'A' => {
+      'input' => 'rs7569578',
+      'id' => [
+        'rs7569578'
+      ],
+      'hgvsg' => [
+        '2:g.45411130N>A'
+      ],
+      'spdi' => [
+        '2:45411129:T:A'
+      ],
+      'vcf_string' => [
+        '2-45411130-T-A'
+      ],
+      var_synonyms => [
+        'Archive dbSNP: rs57302278'
+      ],
+    }
+  }
+];
+
+is_deeply(
+  json_GET("$base/rs7569578?vcf_string=1&var_synonyms=1", "variant_recoder - option vcf_string and var_synonyms"),
+  $exp_options_2,
+  'variant_recoder - GET - option vcf_string and var_synonyms'
+);
+
+is_json_POST(
+  $base,
+  '{"ids" : ["rs142663151", "rs7569578"], "vcf_string": "1", "var_synonyms" : "1"}',
+  [$exp_options->[0], $exp_options_2->[0]],
+  'variant_recoder - POST - option vcf_string and var_synonyms'
+);
+
 # test errors
 action_bad_post($base, '{}', qr/key in your POST/, 'error - POST missing key');
 
