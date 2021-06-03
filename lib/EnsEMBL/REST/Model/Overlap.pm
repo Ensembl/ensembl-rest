@@ -34,7 +34,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory  motif peak array_probe other_regulatory band/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory  motif peak array_probe other_regulatory band mane/
   };
 });
 
@@ -170,6 +170,12 @@ sub to_hash {
       delete $hash->{Name};
     }
     $hash->{feature_type} = $feature_type;
+    if (lc($feature_type) eq 'transcript') {
+      $hash->{is_canonical} = $feature->is_canonical;
+    }
+    if (lc($feature_type) eq 'gene') {
+      $hash->{canonical_transcript} = $feature->canonical_transcript->stable_id.".".$feature->canonical_transcript->version;
+    }
     push(@hashed, $hash);
   }
   return \@hashed;
@@ -182,6 +188,19 @@ sub band {
   } else {
     return;
   }
+}
+
+sub mane {
+  my ($self, $slice) = @_;
+  my $c = $self->context();
+  my $transcripts = $slice->get_all_Transcripts();
+  my $manes;
+  foreach my $transcript (@$transcripts) {
+    if ($transcript->is_mane) {
+      push @$manes, $transcript->mane_transcript;
+    }
+  }
+  return $manes;
 }
 
 sub gene {
