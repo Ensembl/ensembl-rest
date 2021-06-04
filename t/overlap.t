@@ -295,6 +295,7 @@ my $base = '/overlap/region/homo_sapiens';
     feature_type => 'mane',
     refseq_match => 'NM_033260.4',
     type => 'MANE_Select',
+    version => 2
   }], 'Getting MANE feature as JSON');
 }
 
