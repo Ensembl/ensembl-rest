@@ -42,7 +42,7 @@ is_json_GET("/lookup/$basic_id?format=condensed", $condensed_response, 'Get of a
 my $full_response = {
   %{$condensed_response},
   start => 1080164, end => 1105181, strand => 1, version => 1, seq_region_name => '6', assembly_name => 'GRCh37',
-  biotype => 'protein_coding', display_name => 'AL033381.1', logic_name => 'ensembl', source => 'ensembl',
+  biotype => 'protein_coding', display_name => 'AL033381.1', logic_name => 'ensembl', source => 'ensembl', canonical_transcript => 'ENST00000314040.1',
   description => 'Uncharacterized protein; cDNA FLJ34594 fis, clone KIDNE2009109  [Source:UniProtKB/TrEMBL;Acc:Q8NAX6]'
 };
 cmp_deeply(json_GET("/lookup/$basic_id",'lookup a gene'), $full_response, 'Get of a known ID to the old URL will return a value');
@@ -143,6 +143,34 @@ $utr_response = {
 
 cmp_deeply(json_GET("/lookup/id/$basic_id?expand=1;utr=1;format=condensed",'Transcript by ID with UTR'), $utr_response, 'Get of a known ID with utr option will return UTRs as well');
 
+# Test with MANE
+$basic_id = 'ENST00000296839';
+$condensed_response = {object_type => 'Transcript', db_type => 'core', species => 'homo_sapiens', id => $basic_id, version => 1};
+
+$full_response = {
+  %{$condensed_response},
+  Parent => 'ENSG00000164379', start => 1312675, end => 1314992, strand => 1, version => 2, seq_region_name => '6', assembly_name => 'GRCh37',
+  biotype => 'protein_coding', display_name => 'FOXQ1-001', logic_name => 'ensembl_havana_transcript', source => 'ensembl',
+  is_canonical => 1,
+};
+cmp_deeply(json_GET("/lookup/$basic_id",'lookup transcript'), $full_response, 'Full response contains all Transcript information');
+
+$expanded_response = {
+  %{$full_response},
+ Translation => {object_type => 'Translation', db_type => 'core', species => 'homo_sapiens', id => 'ENSP00000296839', version => 2,
+                 start => 1312940, end => 1314151, length => 403, Parent => 'ENST00000296839'},
+        MANE => [ {object_type => 'mane', db_type => 'core', species => 'homo_sapiens', id => 'ENST00000296839', version => 5,
+                 start => 1312675, end => 1314992, strand => 1, version => 2, seq_region_name => '6', Parent => 'ENSG00000164379', assembly_name => 'GRCh37',
+                  type => 'MANE_Select', refseq_match => 'NM_033260.4'}],
+        Exon =>
+                [
+                 {object_type => 'Exon', db_type => 'core', species => 'homo_sapiens', id => 'ENSE00001083937', version => 3,
+                  assembly_name => 'GRCh37', start => 1312675, end => 1314992, seq_region_name => 6, strand => 1},
+                ]
+                };
+cmp_deeply(json_GET("/lookup/id/$basic_id?expand=1;mane=1",'Expanded transcript by ID'), $expanded_response, 'Get of a known ID with expanded option will return transcripts as well');
+
+
 
 # Test POST endpoints
 
@@ -171,7 +199,8 @@ my $id_response = {
     version => 12,
     id => "ENSG00000167393",
     assembly_name => 'GRCh37',
-    start => 294698
+    start => 294698,
+    canonical_transcript => 'ENST00000390665.3'
   }
 };
 # use Data::Dumper;
@@ -195,7 +224,8 @@ my $symbol_response = {
     start => 1080164,
     assembly_name => 'GRCh37',
     strand => 1,
-    version => 1
+    version => 1,
+    canonical_transcript => 'ENST00000314040.1'
   },
 
   snoU13 => {
@@ -213,7 +243,8 @@ my $symbol_response = {
     start => 1186753,
     assembly_name => 'GRCh37',
     strand => 1,
-    version => 1
+    version => 1,
+    canonical_transcript => 'ENST00000459140.1'
   } 
 };
 my $symbol_body = qq{ 

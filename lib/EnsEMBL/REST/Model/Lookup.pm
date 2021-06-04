@@ -496,6 +496,9 @@ sub transcript_feature {
   if ($self->context->request->param('utr')) {
     $features->{UTR} = $self->UTR($transcript, $species, $db_type) ;
   }
+  if ($self->context->request->param('mane')) {
+    $features->{MANE} = $self->MANE($transcript, $species, $db_type) ;
+  }
   return $features;
 }
 
@@ -514,6 +517,18 @@ sub UTR {
   }
 
   return \@utrs;
+}
+
+sub MANE {
+  my ($self, $transcript, $species, $db_type) = @_;
+
+  my @manes;
+
+  if ($transcript->is_mane) {
+    push @manes, $self->features_as_hash($transcript->stable_id, $species, 'mane', $db_type, $transcript->mane_transcript);
+  }
+  
+  return \@manes;
 }
 
 sub Exon {
@@ -544,6 +559,7 @@ sub features_as_hash {
     $obj = $self->find_object($id, $species, $object_type, $db_type) if !$obj;
     if($obj->can('summary_as_hash')) {
       my $summary_hash = $obj->summary_as_hash();
+      $features->{version} = $obj->version() * 1 if $obj->version();
 # Not all features have all labels
 # Seq_region_name, start and end are available for genes, transcripts and exons but not translations
       $features->{seq_region_name} = $summary_hash->{seq_region_name} if defined $summary_hash->{seq_region_name};
@@ -568,8 +584,14 @@ sub features_as_hash {
       $features->{logic_name} = $summary_hash->{logic_name} if defined $summary_hash->{logic_name};
 # Parent field to link back to gene/transcript where available
       $features->{Parent} = $summary_hash->{Parent} if defined $summary_hash->{Parent};
+# MANE data fields linked to transcript
+      $features->{refseq_match} = $summary_hash->{refseq_match} if defined $summary_hash->{refseq_match};
+      $features->{type} = $summary_hash->{type} if defined $summary_hash->{type};
       if (lc($object_type) eq 'transcript') {
         $features->{is_canonical} = $obj->is_canonical;
+      }
+      if (lc($object_type) eq 'gene') {
+        $features->{canonical_transcript} = $obj->canonical_transcript->stable_id.".".$obj->canonical_transcript->version;
       }
     } else {
       Catalyst::Exception->throw(qq{ID '$id' does not support 'full' format type. Please use 'condensed'});
