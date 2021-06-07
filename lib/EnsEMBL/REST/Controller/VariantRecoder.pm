@@ -46,6 +46,9 @@ has valid_user_params => (
     minimal
     fields
 
+    vcf_string
+    var_synonyms
+
     pick
     pick_allele
     per_gene
