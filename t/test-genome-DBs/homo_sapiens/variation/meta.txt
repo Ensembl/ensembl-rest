@@ -129,3 +129,4 @@
 129	\N	patch	patch_102_103_a.sql|schema version
 130	\N	patch	patch_103_104_a.sql|schema version
 131	\N	patch	patch_104_105_a.sql|schema_version
+132	\N	patch	patch_104_105_b.sql|Increase publication title size
