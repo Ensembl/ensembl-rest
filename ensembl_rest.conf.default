@@ -71,11 +71,6 @@ jsonp=1
   # to stop registry reload issues
   preload = 0 
   
-  # Location of HDF5/SQLite DBs if EQTL endpoint is used
-  # <eqtl_dbs>
-  #   species = /path/to/hdf5 db
-  # </eqtl_dbs>
-  
 </Model::Registry>
 
 <Model::Lookup>

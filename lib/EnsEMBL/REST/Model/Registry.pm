@@ -58,9 +58,6 @@ has 'no_version_check'    => ( is => 'ro', isa => 'Bool' );
 
 # Preload settings
 has 'preload'   => ( is => 'ro', isa => 'Bool', default => 1 );
-has 'eqtl_dbs'  => (is => 'ro', isa => 'HashRef[Str]');
-
-has '_eqtl_adaptors' => ( is => 'ro', isa => 'HashRef', lazy => 1, builder => '_get_eqtl_adaptor');
 
 has 'compara_cache' => ( is => 'ro', isa => 'HashRef[Str]', lazy => 1, default => sub { {} });
 
@@ -118,55 +115,6 @@ sub _load_registry {
 }
 
 has '_species_info' => ( isa => 'ArrayRef', is => 'ro', lazy => 1, builder => '_build_species_info' );
-
-sub _get_eqtl_adaptor {
-
-  my ($self) = @_;
-  my $eqtl_adaptors = {};
-  my $log = $self->log();
-
-  if(! $self->eqtl_dbs) {
-    $log->debug("No EQTL database files defined. /eqtl endpoints will fail:\n");
-    return {}
-  }
-  # load if not loaded
-  Catalyst::Utils::ensure_class_loaded('Bio::EnsEMBL::HDF5::EQTLAdaptor');
-
-  for my $user_species (sort keys %{$self->eqtl_dbs}) {
-
-    my $ensembl_species   = $self->get_alias($user_species);
-    if(!$ensembl_species){
-      my $msg = "Species $user_species is not available in Ensembl. Please consult your config file.";
-      $log->fatal($msg);
-      confess $msg;
-    }
-
-    my $core_a = $self->get_DBAdaptor($ensembl_species, 'core');
-    my $var_a  = $self->get_DBAdaptor($ensembl_species, 'variation');
-
-    my $file   = $self->eqtl_dbs->{$user_species};
-
-    try {
-      my $eqtl_a = Bio::EnsEMBL::HDF5::EQTLAdaptor->new(
-        -filename        => $file,
-        -core_db_adaptor => $core_a,
-        -var_db_adaptor  => $var_a,
-        -read_only       => 1,
-        );
-
-      if(ref($eqtl_a) ne 'Bio::EnsEMBL::HDF5::EQTLAdaptor'){
-        confess 'Could not get Bio::EnsEMBL::HDF5::EQTLAdaptor';
-      }
-
-      $eqtl_adaptors->{$ensembl_species} = $eqtl_a;
-    } catch {
-      $log->warn("Failed to create EQTLAdaptor for species '$user_species': $_");
-    };
-  }
-  return $eqtl_adaptors;
-}
-
-
 
 # Logic here is if we were told a compara name we use that
 # If not we query the species for the "best" compara (normally depends on division)
@@ -360,17 +308,10 @@ after 'BUILD' => sub {
     $self->_registry();
     $_->get_MethodLinkSpeciesSetAdaptor()->fetch_all() for @{ $self->get_all_DBAdaptors('compara') };
     $self->_build_species_info();
-    $self->_eqtl_adaptors();
     $log->info('Done');
   }
   return;
 };
-
-sub get_eqtl_adaptor {
-  my ($self, $species) = @_;
-
-  return $self->_eqtl_adaptors->{$species};
-}
 
 sub get_genomeinfo_adaptor {
   my ($self) = @_;
