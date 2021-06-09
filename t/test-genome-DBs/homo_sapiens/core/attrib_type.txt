@@ -229,3 +229,4 @@
 367	karyotype_rank	Rank in the karyotype	For a given seq_region, if it is part of the species karyotype, will indicate its rank
 405	ref_length	Golden Path Length	Length of the primary assembly
 406	total_length	Base Pairs	Total length of the assembly
+535	MANE_Select	MANE Select v0.92	MANE Select (v0.92) is the preliminary release (phase 7) of the MANE Select data set. The Matched Annotation from NCBI and EMBL-EBI project (MANE) is a collaboration between Ensembl-GENCODE and RefSeq to select a default transcript per human protein coding locus that is representative of biology, well-supported, expressed and conserved. This transcript set matches GRCh38 and is 100% identical between RefSeq and Ensembl-GENCODE for 5' UTR, CDS, splicing and 3' UTR.

@@ -90,6 +90,7 @@ my $base = '/overlap/region/homo_sapiens';
     strand => 1,
     assembly_name => 'GRCh37',
     version => '1',
+    canonical_transcript => 'ENST00000314040.1',
   }, 'Checking structure of gene model as expected');
   
   my ($transcript) = grep { $_->{feature_type} eq 'transcript' } @{$json};
@@ -278,6 +279,24 @@ my $base = '/overlap/region/homo_sapiens';
     seq_region_name => '6',
   }], 'Getting band as JSON');
 
+}
+
+#MANE feature testing
+{
+  my $region = '6:1312098..1314758';
+  cmp_deeply(json_GET("$base/$region?feature=mane", "Get MANE feature"), [{
+    id => 'ENST00000296839',
+    Parent => 'ENSG00000164379',
+    assembly_name => 'GRCh37',
+    start => 1312675,
+    end => 1314992,
+    strand => 1,
+    seq_region_name => '6',
+    feature_type => 'mane',
+    refseq_match => 'NM_033260.4',
+    type => 'MANE_Select',
+    version => 2
+  }], 'Getting MANE feature as JSON');
 }
 
 #Regulatory feature testing
