@@ -117,3 +117,4 @@
 142	\N	patch	patch_103_104_b.sql|dnafrag_alt_region
 143	\N	patch	patch_103_104_c.sql|fix_int_types
 145	\N	patch	patch_104_105_a.sql|schema_version
+146	\N	patch	patch_104_105_b.sql|genebuild_varchar255
