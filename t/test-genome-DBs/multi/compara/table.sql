@@ -287,7 +287,7 @@ CREATE TABLE `genome_db` (
   `taxon_id` int(10) unsigned DEFAULT NULL,
   `name` varchar(128) NOT NULL DEFAULT '',
   `assembly` varchar(100) NOT NULL DEFAULT '',
-  `genebuild` varchar(100) NOT NULL DEFAULT '',
+  `genebuild` varchar(255) NOT NULL DEFAULT '',
   `has_karyotype` tinyint(1) NOT NULL DEFAULT '0',
   `is_good_for_alignment` tinyint(1) NOT NULL DEFAULT '0',
   `genome_component` varchar(5) DEFAULT NULL,
@@ -436,7 +436,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=146 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=147 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
