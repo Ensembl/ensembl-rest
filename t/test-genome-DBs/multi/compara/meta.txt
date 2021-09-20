@@ -1,4 +1,4 @@
-144	\N	schema_version	105
+147	\N	schema_version	106
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -118,3 +118,4 @@
 143	\N	patch	patch_103_104_c.sql|fix_int_types
 145	\N	patch	patch_104_105_a.sql|schema_version
 146	\N	patch	patch_104_105_b.sql|genebuild_varchar255
+148	\N	patch	patch_105_106_a.sql|schema_version
