@@ -355,7 +355,7 @@ sub _include_user_params {
 
   # only copy allowed keys to %vep_params as we don't want users to be able to meddle
   $vep_params{$_} = $tmp_vep_params{$_} for grep { $self->valid_user_param($_) } keys %tmp_vep_params;
-  
+ 
   # we currently only have cache for human
   if ($c->stash->{species} ne 'homo_sapiens') {
     delete $vep_params{cache};
@@ -414,6 +414,7 @@ sub _configure_plugins {
       # we now need to add these to a final list, including any that come from the plugin config file
       my $added_given = 0;
       my @params;
+      my $spliceai_file;
 
       foreach my $param(@{$plugin_hash->{params} || []}) {
 
@@ -426,10 +427,35 @@ sub _configure_plugins {
           push @params, @given_params;
           $added_given = 1;
         }
+        # SpliceAI - check which file is defined by user
+        # param = 1 (default) use the illumina's annotation file
+        # param = 2 use the Ensembl annotation file which is defined in config file as snv_ensembl
+        elsif(lc $module eq 'spliceai' && $given_params[0] == 2) {
+          if($param =~ /snv_ensembl/) {
+            my $param_aux = $param;
+            $param_aux =~ s/snv_ensembl=//;
+            $spliceai_file = $param_aux;
+          }
+          push @params, $param;
+        }
         # other params, such as file paths, get passed from the config
         else {
           push @params, $param;
         }
+      }
+
+      # overwrite SpliceAI SNV file
+      if(defined $spliceai_file) {
+        my @new_params;
+        foreach my $spliceai_param (@params) {
+          if($spliceai_param =~ /^snv=/) {
+            push @new_params, 'snv=' . $spliceai_file;
+          }
+          else {
+            push @new_params, $spliceai_param;
+          }
+        }
+        @params = @new_params;
       }
 
       ## could probably implement some checking on @params here based on whats in the web form
