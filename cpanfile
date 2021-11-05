@@ -33,6 +33,7 @@ requires 'DBD::SQLite';
 requires 'List::MoreUtils';
 requires 'Try::Tiny';
 requires 'Starman';
+requires 'Carp::Clan';
 
 # Transient dependencies from Ensembl
 requires 'Parse::RecDescent';
