@@ -231,7 +231,7 @@ CREATE TABLE `gene_tree_root` (
   `root_id` int(10) unsigned NOT NULL,
   `member_type` enum('protein','ncrna') NOT NULL,
   `tree_type` enum('clusterset','supertree','tree') NOT NULL,
-  `clusterset_id` varchar(20) NOT NULL DEFAULT 'default',
+  `clusterset_id` varchar(50) NOT NULL DEFAULT 'default',
   `method_link_species_set_id` int(10) unsigned NOT NULL,
   `species_tree_root_id` bigint(20) unsigned DEFAULT NULL,
   `gene_align_id` int(10) unsigned DEFAULT NULL,
@@ -436,7 +436,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=149 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=150 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
