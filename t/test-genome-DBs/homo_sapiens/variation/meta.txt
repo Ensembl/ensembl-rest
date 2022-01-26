@@ -132,3 +132,4 @@
 132	\N	patch	patch_104_105_b.sql|Increase publication title size
 133	\N	patch	patch_105_106_a.sql|schema version
 134	\N	patch	patch_106_107_a.sql|schema_version
+135	\N	patch	patch_106_107_b.sql|consequences update
