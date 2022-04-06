@@ -121,3 +121,4 @@
 148	\N	patch	patch_105_106_a.sql|schema_version
 150	\N	patch	patch_106_107_a.sql|schema_version
 151	\N	patch	patch_105_106_b.sql|clusterset_id_varchar50
+152	\N	patch	patch_106_107_b.sql|case_sensitive_stable_id
