@@ -164,7 +164,6 @@ jsonp=1
  
     genetree_stable_id=ENSGT00390000003602
     compara_gene_stable_id=ENSG00000173786
-    family_stable_id=PTHR15573
     
     from_coord_system=GRCh37
     to_coord_system=GRCh38
