@@ -1,5 +1,3 @@
-peak	2	160421
-peak	4	160421
 external_feature	2	8062
 external_feature	4	8062
 mirna_target_feature	2	29
