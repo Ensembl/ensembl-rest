@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	107
+2	\N	schema_version	108
 3	\N	patch	patch_59_60_a.sql|schema_version
 4	\N	patch	patch_59_60_b.sql|rename_go_xref_table
 5	\N	patch	patch_59_60_c.sql|QC_fixes
@@ -213,3 +213,5 @@
 1091	\N	patch	patch_104_105_a.sql|schema_version
 1092	\N	patch	patch_105_106_a.sql|schema_version
 1093	\N	patch	patch_106_107_a.sql|schema_version
+1094	\N	patch	patch_106_107_b.sql|Added index for seq_region_mapping
+1095	\N	patch	patch_107_108_a.sql|schema_version
