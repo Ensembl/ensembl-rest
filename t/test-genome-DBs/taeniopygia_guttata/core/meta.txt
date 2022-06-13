@@ -1,4 +1,4 @@
-1	\N	schema_version	107
+1	\N	schema_version	108
 2	\N	patch	patch_50_51_a.sql|schema_version
 3	\N	patch	patch_50_51_b.sql|protein_feature_hit_name
 4	\N	patch	patch_50_51_c.sql|meta_coord_index
@@ -257,3 +257,5 @@
 1313	\N	patch	patch_104_105_a.sql|schema_version
 1314	\N	patch	patch_105_106_a.sql|schema_version
 1315	\N	patch	patch_106_107_a.sql|schema_version
+1316	\N	patch	patch_106_107_b.sql|Added index for seq_region_mapping
+1317	\N	patch	patch_107_108_a.sql|schema_version

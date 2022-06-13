@@ -1,4 +1,4 @@
-149	\N	schema_version	107
+153	\N	schema_version	108
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -121,3 +121,5 @@
 148	\N	patch	patch_105_106_a.sql|schema_version
 150	\N	patch	patch_106_107_a.sql|schema_version
 151	\N	patch	patch_105_106_b.sql|clusterset_id_varchar50
+152	\N	patch	patch_106_107_b.sql|case_sensitive_stable_id
+154	\N	patch	patch_107_108_a.sql|schema_version
