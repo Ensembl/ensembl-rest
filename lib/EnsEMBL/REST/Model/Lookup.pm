@@ -105,25 +105,26 @@ sub find_family_by_member_id {
 
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
   my $fama = $dba->get_FamilyAdaptor;
+  my $genome = $dba->get_GenomeDBAdaptor->fetch_by_name_assembly($species);
   my $member;
   my $fam;
   if ($object_type eq 'Gene') {
-    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($id);
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id_GenomeDB($id, $genome);
     Catalyst::Exception->throw("Could not fetch a $object_type object for ID $id") unless $member;
     $fam = $fama->fetch_all_by_GeneMember($member);
   } elsif ($object_type eq 'Transcript') {
-    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id($id);
+    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id_GenomeDB($id, $genome);
     Catalyst::Exception->throw("Could not fetch a $object_type object for ID $id") unless $member;
     $fam = $fama->fetch_by_SeqMember($member);
   } elsif ($object_type eq 'Translation') {
     my $translation_adaptor = $reg->get_adaptor($species, $db_type, 'Translation');
     my $translation = $translation_adaptor->fetch_by_stable_id($id);
-    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id($translation->stable_id);
+    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id_GenomeDB($translation->stable_id, $genome);
     $fam = $fama->fetch_by_SeqMember($member);
   } elsif ($object_type eq 'Exon') {
     my $gene_adaptor = $reg->get_adaptor($species, $db_type, 'Gene');
     my $gene = $gene_adaptor->fetch_by_exon_stable_id($id);
-    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($gene->stable_id);
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id_GenomeDB($gene->stable_id, $genome);
     $fam = $fama->fetch_all_by_GeneMember($member);
   }
   Catalyst::Exception->throw("No Family found for $object_type ID $id") unless $fam;
@@ -178,22 +179,22 @@ sub find_genetree_by_member_id {
   Catalyst::Exception->throw("'$id' is not an Ensembl Core object, and thus does not have a gene-tree.") if $db_type ne 'core';
 
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
-
+  my $genome = $dba->get_GenomeDBAdaptor->fetch_by_name_assembly($species);
   my $member;
   if ($object_type eq 'Gene') {
-    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($id);
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id_GenomeDB($id, $genome);
   } elsif ($object_type eq 'Transcript') {
     my $gene_adaptor = $reg->get_adaptor($species, $db_type, 'Gene');
     my $gene = $gene_adaptor->fetch_by_transcript_stable_id($id);
-    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($gene->stable_id);
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id_GenomeDB($gene->stable_id, $genome);
   } elsif ($object_type eq 'Translation') {
     my $translation_adaptor = $reg->get_adaptor($species, $db_type, 'Translation');
     my $translation = $translation_adaptor->fetch_by_stable_id($id);
-    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id($translation->stable_id);
+    $member = $dba->get_SeqMemberAdaptor->fetch_by_stable_id_GenomeDB($translation->stable_id, $genome);
   } elsif ($object_type eq 'Exon') {
     my $gene_adaptor = $reg->get_adaptor($species, $db_type, 'Gene');
     my $gene = $gene_adaptor->fetch_by_exon_stable_id($id);
-    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id($gene->stable_id);
+    $member = $dba->get_GeneMemberAdaptor->fetch_by_stable_id_GenomeDB($gene->stable_id, $genome);
   }
   Catalyst::Exception->throw("Could not fetch a $object_type object for ID $id") unless $member;
 
