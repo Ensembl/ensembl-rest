@@ -2,4 +2,3 @@
 201	ENSEMBL_ORTHOLOGUES	Homology.homology	orthologues
 202	ENSEMBL_PARALOGUES	Homology.homology	paralogues
 402	NC_TREES	NCTree.nc_tree_node	ncRNA-trees
-301	FAMILY	Family.family	families
