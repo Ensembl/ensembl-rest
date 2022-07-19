@@ -74,11 +74,12 @@ my %group_objects = (
         Translation      => 1,
         Operon           => 1,
         OperonTranscript => 1,
-    },
-    compara => {
-        GeneTree => 1,
-        Family   => 1,
-    },
+    }
+    # },
+    # compara => {
+    #     GeneTree => 1,
+    #     Family   => 1,
+    # },
     # variation => {
     #     Variation => 1,
     # }

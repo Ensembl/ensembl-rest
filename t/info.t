@@ -234,7 +234,7 @@ is_json_GET(
 #/info/compara/methods
 {
   my $methods_json = json_GET('/info/compara/methods', 'Get the compara methods hash');
-  cmp_ok(keys(%{$methods_json}), '==', 11, 'Ensuring we have the right number of compara methods available');
+  cmp_ok(keys(%{$methods_json}), '==', 10, 'Ensuring we have the right number of compara methods available');
   cmp_deeply(json_GET('/info/compara/methods?class=Homology', 'Get Homology methods'), 
     {'Homology.homology' => bag(qw/ENSEMBL_PROJECTIONS ENSEMBL_PARALOGUES ENSEMBL_ORTHOLOGUES/)}, 
     'Checking filtering brings back subsets of compara methods'

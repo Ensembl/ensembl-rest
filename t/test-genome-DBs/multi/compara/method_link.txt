@@ -10,7 +10,6 @@
 201	ENSEMBL_ORTHOLOGUES	Homology.homology	orthologues
 202	ENSEMBL_PARALOGUES	Homology.homology	paralogues
 205	ENSEMBL_PROJECTIONS	Homology.homology	patch projections
-301	FAMILY	Family.family	families
 401	PROTEIN_TREES	ProteinTree.protein_tree_node	protein-trees
 402	NC_TREES	NCTree.nc_tree_node	ncRNA-trees
 501	GERP_CONSERVATION_SCORE	ConservationScore.conservation_score	GERP Conservation Scores
