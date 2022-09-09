@@ -173,7 +173,7 @@ is_json_GET(
 # /info/external_dbs/:species
 {
   my $external_dbs_json = json_GET('/info/external_dbs/homo_sapiens', 'Get the external dbs hash');
-  cmp_ok(scalar(@{$external_dbs_json}), '==', 510, 'Ensuring we have the right number of external_dbs available');
+  cmp_ok(scalar(@{$external_dbs_json}), '==', 511, 'Ensuring we have the right number of external_dbs available');
   my $expected = [{ name => 'GO', description => undef, release => undef, display_name => 'GO' }];
   is_json_GET('/info/external_dbs/homo_sapiens?filter=GO', $expected, 'Checking GO filtering works');
   my $xref_external_dbs_json = json_GET('info/external_dbs/homo_sapiens?feature=xref', 'Get the xref external dbs hash');

@@ -508,3 +508,4 @@
 50694	SIB_mondelphis_transcriptome	\N	XREF	0	Swiss Institute of Bioinformatics transcriptome data for monodelphis	MISC	\N	\N	\N
 50695	SIB_platypus_transcriptome	\N	XREF	0	Swiss Institute of Bioinformatics transcriptome data for platypus	MISC	\N	\N	\N
 50696	SIB_orangutan_transcriptome	\N	XREF	0	Swiss Institute of Bioinformatics transcriptome data for orangutan	MISC	\N	\N	\N
+50697	GeneCards	\N	XREF	50	GeneCards	MISC	\N	\N	\N
