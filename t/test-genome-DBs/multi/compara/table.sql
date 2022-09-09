@@ -138,7 +138,7 @@ CREATE TABLE `gene_align_member` (
 
 CREATE TABLE `gene_member` (
   `gene_member_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `stable_id` varchar(128) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  `stable_id` varchar(128) NOT NULL,
   `version` int(10) unsigned DEFAULT '0',
   `source_name` enum('ENSEMBLGENE','EXTERNALGENE') NOT NULL,
   `taxon_id` int(10) unsigned NOT NULL,
@@ -152,7 +152,7 @@ CREATE TABLE `gene_member` (
   `dnafrag_strand` tinyint(4) DEFAULT NULL,
   `display_label` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`gene_member_id`),
-  UNIQUE KEY `stable_id` (`stable_id`),
+  UNIQUE KEY `genome_db_stable_id` (`genome_db_id`,`stable_id`),
   KEY `taxon_id` (`taxon_id`),
   KEY `genome_db_id` (`genome_db_id`),
   KEY `source_name` (`source_name`),
@@ -176,7 +176,7 @@ CREATE TABLE `gene_member_hom_stats` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `gene_member_qc` (
-  `gene_member_stable_id` varchar(128) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  `gene_member_id` int(10) unsigned NOT NULL,
   `genome_db_id` int(10) unsigned NOT NULL,
   `seq_member_id` int(10) unsigned DEFAULT NULL,
   `n_species` int(11) DEFAULT NULL,
@@ -184,8 +184,8 @@ CREATE TABLE `gene_member_qc` (
   `avg_cov` float DEFAULT NULL,
   `status` varchar(50) NOT NULL,
   KEY `genome_db_id` (`genome_db_id`),
-  KEY `gene_member_stable_id` (`gene_member_stable_id`),
-  KEY `seq_member_id` (`seq_member_id`)
+  KEY `seq_member_id` (`seq_member_id`),
+  KEY `gene_member_id` (`gene_member_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 CREATE TABLE `gene_tree_node` (
@@ -436,7 +436,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`(255)),
   KEY `species_value_idx` (`species_id`,`meta_value`(255))
-) ENGINE=MyISAM AUTO_INCREMENT=155 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=160 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `method_link` (
   `method_link_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -540,7 +540,7 @@ CREATE TABLE `peptide_align_feature` (
 
 CREATE TABLE `seq_member` (
   `seq_member_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `stable_id` varchar(128) CHARACTER SET latin1 COLLATE latin1_bin NOT NULL,
+  `stable_id` varchar(128) NOT NULL,
   `version` int(10) unsigned DEFAULT '0',
   `source_name` enum('ENSEMBLPEP','ENSEMBLTRANS','Uniprot/SPTREMBL','Uniprot/SWISSPROT','EXTERNALPEP','EXTERNALTRANS','EXTERNALCDS') NOT NULL,
   `taxon_id` int(10) unsigned NOT NULL,
@@ -556,7 +556,7 @@ CREATE TABLE `seq_member` (
   `dnafrag_strand` tinyint(4) DEFAULT NULL,
   `display_label` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`seq_member_id`),
-  UNIQUE KEY `stable_id` (`stable_id`),
+  UNIQUE KEY `genome_db_stable_id` (`genome_db_id`,`stable_id`),
   KEY `taxon_id` (`taxon_id`),
   KEY `genome_db_id` (`genome_db_id`),
   KEY `source_name` (`source_name`),

@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	108
+2	\N	schema_version	109
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -135,3 +135,5 @@
 135	\N	patch	patch_106_107_b.sql|consequences update
 136	\N	patch	patch_106_107_c.sql|remove regulatory and TFBS consequences from consequence_types in transcript_variation
 137	\N	patch	patch_107_108_a.sql|schema version
+138	\N	patch	patch_107_108_b.sql|fix SAS population description
+139	\N	patch	patch_108_109_a.sql|schema version
