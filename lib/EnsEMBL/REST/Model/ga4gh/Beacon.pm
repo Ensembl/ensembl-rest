@@ -47,6 +47,8 @@ has 'sv_so_terms' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
 
 has 'context' => (is => 'ro',  weak_ref => 1);
 
+our $valid_dataset_ids = {};
+
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
   weaken($c);
@@ -116,14 +118,6 @@ sub get_beacon_organization {
 
   my $address = "EMBL-EBI, Wellcome Genome Campus, Hinxton, Cambridgeshire, CB10 1SD, UK";
 
-  # The welcome URL depends on the assembly requested
-  #my $db_assembly = $db_meta->{assembly};
-
-  #my $welcomeURL = "http://www.ensembl.org";
-  #if ($db_assembly eq 'GRCh37') {
-  #  $welcomeURL = "http://grch37.ensembl.org";
-  #}
-  
   my $welcomeURL = "https://www.ebi.ac.uk/";
   my $contactURL = "https://www.ebi.ac.uk/support/";
   
@@ -156,8 +150,14 @@ sub get_beacon_all_datasets {
     @variation_set_list = @{$variation_set_adaptor->fetch_all()};
   }
 
+  # dbSNP is not a variation_set but we need this set for Beacon
+  # That is why we need to create a fake set called 'dbSNP' with id = 63
+  my $dbsnp_set = get_dbsnp_set($c);
+  push(@variation_set_list, $dbsnp_set);
+
   foreach my $dataset (@variation_set_list) {
-    my $beacon_dataset = $self->get_beacon_dataset($db_meta, $dataset); 
+    my $beacon_dataset = $self->get_beacon_dataset($db_meta, $dataset);
+    $valid_dataset_ids->{$beacon_dataset->{id}} = 1 if(defined $beacon_dataset->{id});
     push(@beacon_datasets, $beacon_dataset); 
   }
 
@@ -211,13 +211,13 @@ sub beacon_query {
   # NONE don't return datasets response
   my $incl_ds_response = 0; #NONE
   if (exists $data->{includeDatasetResponses}) {
-    if ($data->{includeDatasetResponses} eq 'ALL') {
+    if (uc $data->{includeDatasetResponses} eq 'ALL') {
       $incl_ds_response = 1;
     }
-    elsif ($data->{includeDatasetResponses} eq 'HIT') {
+    elsif (uc $data->{includeDatasetResponses} eq 'HIT') {
       $incl_ds_response = 2;
     }
-    elsif ($data->{includeDatasetResponses} eq 'MISS') {
+    elsif (uc $data->{includeDatasetResponses} eq 'MISS') {
       $incl_ds_response = 3;
     }
   }
@@ -369,6 +369,13 @@ sub check_parameters {
   }
   elsif(defined($parameters->{includeDatasetResponses}) && $parameters->{includeDatasetResponses} eq ''){
     $error = $self->get_beacon_error('400', "Invalid includeDatasetResponses");
+  }
+  elsif(defined($parameters->{datasetIds})){
+    foreach my $dataset (split(',', $parameters->{datasetIds})){
+      if(!$valid_dataset_ids->{$dataset}){
+        $error = $self->get_beacon_error('400', "Invalid datasetId '$dataset'");
+      }
+    }
   }
 
   return $error; 
@@ -569,6 +576,9 @@ sub variant_exists {
       my $contains_alt = contains_value($alt_allele, $alt_alleles);
       my $contains_new_alt = contains_value($new_alt, $alt_alleles);
 
+      # get variation source
+      my $source_name = $vf->source()->name();
+
       # Some ins/del have allele string 'G/-', others have TG/T
       # trim sequence doesn't always work
       if ( (uc($ref_allele_string) eq uc($ref_allele) || (uc($ref_allele_string) eq uc($new_ref)))
@@ -577,12 +587,21 @@ sub variant_exists {
 
         # Checks datasets only for variants that match
         my $datasets_found = $vf->get_all_VariationSets();
+        
         my @list_datasetids;
-        foreach my $set (@$datasets_found) {
+        foreach my $set (@{$datasets_found}) {
           my $dt_id = $set->dbID();
           $dataset_var_found{$dt_id} = $set;
           push (@list_datasetids, $dt_id);
         }
+
+        # We have to consider all dbSNP variants are in the dbSNP set
+        if(lc $source_name eq 'dbsnp'){
+          push (@list_datasetids, 63);
+          my $dbsnp_set = get_dbsnp_set($c);
+          $dataset_var_found{63} = $dbsnp_set;
+        }
+
         $variant_dt{$vf->variation_name} = \@list_datasetids;
 
         if ($incl_ds_response) {
@@ -791,6 +810,7 @@ sub get_dataset_allele_response {
 }
 
 # Get all datasets that are available in Ensembl Variation
+# Return a hash key => dataset_id; value => dataset object
 sub get_all_datasets {
   my $c = shift;
 
@@ -802,6 +822,11 @@ sub get_all_datasets {
   foreach my $set (@$variation_set) {
     $available_datasets{$set->dbID()} = $set;
   }
+
+  # Add dbSNP to the set list
+  # 'dbSNP' id = 63
+  my $dbsnp_set = get_dbsnp_set($c);
+  $available_datasets{63} = $dbsnp_set;
 
   return \%available_datasets;
 }
@@ -816,13 +841,37 @@ sub get_datasets_input {
   my $variation_set_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationset');
 
   foreach my $dataset_id (@{$dataset_ids_list}) {
-    my $variation_set = $variation_set_adaptor->fetch_by_short_name($dataset_id);
-    if ($variation_set) {
-      $variation_set_list{$variation_set->dbID()} = $variation_set;
+    # If the dataset is dbSNP then add the dataset object to the list
+    if(lc $dataset_id eq 'dbsnp') {
+      my $dbsnp_set = get_dbsnp_set($c);
+      $variation_set_list{63} = $dbsnp_set;
+    }
+    else{
+      my $variation_set = $variation_set_adaptor->fetch_by_short_name($dataset_id);
+      if ($variation_set) {
+        $variation_set_list{$variation_set->dbID()} = $variation_set;
+      }
     }
   }
 
   return \%variation_set_list;
+}
+
+# Create the dbSNP set object
+sub get_dbsnp_set {
+  my $c = shift;
+
+  my $variation_set_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationset');
+
+  my $dbsnp_set = Bio::EnsEMBL::Variation::VariationSet->new(
+                    -dbID => 63,
+                    -adaptor => $variation_set_adaptor,
+                    -name   => 'dbSNP',
+                    -description => 'Variants (including SNPs and indels) imported from dbSNP',
+                    -short_name => 'dbsnp'
+                  );
+
+  return $dbsnp_set;
 }
 
 sub contains_value {
