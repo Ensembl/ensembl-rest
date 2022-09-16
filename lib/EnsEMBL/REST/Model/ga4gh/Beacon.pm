@@ -151,7 +151,7 @@ sub get_beacon_all_datasets {
   }
 
   # dbSNP is not a variation_set but we need this set for Beacon
-  # That is why we need to create a fake set called 'dbSNP' with id = 63
+  # That is why we need to create a fake set called 'dbSNP' using an id that is not being used in the variation db
   my $dbsnp_set = get_dbsnp_set($c);
   push(@variation_set_list, $dbsnp_set);
 
@@ -597,9 +597,9 @@ sub variant_exists {
 
         # We have to consider all dbSNP variants are in the dbSNP set
         if(lc $source_name eq 'dbsnp'){
-          push (@list_datasetids, 63);
           my $dbsnp_set = get_dbsnp_set($c);
-          $dataset_var_found{63} = $dbsnp_set;
+          push (@list_datasetids, $dbsnp_set->dbID());
+          $dataset_var_found{$dbsnp_set->dbID()} = $dbsnp_set;
         }
 
         $variant_dt{$vf->variation_name} = \@list_datasetids;
@@ -824,9 +824,8 @@ sub get_all_datasets {
   }
 
   # Add dbSNP to the set list
-  # 'dbSNP' id = 63
   my $dbsnp_set = get_dbsnp_set($c);
-  $available_datasets{63} = $dbsnp_set;
+  $available_datasets{$dbsnp_set->dbID()} = $dbsnp_set;
 
   return \%available_datasets;
 }
@@ -844,7 +843,7 @@ sub get_datasets_input {
     # If the dataset is dbSNP then add the dataset object to the list
     if(lc $dataset_id eq 'dbsnp') {
       my $dbsnp_set = get_dbsnp_set($c);
-      $variation_set_list{63} = $dbsnp_set;
+      $variation_set_list{$dbsnp_set->dbID()} = $dbsnp_set;
     }
     else{
       my $variation_set = $variation_set_adaptor->fetch_by_short_name($dataset_id);
@@ -863,8 +862,17 @@ sub get_dbsnp_set {
 
   my $variation_set_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationset');
 
+  # Get current max variation_set_id
+  my $variation_sets = $variation_set_adaptor->fetch_all();
+  my $max_id = 1;
+  foreach my $var_set (@{$variation_sets}) {
+    if($var_set->dbID() > $max_id) {
+      $max_id = $var_set->dbID();
+    }
+  }
+
   my $dbsnp_set = Bio::EnsEMBL::Variation::VariationSet->new(
-                    -dbID => 63,
+                    -dbID => $max_id + 1,
                     -adaptor => $variation_set_adaptor,
                     -name   => 'dbSNP',
                     -description => 'Variants (including SNPs and indels) imported from dbSNP',
