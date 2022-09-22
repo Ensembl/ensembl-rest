@@ -60,7 +60,7 @@ cmp_ok($beacon_json->{id}, 'eq', $beaconId, 'Beacon id');
 cmp_ok($beacon_json->{version}, '==', $schema_version, 'Version');
 
 # Is there at least one dataset
-cmp_ok(scalar(@{$beacon_json->{'datasets'}}), '==', 42, 'Check number of datasets');
+cmp_ok(scalar(@{$beacon_json->{'datasets'}}), '==', 43, 'Check number of datasets');
 my $first_dataset = $beacon_json->{'datasets'}->[0];
 cmp_ok(keys(%{$first_dataset}), '==', 12, 'Check dataset has correct number of fields');
 
@@ -135,6 +135,44 @@ my $expected_data1_ds = {
 
 $json = json_POST( $q_base , $post_data1_ds, 'POST query 1 - dataset response HIT' );
 eq_or_diff($json, $expected_data1_ds, "GA4GH Beacon ds 1 - variant exists - dataset response");
+
+# Found variant with includeDataSetResponses HIT and datasetIds dbSNP
+my $post_data_dbsnp_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
+                  '"assemblyId" : "' . $assemblyId . '", "includeDatasetResponses" : "HIT", "datasetIds" : "dbsnp"}';
+
+$allele_request = {
+  "referenceName" => "7",
+  "start" => "86442403",
+  "variantType" => undef,
+  "referenceBases" => "T",
+  "alternateBases" => "C",
+  "assemblyId" => $assemblyId,
+  "datasetIds" => 'dbsnp',
+  "includeDatasetResponses" => 'HIT' };
+
+$dataset_response = {
+   "datasetId" => 'dbsnp',
+   "exists" => JSON::true,
+   "error" => undef,
+   "frequency" => undef,
+   "variantCount" => 1,
+   "callCount" => undef,
+   "sampleCount" => undef,
+   "note" => undef,
+   "externalUrl" => $externalURL . "rs2299222",
+   "info" => undef
+   };
+
+my $expected_data_dbsnp_ds = {
+  "beaconId" => $beaconId,
+  "exists" => JSON::true,
+  "error" => undef,
+  "alleleRequest" => $allele_request,
+  "datasetAlleleResponses" => [$dataset_response]
+};
+
+$json = json_POST( $q_base , $post_data_dbsnp_ds, 'POST query 2 - dataset response HIT dbSNP' );
+eq_or_diff($json, $expected_data_dbsnp_ds, "GA4GH Beacon 2 ds - variant exists in dbSNP - dataset response");
 
 # Found variant with includeDataSetResponses MISS
 my $post_data3_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
@@ -360,16 +398,6 @@ eq_or_diff($json, $expected_data3, "GA4GH Beacon query - variant not at location
 # Testing for an unavailable assembly
 my $post_data4 = '{"referenceName": "7", "start" : 86442405, "referenceBases": "T", "alternateBases": "C",' . 
                    '"assemblyId" : "' . $unavailable_assembly . '" }';
- 
-#my $expected_data4 = {
-#  "beaconId" => $beaconId,
-#  "datasetAlleleResponses" => undef,
-#  "alleleRequest" => undef,
-#  "error" => { "errorCode" => 100,
-#               "message" => "Assembly ($unavailable_assembly) not available"
-#             },
-#  "exists" => undef
-#};
 
 $allele_request = {
   "referenceName" => "7",

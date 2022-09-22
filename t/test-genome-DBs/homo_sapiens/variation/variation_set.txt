@@ -38,5 +38,5 @@
 55	Saqqaq	Variants genotyped in a Palaeo-Eskimo Saqqaq individual	238
 56	Seong-Jin Kim	Variants genotyped in Seong-Jin Kim	240
 57	YanHang	Variants genotyped in a Han Chinese individual (YanHuang Project)	241
-64	clinically associated	Variants described by ClinVar as being probable-pathogenic, pathogenic, drug-response or histocompatibility	345
+58	clinically associated	Variants described by ClinVar as being probable-pathogenic, pathogenic, drug-response or histocompatibility	345
 37	Illumina_HumanOmni5	Variants from the Illumina HumanOmni5v1 whole genome genotyping array designed for association studies	354
