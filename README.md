@@ -7,8 +7,8 @@ API used for our REST server, http://rest.ensembl.org
 
 
 
-[![Build Status](https://travis-ci.org/Ensembl/ensembl-rest.svg?branch=master)][travis]
-[![Coverage Status](https://coveralls.io/repos/github/Ensembl/ensembl-rest/badge.svg?branch=master)][coveralls]
+[![Build Status](https://travis-ci.org/Ensembl/ensembl-rest.svg?branch=release/109)][travis]
+[![Coverage Status](https://coveralls.io/repos/github/Ensembl/ensembl-rest/badge.svg?branch=release/109)][coveralls]
 
 [travis]: https://travis-ci.org/Ensembl/ensembl-rest
 [coveralls]: https://coveralls.io/github/Ensembl/ensembl-rest
