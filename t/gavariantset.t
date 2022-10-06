@@ -143,7 +143,7 @@ my $expected_data2 = {
          type => 'Integer'                                                               
        },                                                                                
        { info => {},                                                                     
-         description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
+         description => 'Ancestral Allele, https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
          id => 'AA',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  
@@ -340,7 +340,7 @@ my $expected_get_data =  {
          type => 'Integer'                                                               
        },                                                                                
        { info => {},                                                                     
-         description => 'Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
+         description => 'Ancestral Allele, https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README',
          id => 'AA',                                                                     
          key => 'INFO',                                                                  
          number => '1',                                                                  

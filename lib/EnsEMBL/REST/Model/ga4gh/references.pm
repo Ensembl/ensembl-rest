@@ -153,7 +153,7 @@ sub format_sequence{
      $ens_ver  = 75         if $seq->{assembly} =~/GRCh37/; 
      $seq->{assembly} =~ s/\.p13// if $seq->{assembly} =~/GRCh37/;
      ## over-write stored ftp location with current for GRCh38 site
-     $ref{sourceURI} =  'ftp://ftp.ensembl.org/pub/release-'. $ens_ver .'/fasta/homo_sapiens/dna/Homo_sapiens.'. $seq->{assembly} .'.dna.chromosome.' . $ref{name} . '.fa.gz'; 
+     $ref{sourceURI} =  'https://ftp.ensembl.org/pub/release-'. $ens_ver .'/fasta/homo_sapiens/dna/Homo_sapiens.'. $seq->{assembly} .'.dna.chromosome.' . $ref{name} . '.fa.gz'; 
      
   }
 

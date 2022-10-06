@@ -2327,7 +2327,7 @@
 2327	1457	"codon_variant" []	\N
 2328	1458	"initiatior codon variant" []	\N
 2329	1458	"initiator codon change" []	\N
-2330	1459	"missense" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2330	1459	"missense" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2331	1459	"missense codon" []	\N
 2332	1459	"non synonymous codon" []	\N
 2333	1459	"non synonymous variant" []	\N
@@ -2338,12 +2338,12 @@
 2338	1460	"quiet missense codon" []	\N
 2339	1461	"non conservative missense codon" []	\N
 2340	1461	"non conservative missense variant" []	\N
-2341	1462	"nonsense" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2341	1462	"nonsense" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2342	1462	"nonsense codon" []	\N
 2343	1462	"stop codon gained" []	\N
 2344	1462	"stop gained" [http://ensembl.org/info/docs/variation/index.html]	\N
 2345	1463	"frameshift variant" []	\N
-2346	1463	"frameshift_" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2346	1463	"frameshift_" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2347	1463	"frameshift_coding" [http://ensembl.org/info/docs/variation/index.html]	\N
 2348	1464	"terminal codon variant" []	\N
 2349	1464	"terminal_codon_variant" []	\N
@@ -2392,15 +2392,15 @@
 2392	1497	"5'UTR variant" []	\N
 2393	1497	"5PRIME_UTR" [http://ensembl.org/info/docs/variation/index.html]	\N
 2394	1497	"five prime UTR variant" []	\N
-2395	1497	"untranslated-5" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2395	1497	"untranslated-5" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2396	1498	"3'UTR variant" []	\N
 2397	1498	"3PRIME_UTR" [http://ensembl.org/info/docs/variation/index.html]	\N
 2398	1498	"three prime UTR variant" []	\N
-2399	1498	"untranslated-3" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2399	1498	"untranslated-3" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2400	1499	"incomplete terminal codon variant" []	\N
 2401	1499	"partial_codon" [http://ensembl.org/info/docs/variation/index.html]	\N
 2402	1500	"intron variant" []	\N
-2403	1500	"intron_" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2403	1500	"intron_" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2404	1500	"intronic" [http://ensembl.org/info/docs/variation/index.html]	\N
 2405	1501	"intergenic" [http://ensembl.org/info/docs/variation/index.html]	\N
 2406	1501	"intergenic variant" []	\N
@@ -2413,11 +2413,11 @@
 2413	1506	"downstream" [http://ensembl.org/info/docs/variation/index.html]	\N
 2414	1506	"within 5KB downstream" []	\N
 2415	1507	"500B downstream variant" []	\N
-2416	1507	"near-gene-3" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2416	1507	"near-gene-3" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2417	1508	"5kb upstream variant" []	\N
 2418	1508	"upstream" [http://ensembl.org/info/docs/variation/index.html]	\N
 2419	1509	"2KB upstream variant" []	\N
-2420	1509	"near-gene-5" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2420	1509	"near-gene-5" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2421	1510	"rRNA gene" []	\N
 2422	1511	"piRNA gene" []	\N
 2423	1512	"RNase P RNA gene" []	\N
@@ -2649,7 +2649,7 @@
 2649	1684	"coding variant quality" []	\N
 2650	1686	"non synonymous" []	\N
 2651	1688	"protein altering variant" []	\N
-2652	1689	"coding-synon" [ftp://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
+2652	1689	"coding-synon" [https://ftp.ncbi.nih.gov/snp/specs/docsum_3.1.xsd]	\N
 2653	1689	"silent mutation" []	\N
 2654	1689	"silent substitution" []	\N
 2655	1689	"silent_mutation" []	\N

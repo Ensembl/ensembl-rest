@@ -4,7 +4,7 @@
       "name": "GRCh37",
       "md5":  "3812377a7767211e8f30e096f1615583",
       "sourceAccessions":["GCA_000001405.14"],
-      "sourceUri": "ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/",
+      "sourceUri": "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/",
       "ncbiTaxonId": "9606",
       "isDerived":   "true",
       "sequences":[
