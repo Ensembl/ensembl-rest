@@ -68,11 +68,6 @@ sub get_beacon {
   my $db_assembly = $db_meta->{assembly} || '';
   my $schema_version = $db_meta->{schema_version} || '';
 
-  my $welcomeURL = 'https://rest.ensembl.org';
-  if ($db_assembly eq 'GRCh37') {
-    $welcomeURL = 'https://grch37.rest.ensembl.org';
-  }
-
   my $altURL = 'https://www.ensembl.org';
   if ($db_assembly eq 'GRCh37') {
     $altURL = 'https://grch37.ensembl.org';
@@ -86,24 +81,50 @@ sub get_beacon {
     $beacon_id = $beacon_id . '.' . lc $db_assembly if($db_assembly eq 'GRCh37');
     $beacon_name = $beacon_name . ' ' . $db_assembly;
   }
-  $beacon->{id} = $beacon_id;
-  $beacon->{name} = $beacon_name;
+  
+  $beacon->{beaconId} = $beacon_id;
 
-  $beacon->{apiVersion} = 'v1.0.1';
-  $beacon->{organization} =  $self->get_beacon_organization();
+  $beacon->{apiVersion} = 'v2.0.0';
   $beacon->{description} = 'Human variant data from the Ensembl database';
   $beacon->{version} = $schema_version;
 
-  $beacon->{welcomeUrl} = $welcomeURL;
   $beacon->{alternativeUrl} = $altURL;
   $beacon->{createDateTime} = undef;
   $beacon->{updateDateTime} = undef;
-  $beacon->{datasets} = $self->get_beacon_all_datasets($db_meta);
-  $beacon->{sampleAlleleRequests} = undef;
-  $beacon->{info} = undef;
+  $beacon->{testMode} = JSON::false;
+  $beacon->{updateDateTime} = undef;
   
-  return $beacon;
+  my @returned_schemas;
+  push (@returned_schemas, {entityType => 'info', schema => ''}); # add schema
+  $beacon->{returnedSchemas} = \@returned_schemas;
+  # $beacon->{datasets} = $self->get_beacon_all_datasets($db_meta);
 
+  my $return_beacon;
+  $return_beacon->{meta} = $beacon;
+  $return_beacon->{response} = $self->get_beacon_response($db_assembly, $beacon_id, $beacon_name);
+
+  return $return_beacon;
+
+}
+
+sub get_beacon_response {
+  my ($self, $db_assembly, $beacon_id, $beacon_name) = @_;
+
+  my $response;
+
+  my $welcomeURL = 'https://rest.ensembl.org';
+  if ($db_assembly eq 'GRCh37') {
+    $welcomeURL = 'https://grch37.rest.ensembl.org';
+  }
+
+  $response->{apiVersion} = 'v2.0.0';
+  $response->{id} = $beacon_id;
+  $response->{name} = $beacon_name;
+  $response->{welcomeUrl} = $welcomeURL;
+  $response->{organization} =  $self->get_beacon_organization();
+  $response->{environment} = 'prod';
+
+  return $response;
 }
 
 # returns ga4gh BeaconOrganization
