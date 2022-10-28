@@ -68,11 +68,6 @@ sub get_beacon {
   my $db_assembly = $db_meta->{assembly} || '';
   my $schema_version = $db_meta->{schema_version} || '';
 
-  my $altURL = 'https://www.ensembl.org';
-  if ($db_assembly eq 'GRCh37') {
-    $altURL = 'https://grch37.ensembl.org';
-  }
-
   # Unique identifier of the Beacon
   my $beacon_id = 'org.ensembl.rest';
   my $beacon_name = 'EBI - Ensembl';
@@ -81,32 +76,47 @@ sub get_beacon {
     $beacon_id = $beacon_id . '.' . lc $db_assembly if($db_assembly eq 'GRCh37');
     $beacon_name = $beacon_name . ' ' . $db_assembly;
   }
-  
-  $beacon->{beaconId} = $beacon_id;
-
-  $beacon->{apiVersion} = 'v2.0.0';
-  $beacon->{description} = 'Human variant data from the Ensembl database';
-  $beacon->{version} = $schema_version;
-
-  $beacon->{alternativeUrl} = $altURL;
-  $beacon->{createDateTime} = undef;
-  $beacon->{updateDateTime} = undef;
-  $beacon->{testMode} = JSON::false;
-  $beacon->{updateDateTime} = undef;
-  
-  my @returned_schemas;
-  push (@returned_schemas, {entityType => 'info', schema => ''}); # add schema
-  $beacon->{returnedSchemas} = \@returned_schemas;
-  # $beacon->{datasets} = $self->get_beacon_all_datasets($db_meta);
 
   my $return_beacon;
-  $return_beacon->{meta} = $beacon;
+  $return_beacon->{meta} = $self->get_beacon_meta($db_assembly, $schema_version, $beacon_id, $beacon_name);
   $return_beacon->{response} = $self->get_beacon_response($db_assembly, $beacon_id, $beacon_name);
 
   return $return_beacon;
-
 }
 
+# framework -> responses -> beaconInformationalResponseMeta
+# returns the meta information of the Beacon
+sub get_beacon_meta {
+  my ($self, $db_assembly, $schema_version, $beacon_id, $beacon_name) = @_;
+
+  my $meta;
+
+  my $altURL = 'https://www.ensembl.org';
+  if ($db_assembly eq 'GRCh37') {
+    $altURL = 'https://grch37.ensembl.org';
+  }
+
+  $meta->{beaconId} = $beacon_id;
+
+  $meta->{apiVersion} = 'v2.0.0';
+  $meta->{description} = 'Human variant data from the Ensembl database';
+  $meta->{version} = $schema_version;
+
+  $meta->{alternativeUrl} = $altURL;
+  $meta->{createDateTime} = undef;
+  $meta->{updateDateTime} = undef;
+  $meta->{testMode} = JSON::false;
+  $meta->{updateDateTime} = undef;
+  
+  my @returned_schemas;
+  push (@returned_schemas, {entityType => 'info', schema => ''}); # add schema
+  $meta->{returnedSchemas} = \@returned_schemas;
+
+  return $meta;
+}
+
+# framework -> responses -> beaconInfoResults
+# returns the results info of the Beacon
 sub get_beacon_response {
   my ($self, $db_assembly, $beacon_id, $beacon_name) = @_;
 
