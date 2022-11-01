@@ -63,7 +63,7 @@ sub get_beacon {
   my $beacon;
 
   # The Beacon identifier depends on the assembly requested
-  my $db_meta = $self->fetch_db_meta();
+  my $db_meta = $self->context->model('ga4gh::ga4gh_utils')->fetch_db_meta();
 
   my $db_assembly = $db_meta->{assembly} || '';
   my $schema_version = $db_meta->{schema_version} || '';
@@ -165,62 +165,6 @@ sub get_beacon_organization {
   $organization->{logoUrl} = $logoURL;
   $organization->{info} = undef;
   return $organization;
-}
-
-# Get list of all available datasets (Beacon Datasets)
-sub get_beacon_all_datasets {
-  my ($self, $db_meta, @variation_set_list) = @_; 
-
-  my @beacon_datasets;
-
-  my $c = $self->context(); 
-
-  my $variation_set_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationset');
-
-  if(!@variation_set_list) {
-    @variation_set_list = @{$variation_set_adaptor->fetch_all()};
-  }
-
-  # dbSNP is not a variation_set but we need this set for Beacon
-  # That is why we need to create a fake set called 'dbSNP' using an id that is not being used in the variation db
-  my $dbsnp_set = get_dbsnp_set($c);
-  push(@variation_set_list, $dbsnp_set);
-
-  foreach my $dataset (@variation_set_list) {
-    my $beacon_dataset = $self->get_beacon_dataset($db_meta, $dataset);
-    $valid_dataset_ids->{$beacon_dataset->{id}} = 1 if(defined $beacon_dataset->{id});
-    push(@beacon_datasets, $beacon_dataset); 
-  }
-
-  return \@beacon_datasets; 
-
-}
-
-# Get a VariationSet and return a Beacon Dataset 
-sub get_beacon_dataset {
-  my ($self, $db_meta, $dataset) = @_;
-
-  my $beacon_dataset;
-
-  my $db_assembly = $db_meta->{assembly};
-  my $externalURL = 'https://www.ensembl.org';
-  if ($db_assembly eq 'GRCh37') {
-    $externalURL = 'https://grch37.ensembl.org';
-  }
-
-  $beacon_dataset->{id} = $dataset->short_name();
-  $beacon_dataset->{name} = $dataset->name();
-  $beacon_dataset->{description} = $dataset->description();
-  $beacon_dataset->{assemblyId} = $db_assembly;
-  $beacon_dataset->{createDateTime} = undef;
-  $beacon_dataset->{updateDateTime} = undef;
-  $beacon_dataset->{version} = $db_meta->{schema_version};
-  $beacon_dataset->{variantCount} = undef;
-  $beacon_dataset->{callCount} = undef;
-  $beacon_dataset->{sampleCount} =  undef;
-  $beacon_dataset->{externalUrl} = $externalURL; 
-  $beacon_dataset->{info} = undef;
-  return $beacon_dataset;
 }
 
 sub beacon_query {
@@ -464,42 +408,11 @@ sub get_beacon_error {
   return $error;
 }
 
+# return the assembly
 sub get_assembly {
   my ($self) = @_;
-  my $db_meta = $self->fetch_db_meta();
+  my $db_meta = $self->context->model('ga4gh::ga4gh_utils')->fetch_db_meta();
   return $db_meta->{assembly};
-}
-
-# Fetch required meta info 
-# TODO place in utilities
-sub fetch_db_meta {
-  my ($self) = @_;
-
-  # my $c = $self->context();-
-  # $c->log()->info("for info");
-  my $species = 'homo_sapiens';
-  my $core_ad = $self->context->model('Registry')->get_DBAdaptor($species, 'Core');
-
-  ## extract required meta data from core db
-  my $cmeta_ext_sth = $core_ad->dbc->db_handle->prepare(qq[ select meta_key, meta_value from meta]);
-  $cmeta_ext_sth->execute();
-  my $core_meta = $cmeta_ext_sth->fetchall_arrayref();
-
-  my %cmeta;
-  foreach my $l(@{$core_meta}){
-    $cmeta{$l->[0]} = $l->[1];
-  }
-
-  ## default ensembl set names/ids
-  my $db_meta;
-  $db_meta->{datasetId}      = "Ensembl";
-  $db_meta->{id}             = join(".", "Ensembl",
-                                         $cmeta{"schema_version"},
-                                         $cmeta{"assembly.default"});
-  $db_meta->{assembly}       = $cmeta{"assembly.default"};
-  $db_meta->{schema_version} = $cmeta{"schema_version"};
- 
-  return $db_meta;
 }
 
 # TODO  parameter for species
