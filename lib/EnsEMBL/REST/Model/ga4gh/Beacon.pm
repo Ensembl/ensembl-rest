@@ -26,6 +26,8 @@ use Catalyst::Exception;
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences); 
 
+use Data::Dumper;
+
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
 
@@ -65,7 +67,7 @@ sub get_beacon {
   # The Beacon identifier depends on the assembly requested
   my $db_meta = $self->context->model('ga4gh::ga4gh_utils')->fetch_db_meta();
 
-  my $db_assembly = $db_meta->{assembly} || '';
+  my $db_assembly = $self->get_assembly();
   my $schema_version = $db_meta->{schema_version} || '';
 
   # Unique identifier of the Beacon
@@ -111,6 +113,32 @@ sub get_beacon_meta {
   my @returned_schemas;
   push (@returned_schemas, {entityType => 'info', schema => ''}); # add schema
   $meta->{returnedSchemas} = \@returned_schemas;
+
+  return $meta;
+}
+
+sub get_meta {
+  my ($self, $beacon_id) = @_;
+
+  my $meta;
+
+  $meta->{beaconId} = $beacon_id;
+  $meta->{apiVersion} = 'v2.0.0';
+
+  my @returned_schemas;
+  push (@returned_schemas, {entityType => 'genomicVariant', schema => ''}); # add schema
+  $meta->{returnedSchemas} = \@returned_schemas;
+
+  $meta->{receivedRequestSummary}->{apiVersion} = 'v2.0.0';
+  $meta->{receivedRequestSummary}->{requestedSchemas} = \@returned_schemas; # same as returnedSchemas (genomicVariant)
+  $meta->{receivedRequestSummary}->{pagination}->{limit} = 0; # size of the page (default: 0). 0 returns all the results or the maximum allowed by the Beacon
+  $meta->{receivedRequestSummary}->{pagination}->{skip} = 0; # number of pages to skip/skipped (default: 0)
+  $meta->{receivedRequestSummary}->{requestedGranularity} = 'record';
+  $meta->{createDateTime} = undef;
+  $meta->{updateDateTime} = undef;
+  $meta->{testMode} = JSON::false;
+  $meta->{updateDateTime} = undef;
+  $meta->{includeResultsetResponses} = undef;
 
   return $meta;
 }
@@ -167,11 +195,43 @@ sub get_beacon_organization {
   return $organization;
 }
 
+# Main method
+#  check the parameters
+#  get the request
+#  check if variant exists
+#  returns the main Beacon response
+# In v2 response has three parts:
+#  1 - meta
+#    1.1 - returnedSchemas
+#    1.2 - receivedRequestSummary
+#  2 - response
+#  3 - responseSummary
 sub beacon_query {
 
   my ($self, $data) = @_;
   my $beaconAlleleResponse;
   my $beaconError;
+
+  # Check assembly requested is assembly of DB
+  my $db_assembly = $self->get_assembly();
+
+  # Unique identifier of the Beacon
+  my $beacon_id = 'org.ensembl.rest';
+  if ($db_assembly) {
+    # beacon id for grch38 is 'org.ensembl.rest' and for grch37 is 'org.ensembl.rest.grch37'
+    $beacon_id = $beacon_id . '.' . lc $db_assembly if($db_assembly eq 'GRCh37');
+  }
+
+  $beaconAlleleResponse->{meta} = $self->get_meta($beacon_id);
+  # 'meta -> receivedRequestSummary' can include the IncludeResultsetResponses
+  # add IncludeResultsetResponses to meta
+  if (exists $data->{IncludeResultsetResponses}) {
+    $beaconAlleleResponse->{meta}->{receivedRequestSummary}->{IncludeResultsetResponses} = $data->{IncludeResultsetResponses};
+  }
+  else {
+    # return the default (HIT)
+    $beaconAlleleResponse->{meta}->{receivedRequestSummary}->{IncludeResultsetResponses} = 'HIT';
+  }
 
   my $beacon = $self->get_beacon();
 
@@ -179,20 +239,20 @@ sub beacon_query {
 
   my $beaconAlleleRequest = $self->get_beacon_allele_request($data);
 
-  # includeDatasetResponses can be:
+  # IncludeResultsetResponses can be:
   # ALL returns all datasets even those that don't have the queried variant
-  # HIT returns only datasets that have the queried variant
+  # HIT returns only datasets that have the queried variant (default)
   # MISS means opposite to HIT value, only datasets that don't have the queried variant
   # NONE don't return datasets response
-  my $incl_ds_response = 0; #NONE
-  if (exists $data->{includeDatasetResponses}) {
-    if (uc $data->{includeDatasetResponses} eq 'ALL') {
+  my $incl_ds_response = 2; # HIT is the default
+  if (exists $data->{IncludeResultsetResponses}) {
+    if (uc $data->{IncludeResultsetResponses} eq 'ALL') {
       $incl_ds_response = 1;
     }
-    elsif (uc $data->{includeDatasetResponses} eq 'HIT') {
-      $incl_ds_response = 2;
+    elsif (uc $data->{IncludeResultsetResponses} eq 'NONE') {
+      $incl_ds_response = 0;
     }
-    elsif (uc $data->{includeDatasetResponses} eq 'MISS') {
+    elsif (uc $data->{IncludeResultsetResponses} eq 'MISS') {
       $incl_ds_response = 3;
     }
   }
@@ -205,14 +265,14 @@ sub beacon_query {
     @dataset_ids_list = split(',', $data->{datasetIds});
   }
 
-  $beaconAlleleResponse->{beaconId} = $beacon->{id};
-  $beaconAlleleResponse->{exists} = undef;
-  $beaconAlleleResponse->{error} = $beaconError;
-  $beaconAlleleResponse->{alleleRequest} = $beaconAlleleRequest;
-  $beaconAlleleResponse->{datasetAlleleResponses} = undef;
+  # $beaconAlleleResponse->{error} = $beaconError;
+  $beaconAlleleResponse->{alleleRequest} = $beaconAlleleRequest; # Change this to return only the dataset ids; move to 'receivedRequestSummary'; delete 'alleleRequest'
+  $beaconAlleleResponse->{response}->{resultSets} = undef;
 
-  # Check assembly requested is assembly of DB
-  my $db_assembly = $self->get_assembly();
+  my $response_summary;
+  $response_summary->{exists} = undef;
+  $response_summary->{numTotalResults} = undef;
+  $beaconAlleleResponse->{responseSummary} = $response_summary;
 
   my $assemblyId = $data->{assemblyId};
   if (uc($db_assembly) ne uc($assemblyId)) {
@@ -221,7 +281,7 @@ sub beacon_query {
       $beaconAlleleResponse->{error} = $beaconError;
       return $beaconAlleleResponse;
   }
- 
+
   # check variant if only all parameters are valid
   if(!defined($beaconError)){
     my %input_coord;
@@ -257,9 +317,11 @@ sub beacon_query {
     } else {
       $exists_JSON = JSON::false;
     }
-    $beaconAlleleResponse->{exists} = $exists_JSON;
+    
+    $beaconAlleleResponse->{responseSummary}->{exists} = $exists_JSON;
+    
     if ($incl_ds_response) {
-      $beaconAlleleResponse->{datasetAlleleResponses} = $dataset_response;
+      $beaconAlleleResponse->{response}->{resultSets} = $dataset_response;
     }
   }
   return $beaconAlleleResponse;
@@ -296,7 +358,7 @@ sub check_parameters {
       unless (exists $parameters->{$key});
   }
 
-  my @optional_fields = qw/content-type callback datasetIds includeDatasetResponses/;
+  my @optional_fields = qw/content-type callback datasetIds IncludeResultsetResponses/;
 
   my %allowed_fields = map { $_ => 1 } @required_fields,  @optional_fields;
 
@@ -342,8 +404,8 @@ sub check_parameters {
   elsif($parameters->{assemblyId} !~ /^(GRCh38|GRCh37)$/i){
     $error = $self->get_beacon_error('400', "Invalid assemblyId");
   }
-  elsif(defined($parameters->{includeDatasetResponses}) && $parameters->{includeDatasetResponses} eq ''){
-    $error = $self->get_beacon_error('400', "Invalid includeDatasetResponses");
+  elsif(defined($parameters->{IncludeResultsetResponses}) && $parameters->{IncludeResultsetResponses} eq ''){
+    $error = $self->get_beacon_error('400', "Invalid IncludeResultsetResponses");
   }
   elsif(defined($parameters->{datasetIds})){
     foreach my $dataset (split(',', $parameters->{datasetIds})){
@@ -391,9 +453,9 @@ sub get_beacon_allele_request {
     $beaconAlleleRequest->{datasetIds} = $data->{datasetIds};
   }
 
-  $beaconAlleleRequest->{includeDatasetResponses} = undef;
-  if (exists $data->{includeDatasetResponses}) {
-    $beaconAlleleRequest->{includeDatasetResponses} = $data->{includeDatasetResponses};
+  $beaconAlleleRequest->{IncludeResultsetResponses} = undef;
+  if (exists $data->{IncludeResultsetResponses}) {
+    $beaconAlleleRequest->{IncludeResultsetResponses} = $data->{IncludeResultsetResponses};
   }
   return $beaconAlleleRequest;
 }
@@ -679,8 +741,7 @@ sub get_dataset_response {
   return ($found, \@dataset_response);
 }
 
-# Returns a BeaconDatasetAlleleResponse for a
-# variant feature
+# Returns a BeaconDatasetAlleleResponse for a variant feature
 # Assumes that it exists
 sub get_dataset_allele_response {
   my ($dataset, $assemblyId, $found, $vf, $sv, $variant_dt) = @_;
@@ -690,15 +751,14 @@ sub get_dataset_allele_response {
   # for now dataset error is null
   my $error;
 
-    $ds_response->{'datasetId'} = $dataset->short_name();
+    $ds_response->{'id'} = $dataset->short_name();
     $ds_response->{'exists'} = undef;
-    $ds_response->{'error'} = undef;
-    $ds_response->{'frequency'} = undef;
-    $ds_response->{'callCount'} = undef;
-    $ds_response->{'sampleCount'} = undef;
-    $ds_response->{'note'} = undef;
-    $ds_response->{'externalUrl'} = undef;
-    $ds_response->{'info'} = undef;
+    # $ds_response->{'error'} = undef;
+    $ds_response->{'resultsCount'} = undef;
+    $ds_response->{'results'} = undef;
+    $ds_response->{'setType'} = 'dataset';
+    $ds_response->{'info'}->{'counts'}->{'callCount'} = undef;
+    $ds_response->{'info'}->{'counts'}->{'sampleCount'} = undef;
 
     # Change 
     if (! defined $found) {
@@ -706,7 +766,7 @@ sub get_dataset_allele_response {
       return $ds_response;
     }
     if ($found == 0) {
-      $ds_response->{'variantCount'} = undef;
+      $ds_response->{'info'}->{'counts'}->{'callCount'} = undef;
       $ds_response->{'exists'} = JSON::false;
       return $ds_response;
     }
@@ -720,15 +780,38 @@ sub get_dataset_allele_response {
 
     my @urls;
 
+    # Array to store the results that include the variant info
+    my @results_list = ();
+    # Prepare the result
+    my $result_details;
+
+    # # TODO caseLevelData
+    # my @case_level_data = (); 
+    # $result_details->{caseLevelData} = \@case_level_data;
+
     if($vf) {
       my $var_name;
       my $delimiter;
+
+      # Format results variation
+      # Using the Beacon v2 legacy SNV and Beacon v2 legacy CNV
+      my $variation;
+      my $variant_type;
+      my $ref_bases; # Only for SNPs
+      my $alt_bases; # Only for SNPs
+      my $seq_region_name;
+
       foreach my $variant (@{$vf}) {
         if($sv == 1) {
+          $variant_type = $variant->class_SO_term();
           $var_name = $variant->variation_name();
           $delimiter = "StructuralVariation/Explore?sv=";
         }
         else {
+          $variant_type = 'SNP';
+          $ref_bases = $variant->ref_allele_string();
+          $alt_bases = join(',', @{$variant->alt_alleles()});
+
           $var_name = $variant->name();
           $delimiter = "Variation/Explore?v=";
         }
@@ -740,13 +823,30 @@ sub get_dataset_allele_response {
         if($contains) {
           my $url_tmp = $externalURL . "/Homo_sapiens/" . $delimiter . $var_name;
           push @urls, $url_tmp;
+
+          $variation->{'variantType'} = $variant_type;
+          $variation->{'referenceBases'} = $variant->ref_allele_string() if($ref_bases);
+          $variation->{'alternateBases'} = join(',', @{$variant->alt_alleles()}) if($alt_bases);
+          $variation->{'location'}->{'type'} = 'SequenceLocation';
+          $variation->{'location'}->{'sequence_id'} = $variant->seq_region_name();
+          $variation->{'location'}->{'interval'}->{'type'} = 'SequenceInterval';
+          $variation->{'location'}->{'interval'}->{'start'}->{'type'} = 'Number';
+          $variation->{'location'}->{'interval'}->{'start'}->{'value'} = $variant->seq_region_start();
+          $variation->{'location'}->{'interval'}->{'end'}->{'type'} = 'Number';
+          $variation->{'location'}->{'interval'}->{'end'}->{'value'} = $variant->seq_region_end();
         }
       }
       my $url = join(',', @urls);
       $externalURL = $url;
+      
+      $result_details->{variantInternalId} = undef;
+      $result_details->{variation} = $variation;
+      push(@results_list, $result_details);
     }
 
-    $ds_response->{'variantCount'} = scalar @urls;
+    $ds_response->{'results'} = \@results_list;
+
+    $ds_response->{'info'}->{'counts'}->{'callCount'} = scalar @urls;
 
     $ds_response->{'externalUrl'} = $externalURL;
 
@@ -801,6 +901,7 @@ sub get_datasets_input {
 }
 
 # Create the dbSNP set object
+# Human is imported from dbSNP
 sub get_dbsnp_set {
   my $c = shift;
 
@@ -826,6 +927,7 @@ sub get_dbsnp_set {
   return $dbsnp_set;
 }
 
+# Check if array contains a value
 sub contains_value {
   my ($value, $array) = @_;
 
