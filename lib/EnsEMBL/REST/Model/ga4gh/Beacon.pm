@@ -195,6 +195,65 @@ sub get_beacon_organization {
   return $organization;
 }
 
+sub get_beacon_all_datasets {
+  my ($self, @variation_set_list) = @_; 
+
+  my @beacon_datasets;
+
+  my $c = $self->context();
+  my $db_meta = $c->model('ga4gh::ga4gh_utils')->fetch_db_meta();
+
+  my $variation_set_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationset');
+
+  if(!@variation_set_list) {
+    @variation_set_list = @{$variation_set_adaptor->fetch_all()};
+  }
+
+  # dbSNP is not a variation_set but we need this set for Beacon
+  # That is why we need to create a fake set called 'dbSNP' using an id that is not being used in the variation db
+  my $dbsnp_set = get_dbsnp_set($c);
+  push(@variation_set_list, $dbsnp_set);
+
+  foreach my $dataset (@variation_set_list) {
+    my $beacon_dataset = $self->get_beacon_dataset($db_meta, $dataset);
+    $valid_dataset_ids->{$beacon_dataset->{id}} = 1 if(defined $beacon_dataset->{id});
+    push(@beacon_datasets, $beacon_dataset); 
+  }
+
+  return \@beacon_datasets;
+}
+
+# Get a VariationSet and return a Beacon Dataset 
+sub get_beacon_dataset {
+  my ($self, $db_meta, $dataset) = @_;
+
+  my $beacon_dataset;
+
+  my $db_assembly = $db_meta->{assembly};
+  my $externalURL = 'https://www.ensembl.org';
+  if ($db_assembly eq 'GRCh37') {
+    $externalURL = 'https://grch37.ensembl.org';
+  }
+
+  $beacon_dataset->{id} = $dataset->short_name();
+  $beacon_dataset->{name} = $dataset->name();
+  $beacon_dataset->{description} = $dataset->description();
+  $beacon_dataset->{externalUrl} = $externalURL;
+
+  # or it could be 'dataUseConditions -> DUODataUse'
+  # my @data_use_conditions = ();
+  # my $duo_data_use;
+  # $duo_data_use->{'id'} = 'DUO:0000004';
+  # $duo_data_use->{'label'} = 'no restriction';
+  # push(@data_use_conditions, $duo_data_use);
+
+  $beacon_dataset->{dataUseConditions}->{'id'} = 'DUO:0000004';
+  $beacon_dataset->{dataUseConditions}->{'label'} = 'no restriction';
+
+  return $beacon_dataset;
+}
+
+
 # Main method
 #  check the parameters
 #  get the request
@@ -223,36 +282,36 @@ sub beacon_query {
   }
 
   $beaconAlleleResponse->{meta} = $self->get_meta($beacon_id);
-  # 'meta -> receivedRequestSummary' can include the IncludeResultsetResponses
-  # add IncludeResultsetResponses to meta
-  if (exists $data->{IncludeResultsetResponses}) {
-    $beaconAlleleResponse->{meta}->{receivedRequestSummary}->{IncludeResultsetResponses} = $data->{IncludeResultsetResponses};
+  # 'meta -> receivedRequestSummary' can include the includeResultsetResponses
+  # add includeResultsetResponses to meta
+  if (exists $data->{includeResultsetResponses}) {
+    $beaconAlleleResponse->{meta}->{receivedRequestSummary}->{includeResultsetResponses} = $data->{includeResultsetResponses};
+    $beaconAlleleResponse->{meta}->{includeResultsetResponses} = $data->{includeResultsetResponses};
   }
   else {
     # return the default (HIT)
-    $beaconAlleleResponse->{meta}->{receivedRequestSummary}->{IncludeResultsetResponses} = 'HIT';
+    $beaconAlleleResponse->{meta}->{receivedRequestSummary}->{includeResultsetResponses} = 'HIT';
+    $beaconAlleleResponse->{meta}->{includeResultsetResponses} = 'HIT';
   }
 
   my $beacon = $self->get_beacon();
-
+  my $all_datasets = $self->get_beacon_all_datasets();
   $beaconError = $self->check_parameters($data); 
 
-  my $beaconAlleleRequest = $self->get_beacon_allele_request($data);
-
-  # IncludeResultsetResponses can be:
+  # includeResultsetResponses can be:
   # ALL returns all datasets even those that don't have the queried variant
   # HIT returns only datasets that have the queried variant (default)
   # MISS means opposite to HIT value, only datasets that don't have the queried variant
   # NONE don't return datasets response
   my $incl_ds_response = 2; # HIT is the default
-  if (exists $data->{IncludeResultsetResponses}) {
-    if (uc $data->{IncludeResultsetResponses} eq 'ALL') {
+  if (exists $data->{includeResultsetResponses}) {
+    if (uc $data->{includeResultsetResponses} eq 'ALL') {
       $incl_ds_response = 1;
     }
-    elsif (uc $data->{IncludeResultsetResponses} eq 'NONE') {
+    elsif (uc $data->{includeResultsetResponses} eq 'NONE') {
       $incl_ds_response = 0;
     }
-    elsif (uc $data->{IncludeResultsetResponses} eq 'MISS') {
+    elsif (uc $data->{includeResultsetResponses} eq 'MISS') {
       $incl_ds_response = 3;
     }
   }
@@ -263,10 +322,10 @@ sub beacon_query {
 
   if (exists $data->{datasetIds}) {
     @dataset_ids_list = split(',', $data->{datasetIds});
+    $beaconAlleleResponse->{meta}->{receivedRequestSummary}->{datasetIds} = \@dataset_ids_list; 
   }
 
-  # $beaconAlleleResponse->{error} = $beaconError;
-  $beaconAlleleResponse->{alleleRequest} = $beaconAlleleRequest; # Change this to return only the dataset ids; move to 'receivedRequestSummary'; delete 'alleleRequest'
+  $beaconAlleleResponse->{error} = $beaconError if($beaconError);
   $beaconAlleleResponse->{response}->{resultSets} = undef;
 
   my $response_summary;
@@ -358,7 +417,7 @@ sub check_parameters {
       unless (exists $parameters->{$key});
   }
 
-  my @optional_fields = qw/content-type callback datasetIds IncludeResultsetResponses/;
+  my @optional_fields = qw/content-type callback datasetIds includeResultsetResponses/;
 
   my %allowed_fields = map { $_ => 1 } @required_fields,  @optional_fields;
 
@@ -404,8 +463,8 @@ sub check_parameters {
   elsif($parameters->{assemblyId} !~ /^(GRCh38|GRCh37)$/i){
     $error = $self->get_beacon_error('400', "Invalid assemblyId");
   }
-  elsif(defined($parameters->{IncludeResultsetResponses}) && $parameters->{IncludeResultsetResponses} eq ''){
-    $error = $self->get_beacon_error('400', "Invalid IncludeResultsetResponses");
+  elsif(defined($parameters->{includeResultsetResponses}) && $parameters->{includeResultsetResponses} eq ''){
+    $error = $self->get_beacon_error('400', "Invalid includeResultsetResponses");
   }
   elsif(defined($parameters->{datasetIds})){
     foreach my $dataset (split(',', $parameters->{datasetIds})){
@@ -415,49 +474,7 @@ sub check_parameters {
     }
   }
 
-  return $error; 
- 
-}
-
-# Get beacon_allele_request
-sub get_beacon_allele_request {
-  my ($self, $data) = @_;
-  my $beaconAlleleRequest;
-
-  for my $field (qw/referenceName start referenceBases alternateBases variantType assemblyId/) {
-    $beaconAlleleRequest->{$field} = $data->{$field};
-  }
-
-  if (exists $data->{start}) {
-    $beaconAlleleRequest->{start} = int($data->{start});
-  }
-
-  if (exists $data->{end}) {
-    $beaconAlleleRequest->{end} = int($data->{end});
-  }
-  if (exists $data->{startMin}) {
-    $beaconAlleleRequest->{startMin} = int($data->{startMin});
-  }
-  if (exists $data->{startMax}) {
-    $beaconAlleleRequest->{startMax} = int($data->{startMax});
-  }
-  if (exists $data->{endMin}) {
-    $beaconAlleleRequest->{endMin} = int($data->{endMin});
-  }
-  if (exists $data->{endMax}) {
-    $beaconAlleleRequest->{endMax} = int($data->{endMax});
-  }
-
-  $beaconAlleleRequest->{datasetIds} = undef;
-  if (exists $data->{datasetIds}) {
-    $beaconAlleleRequest->{datasetIds} = $data->{datasetIds};
-  }
-
-  $beaconAlleleRequest->{IncludeResultsetResponses} = undef;
-  if (exists $data->{IncludeResultsetResponses}) {
-    $beaconAlleleRequest->{IncludeResultsetResponses} = $data->{IncludeResultsetResponses};
-  }
-  return $beaconAlleleRequest;
+  return $error;
 }
 
 sub get_beacon_error {
@@ -478,8 +495,6 @@ sub get_assembly {
 }
 
 # TODO  parameter for species
-# TODO  use assemblyID
-# Assembly not taken to account, assembly of REST machine
 sub variant_exists {
   my ($self, $input_coords, $incl_ds_response, $assemblyId, $dataset_ids_list) = @_;
 
