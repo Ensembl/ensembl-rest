@@ -24,9 +24,7 @@ extends 'Catalyst::Model';
 use Catalyst::Exception;
 
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
-use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences); 
-
-use Data::Dumper;
+use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences);
 
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
@@ -48,6 +46,15 @@ has 'sv_so_terms' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
 });
 
 has 'context' => (is => 'ro',  weak_ref => 1);
+
+# Info for the variation sets that are going to be created
+has 'variation_sets_info' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
+  return {
+    'dbsnp' => 'Variants (including SNPs and indels) imported from dbSNP',
+    'dgva'  => 'Variants imported from the Database of Genomic Variants Archive',
+    'dbvar' => 'Variants imported from the NCBI database of human genomic structural variation'
+  };
+});
 
 our $valid_dataset_ids = {};
 
@@ -211,8 +218,14 @@ sub get_beacon_all_datasets {
 
   # dbSNP is not a variation_set but we need this set for Beacon
   # That is why we need to create a fake set called 'dbSNP' using an id that is not being used in the variation db
-  my $dbsnp_set = get_dbsnp_set($c);
+  my $dbsnp_set = create_var_set($c, 'dbSNP', $self->variation_sets_info->{'dbsnp'}, 'dbsnp');
   push(@variation_set_list, $dbsnp_set);
+  # Also create variation sets for structural variants
+  # Variation sets: DGVa and dbVar
+  my $dgva_set = create_var_set($c, 'DGVa', $self->variation_sets_info->{'dgva'}, 'dgva');
+  my $dbvar_set = create_var_set($c, 'dbVar', $self->variation_sets_info->{'dbvar'}, 'dbvar');
+  push(@variation_set_list, $dgva_set);
+  push(@variation_set_list, $dbvar_set);
 
   foreach my $dataset (@variation_set_list) {
     my $beacon_dataset = $self->get_beacon_dataset($db_meta, $dataset);
@@ -598,7 +611,7 @@ sub variant_exists {
       my $contains_new_alt = contains_value($new_alt, $alt_alleles);
 
       # get variation source
-      my $source_name = $vf->source()->name();
+      my $source_name = $vf->source_name();
 
       # Some ins/del have allele string 'G/-', others have TG/T
       # trim sequence doesn't always work
@@ -616,9 +629,9 @@ sub variant_exists {
           push (@list_datasetids, $dt_id);
         }
 
-        # We have to consider all dbSNP variants are in the dbSNP set
-        if(lc $source_name eq 'dbsnp'){
-          my $dbsnp_set = get_dbsnp_set($c);
+        # We have to consider all dbSNP variants are in the dbSNP set (human)
+        if(lc $source_name eq 'dbsnp') {
+          my $dbsnp_set = create_var_set($c, 'dbSNP', $self->variation_sets_info->{'dbsnp'}, 'dbsnp');
           push (@list_datasetids, $dbsnp_set->dbID());
           $dataset_var_found{$dbsnp_set->dbID()} = $dbsnp_set;
         }
@@ -635,6 +648,9 @@ sub variant_exists {
       $so_term = defined $terms{$alt_allele} ? $terms{$alt_allele} : $alt_allele;
       my $vf_so_term = $vf->class_SO_term();
 
+      # get Structural Variation source
+      my $source_name = $vf->source_name();
+
       my $contains_so_term = contains_value($vf_so_term, $so_term);
 
       if ($contains_so_term) {
@@ -642,12 +658,27 @@ sub variant_exists {
 
         # Checks datasets only for variants that match
         my $datasets_found = $vf->get_all_VariationSets();
+
         my @list_datasetids;
         foreach my $set (@$datasets_found) {
           my $dt_id = $set->dbID();
           $dataset_var_found{$dt_id} = $set;
           push (@list_datasetids, $dt_id);
         }
+        
+        my $new_set;
+        if(lc $source_name eq 'dgva') {
+          $new_set = create_var_set($c, 'DGVa', $self->variation_sets_info->{'dgva'}, 'dgva');
+        }
+        elsif(lc $source_name eq 'dbvar') {
+          $new_set = create_var_set($c, 'dbVar', $self->variation_sets_info->{'dbvar'}, 'dbvar');
+        }
+        
+        if($new_set) {
+          push (@list_datasetids, $new_set->dbID());
+          $dataset_var_found{$new_set->dbID()} = $new_set;
+        }
+        
         $variant_dt{$vf->variation_name} = \@list_datasetids;
 
         if ($incl_ds_response) {
@@ -661,7 +692,7 @@ sub variant_exists {
 
   # Include dataset response
   if ($incl_ds_response) {
-    ($found, $dataset_response) = get_dataset_response($c, $dataset_ids_list, \@vf_found, \%dataset_var_found, $assemblyId, $sv, \%variant_dt, $found, $incl_ds_response);
+    ($found, $dataset_response) = $self->get_dataset_response($c, $dataset_ids_list, \@vf_found, \%dataset_var_found, $assemblyId, $sv, \%variant_dt, $found, $incl_ds_response);
   }
 
   return ($found, $dataset_response);
@@ -672,11 +703,11 @@ sub variant_exists {
 #    $found: variable was found in the datasets from input or all available datasets
 #    @dataset_response: list of datasets response
 sub get_dataset_response {
-  my ($c, $dataset_ids_list, $vf_found, $dataset_var_found, $assemblyId, $sv, $variant_dt, $found, $incl_ds_response) = @_;
+  my ($self, $c, $dataset_ids_list, $vf_found, $dataset_var_found, $assemblyId, $sv, $variant_dt, $found, $incl_ds_response) = @_;
 
   my %datasets;
-  my $available_datasets = get_all_datasets($c); # All datasets available
-  my $variation_set_list = get_datasets_input($c, $dataset_ids_list); # Datasets from input
+  my $available_datasets = $self->get_all_datasets($c); # All datasets available
+  my $variation_set_list = $self->get_datasets_input($c, $dataset_ids_list); # Datasets from input
 
  my @dataset_response;
 
@@ -871,6 +902,7 @@ sub get_dataset_allele_response {
 # Get all datasets that are available in Ensembl Variation
 # Return a hash key => dataset_id; value => dataset object
 sub get_all_datasets {
+  my $self = shift;
   my $c = shift;
 
   my %available_datasets;
@@ -883,14 +915,19 @@ sub get_all_datasets {
   }
 
   # Add dbSNP to the set list
-  my $dbsnp_set = get_dbsnp_set($c);
+  my $dbsnp_set = create_var_set($c, 'dbSNP', $self->variation_sets_info->{'dbsnp'}, 'dbsnp');
   $available_datasets{$dbsnp_set->dbID()} = $dbsnp_set;
+  my $dgva_set = create_var_set($c, 'DGVa', $self->variation_sets_info->{'dgva'}, 'dgva');
+  $available_datasets{$dgva_set->dbID()} = $dgva_set;
+  my $dbvar_set = create_var_set($c, 'dbVar', $self->variation_sets_info->{'dbvar'}, 'dbvar');
+  $available_datasets{$dbvar_set->dbID()} = $dbvar_set;
 
   return \%available_datasets;
 }
 
 # Get datasets specified in the input
 sub get_datasets_input {
+  my $self = shift;
   my $c = shift;
   my $dataset_ids_list = shift;
 
@@ -901,8 +938,16 @@ sub get_datasets_input {
   foreach my $dataset_id (@{$dataset_ids_list}) {
     # If the dataset is dbSNP then add the dataset object to the list
     if(lc $dataset_id eq 'dbsnp') {
-      my $dbsnp_set = get_dbsnp_set($c);
+      my $dbsnp_set = create_var_set($c, 'dbSNP', $self->variation_sets_info->{'dbsnp'}, 'dbsnp');
       $variation_set_list{$dbsnp_set->dbID()} = $dbsnp_set;
+    }
+    elsif(lc $dataset_id eq 'dgva') {
+      my $dgva_set = create_var_set($c, 'DGVa', $self->variation_sets_info->{'dgva'}, 'dgva');
+      $variation_set_list{$dgva_set->dbID()} = $dgva_set;
+    }
+    elsif(lc $dataset_id eq 'dbvar') {
+      my $dbvar_set = create_var_set($c, 'dbVar', $self->variation_sets_info->{'dbvar'}, 'dbvar');
+      $variation_set_list{$dbvar_set->dbID()} = $dbvar_set;
     }
     else{
       my $variation_set = $variation_set_adaptor->fetch_by_short_name($dataset_id);
@@ -915,12 +960,44 @@ sub get_datasets_input {
   return \%variation_set_list;
 }
 
-# Create the dbSNP set object
-# Human is imported from dbSNP
-sub get_dbsnp_set {
+# Create the dbSNP variation set object - in the variation db dbSNP is not a variation set but we need one for Beacon
+# Creates the sets for the Structural Variants
+# SVs do not have a variation_set attached so we need to create two fake variation sets for Beacon
+# One set for DGVa, another for dbVar
+sub create_var_set {
   my $c = shift;
+  my $name = shift;
+  my $description = shift;
+  my $short_name = shift;
 
   my $variation_set_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'variation', 'variationset');
+  my $max_id = get_var_set_max($variation_set_adaptor);
+  my $dbid;
+
+  if($short_name eq 'dbsnp') {
+    $dbid = $max_id + 1;
+  }
+  elsif($short_name eq 'dgva') {
+    $dbid = $max_id + 2;
+  }
+  else {
+    $dbid = $max_id + 3;
+  }
+
+  my $new_set = Bio::EnsEMBL::Variation::VariationSet->new(
+                    -dbID => $dbid,
+                    -adaptor => $variation_set_adaptor,
+                    -name   => $name,
+                    -description => $description,
+                    -short_name => $short_name
+                  );
+
+  return $new_set;
+}
+
+# Returns the max variation_set_id from the Variation database
+sub get_var_set_max {
+  my $variation_set_adaptor = shift;
 
   # Get current max variation_set_id
   my $variation_sets = $variation_set_adaptor->fetch_all();
@@ -931,15 +1008,7 @@ sub get_dbsnp_set {
     }
   }
 
-  my $dbsnp_set = Bio::EnsEMBL::Variation::VariationSet->new(
-                    -dbID => $max_id + 1,
-                    -adaptor => $variation_set_adaptor,
-                    -name   => 'dbSNP',
-                    -description => 'Variants (including SNPs and indels) imported from dbSNP',
-                    -short_name => 'dbsnp'
-                  );
-
-  return $dbsnp_set;
+  return $max_id;
 }
 
 # Check if array contains a value
