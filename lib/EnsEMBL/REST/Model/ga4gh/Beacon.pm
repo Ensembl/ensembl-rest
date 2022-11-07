@@ -849,7 +849,7 @@ sub get_dataset_allele_response {
 
       foreach my $variant (@{$vf}) {
         if($sv == 1) {
-          $variant_type = $variant->class_SO_term();
+          $variant_type = $variant->class_SO_term(); # TODO - use correct terms
           $var_name = $variant->variation_name();
           $delimiter = "StructuralVariation/Explore?sv=";
         }
