@@ -245,7 +245,9 @@ sub get_unique_schema_versions {
   my %hash;
   my $species_info = $self->_species_info();
   foreach my $species (@{$species_info}) {
-    $hash{$species->{release}} = 1;
+    if(defined $species->{release}) {
+      $hash{$species->{release}} = 1;
+    }
   }
   return [map { $_ *1 } keys %hash];
 }
