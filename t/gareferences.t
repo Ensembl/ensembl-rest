@@ -69,7 +69,7 @@ my $expected_data_single =  {
       length => 51304566,
       sourceDivergence => undef,
       isDerived => "true",
-      sourceURI => "ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.22.fa.gz",
+      sourceURI => "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.75.dna.chromosome.22.fa.gz",
       id => "a718acaa6135fdca8357d5bfe94211dd",
     },
   ],
@@ -90,7 +90,7 @@ my $expected_data2 =  {
         'NC_000011.9'                                    
       ],                                                 
       sourceDivergence => undef,                            
-      sourceURI => 'ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.11.fa.gz'
+      sourceURI => 'https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.75.dna.chromosome.11.fa.gz'
     },                                                    
     {                                                     
       id => '2979a6085bfe28e3ad6f552f361ed74d',           
@@ -104,7 +104,7 @@ my $expected_data2 =  {
         'NC_000021.8'                                     
       ],                                                  
       sourceDivergence => undef,                             
-      sourceURI => 'ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.21.fa.gz'
+      sourceURI => 'https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.75.dna.chromosome.21.fa.gz'
     } 
   ]
 };
@@ -124,7 +124,7 @@ my $expected_data3 =  {
         'NC_000007.13'                                                                                                 
       ],                                                                                                               
       sourceDivergence => undef,                                          
-      sourceURI => 'ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.7.fa.gz'
+      sourceURI => 'https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.75.dna.chromosome.7.fa.gz'
     },                                                                                                                 
     {                                                                                                                  
       id => '1fa3474750af0948bdf97d5a0ee52e51',                                                                        
@@ -138,7 +138,7 @@ my $expected_data3 =  {
         'NC_000024.9'                                                                                                  
       ],                                                                                                               
       sourceDivergence => undef,                                                                                          
-      sourceURI => 'ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.Y.fa.gz'  
+      sourceURI => 'https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.75.dna.chromosome.Y.fa.gz'
     }                                                                                                                  
   ] 
 };
@@ -181,7 +181,7 @@ my $expected_get_data =  {
       length => 51304566,
       sourceDivergence => undef,
       isDerived => "true",
-      sourceURI => "ftp://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.dna.chromosome.22.fa.gz",
+      sourceURI => "https://ftp.ensembl.org/pub/release-75/fasta/homo_sapiens/dna/Homo_sapiens.GRCh37.75.dna.chromosome.22.fa.gz",
       id => "a718acaa6135fdca8357d5bfe94211dd",
 } ; 
 
@@ -203,4 +203,3 @@ eq_or_diff($json_seq_get, $expected_get_seq_data, "Checking the get bases result
 
 
 done_testing();
-
