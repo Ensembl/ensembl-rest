@@ -72,7 +72,7 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   my ( $self, $c, $id ) = @_;
   my $lookup = $c->model('Lookup');
   my $species;
-  $species = $lookup->find_object_location($id);
+  ($species) = $lookup->find_object_location($id);
 
   if ( !$species ) {
     $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
