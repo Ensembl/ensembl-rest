@@ -105,7 +105,7 @@ sub extract_data{
     next if defined $post_data->{md5checksum} && $post_data->{md5checksum} ne '' 
                                               && $post_data->{md5checksum} ne $refseq->{md5};
 
-    next if defined $post_data->{accession}   && $post_data->{accession}   ne '' 
+    next if defined $post_data->{accession}   && $post_data->{accession}   ne ''
                                               && $post_data->{accession}   ne $refseq->{sourceAccessions}->[0]; 
 
     ## rough paging
@@ -150,11 +150,16 @@ sub format_sequence{
      $ref{sourceURI} = "https://github.com/ga4gh/compliance/blob/master/test-data/";
   }
   else{
-     $ens_ver  = 75         if $seq->{assembly} =~/GRCh37/; 
+     $ens_ver = 75 if $seq->{assembly} =~/GRCh37/;
      $seq->{assembly} =~ s/\.p13// if $seq->{assembly} =~/GRCh37/;
      ## over-write stored ftp location with current for GRCh38 site
-     $ref{sourceURI} =  'ftp://ftp.ensembl.org/pub/release-'. $ens_ver .'/fasta/homo_sapiens/dna/Homo_sapiens.'. $seq->{assembly} .'.dna.chromosome.' . $ref{name} . '.fa.gz'; 
-     
+     $ref{sourceURI} = 'https://ftp.ensembl.org/pub/release-'. $ens_ver .'/fasta/homo_sapiens/dna/Homo_sapiens.'. $seq->{assembly};
+      if($seq->{assembly} =~/GRCh37/) {
+        $ref{sourceURI} .= '.75.dna.chromosome.' . $ref{name} . '.fa.gz';
+      }
+      else {
+        $ref{sourceURI} .= '.dna.chromosome.' . $ref{name} . '.fa.gz';
+      }
   }
 
   return \%ref;
