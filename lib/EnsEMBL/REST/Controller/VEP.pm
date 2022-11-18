@@ -71,6 +71,7 @@ has valid_user_params => (
     mane
     shift_3prime
     shift_genomic
+    miRNA
 
     pick
     pick_allele
