@@ -66,6 +66,11 @@ is_json_GET(
 );
 
 is_json_GET(
+    '/homology/id/ENSG00000139618?format=condensed;target_species=gorilla_gorilla;type=orthologues', {data => []},
+    'homologies without compara division specified',
+);
+
+is_json_GET(
     '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_taxon=9595;type=orthologues',
     _get_returned_json('ENSG00000139618', $condensed_ortho_ENSG00000139618_gorilla),
     '"condensed" homologies with a target single-species taxon',
