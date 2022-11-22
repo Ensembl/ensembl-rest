@@ -72,6 +72,8 @@ has valid_user_params => (
     shift_3prime
     shift_genomic
 
+    ga4gh_vrs
+
     pick
     pick_allele
     per_gene
