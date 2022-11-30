@@ -176,7 +176,7 @@ my $expected_data_dbsnp_ds = {
                          },
                          "start" => {
                            "type" => "Number",
-                           "value" => 86442404
+                           "value" => 86442403
                          },
                          "type" => "SequenceInterval"
                        },
@@ -416,7 +416,7 @@ my $expected_data_cnv = {
                          },
                          "start" => {
                            "type" => "Number",
-                           "value" => 7803891
+                           "value" => 7803890
                          },
                          "type" => "SequenceInterval"
                        },

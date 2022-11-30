@@ -22,7 +22,7 @@ package EnsEMBL::REST::Model::ga4gh::Beacon;
 use Moose;
 extends 'Catalyst::Model';
 use Catalyst::Exception;
-
+use List::MoreUtils qw(uniq);
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences);
 
@@ -851,6 +851,10 @@ sub get_dataset_allele_response {
       my $ref_bases; # Only for SNPs
       my $alt_bases; # Only for SNPs
       my $seq_region_name;
+      my $variation_name = undef;
+      my @var_alt_ids; # variantAlternativeIds (part of the identifiers)
+      my @genes; # geneIds (part of MolecularAttributes)
+      my @molecular_effects; # molecularEffects (part of MolecularAttributes)
 
       foreach my $variant (@{$vf}) {
         if($sv == 1) {
@@ -875,6 +879,28 @@ sub get_dataset_allele_response {
           my $url_tmp = $externalURL . "/Homo_sapiens/" . $delimiter . $var_name;
           push @urls, $url_tmp;
 
+          $variation_name = $variant->name();
+          my $source_name = $variant->source_name();
+          if($source_name eq 'dbSNP') {
+            push @var_alt_ids, 'dbSNP:' . $variation_name;
+          }
+          elsif($source_name eq 'COSMIC') {
+            push @var_alt_ids, 'COSMIC:' . $variation_name;
+          }
+
+          my $gene_list = $variant->get_overlapping_Genes();
+          foreach my $gene (@{$gene_list}) {
+            push @genes, $gene->external_name();
+          }
+
+          my $var_consequences = $variant->get_all_OverlapConsequences();
+          foreach my $consequence (@{$var_consequences}) {
+            my $cons;
+            $cons->{id} = $consequence->SO_accession();
+            $cons->{label} = $consequence->SO_term();
+            push @molecular_effects, $cons;
+          }
+
           $variation->{'variantType'} = $variant_type;
           $variation->{'referenceBases'} = $variant->ref_allele_string() if($ref_bases);
           $variation->{'alternateBases'} = join(',', @{$variant->alt_alleles()}) if($alt_bases);
@@ -882,7 +908,7 @@ sub get_dataset_allele_response {
           $variation->{'location'}->{'sequence_id'} = $variant->seq_region_name();
           $variation->{'location'}->{'interval'}->{'type'} = 'SequenceInterval';
           $variation->{'location'}->{'interval'}->{'start'}->{'type'} = 'Number';
-          $variation->{'location'}->{'interval'}->{'start'}->{'value'} = $variant->seq_region_start();
+          $variation->{'location'}->{'interval'}->{'start'}->{'value'} = $variant->seq_region_start() - 1; # following GA4GH VRS specification
           $variation->{'location'}->{'interval'}->{'end'}->{'type'} = 'Number';
           $variation->{'location'}->{'interval'}->{'end'}->{'value'} = $variant->seq_region_end();
         }
@@ -890,8 +916,16 @@ sub get_dataset_allele_response {
       my $url = join(',', @urls);
       $externalURL = $url;
       
-      $result_details->{variantInternalId} = undef;
+      $result_details->{variantInternalId} = $variation_name;
       $result_details->{variation} = $variation;
+      $result_details->{identifiers} = \@var_alt_ids if (scalar @var_alt_ids > 0);
+
+      my @unique_genes = uniq @genes;
+      $result_details->{MolecularAttributes}->{geneIds} = \@unique_genes if (scalar @unique_genes > 0);
+
+      my @unique_molecular_effects = uniq @molecular_effects;
+      $result_details->{MolecularAttributes}->{molecularEffects} = \@unique_molecular_effects if (scalar @unique_molecular_effects > 0);
+
       push(@results_list, $result_details);
     }
 
