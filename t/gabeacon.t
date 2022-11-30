@@ -165,8 +165,8 @@ my $expected_data_dbsnp_ds = {
   "exists" => JSON::true,
   "externalUrl" => $externalURL . "rs2299222",
   "info" => { "counts" => { "callCount" => 1, "sampleCount" => undef } },
-  "results" => [ { "variantInternalId" => undef,
-                   "variation" => { 
+  "results" => [ { "variantInternalId" => "rs2299222",
+                   "variation" => {
                      "alternateBases" => "C",
                      "location" => {
                        "interval" => {
@@ -185,6 +185,10 @@ my $expected_data_dbsnp_ds = {
                      },
                      "referenceBases" => "T",
                      "variantType" => "SNP"
+                   },
+                   "identifiers" => [ "dbSNP:rs2299222" ],
+                   "MolecularAttributes" => {
+                     "molecularEffects" => [ { "id" => "SO:0001627", "label" => "intron_variant" } ]
                    }
                  } ],
   "resultsCount" => undef,

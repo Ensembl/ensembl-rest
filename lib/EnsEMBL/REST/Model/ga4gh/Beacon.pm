@@ -851,7 +851,6 @@ sub get_dataset_allele_response {
       my $ref_bases; # Only for SNPs
       my $alt_bases; # Only for SNPs
       my $seq_region_name;
-      my $variation_name = undef;
       my @var_alt_ids; # variantAlternativeIds (part of the identifiers)
       my @genes; # geneIds (part of MolecularAttributes)
       my @molecular_effects; # molecularEffects (part of MolecularAttributes)
@@ -879,13 +878,12 @@ sub get_dataset_allele_response {
           my $url_tmp = $externalURL . "/Homo_sapiens/" . $delimiter . $var_name;
           push @urls, $url_tmp;
 
-          $variation_name = $variant->name();
           my $source_name = $variant->source_name();
           if($source_name eq 'dbSNP') {
-            push @var_alt_ids, 'dbSNP:' . $variation_name;
+            push @var_alt_ids, 'dbSNP:' . $var_name;
           }
           elsif($source_name eq 'COSMIC') {
-            push @var_alt_ids, 'COSMIC:' . $variation_name;
+            push @var_alt_ids, 'COSMIC:' . $var_name;
           }
 
           my $gene_list = $variant->get_overlapping_Genes();
@@ -916,7 +914,7 @@ sub get_dataset_allele_response {
       my $url = join(',', @urls);
       $externalURL = $url;
       
-      $result_details->{variantInternalId} = $variation_name;
+      $result_details->{variantInternalId} = $var_name;
       $result_details->{variation} = $variation;
       $result_details->{identifiers} = \@var_alt_ids if (scalar @var_alt_ids > 0);
 
