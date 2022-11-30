@@ -68,15 +68,51 @@ cmp_ok(keys(%{$beacon_json->{response}->{organization}}), '==', 8, 'Check organi
 # POST checks 
 my $json;
 
+# Expected responses
+my $expected_response_sum_1 = {
+  "numTotalResults" => 20,
+  "exists" => JSON::true
+};
+
+my $expected_response_sum_2 = {
+  "numTotalResults" => 1,
+  "exists" => JSON::false
+};
+
+my $expected_response_sum_3 = {
+  "numTotalResults" => 0,
+  "exists" => JSON::false
+};
+
+my $expected_response_sum_4 = {
+  "numTotalResults" => 1,
+  "exists" => JSON::true
+};
+
+my $expected_response_sum_5 = {
+  "numTotalResults" => 0,
+  "exists" => JSON::true
+};
+
+my $expected_response_sum_6 = {
+    "numTotalResults" => 3,
+    "exists" => JSON::true
+};
+
+my $expected_response_sum_7 = {
+    "numTotalResults" => 45,
+    "exists" => JSON::false
+};
+
+my $expected_response_sum_8 = {
+    "numTotalResults" => 2,
+    "exists" => JSON::true
+};
+
 # Testing for a variant that exists at a given location
 # includeResultsetResponses = default (HIT)
 my $post_data1 = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
                   '"assemblyId" : "' . $assemblyId . '" }'; 
-
-my $expected_response_sum_1 = {
-  "numTotalResults" => undef,
-  "exists" => JSON::true
-};
 
 my $expected_meta_receive_req_sum = {
   "apiVersion" => $beacon_version,
@@ -116,7 +152,7 @@ my $expected_meta_receive_req_sum_dt = {
 };
 
 $json = json_POST( $q_base , $post_data1_ds, 'POST query SNV - dataset response HIT' );
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query SNV with datasets - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_4, "GA4GH Beacon query SNV with datasets - responseSummary");
 eq_or_diff($json->{meta}->{receivedRequestSummary}, $expected_meta_receive_req_sum_dt, "GA4GH Beacon query SNV with datasets - response meta");
 cmp_ok(@{$json->{response}->{resultSets}}, '==', 1, 'GA4GH Beacon query SNV with datasets - response resultSets count');
 
@@ -178,16 +214,11 @@ my $dataset_response_miss = {
 
 $json = json_POST( $q_base , $post_data3_ds, 'POST query SNV - dataset response MISS' );
 eq_or_diff($json->{response}->{resultSets}, [$dataset_response_miss], "GA4GH Beacon query SNV dataset MISS - response");
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query SNV dataset MISS - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_4, "GA4GH Beacon query SNV dataset MISS - responseSummary");
 
 # Not found variant with dataset and includeResultsetResponses ALL
 my $post_data4_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
                   '"assemblyId" : "' . $assemblyId . '", "includeResultsetResponses" : "ALL", "datasetIds" : "clin_assoc"}';
-
-my $expected_response_sum_2 = {
-  "numTotalResults" => undef,
-  "exists" => JSON::false
-};
 
 my $expected_data4_ds = {
   "id" => "clin_assoc",
@@ -213,7 +244,8 @@ my $post_data5_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases"
 
 $json = json_POST( $q_base , $post_data5_ds, 'POST query SNV - dataset response NONE' );
 eq_or_diff($json->{response}->{resultSets}, undef, "GA4GH Beacon query SNV dataset NONE - response");
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query SNV dataset NONE - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_5, "GA4GH Beacon query SNV dataset NONE - responseSummary");
+
 
 # Found variant with includeDataSetResponse empty
 my $post_data6_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
@@ -233,7 +265,7 @@ my $post_data7_ds = '{"referenceName": "7", "start" : 86442403, "referenceBases"
                  '"assemblyId" : "' . $assemblyId . '" }';
 
 $json = json_POST( $q_base , $post_data7_ds, 'POST query SNV - not found' );
-eq_or_diff($json->{responseSummary}, $expected_response_sum_2, "GA4GH Beacon query SNV not found - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_3, "GA4GH Beacon query SNV not found - responseSummary");
 # TODO: test response -> resultSets
 
 # Test with includeResultsetResponses without dataset ids
@@ -285,7 +317,7 @@ my $post_data7 = '{"referenceName": "8", "start" : 7803890, "end" : 7825339, "va
                    '"assemblyId" : "' . $assemblyId . '" }';
 
 $json = json_POST( $q_base , $post_data7, 'POST query CNV' );
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query CNV - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_6, "GA4GH Beacon query CNV - responseSummary");
 cmp_ok(@{$json->{response}->{resultSets}}, '==', 3, 'GA4GH Beacon query CNV - response resultSets count');
 
 
@@ -311,14 +343,14 @@ cmp_ok(@{$json->{response}->{resultSets}}, '==', 20, 'GA4GH Beacon query SNV - r
 # Testing with an includeResultsetResponses HIT
 my $uri_ds_1 = $get_base_uri . ";referenceName=7;start=86442403;referenceBases=T;alternateBases=C;assemblyId=$assemblyId;includeResultsetResponses=HIT;datasetIds=hapmap_ceu,clin_assoc";
 $json = json_GET($uri_ds_1, 'GET query SNV - entry with dataset response');
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query SNV with datasets - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_4, "GA4GH Beacon query SNV with datasets - responseSummary");
 eq_or_diff($json->{meta}->{receivedRequestSummary}, $expected_meta_receive_req_sum_dt, "GA4GH Beacon query SNV with datasets - response meta");
 cmp_ok(@{$json->{response}->{resultSets}}, '==', 1, 'GA4GH Beacon query SNV with datasets - response resultSets count');
 
 # Testing for a variant that exists at a given location not found
 my $uri_2 = $get_base_uri . ";referenceName=7;start=86442403;referenceBases=C;alternateBases=T;assemblyId=$assemblyId";
 $json = json_GET($uri_2, 'GET query SNV not found');
-eq_or_diff($json->{responseSummary}, $expected_response_sum_2, "GA4GH Beacon query SNV not found - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_3, "GA4GH Beacon query SNV not found - responseSummary");
 # TODO: test response -> resultSets
 
 # Testing with an includeResultsetResponses ALL and dataset ids
@@ -331,13 +363,13 @@ eq_or_diff($json->{responseSummary}, $expected_response_sum_2, "GA4GH Beacon que
 my $uri_ds_3 = $get_base_uri . ";referenceName=7;start=86442403;referenceBases=C;alternateBases=T;assemblyId=$assemblyId;includeResultsetResponses=ALL";
 $json = json_GET($uri_ds_3, 'GET query SNV ALL datasets');
 cmp_ok(@{$json->{response}->{resultSets}}, '==', 45, 'GA4GH Beacon query SNV ALL datasets - response resultSets count');
-eq_or_diff($json->{responseSummary}, $expected_response_sum_2, "GA4GH Beacon query SNV ALL datasets - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_7, "GA4GH Beacon query SNV ALL datasets - responseSummary");
 
 # Testing with an includeResultsetResponses MISS and dataset ids
 my $uri_ds_4 = $get_base_uri . ";referenceName=7;start=86442403;referenceBases=T;alternateBases=C;assemblyId=$assemblyId;includeResultsetResponses=MISS;datasetIds=hapmap_ceu,clin_assoc";
 $json = json_GET($uri_ds_4, 'GET query SNV dataset MISS');
 eq_or_diff($json->{response}->{resultSets}, [$dataset_response_miss], "GA4GH Beacon query SNV dataset MISS - response");
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query SNV dataset MISS - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_4, "GA4GH Beacon query SNV dataset MISS - responseSummary");
 
 # Testing using an assembly that does not match DB assembly
 my $uri_5 = $get_base_uri . ";referenceName=7;start=86442405;referenceBases=T;alternateBases=C;assemblyId=$unavailable_assembly";
@@ -353,18 +385,18 @@ eq_or_diff($json->{error}, $expected_error_message_4, "GA4GH Beacon query SNV - 
 # Testing structural variant with precise coordinates
 my $uri_7 = $get_base_uri . ";referenceName=8;start=7803890;end=7825339;variantType=CNV;referenceBases=N;assemblyId=$assemblyId";
 $json = json_GET($uri_7, 'GET query CNV - structural variant');
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query CNV - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_6, "GA4GH Beacon query CNV - responseSummary");
 cmp_ok(@{$json->{response}->{resultSets}}, '==', 3, 'GA4GH Beacon query CNV - response resultSets count');
 
 # Testing structural variant with a range of coordinates
 my $uri_8 = $get_base_uri . ";referenceName=8;startMin=7803800;startMax=7803900;endMin=7825300;endMax=7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId";
 $json = json_GET($uri_8, 'GET query CNV - range query');
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query CNV - range query");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_6, "GA4GH Beacon query CNV - range query");
 
 # Testing a small insertion - SNV
 my $uri_9 = $get_base_uri . ";referenceName=11;start=6303492;referenceBases=T;alternateBases=GT;assemblyId=$assemblyId";
 $json = json_GET($uri_9, 'GET query insertion');
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query insertion");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_8, "GA4GH Beacon query insertion");
 
 # Testing different CNVs in datasets
 # There's two variants in this region but only one in dataset '1kg_eur_com'
@@ -400,7 +432,7 @@ my $expected_data_cnv = {
 
 my $uri_ds_cnv = $get_base_uri . ";referenceName=8;startMin=7803800;startMax=7806000;endMin=7823400;endMax=7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId;includeResultsetResponses=HIT;datasetIds=1kg_eur_com";
 $json = json_GET($uri_ds_cnv, 'GET query CNV HIT dataset');
-eq_or_diff($json->{responseSummary}, $expected_response_sum_1, "GA4GH Beacon query CNV HIT dataset - responseSummary");
+eq_or_diff($json->{responseSummary}, $expected_response_sum_4, "GA4GH Beacon query CNV HIT dataset - responseSummary");
 eq_or_diff($json->{response}->{resultSets}, [$expected_data_cnv], "GA4GH Beacon query CNV HIT dataset - response");
 
 done_testing();

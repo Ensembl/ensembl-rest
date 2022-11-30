@@ -115,8 +115,7 @@ sub get_beacon_meta {
   $meta->{createDateTime} = undef;
   $meta->{updateDateTime} = undef;
   $meta->{testMode} = JSON::false;
-  $meta->{updateDateTime} = undef;
-  
+
   my @returned_schemas;
   push (@returned_schemas, {entityType => 'info', schema => ''}); # add schema
   $meta->{returnedSchemas} = \@returned_schemas;
@@ -343,7 +342,7 @@ sub beacon_query {
 
   my $response_summary;
   $response_summary->{exists} = undef;
-  $response_summary->{numTotalResults} = undef;
+  $response_summary->{numTotalResults} = 0;
   $beaconAlleleResponse->{responseSummary} = $response_summary;
 
   my $assemblyId = $data->{assemblyId};
@@ -389,9 +388,15 @@ sub beacon_query {
     } else {
       $exists_JSON = JSON::false;
     }
-    
+
     $beaconAlleleResponse->{responseSummary}->{exists} = $exists_JSON;
-    
+
+    # $dataset_response is an array ref in which each element is a dataset
+    # NumTotalResults is the total number of results
+    if($dataset_response){
+      $beaconAlleleResponse->{responseSummary}->{numTotalResults} = scalar(@{$dataset_response});
+    }
+
     if ($incl_ds_response) {
       $beaconAlleleResponse->{response}->{resultSets} = $dataset_response;
     }
