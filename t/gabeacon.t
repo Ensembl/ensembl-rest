@@ -189,6 +189,9 @@ my $expected_data_dbsnp_ds = {
                    "identifiers" => [ "dbSNP:rs2299222" ],
                    "MolecularAttributes" => {
                      "molecularEffects" => [ { "id" => "SO:0001627", "label" => "intron_variant" } ]
+                   },
+                   "variantLevelData" => {
+                     "clinicalInterpretations" => [ { "conditionId" => "ACHONDROPLASIA", "effect" => { "id" => "Orphanet:15", "label" => "ACHONDROPLASIA" } } ]
                    }
                  } ],
   "resultsCount" => undef,
@@ -410,7 +413,7 @@ my $expected_data_cnv = {
   "exists" => JSON::true,
   "externalUrl" => $externalURL_2 . "esv93078",
   "info" => { "counts" => { "callCount" => 1, "sampleCount" => undef } },
-  "results" => [ { "variantInternalId" => undef,
+  "results" => [ { "variantInternalId" => "esv89107",
                    "variation" => {
                      "location" => {
                        "interval" => {
@@ -428,6 +431,12 @@ my $expected_data_cnv = {
                        "type" => "SequenceLocation"
                      },
                      "variantType" => "copy_number_variation"
+                   },
+                   "MolecularAttributes" => {
+                     "molecularEffects" => [ { "id" => "SO:0001628", "label" => "intergenic_variant" } ]
+                   },
+                   "variantLevelData" => {
+                     "clinicalInterpretations" => [ { "conditionId" => "ACHONDROPLASIA", "effect" => { "id" => "Orphanet:15", "label" => "ACHONDROPLASIA" } } ]
                    }
                  } ],
   "resultsCount" => undef,

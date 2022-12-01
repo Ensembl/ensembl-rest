@@ -802,136 +802,169 @@ sub get_dataset_allele_response {
   # for now dataset error is null
   my $error;
 
-    $ds_response->{'id'} = $dataset->short_name();
-    $ds_response->{'exists'} = undef;
-    # $ds_response->{'error'} = undef;
-    $ds_response->{'resultsCount'} = undef;
-    $ds_response->{'results'} = undef;
-    $ds_response->{'setType'} = 'dataset';
+  $ds_response->{'id'} = $dataset->short_name();
+  $ds_response->{'exists'} = undef;
+  # $ds_response->{'error'} = undef;
+  $ds_response->{'resultsCount'} = undef;
+  $ds_response->{'results'} = undef;
+  $ds_response->{'setType'} = 'dataset';
+  $ds_response->{'info'}->{'counts'}->{'callCount'} = undef;
+  $ds_response->{'info'}->{'counts'}->{'sampleCount'} = undef;
+
+  # Change
+  if (! defined $found) {
+    $ds_response->{'error'} = $error;
+    return $ds_response;
+  }
+  if ($found == 0) {
     $ds_response->{'info'}->{'counts'}->{'callCount'} = undef;
-    $ds_response->{'info'}->{'counts'}->{'sampleCount'} = undef;
+    $ds_response->{'exists'} = JSON::false;
+    return $ds_response;
+  }
 
-    # Change 
-    if (! defined $found) {
-      $ds_response->{'error'} = $error;
-      return $ds_response;
-    }
-    if ($found == 0) {
-      $ds_response->{'info'}->{'counts'}->{'callCount'} = undef;
-      $ds_response->{'exists'} = JSON::false;
-      return $ds_response;
-    }
+  $ds_response->{'exists'} = JSON::true;
 
-    $ds_response->{'exists'} = JSON::true;
+  my $url;
+  my $externalURL = "https://www.ensembl.org";
+  if ($assemblyId eq 'GRCh37') {
+    $externalURL = "https://grch37.ensembl.org";
+  }
 
-    my $externalURL = "https://www.ensembl.org";
-    if ($assemblyId eq 'GRCh37') {
-      $externalURL = "https://grch37.ensembl.org";
-    }
+  my @urls;
 
-    my @urls;
+  # Array to store the results that include the variant info
+  my @results_list = ();
+  # Prepare the result
+  my $result_details;
 
-    # Array to store the results that include the variant info
-    my @results_list = ();
-    # Prepare the result
-    my $result_details;
+  if($vf) {
+    my $var_name;
+    my $delimiter;
 
-    # # TODO caseLevelData
-    # my @case_level_data = (); 
-    # $result_details->{caseLevelData} = \@case_level_data;
+    # Format results variation
+    # Using the Beacon v2 legacy SNV and Beacon v2 legacy CNV
+    my $variation;
+    my $variant_type;
+    my $ref_bases; # Only for SNPs
+    my $alt_bases; # Only for SNPs
+    my $seq_region_name;
+    my @var_alt_ids; # variantAlternativeIds (part of the identifiers)
+    my @genes; # geneIds (part of MolecularAttributes)
+    my @molecular_effects; # molecularEffects (part of MolecularAttributes)
+    my @clinical; # clinicalInterpretations (part of variantLevelData)
+    my %unique_phenotypes;
 
-    if($vf) {
-      my $var_name;
-      my $delimiter;
+    foreach my $variation_feature (@{$vf}) {
+      my $var;
 
-      # Format results variation
-      # Using the Beacon v2 legacy SNV and Beacon v2 legacy CNV
-      my $variation;
-      my $variant_type;
-      my $ref_bases; # Only for SNPs
-      my $alt_bases; # Only for SNPs
-      my $seq_region_name;
-      my @var_alt_ids; # variantAlternativeIds (part of the identifiers)
-      my @genes; # geneIds (part of MolecularAttributes)
-      my @molecular_effects; # molecularEffects (part of MolecularAttributes)
-
-      foreach my $variant (@{$vf}) {
-        if($sv == 1) {
-          $variant_type = $variant->class_SO_term(); # TODO - use correct terms
-          $var_name = $variant->variation_name();
-          $delimiter = "StructuralVariation/Explore?sv=";
-        }
-        else {
-          $variant_type = 'SNP';
-          $ref_bases = $variant->ref_allele_string();
-          $alt_bases = join(',', @{$variant->alt_alleles()});
-
-          $var_name = $variant->name();
-          $delimiter = "Variation/Explore?v=";
-        }
-
-        # Checks if dataset_id is one of the datasets where variant is found
-        # If it's not found then dataset response won't include this variant
-        my $datasets = $variant_dt->{$var_name};
-        my $contains = contains_value($dataset_id, $datasets);
-        if($contains) {
-          my $url_tmp = $externalURL . "/Homo_sapiens/" . $delimiter . $var_name;
-          push @urls, $url_tmp;
-
-          my $source_name = $variant->source_name();
-          if($source_name eq 'dbSNP') {
-            push @var_alt_ids, 'dbSNP:' . $var_name;
-          }
-          elsif($source_name eq 'COSMIC') {
-            push @var_alt_ids, 'COSMIC:' . $var_name;
-          }
-
-          my $gene_list = $variant->get_overlapping_Genes();
-          foreach my $gene (@{$gene_list}) {
-            push @genes, $gene->external_name();
-          }
-
-          my $var_consequences = $variant->get_all_OverlapConsequences();
-          foreach my $consequence (@{$var_consequences}) {
-            my $cons;
-            $cons->{id} = $consequence->SO_accession();
-            $cons->{label} = $consequence->SO_term();
-            push @molecular_effects, $cons;
-          }
-
-          $variation->{'variantType'} = $variant_type;
-          $variation->{'referenceBases'} = $variant->ref_allele_string() if($ref_bases);
-          $variation->{'alternateBases'} = join(',', @{$variant->alt_alleles()}) if($alt_bases);
-          $variation->{'location'}->{'type'} = 'SequenceLocation';
-          $variation->{'location'}->{'sequence_id'} = $variant->seq_region_name();
-          $variation->{'location'}->{'interval'}->{'type'} = 'SequenceInterval';
-          $variation->{'location'}->{'interval'}->{'start'}->{'type'} = 'Number';
-          $variation->{'location'}->{'interval'}->{'start'}->{'value'} = $variant->seq_region_start() - 1; # following GA4GH VRS specification
-          $variation->{'location'}->{'interval'}->{'end'}->{'type'} = 'Number';
-          $variation->{'location'}->{'interval'}->{'end'}->{'value'} = $variant->seq_region_end();
-        }
+      if($sv == 1) {
+        $var = $variation_feature->structural_variation();
+        $variant_type = $variation_feature->class_SO_term(); # TODO - use correct terms
+        $var_name = $variation_feature->variation_name();
+        $delimiter = "StructuralVariation/Explore?sv=";
       }
-      my $url = join(',', @urls);
-      $externalURL = $url;
-      
-      $result_details->{variantInternalId} = $var_name;
-      $result_details->{variation} = $variation;
-      $result_details->{identifiers} = \@var_alt_ids if (scalar @var_alt_ids > 0);
+      else {
+        $variant_type = 'SNP';
+        $var = $variation_feature->variation();
+        $ref_bases = $variation_feature->ref_allele_string();
+        $alt_bases = join(',', @{$variation_feature->alt_alleles()});
 
-      my @unique_genes = uniq @genes;
-      $result_details->{MolecularAttributes}->{geneIds} = \@unique_genes if (scalar @unique_genes > 0);
+        $var_name = $variation_feature->name();
+        $delimiter = "Variation/Explore?v=";
+      }
 
-      my @unique_molecular_effects = uniq @molecular_effects;
-      $result_details->{MolecularAttributes}->{molecularEffects} = \@unique_molecular_effects if (scalar @unique_molecular_effects > 0);
+      # Checks if dataset_id is one of the datasets where variant is found
+      # If it's not found then dataset response won't include this variant
+      my $datasets = $variant_dt->{$var_name};
+      my $contains = contains_value($dataset_id, $datasets);
+      if($contains) {
+        my $url_tmp = $externalURL . "/Homo_sapiens/" . $delimiter . $var_name;
+        push @urls, $url_tmp;
 
-      push(@results_list, $result_details);
+        my $source_name = $variation_feature->source_name();
+        if($source_name eq 'dbSNP') {
+          push @var_alt_ids, 'dbSNP:' . $var_name;
+        }
+        elsif($source_name eq 'COSMIC') {
+          push @var_alt_ids, 'COSMIC:' . $var_name;
+        }
+
+        # Add other variant ids from variation synonyms
+        # Only for SNPs
+        if(!$sv) {
+          foreach my $source (@{$var->get_all_synonym_sources()}) {
+            if($source !~ /Archive dbSNP/) {
+              my $synonyms = $var->get_all_synonyms($source);
+              foreach my $source_id (@{$synonyms}) {
+                push @var_alt_ids, $source . ':' . $source_id;
+              }
+            }
+          }
+        }
+
+        my $gene_list = $variation_feature->get_overlapping_Genes();
+        foreach my $gene (@{$gene_list}) {
+          push @genes, $gene->external_name();
+        }
+
+        my $var_consequences = $variation_feature->get_all_OverlapConsequences();
+        foreach my $consequence (@{$var_consequences}) {
+          my $cons;
+          $cons->{id} = $consequence->SO_accession();
+          $cons->{label} = $consequence->SO_term();
+          push @molecular_effects, $cons;
+        }
+
+        $variation->{'variantType'} = $variant_type;
+        $variation->{'referenceBases'} = $variation_feature->ref_allele_string() if($ref_bases);
+        $variation->{'alternateBases'} = join(',', @{$variation_feature->alt_alleles()}) if($alt_bases);
+        $variation->{'location'}->{'type'} = 'SequenceLocation';
+        $variation->{'location'}->{'sequence_id'} = $variation_feature->seq_region_name();
+        $variation->{'location'}->{'interval'}->{'type'} = 'SequenceInterval';
+        $variation->{'location'}->{'interval'}->{'start'}->{'type'} = 'Number';
+        $variation->{'location'}->{'interval'}->{'start'}->{'value'} = $variation_feature->seq_region_start() - 1; # following GA4GH VRS specification
+        $variation->{'location'}->{'interval'}->{'end'}->{'type'} = 'Number';
+        $variation->{'location'}->{'interval'}->{'end'}->{'value'} = $variation_feature->seq_region_end();
+
+        # Get phenotype features to attach to variantLevelData
+        my $pheno_features = $var->get_all_PhenotypeFeatures();
+        foreach my $pheno_feature (@{$pheno_features}) {
+          my $pheno_desc = $pheno_feature->phenotype_description();
+          my $ontology_acc = @{$pheno_feature->get_all_ontology_accessions()}[0];
+          my $pheno;
+          if($pheno_desc && $ontology_acc) {
+            $pheno->{conditionId} = $pheno_desc;
+            $pheno->{effect}->{id} = $ontology_acc;
+            $pheno->{effect}->{label} = $pheno_desc;
+            push @clinical, $pheno if (!$unique_phenotypes{$pheno_desc});
+            $unique_phenotypes{$pheno_desc} = 1;
+          }
+        }
+
+      }
     }
+    $url = join(',', @urls);
 
-    $ds_response->{'results'} = \@results_list;
+    $result_details->{variantInternalId} = $var_name;
+    $result_details->{variation} = $variation;
+    $result_details->{identifiers} = \@var_alt_ids if (scalar @var_alt_ids > 0);
 
-    $ds_response->{'info'}->{'counts'}->{'callCount'} = scalar @urls;
+    my @unique_genes = uniq @genes;
+    $result_details->{MolecularAttributes}->{geneIds} = \@unique_genes if (scalar @unique_genes > 0);
 
-    $ds_response->{'externalUrl'} = $externalURL;
+    my @unique_molecular_effects = uniq @molecular_effects;
+    $result_details->{MolecularAttributes}->{molecularEffects} = \@unique_molecular_effects if (scalar @unique_molecular_effects > 0);
+
+    $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical;
+
+    push(@results_list, $result_details);
+  }
+
+  $ds_response->{'results'} = \@results_list;
+
+  $ds_response->{'info'}->{'counts'}->{'callCount'} = scalar @urls;
+
+  $ds_response->{'externalUrl'} = $url;
 
   return $ds_response;
 }
