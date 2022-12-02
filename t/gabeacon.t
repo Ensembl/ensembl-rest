@@ -163,7 +163,7 @@ my $post_data_dbsnp_ds = '{"referenceName": "7", "start" : 86442403, "referenceB
 my $expected_data_dbsnp_ds = {
   "id" => "dbsnp",
   "exists" => JSON::true,
-  "externalUrl" => $externalURL . "rs2299222",
+  "externalUrl" => [ $externalURL . "rs2299222" ],
   "info" => { "counts" => { "callCount" => 1, "sampleCount" => undef } },
   "results" => [ { "variantInternalId" => "rs2299222",
                    "variation" => {
@@ -396,7 +396,7 @@ eq_or_diff($json->{responseSummary}, $expected_response_sum_6, "GA4GH Beacon que
 cmp_ok(@{$json->{response}->{resultSets}}, '==', 3, 'GA4GH Beacon query CNV - response resultSets count');
 
 # Testing structural variant with a range of coordinates
-my $uri_8 = $get_base_uri . ";referenceName=8;startMin=7803800;startMax=7803900;endMin=7825300;endMax=7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId";
+my $uri_8 = $get_base_uri . ";referenceName=8;start=7803800,7803900;end=7825300,7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId";
 $json = json_GET($uri_8, 'GET query CNV - range query');
 eq_or_diff($json->{responseSummary}, $expected_response_sum_6, "GA4GH Beacon query CNV - range query");
 
@@ -411,9 +411,9 @@ eq_or_diff($json->{responseSummary}, $expected_response_sum_8, "GA4GH Beacon que
 my $expected_data_cnv = {
   "id" => "1kg_eur_com",
   "exists" => JSON::true,
-  "externalUrl" => $externalURL_2 . "esv93078",
+  "externalUrl" => [ $externalURL_2 . "esv93078" ],
   "info" => { "counts" => { "callCount" => 1, "sampleCount" => undef } },
-  "results" => [ { "variantInternalId" => "esv89107",
+  "results" => [ { "variantInternalId" => "esv93078",
                    "variation" => {
                      "location" => {
                        "interval" => {
@@ -443,7 +443,7 @@ my $expected_data_cnv = {
   "setType" => "dataset"
 };
 
-my $uri_ds_cnv = $get_base_uri . ";referenceName=8;startMin=7803800;startMax=7806000;endMin=7823400;endMax=7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId;includeResultsetResponses=HIT;datasetIds=1kg_eur_com";
+my $uri_ds_cnv = $get_base_uri . ";referenceName=8;start=7803800,7806000;end=7823400,7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId;includeResultsetResponses=HIT;datasetIds=1kg_eur_com";
 $json = json_GET($uri_ds_cnv, 'GET query CNV HIT dataset');
 eq_or_diff($json->{responseSummary}, $expected_response_sum_4, "GA4GH Beacon query CNV HIT dataset - responseSummary");
 eq_or_diff($json->{response}->{resultSets}, [$expected_data_cnv], "GA4GH Beacon query CNV HIT dataset - response");
