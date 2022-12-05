@@ -68,6 +68,100 @@ cmp_ok(keys(%{$beacon_json->{response}->{organization}}), '==', 8, 'Check organi
 # POST checks 
 my $json;
 
+### Check invalid parameters ###
+# Invalid referenceName
+my $post_invalid_refname = '{"referenceName": "CHR7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
+                  '"assemblyId" : "' . $assemblyId . '" }';
+
+my $expected_error_invalid = {
+  "errorCode" => 400,
+  "errorMessage" => "Invalid referenceName"
+};
+
+$json = json_POST( $q_base , $post_invalid_refname, 'POST query invalid referenceName' );
+eq_or_diff($json->{error}, $expected_error_invalid, "GA4GH Beacon query invalid referenceName - error");
+
+
+# Missing alternateBases
+# start without end requires alternateBases
+my $post_missing_alt = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T",' .
+                  '"assemblyId" : "' . $assemblyId . '" }';
+
+my $expected_error_missing_alt = {
+  "errorCode" => 400,
+  "errorMessage" => "Missing mandatory parameter alternateBases"
+};
+
+$json = json_POST( $q_base , $post_missing_alt, 'POST query missing alternateBases' );
+eq_or_diff($json->{error}, $expected_error_missing_alt, "GA4GH Beacon query missing alternateBases - error");
+
+
+# Invalid referenceBases
+my $post_invalid_ref = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T2", "alternateBases": "C",' .
+                  '"assemblyId" : "' . $assemblyId . '" }';
+
+my $expected_error_invalid_ref = {
+  "errorCode" => 400,
+  "errorMessage" => "Invalid referenceBases"
+};
+
+$json = json_POST( $q_base , $post_invalid_ref, 'POST query invalid referenceBases' );
+eq_or_diff($json->{error}, $expected_error_invalid_ref, "GA4GH Beacon query invalid referenceBases - error");
+
+
+# Invalid alternateBases
+my $post_invalid_alt = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C2",' .
+                  '"assemblyId" : "' . $assemblyId . '" }';
+
+my $expected_error_invalid_alt = {
+  "errorCode" => 400,
+  "errorMessage" => "Invalid alternateBases"
+};
+
+$json = json_POST( $q_base , $post_invalid_alt, 'POST query invalid alternateBases' );
+eq_or_diff($json->{error}, $expected_error_invalid_alt, "GA4GH Beacon query invalid alternateBases - error");
+
+
+# Invalid variantType
+my $post_invalid_sv = '{"referenceName": "7", "start" : 86442403, "referenceBases": "N", "variantType": "SNP",' .
+                  '"end" : 86442603, "assemblyId" : "' . $assemblyId . '" }';
+
+my $expected_error_invalid_sv = {
+  "errorCode" => 400,
+  "errorMessage" => "Invalid variantType"
+};
+
+$json = json_POST( $q_base , $post_invalid_sv, 'POST query invalid variantType' );
+eq_or_diff($json->{error}, $expected_error_invalid_sv, "GA4GH Beacon query invalid variantType - error");
+
+
+# Invalid assemblyId
+my $post_invalid_assembly = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
+                  '"assemblyId" : "GRCh38" }';
+
+my $expected_error_invalid_assembly = {
+  "errorCode" => 400,
+  "errorMessage" => "User provided assemblyId (GRCh38) does not match with dataset assembly (GRCh37)"
+};
+
+$json = json_POST( $q_base , $post_invalid_assembly, 'POST query invalid assemblyId' );
+eq_or_diff($json->{error}, $expected_error_invalid_assembly, "GA4GH Beacon query invalid assemblyId - error");
+
+
+# Invalid datasetId
+my $post_invalid_dataset = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
+                  '"assemblyId" : "' . $assemblyId . '", "datasetIds" : "clinic_var" }';
+
+my $expected_error_invalid_dataset = {
+  "errorCode" => 400,
+  "errorMessage" => "Invalid datasetId 'clinic_var'"
+};
+
+$json = json_POST( $q_base , $post_invalid_dataset, 'POST query invalid datasetId' );
+eq_or_diff($json->{error}, $expected_error_invalid_dataset, "GA4GH Beacon query invalid datasetId - error");
+
+######
+
 # Expected responses
 my $expected_response_sum_1 = {
   "numTotalResults" => 20,
@@ -106,6 +200,11 @@ my $expected_response_sum_7 = {
 
 my $expected_response_sum_8 = {
     "numTotalResults" => 2,
+    "exists" => JSON::true
+};
+
+my $expected_response_sum_9 = {
+    "numTotalResults" => 4,
     "exists" => JSON::true
 };
 
@@ -397,8 +496,8 @@ cmp_ok(@{$json->{response}->{resultSets}}, '==', 3, 'GA4GH Beacon query CNV - re
 
 # Testing structural variant with a range of coordinates
 my $uri_8 = $get_base_uri . ";referenceName=8;start=7803800,7803900;end=7825300,7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId";
-$json = json_GET($uri_8, 'GET query CNV - range query');
-eq_or_diff($json->{responseSummary}, $expected_response_sum_6, "GA4GH Beacon query CNV - range query");
+$json = json_GET($uri_8, 'GET query CNV - bracket query');
+eq_or_diff($json->{responseSummary}, $expected_response_sum_9, "GA4GH Beacon query CNV - bracket query");
 
 # Testing a small insertion - SNV
 my $uri_9 = $get_base_uri . ";referenceName=11;start=6303492;referenceBases=T;alternateBases=GT;assemblyId=$assemblyId";
@@ -447,5 +546,11 @@ my $uri_ds_cnv = $get_base_uri . ";referenceName=8;start=7803800,7806000;end=782
 $json = json_GET($uri_ds_cnv, 'GET query CNV HIT dataset');
 eq_or_diff($json->{responseSummary}, $expected_response_sum_4, "GA4GH Beacon query CNV HIT dataset - responseSummary");
 eq_or_diff($json->{response}->{resultSets}, [$expected_data_cnv], "GA4GH Beacon query CNV HIT dataset - response");
+
+# Query datasets DGVa and dbVar
+# Testing structural variant with a range of coordinates
+my $query_sv = $get_base_uri . ";referenceName=8;start=7803800,7803900;end=7825300,7825400;variantType=CNV;referenceBases=N;assemblyId=$assemblyId;datasetIds=dgva,dbvar";
+$json = json_GET($query_sv, 'GET query datasets DGVa and dbVar - bracket query');
+eq_or_diff($json->{responseSummary}, $expected_response_sum_8, "GA4GH Beacon query datasets DGVa and dbVar - bracket query");
 
 done_testing();

@@ -5,3 +5,4 @@
 4479	11	estd195	Altshuler 2010 "Integrating common and rare genetic variation in diverse human populations" PMID:20811451 [remapped from build NCBI36]	ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd195_Altshuler_et_al_2010	pubmed/20811451	Control Set
 4480	52	NULL	NULL	NULL	PMID:8626802	NULL
 4465	11	estd192	Catalogue of Somatic Mutations in Cancer (COSMIC) version 61	ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd192_COSMIC http://cancer.sanger.ac.uk/cancergenome/projects/cosmic/	Somatic	\N
+4466	55	nstd206	Byrska-Bishop 2021  "The 1000 Genomes Project (1kGP), launched in 2008	NULL	NULL	NULL

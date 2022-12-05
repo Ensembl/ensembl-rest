@@ -417,8 +417,12 @@ sub check_parameters {
     push(@required_fields, 'start');
   }
   else{
-    push(@required_fields, 'variantType');
-    if($parameters->{'start'}){
+    if(!$parameters->{'end'}) {
+      push(@required_fields, 'alternateBases');
+      push(@required_fields, 'start');
+    }
+    else{
+      push(@required_fields, 'variantType'); #TODO: update to support start and end for SNVs
       push(@required_fields, 'start');
       push(@required_fields, 'end');
     }
@@ -444,9 +448,6 @@ sub check_parameters {
   #   allow a * that is VCF spec for ALT
   if($parameters->{referenceName} !~ /^([1-9]|1[0-9]|2[012]|X|Y|MT)$/i){
     $error = $self->get_beacon_error('400', "Invalid referenceName");
-  }
-  elsif($parameters->{start} && !$parameters->{end} && !$parameters->{alternateBases}){
-    $error = $self->get_beacon_error('400', "Invalid parameters: start without end requires alternateBases");
   }
   elsif($parameters->{referenceBases} !~ /^([AGCT]+|N)$/i){
     $error = $self->get_beacon_error('400', "Invalid referenceBases");
