@@ -135,19 +135,6 @@ $json = json_POST( $q_base , $post_invalid_sv, 'POST query invalid variantType' 
 eq_or_diff($json->{error}, $expected_error_invalid_sv, "GA4GH Beacon query invalid variantType - error");
 
 
-# Invalid assemblyId
-my $post_invalid_assembly = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
-                  '"assemblyId" : "GRCh38" }';
-
-my $expected_error_invalid_assembly = {
-  "errorCode" => 400,
-  "errorMessage" => "User provided assemblyId (GRCh38) does not match with dataset assembly (GRCh37)"
-};
-
-$json = json_POST( $q_base , $post_invalid_assembly, 'POST query invalid assemblyId' );
-eq_or_diff($json->{error}, $expected_error_invalid_assembly, "GA4GH Beacon query invalid assemblyId - error");
-
-
 # Invalid datasetId
 my $post_invalid_dataset = '{"referenceName": "7", "start" : 86442403, "referenceBases": "T", "alternateBases": "C",' .
                   '"assemblyId" : "' . $assemblyId . '", "datasetIds" : "clinic_var" }';
@@ -207,6 +194,15 @@ my $expected_response_sum_9 = {
     "numTotalResults" => 4,
     "exists" => JSON::true
 };
+
+### Range query ###
+# Testing SNP/indels falling within the range
+my $post_snv_range = '{"referenceName": "X", "start" : 215800, "referenceBases": "C", "end" : 215950,' .
+                  '"assemblyId" : "' . $assemblyId . '", "datasetIds" : "dbsnp"}';
+
+$json = json_POST( $q_base , $post_snv_range, 'POST query SNV within range' );
+cmp_ok(@{$json->{response}->{resultSets}[0]->{results}}, '==', 4, 'GA4GH Beacon query SNV within range - response resultSets count');
+
 
 # Testing for a variant that exists at a given location
 # includeResultsetResponses = default (HIT)

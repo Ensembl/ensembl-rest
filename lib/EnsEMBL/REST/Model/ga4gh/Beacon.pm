@@ -301,7 +301,7 @@ sub beacon_query {
 
   my $beacon = $self->get_beacon();
   my $all_datasets = $self->get_beacon_all_datasets();
-  $beaconError = $self->check_parameters($data); 
+  $beaconError = $self->check_parameters($data);
 
   # includeResultsetResponses can be:
   # ALL returns all datasets even those that don't have the queried variant
@@ -412,17 +412,23 @@ sub check_parameters {
 
   my @required_fields = qw/referenceName referenceBases assemblyId/;
 
-  if($parameters->{'alternateBases'}){
+  if($parameters->{'alternateBases'}) {
     push(@required_fields, 'alternateBases');
     push(@required_fields, 'start');
   }
-  else{
+  elsif($parameters->{'variantType'}) {
+    push(@required_fields, 'variantType');
+    push(@required_fields, 'start');
+    push(@required_fields, 'end');
+  }
+  else {
     if(!$parameters->{'end'}) {
       push(@required_fields, 'alternateBases');
       push(@required_fields, 'start');
     }
-    else{
-      push(@required_fields, 'variantType'); #TODO: update to support start and end for SNVs
+    else {
+      # range query
+      # any variant found within [start, end]
       push(@required_fields, 'start');
       push(@required_fields, 'end');
     }
@@ -499,6 +505,13 @@ sub variant_exists {
   my $ref_allele = $input_coords->{'ref_allele'};
   my $alt_allele = $input_coords->{'alt_allele'};
 
+  # If alt allele is missing then we have a range query
+  # return any variant within start and end
+  my $range_query = 0;
+  if(!$alt_allele) {
+    $range_query = 1;
+  }
+
   my $c = $self->context();
  
   my $sv = 0; # structural variant
@@ -526,13 +539,6 @@ sub variant_exists {
   my $start_max_pos = $input_coords->{'start_max'} + 1;
   my $end_min_pos = $input_coords->{'end_min'} + 1;
 
-  # Reference bases for this variant (starting from start).
-  # Accepted values: see the REF field in VCF 4.2 specification 
-  # (http://samtools.github.io/hts-specs/VCFv4.2.pdf)
-
-  my ($new_ref, $new_alt, $new_start, $new_end, $changed) =
-        @{trim_sequences($ref_allele, $alt_allele, $start_pos, $end_pos, 1)};
-
   my $slice_start = $start_pos - $slice_step;
   my $slice_end   = $end_pos + $slice_step;
   my $reference_name = $input_coords->{'reference_name'};
@@ -544,7 +550,7 @@ sub variant_exists {
 
   my %terms = %{$self->sv_so_terms()};
 
-  if(defined($terms{$alt_allele})){
+  if($alt_allele && $terms{$alt_allele}){
     $sv = 1; 
   }
 
@@ -578,17 +584,20 @@ sub variant_exists {
     }
 
     # Type of query
-    my $bracket_query = 0;
+    my $bracket_query;
     if($start_pos != $start_max_pos || $end_pos != $end_min_pos) {
       $bracket_query = 1;
     }
 
-    # Precise match for snv or small indels - end does not make a difference
-    if ($sv == 0 && ($seq_region_start != $start_pos) && ($seq_region_end != $end_pos)) {
-      next;
+    # Match for snv or small indels
+    # Range query is supported - this type of query only requires the ref allele
+    if($sv == 0) {
+      next if (!$range_query && $seq_region_start != $start_pos && $seq_region_end != $end_pos);
+      # Range query
+      next if ($range_query && $seq_region_start < $start_pos || $seq_region_end > $end_pos);
     }
     # Match for structural variants
-    if($sv == 1){
+    if($sv == 1) {
       # Bracket query
       next if($bracket_query && ($seq_region_start < $start_pos || $seq_region_start > $start_max_pos
               || $seq_region_end < $end_min_pos || $seq_region_end > $end_pos));
@@ -603,16 +612,23 @@ sub variant_exists {
       $ref_allele_string = $vf->ref_allele_string();
       $alt_alleles = $vf->alt_alleles();
 
-      my $contains_alt = contains_value($alt_allele, $alt_alleles);
-      my $contains_new_alt = contains_value($new_alt, $alt_alleles);
+      my ($new_ref, $new_alt, $new_start, $new_end, $changed);
+      my $contains_alt;
+      my $contains_new_alt;
+
+      if(!$range_query) {
+        ($new_ref, $new_alt, $new_start, $new_end, $changed) = @{trim_sequences($ref_allele, $alt_allele, $start_pos, $end_pos, 1)};
+        $contains_alt = contains_value($alt_allele, $alt_alleles);
+        $contains_new_alt = contains_value($new_alt, $alt_alleles);
+      }
 
       # get variation source
       my $source_name = $vf->source_name();
 
       # Some ins/del have allele string 'G/-', others have TG/T
       # trim sequence doesn't always work
-      if ( (uc($ref_allele_string) eq uc($ref_allele) || (uc($ref_allele_string) eq uc($new_ref)))
-      && ($contains_alt || $contains_new_alt) ) {
+      if ( ($range_query && uc $ref_allele_string eq uc $ref_allele) ||
+           ((uc $ref_allele_string eq uc $ref_allele || ($new_ref && uc $ref_allele_string eq uc $new_ref)) && ($contains_alt || $contains_new_alt)) ) {
         $found = 1;
 
         # Checks datasets only for variants that match
