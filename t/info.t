@@ -266,7 +266,7 @@ is_json_GET(
 #/info/variation/:species
 {
   my $variation_json = json_GET('/info/variation/homo_sapiens', 'Get analysis hash');
-  cmp_ok(scalar(@{$variation_json}), '==', 7, 'Ensuring we have the right number of sources available');
+  cmp_ok(scalar(@{$variation_json}), '==', 8, 'Ensuring we have the right number of sources available');
 
   # Check with filter
   my $expected = 
