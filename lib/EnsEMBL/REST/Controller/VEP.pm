@@ -44,7 +44,6 @@ has valid_user_params => (
     gencode_basic
     refseq
     merged
-    all_refseq
 
     failed
     variant_class
@@ -52,7 +51,6 @@ has valid_user_params => (
     vcf_string
     transcript_version
 
-    everything
     appris
     canonical
     ccds
