@@ -40,7 +40,6 @@ has valid_user_params => (
   handles => { valid_user_param => 'exists' },
   default => sub { return { map {$_ => 1} (qw/
     gencode_basic
-    all_refseq
 
     failed
     minimal
@@ -48,12 +47,6 @@ has valid_user_params => (
 
     vcf_string
     var_synonyms
-
-    pick
-    pick_allele
-    per_gene
-    pick_allele_gene
-    pick_order
     /) }
   }
 );
