@@ -50,6 +50,7 @@ has valid_user_params => (
     minimal
     vcf_string
     transcript_version
+    ambiguous_hgvs
 
     appris
     canonical
