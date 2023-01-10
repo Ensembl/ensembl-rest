@@ -51,6 +51,7 @@ has valid_user_params => (
     minimal
     vcf_string
     transcript_version
+    ambiguous_hgvs
 
     everything
     appris
@@ -489,4 +490,3 @@ sub _configure_plugins {
 }
 
 __PACKAGE__->meta->make_immutable;
-
