@@ -49,6 +49,8 @@ has valid_user_params => (
     vcf_string
     var_synonyms
 
+    ga4gh_vrs
+
     pick
     pick_allele
     per_gene

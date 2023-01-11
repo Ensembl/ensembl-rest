@@ -73,6 +73,8 @@ has valid_user_params => (
     shift_genomic
     mirna
 
+    ga4gh_vrs
+
     pick
     pick_allele
     per_gene
