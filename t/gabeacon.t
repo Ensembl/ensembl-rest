@@ -289,7 +289,7 @@ my $expected_data_dbsnp_ds = {
                      "clinicalInterpretations" => [ { "conditionId" => "ACHONDROPLASIA", "effect" => { "id" => "Orphanet:15", "label" => "ACHONDROPLASIA" } } ]
                    }
                  } ],
-  "resultsCount" => undef,
+  "resultsCount" => 1,
   "setType" => "dataset"
 };
 
@@ -534,7 +534,7 @@ my $expected_data_cnv = {
                      "clinicalInterpretations" => [ { "conditionId" => "ACHONDROPLASIA", "effect" => { "id" => "Orphanet:15", "label" => "ACHONDROPLASIA" } } ]
                    }
                  } ],
-  "resultsCount" => undef,
+  "resultsCount" => 1,
   "setType" => "dataset"
 };
 

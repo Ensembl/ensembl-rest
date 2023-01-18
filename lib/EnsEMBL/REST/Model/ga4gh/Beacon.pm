@@ -965,6 +965,8 @@ sub get_dataset_allele_response {
 
   $ds_response->{'results'} = \@results_list;
 
+  $ds_response->{'resultsCount'} = scalar @results_list;
+
   $ds_response->{'info'}->{'counts'}->{'callCount'} = scalar @urls;
 
   $ds_response->{'externalUrl'} = \@urls;
