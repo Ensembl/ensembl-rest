@@ -1,3 +1,3 @@
-68	HumanWG_6_V2	28	HumanWG_6_V2
+68	HumanWG_6_V3	28	HumanWG_6_V3
 70	HuEx-1_0-st-v2	30	HuEx-1_0-st-v2
 16	HC-G110	16	HC-G110
