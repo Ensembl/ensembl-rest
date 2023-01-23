@@ -44,15 +44,14 @@ has valid_user_params => (
     gencode_basic
     refseq
     merged
-    all_refseq
 
     failed
     variant_class
     minimal
     vcf_string
     transcript_version
+    ambiguous_hgvs
 
-    everything
     appris
     canonical
     ccds
