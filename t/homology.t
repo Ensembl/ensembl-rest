@@ -57,12 +57,27 @@ my $condensed_ortho_ENSG00000139618_gorilla = {
     'method_link_type' => 'ENSEMBL_ORTHOLOGUES'
 };
 
+my $condensed_ortho_ENSECAG00000014890_gorilla = {
+    'taxonomy_level' => 'Boreoeutheria',
+    'protein_id' => 'ENSGGOP00000015446',
+    'type' => 'ortholog_one2one',
+    'id' => 'ENSGGOG00000015808',
+    'species' => 'gorilla_gorilla',
+    'method_link_type' => 'ENSEMBL_ORTHOLOGUES'
+};
+
 ## "condensed" homologies with target species
 
 is_json_GET(
     '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_species=gorilla_gorilla;type=orthologues',
     _get_returned_json('ENSG00000139618', $condensed_ortho_ENSG00000139618_gorilla),
     '"condensed" homologies with a target species',
+);
+
+is_json_GET(
+    '/homology/id/ENSECAG00000014890?compara=homology;format=condensed;target_species=gorilla_gorilla;type=orthologues',
+    _get_returned_json('ENSECAG00000014890', $condensed_ortho_ENSECAG00000014890_gorilla),
+    'homologies of gene not found in stable_id_lookup',
 );
 
 is_json_GET(
