@@ -375,7 +375,7 @@ sub beacon_query {
     }
     else {
       $input_coord{'end'} = $input_coord{'start'};
-      $input_coord{'end_min'} = $input_coord{'start'};
+      $input_coord{'end_min'} = $input_coord{'start_max'};
     }
 
     # Multiple dataset
@@ -589,26 +589,14 @@ sub variant_exists {
       $bracket_query = 1;
     }
 
-    # Match for snv or small indels
-    # Range query is supported - this type of query only requires the ref allele
-    if($sv == 0) {
+    # Variant is a SNV or small indels
+    if ($sv == 0) {
+      # Match for snv or small indels
+      # Range query is supported - this type of query only requires the ref allele
       next if (!$range_query && $seq_region_start != $start_pos && $seq_region_end != $end_pos);
       # Range query
       next if ($range_query && $seq_region_start < $start_pos || $seq_region_end > $end_pos);
-    }
-    # Match for structural variants
-    if($sv == 1) {
-      # Bracket query
-      next if($bracket_query && ($seq_region_start < $start_pos || $seq_region_start > $start_max_pos
-              || $seq_region_end < $end_min_pos || $seq_region_end > $end_pos));
 
-      # Range query
-      next if ($seq_region_start < $start_pos || $seq_region_start >= $end_pos
-              || $seq_region_end <= $start_pos || $seq_region_end > $end_pos);
-    }
-
-    # Variant is a SNV
-    if ($sv == 0) {
       $ref_allele_string = $vf->ref_allele_string();
       $alt_alleles = $vf->alt_alleles();
 
@@ -657,6 +645,14 @@ sub variant_exists {
     }
     # Variant is a SV 
     else {
+      # Bracket query
+      next if($bracket_query && ($seq_region_start < $start_pos || $seq_region_start > $start_max_pos
+              || $seq_region_end < $end_min_pos || $seq_region_end > $end_pos));
+
+      # Range query
+      next if ($seq_region_start < $start_pos || $seq_region_start >= $end_pos
+              || $seq_region_end <= $start_pos || $seq_region_end > $end_pos);
+
       $so_term = defined $terms{$alt_allele} ? $terms{$alt_allele} : $alt_allele;
       my $vf_so_term = $vf->class_SO_term();
 
