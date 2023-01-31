@@ -315,6 +315,33 @@ sub read_gff_tabix{
   return;
 }
 
+# Fetch required meta info for Beacon
+sub fetch_db_meta {
+  my ($self) = @_;
 
+  my $species = 'homo_sapiens';
+  my $core_ad = $self->context->model('Registry')->get_DBAdaptor($species, 'Core');
+
+  ## extract required meta data from core db
+  my $cmeta_ext_sth = $core_ad->dbc->db_handle->prepare(qq[ select meta_key, meta_value from meta]);
+  $cmeta_ext_sth->execute();
+  my $core_meta = $cmeta_ext_sth->fetchall_arrayref();
+
+  my %cmeta;
+  foreach my $l(@{$core_meta}){
+    $cmeta{$l->[0]} = $l->[1];
+  }
+
+  ## default ensembl set names/ids
+  my $db_meta;
+  $db_meta->{datasetId}      = "Ensembl";
+  $db_meta->{id}             = join(".", "Ensembl",
+                                         $cmeta{"schema_version"},
+                                         $cmeta{"assembly.default"});
+  $db_meta->{assembly}       = $cmeta{"assembly.default"};
+  $db_meta->{schema_version} = $cmeta{"schema_version"};
+
+  return $db_meta;
+}
 
 1;
