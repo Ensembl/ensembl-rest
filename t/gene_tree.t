@@ -34,6 +34,8 @@ use List::Util qw(sum);
 use Data::Dumper;
 
 my $human = Bio::EnsEMBL::Test::MultiTestDB->new("homo_sapiens");
+my $chicken = Bio::EnsEMBL::Test::MultiTestDB->new('gallus_gallus');
+my $turkey = Bio::EnsEMBL::Test::MultiTestDB->new('meleagris_gallopavo');
 my $mult  = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homology');
 Catalyst::Test->import('EnsEMBL::REST');
@@ -130,20 +132,37 @@ is_json_GET(
 );
 
 is_json_GET(
+    '/genetree/member/id/homo_sapiens/ENSG00000176515?compara=homology;subtree_node_id=100462673',
+    $restricted_RF01299,
+    'Gene-tree (ncRNA) by species name and gene ID, pruned to a subtree',
+);
+
+is_json_GET(
     '/genetree/member/id/ENST00000314040?compara=homology;subtree_node_id=100462673',
     $restricted_RF01299,
     'Gene-tree (ncRNA) by transcript ID pruned to a subtree',
 );
 
+is_json_GET(
+    '/genetree/member/id/homo_sapiens/ENST00000314040?compara=homology;subtree_node_id=100462673',
+    $restricted_RF01299,
+    'Gene-tree (ncRNA) by species name and transcript stable ID, pruned to a subtree',
+);
+
 # Aliases are somehow not loaded yet, so we need to add one here
-Bio::EnsEMBL::Registry->add_alias('homo_sapiens', 'johndoe');
+Bio::EnsEMBL::Registry->add_alias('homo_sapiens', 'human');
 
 is_json_GET(
-    '/genetree/member/symbol/johndoe/AL033381.1?compara=homology;subtree_node_id=100462673',
+    '/genetree/member/symbol/human/AL033381.1?compara=homology;subtree_node_id=100462673',
     $restricted_RF01299,
     'Gene-tree (ncRNA) by transcript ID pruned to a subtree',
 );
 
+is_json_GET(
+    '/genetree/member/id/human/ENST00000314040?compara=homology;subtree_node_id=100462673',
+    $restricted_RF01299,
+    'Gene-tree (ncRNA) by species alias and transcript ID, pruned to a subtree',
+);
 
 my $rodents_RF01299 = {
     'tree' => {
@@ -334,6 +353,22 @@ my $json2 = json_GET(
 is(count_leaves($json2->{tree}), 69, 'Got all the leaves');
 ($human_leaf) = find_leaf($json2->{'tree'}, 'ENSG00000176515');
 is($human_leaf->{'branch_length'}, '2.11826733883463e-06', 'Got the right branch-length');
+
+my $json3 = json_GET(
+    '/genetree/member/id/homo_sapiens/ENSG00000176515?compara=homology&clusterset_id=default',
+    'Gene-tree (ncRNA) by species and ID. Explicitly require the default clusterset_id',
+);
+is(count_leaves($json3->{tree}), 69, 'Got all the leaves (query by species and gene ID)');
+($human_leaf) = find_leaf($json3->{'tree'}, 'ENSG00000176515');
+is($human_leaf->{'branch_length'}, '0.1', 'Got the right branch-length (query by species and gene ID)');
+
+my $json4 = json_GET(
+    '/genetree/member/id/homo_sapiens/ENSG00000176515?compara=homology&clusterset_id=ss_it_s16',
+    'Gene-tree (ncRNA) by species and ID. Alternative clusterset_id',
+);
+is(count_leaves($json4->{tree}), 69, 'Got all the leaves (query by species and gene ID)');
+($human_leaf) = find_leaf($json4->{'tree'}, 'ENSG00000176515');
+is($human_leaf->{'branch_length'}, '2.11826733883463e-06', 'Got the right branch-length (query by species and gene ID)');
 
 
 my $restricted_ENSGT00390000003602 = {
@@ -579,6 +614,93 @@ subtest 'PhyloXML file', sub {
                 }, "sequence entry is complete");
         }, 'second gene is complete');
 };
+
+## queries with a clashing gene / transcript / translation stable ID
+
+my $bird_subtree = {
+  'id' => 'aves_PTHR08128',
+  'type' => 'gene tree',
+  'rooted' => 1,
+  'tree' => {
+    'taxonomy' => {
+      'id' => 59894,
+      'scientific_name' => 'Ficedula albicollis',
+      'common_name' => 'Flycatcher',
+    },
+    'branch_length' => 0,
+    'confidence' => {},
+    'id' => {
+      'accession' => 'ENSFALG00000116138',
+      'source' => 'EnsEMBL',
+    },
+    'sequence' => {
+      'id' => [
+        {
+          'accession' => 'ENSFALP00000039910',
+          'source' => 'EnsEMBL',
+        }
+      ],
+      'location' => 'JH603207.1:6605665-6608045',
+      'mol_seq' => {
+        'seq' => 'MWPPSGAVRNLALVLARSQRARTCSGVERVSYTQGQSPEPRTREYFYYVDHQGQLFLDDSKMKNFITCFKDLQFLVTFFSRLRPNHSGRYEASFPFLSLCGRERNFLRCEDRPVVFTHLLASDSESPRLSYCGGGEALAIPFEPARLLPLAANGRLYHPAPERAGGVGLVRSALAFELSACFEYGPSSPTVPSHVHWQGRRIALTMDLAPLLPAAPPP',
+        'is_aligned' => 0,
+      }
+    }
+  },
+};
+
+my @stable_ids = (
+    'ENSGALG00010013238',
+    'ENSGALT00010013238',
+    'ENSGALP00010013238',
+    'ENSGALE00010013238_1',
+);
+
+my %stable_id_to_object_type = (
+    'ENSGALG00010013238' => 'gene',
+    'ENSGALT00010013238' => 'transcript',
+    'ENSGALP00010013238' => 'translation',
+    'ENSGALE00010013238_1' => 'exon',
+);
+
+foreach my $stable_id (@stable_ids) {
+    my $object_type = $stable_id_to_object_type{$stable_id};
+
+    my $resp = do_GET(
+        "/genetree/member/id/${stable_id}?compara=homology",
+        "gene tree using clashing $object_type stable ID",
+    );
+    eq_or_diff(
+        $resp->decoded_content,
+        qq/{"error":"Multiple objects found with ID ${stable_id}"}/,
+        "gene tree query - clashing $object_type stable ID error message",
+    );
+    eq_or_diff(
+        $resp->code,
+        400,
+        "gene tree query - clashing $object_type stable ID status code",
+    );
+
+    $json = json_GET(
+        "/genetree/member/id/${stable_id}?compara=homology;species=meleagris_gallopavo;subtree_node_id=1800121321",
+        "gene tree using $object_type stable ID, with species parameter",
+    );
+    eq_or_diff(
+      $json,
+      $bird_subtree,
+      "Got the correct gene tree by $object_type stable ID, with species parameter",
+    );
+
+    $json = json_GET(
+        "/genetree/member/id/meleagris_gallopavo/${stable_id}?compara=homology;subtree_node_id=1800121321",
+        "gene tree using species name and $object_type stable ID",
+    );
+    eq_or_diff(
+      $json,
+      $bird_subtree,
+      "Got the correct gene tree by species name and $object_type stable ID",
+    );
+}
 
 done_testing();
 

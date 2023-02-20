@@ -1218,3 +1218,13 @@
 100184236	lost_species_tree_node_id	40102023
 100184280	lost_species_tree_node_id	40102024
 100184280	lost_species_tree_node_id	40102009
+1801625522	tree_support	phyml-nt
+1801625522	tree_support	nj-ds
+1801625522	tree_support	phyml-aa
+1801625522	tree_support	nj-dn
+1801625522	tree_support	nj-mm
+1801625523	tree_support	phyml-nt
+1801625523	tree_support	nj-ds
+1801625523	tree_support	phyml-aa
+1801625523	tree_support	nj-dn
+1801625523	tree_support	nj-mm
