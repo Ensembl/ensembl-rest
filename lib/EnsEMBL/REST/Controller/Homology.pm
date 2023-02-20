@@ -92,8 +92,19 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
     my %distinct_species;
     foreach my $compara_db (@{$comparas}) {
       my $gma = $compara_db->get_GeneMemberAdaptor();
-      foreach my $gene_member (@{$gma->fetch_all_by_stable_id($id)}) {
-        $distinct_species{$gene_member->genome_db->name} = 1;
+
+      # If 'MemberAdaptor::fetch_all_by_stable_id' is available, use it..
+      if ($gma->can('fetch_all_by_stable_id')) {
+        foreach my $gene_member (@{$gma->fetch_all_by_stable_id($id)}) {
+          $distinct_species{$gene_member->genome_db->name} = 1;
+        }
+      } else {  # ..otherwise fall back to using 'MemberAdaptor::fetch_by_stable_id_GenomeDB'.
+        foreach my $gdb (@{$compara_db->get_GenomeDBAdaptor()->fetch_all()}) {
+          my $gene_member = $gma->fetch_by_stable_id_GenomeDB( $id, $gdb );
+          if (defined $gene_member) {
+            $distinct_species{$gene_member->genome_db->name} = 1;
+          }
+        }
       }
     }
 
