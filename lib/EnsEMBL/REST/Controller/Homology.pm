@@ -100,9 +100,9 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
         }
       } else {  # ..otherwise fall back to using 'MemberAdaptor::fetch_by_stable_id_GenomeDB'.
         foreach my $gdb (@{$compara_db->get_GenomeDBAdaptor()->fetch_all()}) {
-          my $gene_member = $gma->fetch_by_stable_id_GenomeDB( $id, $gdb );
+          my $gene_member = $gma->fetch_by_stable_id_GenomeDB($id, $gdb);
           if (defined $gene_member) {
-            $distinct_species{$gene_member->genome_db->name} = 1;
+            $distinct_species{$gdb->name} = 1;
           }
         }
       }
