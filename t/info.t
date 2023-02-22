@@ -381,7 +381,7 @@ is_json_GET(
 
   my $consequence_types_rank_json = json_GET('/info/variation/consequence_types?rank=1', 'Get the consequence_types with consequence ranking hash');
   my $so_term = 'feature_truncation';
-  my $rank = '37';
+  my $rank = '9';
   my @matched_rank = grep {
                        (
                          ($_->{SO_term} eq $so_term)
