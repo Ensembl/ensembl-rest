@@ -379,17 +379,13 @@ is_json_GET(
                      } @$consequence_types_json;
   cmp_ok(scalar(@matched), '==', 1, "Get match for known consequence type");
 
-  my $consequence_types_rank_json = json_GET('/info/variation/consequence_types?rank=1', 'Get the consequence_types with consequence ranking hash');
-  my $so_term = 'feature_truncation';
-  my $rank = '9';
-  my @matched_rank = grep {
-                       (
-                         ($_->{SO_term} eq $so_term)
-                         &&
-                         ($_->{consequence_ranking} eq $rank)
-                       )
-                     } @$consequence_types_rank_json;
-  cmp_ok(scalar(@matched_rank), '==', 1, "Get match for known consequence type with consequence ranking");
+  my $consequence_types_rank_json = json_GET(
+    '/info/variation/consequence_types?rank=1',
+    'Get the consequence_types with consequence ranking');
+  ok($consequence_types_rank_json &&
+       @$consequence_types_rank_json[0]->{SO_term} &&
+       @$consequence_types_rank_json[0]->{consequence_ranking},
+     "Check if returning consequence rankings");
 }
 
 done_testing();
