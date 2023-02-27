@@ -192,8 +192,8 @@ sub get_orthologs : Args(0) ActionClass('REST') {
       $c->log->error(qq{Species not found in db: $species});
       $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
       $c->go('ReturnError', 'custom', [qq{$_}]);
-    }
-  };
+    };
+  }
 
   #Loop for stable IDs
   foreach my $stable_id ( @{ $s->{stable_ids} } ) {
