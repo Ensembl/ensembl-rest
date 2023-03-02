@@ -66,6 +66,17 @@ is_json_GET(
 );
 
 is_json_GET(
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;target_species=gorilla_gorilla;type=orthologues',
+    _get_returned_json('ENSG00000139618', $condensed_ortho_ENSG00000139618_gorilla),
+    '"condensed" homologies of human gene with a target species',
+);
+
+is_json_GET(
+    '/homology/id/ENSG00000139618?format=condensed;target_species=gorilla_gorilla;type=orthologues', {data => []},
+    'homologies without compara division specified',
+);
+
+is_json_GET(
     '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_taxon=9595;type=orthologues',
     _get_returned_json('ENSG00000139618', $condensed_ortho_ENSG00000139618_gorilla),
     '"condensed" homologies with a target single-species taxon',
@@ -103,6 +114,52 @@ $json = json_GET(
 );
 is(scalar(@{$json->{data}->[0]->{homologies}}), 63, 'Got all the homologies');
 
+$json = json_GET(
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;type=orthologues',
+    '"condensed" homologies of human gene with no species filter',
+);
+is(scalar(@{$json->{data}->[0]->{homologies}}), 63, 'Got all the homologies of human gene');
+
+## queries with a versioned gene member stable ID
+
+my $condensed_ortho_ENSGALG00010013238_duck = {
+    'id' => 'ENSAPLG00000024671',
+    'method_link_type' => 'ENSEMBL_ORTHOLOGUES',
+    'protein_id' => 'ENSAPLP00000029370',
+    'species' => 'anas_platyrhynchos',
+    'taxonomy_level' => 'Aves',
+    'type' => 'ortholog_one2one'
+};
+
+is_json_GET(
+    '/homology/id/ENSGALG00010013238.1?compara=homology;format=condensed;target_species=anas_platyrhynchos;type=orthologues',
+    _get_returned_json('ENSGALG00010013238.1', $condensed_ortho_ENSGALG00010013238_duck),
+    'homologies of gene by versioned stable ID',
+);
+
+is_json_GET(
+    '/homology/id/meleagris_gallopavo/ENSGALG00010013238.1?compara=homology;format=condensed;target_species=anas_platyrhynchos;type=orthologues',
+    _get_returned_json('ENSGALG00010013238.1', $condensed_ortho_ENSGALG00010013238_duck),
+    'homologies of gene by species and versioned stable ID',
+);
+
+## queries with a clashing gene member stable ID
+
+my $exp_error_gene_stable_id_clash = q/{"error":"Could not find a unique gene matching ID 'ENSGALG00010013238'. Please try again"}/;
+my $exp_status_stable_id_clash = 400;
+
+my $resp = do_GET(
+    '/homology/id/ENSGALG00010013238?compara=homology;format=condensed;type=orthologues',
+    'homologies using clashing gene stable ID',
+);
+eq_or_diff($resp->decoded_content, $exp_error_gene_stable_id_clash, "homologies query - clashing gene stable ID error message");
+eq_or_diff($resp->code, $exp_status_stable_id_clash, "homologies query - clashing gene stable ID status code");
+
+is_json_GET(
+    '/homology/id/meleagris_gallopavo/ENSGALG00010013238?compara=homology;format=condensed;target_species=anas_platyrhynchos;type=orthologues',
+    _get_returned_json('ENSGALG00010013238', $condensed_ortho_ENSGALG00010013238_duck),
+    '"condensed" homologies using species name and gene stable ID',
+);
 
 ## Only 1 target species in "full" mode
 
@@ -190,8 +247,14 @@ is_json_GET(
     '"condensed" paralogues'
 );
 
+is_json_GET(
+    '/homology/id/homo_sapiens/ENSG00000238707?format=condensed;type=paralogues;compara=homology',
+    _get_returned_json('ENSG00000238707', $condensed_para_ENSG00000238707),
+    '"condensed" human paralogues'
+);
+
 # Aliases are somehow not loaded yet, so we need to add one here
-Bio::EnsEMBL::Registry->add_alias('homo_sapiens', 'johndoe');
+Bio::EnsEMBL::Registry->add_alias('homo_sapiens', 'human');
 
 my $condensed_para_ENSG00000176515 = {
     'taxonomy_level' => 'Eutheria',
@@ -203,9 +266,15 @@ my $condensed_para_ENSG00000176515 = {
 };
 
 is_json_GET(
-    '/homology/symbol/johndoe/AL033381.1?format=condensed;type=paralogues;compara=homology',
+    '/homology/symbol/human/AL033381.1?format=condensed;type=paralogues;compara=homology',
     _get_returned_json('ENSG00000176515', $condensed_para_ENSG00000176515),
     'paralogues via the gene symbol'
+);
+
+is_json_GET(
+    '/homology/id/human/ENSG00000176515?format=condensed;type=paralogues;compara=homology',
+    _get_returned_json('ENSG00000176515', $condensed_para_ENSG00000176515),
+    'paralogues via the species alias and gene stable ID'
 );
 
 my $full_ortho_ENSG00000238707_zebrafish = {

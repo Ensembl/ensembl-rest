@@ -72,13 +72,60 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   my ( $self, $c, $id ) = @_;
   my $lookup = $c->model('Lookup');
   my $species;
-  $species = $lookup->find_object_location($id);
 
-  if ( !$species ) {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', ["Could not find the ID '${id}' in any database. Please try again"]);
+  my $capture_sets = $lookup->find_all_object_locations_for_compara($id, 'Gene', 'core');
+  if (scalar(@{$capture_sets}) == 1) {
+    $species = $capture_sets->[0][0];
+  } else {
+    # if unique gene member not found in stable_id_lookup for some reason
+    # (e.g. versioned gene stable ID), try looking it up in compara dbs
+    my $param_compara = $c->request->parameters->{compara};
+    my $reg = $c->model('Registry');
+
+    my $comparas;
+    if ($param_compara) {
+      $comparas = [$reg->get_best_compara_DBAdaptor($species, $param_compara, $self->default_compara())];
+    } else {
+      $comparas = $reg->get_all_DBAdaptors('compara');
+    }
+
+    my %distinct_species;
+    foreach my $compara_db (@{$comparas}) {
+      my $gma = $compara_db->get_GeneMemberAdaptor();
+
+      # If 'MemberAdaptor::fetch_all_by_stable_id' is available, use it..
+      if ($gma->can('fetch_all_by_stable_id')) {
+        foreach my $gene_member (@{$gma->fetch_all_by_stable_id($id)}) {
+          $distinct_species{$gene_member->genome_db->name} = 1;
+        }
+      } else {  # ..otherwise fall back to using 'MemberAdaptor::fetch_by_stable_id_GenomeDB'.
+        foreach my $gdb (@{$compara_db->get_GenomeDBAdaptor()->fetch_all()}) {
+          my $gene_member = $gma->fetch_by_stable_id_GenomeDB($id, $gdb);
+          if (defined $gene_member) {
+            $distinct_species{$gdb->name} = 1;
+          }
+        }
+      }
+    }
+
+    my @matching_species = keys %distinct_species;
+    if (scalar(@matching_species) == 1) {
+      $species = $matching_species[0];
+    } elsif (scalar(@matching_species) > 1) {
+      $c->go('ReturnError', 'custom', ["Could not find a unique gene matching ID '${id}'. Please try again"]);
+    } else {
+      $c->go('ReturnError', 'custom', ["Could not find any gene matching the ID '${id}' in any database. Please try again"]);
+    }
   }
+
   $c->stash(stable_ids => [$id], species => $species);
+  $c->detach('get_orthologs');
+}
+
+sub fetch_by_species_ensembl_gene : Chained("/") PathPart("homology/id") Args(2)  {
+  my ( $self, $c, $species, $id ) = @_;
+
+  $c->stash(species => $species, stable_ids => [$id]);
   $c->detach('get_orthologs');
 }
 
@@ -130,42 +177,29 @@ sub get_orthologs : Args(0) ActionClass('REST') {
   
   my @final_homologies;
   
+  my $species = $s->{species};  # species is assumed to have been stashed
+  my $gdb = try {
+    $s->{genome_adaptor}->fetch_by_name_assembly( $species );
+  } catch {
+    $c->log->warn("Could not fetch GenomeDB for species [$species], will try aliases");
+  };
+
+  if (!defined $gdb) {
+    my $resolved_species_name = $c->model('Registry')->get_alias( $species );
+    $gdb = try {
+      $s->{genome_adaptor}->fetch_by_name_assembly( $resolved_species_name );
+    } catch {
+      $c->log->error(qq{Species not found in db: $species});
+      $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+      $c->go('ReturnError', 'custom', [qq{$_}]);
+    };
+  }
+
   #Loop for stable IDs
   foreach my $stable_id ( @{ $s->{stable_ids} } ) {
-    #Get the species for member lookup
-    my $species;
-    $species = $c->request->param('target_species');
-    my $taxon_id;
-    $taxon_id = $c->request->param('target_taxon');
-    my @gdbs;
-    if (ref $species ne 'ARRAY' and defined $species) {
-      my $genome = $s->{genome_adaptor}->fetch_by_name_assembly( $species );
-      push @gdbs, $genome;
-    }
-    elsif (ref $species eq 'ARRAY' or defined $taxon_id) {
-      foreach my $spec ( @$species ) {
-        my $genome = $species
-          ? $s->{genome_adaptor}->fetch_by_name_assembly( $species )
-          : $s->{genome_adaptor}->fetch_all_by_taxon_id( $taxon_id );
-        if (ref $genome ne 'ARRAY') {
-          push @gdbs, $genome;
-        }
-        else {
-          push (@gdbs, @$genome);
-        }
-      }
-    }
-    #Tag the rest of the available genomes at the end to search for matching gene_member.stable_id
-    my @alt_genomes = @{$s->{genome_adaptor}->fetch_all()};
-    push (@gdbs, @alt_genomes);
-    my $member = undef;
-    try {
-      $c->log->debug('Searching for gene member linked to ', $stable_id);
-      foreach my $gdb ( @gdbs ) {
-        next unless ref($gdb) eq 'Bio::EnsEMBL::Compara::GenomeDB';
-        $member = $s->{gene_member_adaptor}->fetch_by_stable_id_GenomeDB( $stable_id, $gdb );
-        last if defined $member;
-      }
+    my $member = try {
+      $c->log->debug('Searching for gene member linked to ', $stable_id, ' in GenomeDB ', $gdb->name);
+      $s->{gene_member_adaptor}->fetch_by_stable_id_GenomeDB( $stable_id, $gdb );
     } catch {
       $c->log->error(qq{Stable Id not found id db: $stable_id});
       $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;

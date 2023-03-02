@@ -33,6 +33,8 @@ use Test::XPath;
 use List::Util qw(sum);
 
 my $human = Bio::EnsEMBL::Test::MultiTestDB->new("homo_sapiens");
+my $chicken = Bio::EnsEMBL::Test::MultiTestDB->new('gallus_gallus');
+my $turkey = Bio::EnsEMBL::Test::MultiTestDB->new('meleagris_gallopavo');
 my $mult  = Bio::EnsEMBL::Test::MultiTestDB->new('multi');
 my $dba = Bio::EnsEMBL::Test::MultiTestDB->new('homology');
 Catalyst::Test->import('EnsEMBL::REST');
@@ -232,13 +234,25 @@ is_json_GET(
     'cafe species-tree using MAOA gene stable id ',
 );
 
+is_json_GET(
+    '/cafe/genetree/member/id/homo_sapiens/ENSG00000176515?compara=homology',
+    $cafe_species_tree,
+    'cafe species-tree using species name and MAOA gene stable id',
+);
+
 # Aliases are somehow not loaded yet, so we need to add one here
-Bio::EnsEMBL::Registry->add_alias('homo_sapiens', 'johndoe');
+Bio::EnsEMBL::Registry->add_alias('homo_sapiens', 'human');
 
 is_json_GET(
-    '/cafe/genetree/member/symbol/johndoe/AL033381.1?compara=homology',
+    '/cafe/genetree/member/symbol/human/AL033381.1?compara=homology',
     $cafe_species_tree,
     'cafe species-tree using MAOA gene stable id ',
+);
+
+is_json_GET(
+    '/cafe/genetree/member/id/human/ENSG00000176515?compara=homology',
+    $cafe_species_tree,
+    'cafe species-tree using species alias and MAOA gene stable id',
 );
 
 $nh = nh_GET(
@@ -248,5 +262,190 @@ $nh = nh_GET(
 
 my $nh_simple = '(((((pan.troglodytes_2_1,homo.sapiens_2_1)Homininae_2_1,callithrix.jacchus_1_1)Simiiformes_1_1,mus.musculus_1_1)Euarchontoglires_1_1,taeniopygia.guttata_1_1)Amniota_1_1,danio.rerio_3_1)Euteleostomi_1_0.5;';
 is($nh, $nh_simple, 'Got the correct newick');
+
+## queries with a clashing gene / transcript / translation / exon stable id
+
+my $bird_cafe_tree = {
+  'pvalue_avg' => '0.2144',
+  'rooted' => 1,
+  'tree' => {
+    'id' => 4015700100,
+    'lambda' => '2.48e-07',
+    'pvalue' => '0.5',
+    'p_value_lim' => '0.01',
+    'tax' => {
+      'id' => 8457,
+      'common_name' => 'Sauropsids',
+      'scientific_name' => 'Sauropsida',
+      'timetree_mya' => 0,
+    },
+    'name' => 'Sauropsida',
+    'n_members' => 1,
+    'children' => [
+      {
+        'id' => 4015700101,
+        'lambda' => '2.48e-07',
+        'name' => 'Aves',
+        'n_members' => 1,
+        'pvalue' => '0.5',
+        'p_value_lim' => '0.01',
+        'tax' => {
+          'id' => 8782,
+          'common_name' => 'Birds',
+          'scientific_name' => 'Aves',
+          'timetree_mya' => 0,
+        },
+        'children' => [
+          {
+            'id' => 4015700103,
+            'is_contraction' => 1,
+            'is_node_significant' => 1,
+            'lambda' => '2.48e-07',
+            'name' => 'Gallus gallus',
+            'n_members' => 0,
+            'pvalue' => '0.0029',
+            'p_value_lim' => '0.01',
+            'tax' => {
+              'id' => 9031,
+              'common_name' => 'Chicken',
+              'production_name' => 'gallus_gallus',
+              'scientific_name' => 'Gallus gallus Galgal4',
+              'timetree_mya' => 0,
+            }
+          },
+          {
+            'id' => 4015700111,
+            'lambda' => '2.48e-07',
+            'name' => 'Anas platyrhynchos',
+            'n_members' => 1,
+            'pvalue' => '0.5',
+            'p_value_lim' => '0.01',
+            'tax' => {
+              'id' => 8839,
+              'common_name' => 'Duck',
+              'production_name' => 'anas_platyrhynchos',
+              'scientific_name' => 'Anas platyrhynchos',
+              'timetree_mya' => 0,
+            },
+          },
+          {
+            'id' => 4015700113,
+            'lambda' => '2.48e-07',
+            'name' => 'Meleagris gallopavo',
+            'n_members' => 1,
+            'pvalue' => '0.5',
+            'p_value_lim' => '0.01',
+            'tax' => {
+              'id' => 9103,
+              'common_name' => 'Turkey',
+              'production_name' => 'meleagris_gallopavo',
+              'scientific_name' => 'Meleagris gallopavo',
+              'timetree_mya' => 0,
+            },
+          },
+          {
+            'id' => 4015700119,
+            'lambda' => '2.48e-07',
+            'name' => 'Ficedula albicollis',
+            'n_members' => 1,
+            'pvalue' => '0.5',
+            'p_value_lim' => '0.01',
+            'tax' => {
+              'id' => 59894,
+              'common_name' => 'Flycatcher',
+              'production_name' => 'ficedula_albicollis',
+              'scientific_name' => 'Ficedula albicollis',
+              'timetree_mya' => 0,
+            },
+          }
+        ],
+      },
+      {
+        'id' => 4015700122,
+        'lambda' => '2.48e-07',
+        'name' => 'Anolis carolinensis',
+        'n_members' => 1,
+        'pvalue' => '0.5',
+        'p_value_lim' => '0.01',
+        'tax' => {
+          'id' => 28377,
+          'common_name' => 'Anole Lizard',
+          'production_name' => 'anolis_carolinensis',
+          'scientific_name' => 'Anolis carolinensis',
+          'timetree_mya' => 0,
+        }
+      }
+    ]
+  },
+  'type' => 'cafe tree',
+};
+
+# Children in "$bird_cafe_tree" are not always returned in the same order, so this function
+# can be used to sort them in order to facilitate comparison with the expected value.
+sub sort_json_cafe_tree_children {
+    my ($cafe_json) = @_;
+    my @nodes = ($cafe_json->{'tree'});
+    while (my $node = shift @nodes) {
+        if (exists $node->{'children'}) {
+            $node->{'children'} = [sort { $a->{'id'} <=> $b->{'id'} } @{$node->{'children'}}];
+            push(@nodes, @{$node->{'children'}});
+        }
+    }
+    return $json;
+}
+
+my @stable_ids = (
+    'ENSGALG00010013238',
+    'ENSGALT00010013238',
+    'ENSGALP00010013238',
+    'ENSGALE00010013238_1',
+);
+
+my %stable_id_to_object_type = (
+    'ENSGALG00010013238' => 'gene',
+    'ENSGALT00010013238' => 'transcript',
+    'ENSGALP00010013238' => 'translation',
+    'ENSGALE00010013238_1' => 'exon',
+);
+
+foreach my $stable_id (@stable_ids) {
+    my $object_type = $stable_id_to_object_type{$stable_id};
+
+    my $resp = do_GET(
+        "/cafe/genetree/member/id/${stable_id}?compara=homology",
+        "cafe species-tree using clashing $object_type stable id",
+    );
+    is(
+        $resp->decoded_content,
+        qq/{"error":"Multiple objects found with ID ${stable_id}"}/,
+        "cafe species-tree query - clashing $object_type stable id error message",
+    );
+    is(
+        $resp->code,
+        400,
+        "cafe species-tree query - clashing $object_type stable id status code",
+    );
+
+    $json = json_GET(
+        "/cafe/genetree/member/id/${stable_id}?compara=homology;species=meleagris_gallopavo",
+        "cafe species-tree using $object_type stable id, with species parameter",
+    );
+    eq_or_diff(
+        sort_json_cafe_tree_children($json),
+        $bird_cafe_tree,
+        "Got the correct cafe species-tree by $object_type stable id, with species parameter",
+    );
+
+    $json = json_GET(
+        "/cafe/genetree/member/id/meleagris_gallopavo/${stable_id}?compara=homology",
+        "cafe tree using species and $object_type stable id",
+    );
+    ;
+    eq_or_diff(
+        sort_json_cafe_tree_children($json),
+        $bird_cafe_tree,
+        "Got the correct cafe species-tree by species name and $object_type stable id"
+    );
+}
 
 done_testing();

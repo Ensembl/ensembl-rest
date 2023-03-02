@@ -58,8 +58,27 @@ sub get_genetree_cafe_by_member_id_GET { }
 
 sub get_genetree_cafe_by_member_id : Chained('/') PathPart('cafe/genetree/member/id') Args(1) ActionClass('REST') {
   my ($self, $c, $id) = @_;
+  my $species = $c->request->param('species');
+  $c->stash(species => $species) if $species;  # find_genetree_by_member_id assumes this is stashed if specified
+
   try {
     my $gt = $c->model('Lookup')->find_genetree_by_member_id($id);
+    my $cafe = $c->model('Lookup')->find_cafe_by_genetree($gt);
+    $self->_set_cafe_species_tree($c, $cafe);
+  } catch {
+    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
+    $c->go('ReturnError', 'custom', [qq{$_}]);
+  }
+}
+
+sub get_genetree_cafe_by_species_member_id_GET { }
+
+sub get_genetree_cafe_by_species_member_id : Chained('/') PathPart('cafe/genetree/member/id') Args(2) ActionClass('REST') {
+  my ($self, $c, $species, $id) = @_;
+  $c->stash(species => $species);
+
+  try {
+    my $gt = $c->model('Lookup')->find_genetree_by_member_id($id);  # lookup method gets species from stash
     my $cafe = $c->model('Lookup')->find_cafe_by_genetree($gt);
     $self->_set_cafe_species_tree($c, $cafe);
   } catch {
