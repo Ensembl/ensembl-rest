@@ -1,4 +1,4 @@
-155	\N	schema_version	109
+162	\N	schema_version	110
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -127,3 +127,8 @@
 157	\N	patch	patch_108_109_b.sql|gene_member_qc_key
 158	\N	patch	patch_108_109_c.sql|stable_id_unique_per_genome
 159	\N	patch	patch_108_109_d.sql|case_insensitive_stable_id
+160	\N	patch	patch_108_109_e.sql|case_sensitive_stable_id_again
+161	\N	patch	patch_108_109_f.sql|stable_id_key_again
+163	\N	patch	patch_109_110_a.sql|schema_version
+164	\N	patch	patch_109_110_b.sql|case_insensitive_stable_id_again
+165	\N	patch	patch_109_110_c.sql|ncbi_taxa_name_varchar500
