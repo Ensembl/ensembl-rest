@@ -1,4 +1,4 @@
-1	\N	schema_version	109
+1	\N	schema_version	110
 2	\N	patch	patch_50_51_a.sql|schema_version
 3	\N	patch	patch_50_51_b.sql|protein_feature_hit_name
 4	\N	patch	patch_50_51_c.sql|meta_coord_index
@@ -261,3 +261,6 @@
 1317	\N	patch	patch_107_108_a.sql|schema_version
 1318	\N	patch	patch_108_109_a.sql|schema_version
 1319	\N	patch	patch_108_109_b.sql|Added xref source GeneCards into external_db
+1320	\N	patch	patch_109_110_a.sql|schema_version
+1321	\N	patch	patch_109_110_b.sql|Add IS_PAR relationship to link X- and Y-PAR genes
+1322	\N	patch	patch_109_110_c.sql|Allow gene id to belong to multiple alt allele groups

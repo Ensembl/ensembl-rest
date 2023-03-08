@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	109
+2	\N	schema_version	110
 3	\N	patch	patch_77_78_a.sql|schema_version
 4	\N	patch	patch_77_78_b.sql|source_column_increase
 5	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
@@ -76,3 +76,6 @@
 875	\N	patch	patch_107_108_a.sql|schema_version
 876	\N	patch	patch_108_109_a.sql|schema_version
 877	\N	patch	patch_108_109_b.sql|Added xref source GeneCards into external_db
+878	\N	patch	patch_109_110_a.sql|schema_version
+879	\N	patch	patch_109_110_b.sql|Add IS_PAR relationship to link X- and Y-PAR genes
+880	\N	patch	patch_109_110_c.sql|Allow gene id to belong to multiple alt allele groups
