@@ -73,7 +73,7 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   my $lookup = $c->model('Lookup');
   my $species;
 
-  my $capture_sets = $lookup->find_all_object_locations_for_compara($id, 'Gene', 'core');
+  my $capture_sets = $lookup->find_all_core_object_locations_for_compara($id, 'Gene');
   if (scalar(@{$capture_sets}) == 1) {
     $species = $capture_sets->[0][0];
   } else {
