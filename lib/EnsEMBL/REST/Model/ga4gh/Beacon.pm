@@ -26,6 +26,13 @@ use List::MoreUtils qw(uniq);
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences);
 
+use EnsEMBL::REST::Controller::VEP;
+use Bio::EnsEMBL::VEP::Runner;
+
+require EnsEMBL::REST;
+
+use Data::Dumper;
+
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
 
@@ -546,6 +553,23 @@ sub variant_exists {
   my $slice_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'core', 'slice');
   my $slice = $slice_adaptor->fetch_by_region('chromosome', $reference_name, $slice_start, $slice_end);
 
+  # Run VEP
+  # $config is a hash
+  my $config = $c->config->{'Controller::VEP'};
+  $config->{database} = 0;
+  $config->{species} = 'homo_sapiens';
+  $config->{format} = 'ensembl';
+  $config->{output_format} = 'rest';
+  $config->{delimiter} = ' ';
+  
+  my $plugins_to_use = { 'IntAct' => 'all=1' };
+  my $plugin_config = EnsEMBL::REST::Controller::VEP->_configure_plugins($c, $plugins_to_use, $config);
+  $config->{plugins} = $plugin_config if $plugin_config;
+
+  my $runner = Bio::EnsEMBL::VEP::Runner->new($config);
+  $runner->registry($c->model('Registry')->_registry());
+  $runner->{plugins} = $config->{plugins} || [];
+
   my $variation_feature_adaptor; 
 
   my %terms = %{$self->sv_so_terms()};
@@ -584,7 +608,7 @@ sub variant_exists {
     }
 
     # Type of query
-    my $bracket_query;
+    my $bracket_query = 0;
     if($start_pos != $start_max_pos || $end_pos != $end_min_pos) {
       $bracket_query = 1;
     }
@@ -618,6 +642,19 @@ sub variant_exists {
       if ( ($range_query && uc $ref_allele_string eq uc $ref_allele) ||
            ((uc $ref_allele_string eq uc $ref_allele || ($new_ref && uc $ref_allele_string eq uc $new_ref)) && ($contains_alt || $contains_new_alt)) ) {
         $found = 1;
+
+        # Run VEP for input variant (SNVs and small indels)
+        if(!$range_query && !$bracket_query) {
+          my $vep_consequences = $runner->run_rest($reference_name.' '.$start_pos.' '.$end_pos.' '.$ref_allele.'/'.$alt_allele.' 1');
+          $vf->{'vep_consequence'} = $vep_consequences;
+        }
+        # Run VEP for variants found within region - range query
+        elsif($range_query) {
+          print "Range query\n";
+          # TODO: calculate consequence for all alt alleles
+          my $vep_consequences = $runner->run_rest($reference_name.' '.$seq_region_start.' '.$seq_region_end.' '.$ref_allele.'/'.$alt_alleles->[0].' 1');
+          $vf->{'vep_consequence'} = $vep_consequences;
+        }
 
         # Checks datasets only for variants that match
         my $datasets_found = $vf->get_all_VariationSets();
@@ -852,6 +889,7 @@ sub get_dataset_allele_response {
     my @var_alt_ids; # variantAlternativeIds (part of the identifiers)
     my @genes; # geneIds (part of MolecularAttributes)
     my @molecular_effects; # molecularEffects (part of MolecularAttributes)
+    my %molecular_interactions; # molecularInteractions (part of MolecularAttributes)
     my @clinical; # clinicalInterpretations (part of variantLevelData)
     my %unique_phenotypes;
     my $var;
@@ -900,6 +938,11 @@ sub get_dataset_allele_response {
             }
           }
         }
+      }
+
+      # Get plugin data from VEP (if available)
+      if($variation_feature->{'vep_consequence'}) {
+        %molecular_interactions = %{get_vep_molecular_attribs($variation_feature->{'vep_consequence'})};
       }
 
       my $gene_list = $variation_feature->get_overlapping_Genes();
@@ -954,6 +997,8 @@ sub get_dataset_allele_response {
     my @unique_molecular_effects = uniq @molecular_effects;
     $result_details->{MolecularAttributes}->{molecularEffects} = \@unique_molecular_effects if (scalar @unique_molecular_effects > 0);
 
+    $result_details->{MolecularAttributes}->{molecularInteractions} = \%molecular_interactions;
+
     $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical;
 
     push(@results_list, $result_details) if $variation;
@@ -968,6 +1013,29 @@ sub get_dataset_allele_response {
   $ds_response->{'externalUrl'} = \@urls;
 
   return $ds_response;
+}
+
+# Input: vep consequences list
+# Output: list of genes and list of variant consequences
+sub get_vep_molecular_attribs {
+  my $vep_consequences = shift;
+
+  my @genes;
+  my @molecular_effects;
+  my %molecular_interactions;
+  my @intact_data;
+
+  foreach my $consequence (@{$vep_consequences}) {
+    foreach my $transcript_consequences (@{$consequence->{'transcript_consequences'}}) {
+      # IntAct
+      foreach my $intact (@{$transcript_consequences->{'intact'}}) {
+        push @intact_data, $intact;
+      }
+      $molecular_interactions{'IntAct'} = \@intact_data if(scalar @intact_data > 0);
+    }
+  }
+
+  return (\%molecular_interactions);
 }
 
 # Get all datasets that are available in Ensembl Variation
