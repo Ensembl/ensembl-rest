@@ -556,13 +556,27 @@ sub variant_exists {
   # Run VEP
   # $config is a hash
   my $config = $c->config->{'Controller::VEP'};
+  $config->{assembly} = $assemblyId;
   $config->{database} = 0;
   $config->{species} = 'homo_sapiens';
   $config->{format} = 'ensembl';
   $config->{output_format} = 'rest';
   $config->{delimiter} = ' ';
-  
-  my $plugins_to_use = { 'IntAct' => 'all=1' };
+  $config->{domains} = 1;
+  $config->{mane_select} = 1;
+  $config->{uniprot} = 1;
+
+  my $plugins_to_use = { 
+    'IntAct' => 'all=1',
+    'Mastermind' => '0,0,1',
+    'GO' => '1',
+    'Phenotypes' => '1',
+    'DisGeNET' => 'disease=1',
+    'CADD' => '1',
+    'EVE' => '1',
+    'SpliceAI' => '1'
+  };
+
   my $plugin_config = EnsEMBL::REST::Controller::VEP->_configure_plugins($c, $plugins_to_use, $config);
   $config->{plugins} = $plugin_config if $plugin_config;
 
@@ -889,10 +903,13 @@ sub get_dataset_allele_response {
     my @var_alt_ids; # variantAlternativeIds (part of the identifiers)
     my @genes; # geneIds (part of MolecularAttributes)
     my @molecular_effects; # molecularEffects (part of MolecularAttributes)
-    my %molecular_interactions; # molecularInteractions (part of MolecularAttributes)
+    my $molecular_interactions; # molecularInteractions (part of MolecularAttributes)
+    my $gene_ontology;
     my @clinical; # clinicalInterpretations (part of variantLevelData)
     my %unique_phenotypes;
     my $var;
+    my $disgenet;
+    my $frequency;
 
     if($sv == 1) {
       $var = $variation_feature->structural_variation();
@@ -942,7 +959,13 @@ sub get_dataset_allele_response {
 
       # Get plugin data from VEP (if available)
       if($variation_feature->{'vep_consequence'}) {
-        %molecular_interactions = %{get_vep_molecular_attribs($variation_feature->{'vep_consequence'})};
+        
+        # print "Vep consequence: ", Dumper($variation_feature->{'vep_consequence'});
+        
+        ($molecular_interactions, $gene_ontology, $disgenet) = get_vep_molecular_attribs($variation_feature->{'vep_consequence'});
+
+        # Frequency data from gnomAD
+        $frequency = get_vep_frequency($variation_feature->{'vep_consequence'});
       }
 
       my $gene_list = $variation_feature->get_overlapping_Genes();
@@ -975,14 +998,15 @@ sub get_dataset_allele_response {
         my $pheno_desc = $pheno_feature->phenotype_description();
         my $ontology_acc = @{$pheno_feature->get_all_ontology_accessions()}[0];
         my $pheno;
-        if($pheno_desc && $ontology_acc) {
+        if($pheno_desc) {
           $pheno->{conditionId} = $pheno_desc;
-          $pheno->{effect}->{id} = $ontology_acc;
+          $pheno->{effect}->{id} = $ontology_acc ? $ontology_acc : '-';
           $pheno->{effect}->{label} = $pheno_desc;
           push @clinical, $pheno if (!$unique_phenotypes{$pheno_desc});
           $unique_phenotypes{$pheno_desc} = 1;
         }
       }
+
     }
 
     # Prepare the result
@@ -993,13 +1017,18 @@ sub get_dataset_allele_response {
 
     my @unique_genes = uniq @genes;
     $result_details->{MolecularAttributes}->{geneIds} = \@unique_genes if (scalar @unique_genes > 0);
+    $result_details->{MolecularAttributes}->{geneOntology} = $gene_ontology if (scalar @{$gene_ontology} > 0);
 
     my @unique_molecular_effects = uniq @molecular_effects;
     $result_details->{MolecularAttributes}->{molecularEffects} = \@unique_molecular_effects if (scalar @unique_molecular_effects > 0);
 
-    $result_details->{MolecularAttributes}->{molecularInteractions} = \%molecular_interactions;
+    $result_details->{MolecularAttributes}->{molecularInteractions} = $molecular_interactions;
 
-    $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical;
+    $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical if (scalar @clinical > 0);
+
+    $result_details->{variantLevelData}->{phenotypicEffects} = $disgenet if (scalar @{$disgenet} > 0);
+
+    $result_details->{FrequencyInPopulations}->{frequencies} = $frequency if (scalar @{$frequency} > 0);
 
     push(@results_list, $result_details) if $variation;
   }
@@ -1015,15 +1044,42 @@ sub get_dataset_allele_response {
   return $ds_response;
 }
 
+sub get_vep_frequency {
+  my $vep_consequences = shift;
+
+  my @gnomad_frequency;
+
+  foreach my $consequence (@{$vep_consequences}) {
+    foreach my $variant (@{$consequence->{colocated_variants}}) {
+      foreach my $allele (keys %{$variant->{frequencies}}) {
+        my $frequencies = $variant->{frequencies}->{$allele};
+        foreach my $key (keys %{$frequencies}) {
+          if($key =~ /gnomad/) {
+            my $freq_obj;
+            $freq_obj->{alleleFrequency} = $frequencies->{$key};
+            $freq_obj->{allele} = $allele;
+              $freq_obj->{population} = $key;
+            push @gnomad_frequency, $freq_obj;
+          }
+        }
+      }
+    }
+  }
+
+  return \@gnomad_frequency;
+}
+
 # Input: vep consequences list
-# Output: list of genes and list of variant consequences
+# Output: hash of molecular interationc and list of gene ontologies
 sub get_vep_molecular_attribs {
   my $vep_consequences = shift;
 
-  my @genes;
-  my @molecular_effects;
+  my @gene_ontology;
   my %molecular_interactions;
   my @intact_data;
+  my @phenotypes;
+  my %unique_disgenet;
+  my @disgenet_data;
 
   foreach my $consequence (@{$vep_consequences}) {
     foreach my $transcript_consequences (@{$consequence->{'transcript_consequences'}}) {
@@ -1032,10 +1088,40 @@ sub get_vep_molecular_attribs {
         push @intact_data, $intact;
       }
       $molecular_interactions{'IntAct'} = \@intact_data if(scalar @intact_data > 0);
+
+      # GO
+      if($transcript_consequences->{'go'}) {
+        my @go_terms = split ',', $transcript_consequences->{'go'};
+        foreach my $go (@go_terms) {
+          my ($id, $term) = $go =~ /(.*):(.*)/;
+          my $cons;
+          $cons->{id} = $id;
+          $cons->{label} = $term;
+          push @gene_ontology, $cons;
+        }
+      }
+
+      # DisGeNET
+      if($transcript_consequences->{'disgenet'}) {
+        foreach my $disgenet (@{$transcript_consequences->{'disgenet'}}) {
+          my $key = $disgenet->{score} . '-' . $disgenet->{pmid} . '-' . $disgenet->{diseaseName};
+          if(!$unique_disgenet{$key}) {
+            my $disgenet_obj;
+            $disgenet_obj->{annotatedWith}->{toolName} = 'DisGeNET';
+            $disgenet_obj->{annotatedWith}->{version} = 'v7';
+            $disgenet_obj->{conditionId} = $disgenet->{diseaseName};
+            $disgenet_obj->{evidenceType} = 'PMID:' . $disgenet->{pmid};
+            $disgenet_obj->{score} = $disgenet->{score};
+            push @disgenet_data, $disgenet_obj;
+            $unique_disgenet{$key} = 1;
+          }
+        }
+      }
+
     }
   }
 
-  return (\%molecular_interactions);
+  return (\%molecular_interactions, \@gene_ontology, \@disgenet_data);
 }
 
 # Get all datasets that are available in Ensembl Variation
