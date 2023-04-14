@@ -65,6 +65,19 @@ has 'variation_sets_info' => ( isa => 'HashRef', is => 'ro', lazy => 1, default 
 
 our $valid_dataset_ids = {};
 
+our $gnomad_pop = {
+  'amr' => 'allele frequency in samples of Latino ancestry',
+  'nfe' => 'allele frequency in samples of Non-Finnish European ancestry',
+  'ami' => 'allele frequency in samples of Amish ancestry',
+  'sas' => 'allele frequency in samples of South Asian ancestry',
+  'oth' => 'allele frequency in samples of Other ancestry',
+  'afr' => 'allele frequency in samples of African/African-American ancestry',
+  'fin' => 'allele frequency in samples of Finnish ancestry',
+  'eas' => 'allele frequency in samples of East Asian ancestry',
+  'mid' => 'allele frequency in samples of Middle Eastern ancestry',
+  'asj' => 'allele frequency in samples of Ashkenazi Jewish ancestry'
+};
+
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
   weaken($c);
@@ -959,9 +972,6 @@ sub get_dataset_allele_response {
 
       # Get plugin data from VEP (if available)
       if($variation_feature->{'vep_consequence'}) {
-        
-        # print "Vep consequence: ", Dumper($variation_feature->{'vep_consequence'});
-        
         ($molecular_interactions, $gene_ontology, $disgenet) = get_vep_molecular_attribs($variation_feature->{'vep_consequence'});
 
         # Frequency data from gnomAD
@@ -1055,10 +1065,23 @@ sub get_vep_frequency {
         my $frequencies = $variant->{frequencies}->{$allele};
         foreach my $key (keys %{$frequencies}) {
           if($key =~ /gnomad/) {
+            my ($gnomad_type, $pop) = $key =~ /(.*)_(.*)/;
             my $freq_obj;
             $freq_obj->{alleleFrequency} = $frequencies->{$key};
             $freq_obj->{allele} = $allele;
+
+            if($gnomad_type) {
+              $pop = $gnomad_pop->{$pop} ? $gnomad_pop->{$pop} : $pop;
+              $gnomad_type =~ s/gnomade/gnomAD exomes/;
+              $gnomad_type =~ s/gnomadg/gnomAD genomes/;
+              $freq_obj->{population} = $gnomad_type . ' ' .$pop;
+            }
+            else {
+              $key =~ s/gnomade/gnomAD exomes/;
+              $key =~ s/gnomadg/gnomAD genomes/;
               $freq_obj->{population} = $key;
+            }
+
             push @gnomad_frequency, $freq_obj;
           }
         }
