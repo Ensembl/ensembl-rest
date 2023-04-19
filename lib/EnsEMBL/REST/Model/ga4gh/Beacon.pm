@@ -29,10 +29,6 @@ use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences);
 use EnsEMBL::REST::Controller::VEP;
 use Bio::EnsEMBL::VEP::Runner;
 
-require EnsEMBL::REST;
-
-use Data::Dumper;
-
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
 
@@ -77,6 +73,7 @@ our $gnomad_pop = {
   'mid' => 'allele frequency in samples of Middle Eastern ancestry',
   'asj' => 'allele frequency in samples of Ashkenazi Jewish ancestry'
 };
+
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
@@ -567,28 +564,7 @@ sub variant_exists {
   my $slice = $slice_adaptor->fetch_by_region('chromosome', $reference_name, $slice_start, $slice_end);
 
   # Run VEP
-  # $config is a hash
-  my $config = $c->config->{'Controller::VEP'};
-  $config->{assembly} = $assemblyId;
-  $config->{database} = 0;
-  $config->{species} = 'homo_sapiens';
-  $config->{format} = 'ensembl';
-  $config->{output_format} = 'rest';
-  $config->{delimiter} = ' ';
-  $config->{domains} = 1;
-  $config->{mane_select} = 1;
-  $config->{uniprot} = 1;
-
-  my $plugins_to_use = { 
-    'IntAct' => 'all=1',
-    'Mastermind' => '0,0,1',
-    'GO' => '1',
-    'Phenotypes' => '1',
-    'DisGeNET' => 'disease=1',
-    'CADD' => '1',
-    'EVE' => '1',
-    'SpliceAI' => '1'
-  };
+  my ($plugins_to_use, $config) = configure_vep($c, $assemblyId);
 
   my $plugin_config = EnsEMBL::REST::Controller::VEP->_configure_plugins($c, $plugins_to_use, $config);
   $config->{plugins} = $plugin_config if $plugin_config;
@@ -677,7 +653,6 @@ sub variant_exists {
         }
         # Run VEP for variants found within region - range query
         elsif($range_query) {
-          print "Range query\n";
           # TODO: calculate consequence for all alt alleles
           my $vep_consequences = $runner->run_rest($reference_name.' '.$seq_region_start.' '.$seq_region_end.' '.$ref_allele.'/'.$alt_alleles->[0].' 1');
           $vf->{'vep_consequence'} = $vep_consequences;
@@ -768,6 +743,38 @@ sub variant_exists {
   }
 
   return ($found, $dataset_response);
+}
+
+
+sub configure_vep {
+  my $c = shift;
+  my $assemblyId = shift;
+
+  # $config
+  my $config = $c->config->{'Controller::VEP'};
+  $config->{assembly} = $assemblyId;
+  $config->{database} = 0;
+  $config->{species} = 'homo_sapiens';
+  $config->{format} = 'ensembl';
+  $config->{output_format} = 'rest';
+  $config->{delimiter} = ' ';
+  $config->{domains} = 1;
+  $config->{mane_select} = 1;
+  $config->{uniprot} = 1;
+
+  # VEP plugins to run
+  my $plugins_to_use = {
+    'IntAct' => 'all=1',
+    'Mastermind' => '0,0,1',
+    'GO' => '1',
+    'Phenotypes' => '1',
+    'DisGeNET' => 'disease=1',
+    'CADD' => '1',
+    'EVE' => '1',
+    'SpliceAI' => '1'
+  };
+
+  return ($plugins_to_use, $config);
 }
 
 # Returns the dataset response
