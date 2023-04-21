@@ -19,7 +19,6 @@ limitations under the License.
 
 package EnsEMBL::REST::Model::DatabaseIDLookup;
 
-use DBI qw(:sql_types);
 use Moose;
 use Scalar::Util qw/weaken/;
 use namespace::autoclean;
@@ -67,48 +66,14 @@ sub find_prediction_transcript {
   return ($species, $object_type, $db_type);
 }
 
-sub find_all_object_locations_for_compara {
-  # Adapted from method Bio::EnsEMBL::Registry::stable_id_lookup, the main difference
-  # being that this is intended to return all results for a given stable_id.
-  my ($self, $id, $object_type, $db_type, $species) = @_;
+sub find_all_core_object_locations_for_compara {
+  my ($self, $id, $object_type, $species) = @_;
   my $reg = $self->context->model('Registry');
 
-  my $stable_ids_dba = $reg->get_DBAdaptor('multi', 'stable_ids', 1);
+  my $force_long_lookup = $self->long_lookup();
 
-  my $statement = 'SELECT name, object_type, db_type FROM stable_id_lookup join species using(species_id) WHERE stable_id = ?';
-
-  if ($species) {
-    $statement .= ' AND name = ?';
-  }
-  if ($db_type) {
-    $statement .= ' AND db_type = ?';
-  }
-  if ($object_type) {
-    $statement .= ' AND object_type = ?';
-  }
-
-  my $sth = $stable_ids_dba->dbc()->prepare($statement);
-  my $param_count = 1;
-  $sth->bind_param($param_count, $id, SQL_VARCHAR);
-  if ($species) {
-    $species = $reg->get_alias($species);
-    $param_count++;
-    $sth->bind_param($param_count, $species, SQL_VARCHAR);
-  }
-  if ($db_type) {
-    $param_count++;
-    $sth->bind_param($param_count, $db_type, SQL_VARCHAR);
-  }
-  if ($object_type) {
-    $param_count++;
-    $sth->bind_param($param_count, $object_type, SQL_VARCHAR);
-  }
-
-  $sth->execute();
-  my $capture_sets = $sth->fetchall_arrayref();
-  $sth->finish();
-
-  return $capture_sets;
+  $self->context->log->debug(sprintf('Looking for %s with %s in %s', $id, ($object_type || q{?}), ($species || q{?})));
+  return $reg->get_all_core_species_and_object_types($id, $object_type, $species, $force_long_lookup);
 }
 
 1;

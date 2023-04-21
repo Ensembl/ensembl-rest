@@ -99,11 +99,20 @@ sub find_genetree_by_member_id {
 
   my $r = $c->request;
   my ($object_type, $db_type) = map { my $p = $r->param($_); $p; } qw/object_type db_type/;
+
+  if (defined $db_type) {
+    if ($db_type ne 'core') {
+      Catalyst::Exception->throw("Gene-tree retrieval by member ID is supported only for objects of db_type 'core', not '$db_type'");
+    }
+  } else {
+    $db_type = 'core';
+  }
+
   my $species = $c->stash->{'species'};  # species is assumed to have been stashed
-  my $capture_sets = $self->find_all_object_locations_for_compara($id, $object_type, $db_type, $species);
+  my $capture_sets = $self->find_all_core_object_locations_for_compara($id, $object_type, $species);
 
   if (scalar(@{$capture_sets}) == 1) {
-    ($species, $object_type, $db_type) = @{$capture_sets->[0]};
+    ($species, $object_type) = @{$capture_sets->[0]};
   } elsif (scalar(@{$capture_sets}) > 1) {
     if ($compara_name) {
       my @rel_capture_sets;
@@ -114,7 +123,7 @@ sub find_genetree_by_member_id {
         }
       }
       if (scalar(@rel_capture_sets) == 1) {
-        ($species, $object_type, $db_type) = @{$rel_capture_sets[0]};
+        ($species, $object_type) = @{$rel_capture_sets[0]};
       }
     }
     if (! defined $species) {
@@ -124,9 +133,8 @@ sub find_genetree_by_member_id {
     Catalyst::Exception->throw("Unable to find given object: $id");
   }
 
-  # The rest of the method should treat all the possible $object_type and
-  # $db_type, and output the relevant error messages
-  Catalyst::Exception->throw("'$id' is not an Ensembl Core object, and thus does not have a gene-tree.") if $db_type ne 'core';
+  # The rest of the method should deal with all the possible $object_type,
+  # and output the relevant error messages.
 
   my $dba = $reg->get_best_compara_DBAdaptor($species,$compara_name);
   my $genome = $dba->get_GenomeDBAdaptor->fetch_by_name_assembly($species);
@@ -266,14 +274,14 @@ sub find_objects_by_symbol {
   return \@entries;
 }
 
-sub find_all_object_locations_for_compara {
-  my ($self, $id, $object_type, $db_type, $species) = @_;
+sub find_all_core_object_locations_for_compara {
+  my ($self, $id, $object_type, $species) = @_;
 
   my $c = $self->context();
-  $c->log()->debug(sprintf('Looking for %s with %s and %s in %s', $id, ($object_type || q{?}), ($db_type || q{?}), ($species || q{?})));
+  $c->log()->debug(sprintf('Looking for %s with %s in %s', $id, ($object_type || q{?}), ($species || q{?})));
   my $lookup = $c->model('DatabaseIDLookup');
 
-  return $lookup->find_all_object_locations_for_compara($id, $object_type, $db_type, $species);
+  return $lookup->find_all_core_object_locations_for_compara($id, $object_type, $species);
 }
 
 sub find_object_location {
