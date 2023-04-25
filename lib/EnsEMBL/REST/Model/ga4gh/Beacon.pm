@@ -924,12 +924,12 @@ sub get_dataset_allele_response {
     my @genes; # geneIds (part of MolecularAttributes)
     my @molecular_effects; # molecularEffects (part of MolecularAttributes)
     my $molecular_interactions; # molecularInteractions (part of MolecularAttributes)
-    my $gene_ontology;
+    my $gene_ontology = [];
     my @clinical; # clinicalInterpretations (part of variantLevelData)
     my %unique_phenotypes;
     my $var;
-    my $disgenet;
-    my $frequency;
+    my $disgenet = [];
+    my $frequency = [];
 
     if($sv == 1) {
       $var = $variation_feature->structural_variation();
@@ -1039,7 +1039,7 @@ sub get_dataset_allele_response {
     my @unique_molecular_effects = uniq @molecular_effects;
     $result_details->{MolecularAttributes}->{molecularEffects} = \@unique_molecular_effects if (scalar @unique_molecular_effects > 0);
 
-    $result_details->{MolecularAttributes}->{molecularInteractions} = $molecular_interactions;
+    $result_details->{MolecularAttributes}->{molecularInteractions} = $molecular_interactions if (scalar keys %{$molecular_interactions} > 0);
 
     $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical if (scalar @clinical > 0);
 
