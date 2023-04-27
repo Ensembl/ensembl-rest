@@ -930,6 +930,7 @@ sub get_dataset_allele_response {
     my $var;
     my $disgenet = [];
     my $frequency = [];
+    my $cadd = [];
 
     if($sv == 1) {
       $var = $variation_feature->structural_variation();
@@ -979,7 +980,12 @@ sub get_dataset_allele_response {
 
       # Get plugin data from VEP (if available)
       if($variation_feature->{'vep_consequence'}) {
-        ($molecular_interactions, $gene_ontology, $disgenet) = get_vep_molecular_attribs($variation_feature->{'vep_consequence'});
+        my $vep_consequence_results = get_vep_molecular_attribs($variation_feature->{'vep_consequence'});
+
+        $molecular_interactions = $vep_consequence_results->{molecular_interactions};
+        $gene_ontology = $vep_consequence_results->{gene_ontology};
+        $disgenet = $vep_consequence_results->{disgenet};
+        $cadd = $vep_consequence_results->{cadd};
 
         # Frequency data from gnomAD
         $frequency = get_vep_frequency($variation_feature->{'vep_consequence'});
@@ -1044,6 +1050,7 @@ sub get_dataset_allele_response {
     $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical if (scalar @clinical > 0);
 
     $result_details->{variantLevelData}->{phenotypicEffects} = $disgenet if (scalar @{$disgenet} > 0);
+    $result_details->{variantLevelData}->{pathogenicityPredictions} = $cadd if (scalar @{$cadd} > 0);
 
     $result_details->{FrequencyInPopulations}->{frequencies} = $frequency if (scalar @{$frequency} > 0);
 
@@ -1110,6 +1117,10 @@ sub get_vep_molecular_attribs {
   my @phenotypes;
   my %unique_disgenet;
   my @disgenet_data;
+  my @cadd_scores;
+  my %cadd_unique;
+
+  my %results;
 
   foreach my $consequence (@{$vep_consequences}) {
     foreach my $transcript_consequences (@{$consequence->{'transcript_consequences'}}) {
@@ -1148,10 +1159,34 @@ sub get_vep_molecular_attribs {
         }
       }
 
+      # CADD
+      if($transcript_consequences->{'cadd_phred'} || $transcript_consequences->{'cadd_raw'}) {
+        my $cadd;
+        $cadd->{annotatedWith}->{toolName} = 'Combined Annotation-Dependent Depletion (CADD)';
+        $cadd->{annotatedWith}->{version} = 'v1.6';
+
+        if($transcript_consequences->{'cadd_phred'}) {
+          $cadd->{cadd_phred} = $transcript_consequences->{'cadd_phred'};
+        }
+        if($transcript_consequences->{'cadd_raw'}) {
+          $cadd->{cadd_raw} = $transcript_consequences->{'cadd_raw'};
+        }
+
+        if(!$cadd_unique{$cadd->{cadd_phred}.'_'.$cadd->{cadd_raw}}){
+          $cadd_unique{$cadd->{cadd_phred}.'_'.$cadd->{cadd_raw}} = 1;
+          push @cadd_scores, $cadd;
+        }
+      }
+
     }
   }
 
-  return (\%molecular_interactions, \@gene_ontology, \@disgenet_data);
+  $results{molecular_interactions} = \%molecular_interactions;
+  $results{gene_ontology} = \@gene_ontology;
+  $results{disgenet} = \@disgenet_data;
+  $results{cadd} = \@cadd_scores;
+
+  return (\%results);
 }
 
 # Get all datasets that are available in Ensembl Variation
