@@ -26,6 +26,9 @@ use List::MoreUtils qw(uniq);
 use EnsEMBL::REST::Model::ga4gh::ga4gh_utils;
 use Bio::EnsEMBL::Variation::Utils::Sequence qw(trim_sequences);
 
+use EnsEMBL::REST::Controller::VEP;
+use Bio::EnsEMBL::VEP::Runner;
+
 use Scalar::Util qw/weaken/;
 with 'Catalyst::Component::InstancePerContext';
 
@@ -57,6 +60,20 @@ has 'variation_sets_info' => ( isa => 'HashRef', is => 'ro', lazy => 1, default 
 });
 
 our $valid_dataset_ids = {};
+
+our $gnomad_pop = {
+  'amr' => 'allele frequency in samples of Latino ancestry',
+  'nfe' => 'allele frequency in samples of Non-Finnish European ancestry',
+  'ami' => 'allele frequency in samples of Amish ancestry',
+  'sas' => 'allele frequency in samples of South Asian ancestry',
+  'oth' => 'allele frequency in samples of Other ancestry',
+  'afr' => 'allele frequency in samples of African/African-American ancestry',
+  'fin' => 'allele frequency in samples of Finnish ancestry',
+  'eas' => 'allele frequency in samples of East Asian ancestry',
+  'mid' => 'allele frequency in samples of Middle Eastern ancestry',
+  'asj' => 'allele frequency in samples of Ashkenazi Jewish ancestry'
+};
+
 
 sub build_per_context_instance {
   my ($self, $c, @args) = @_;
@@ -546,6 +563,16 @@ sub variant_exists {
   my $slice_adaptor = $c->model('Registry')->get_adaptor('homo_sapiens', 'core', 'slice');
   my $slice = $slice_adaptor->fetch_by_region('chromosome', $reference_name, $slice_start, $slice_end);
 
+  # Run VEP
+  my ($plugins_to_use, $config) = configure_vep($c, $assemblyId);
+
+  my $plugin_config = EnsEMBL::REST::Controller::VEP->_configure_plugins($c, $plugins_to_use, $config);
+  $config->{plugins} = $plugin_config if $plugin_config;
+
+  my $runner = Bio::EnsEMBL::VEP::Runner->new($config);
+  $runner->registry($c->model('Registry')->_registry());
+  $runner->{plugins} = $config->{plugins} || [];
+
   my $variation_feature_adaptor; 
 
   my %terms = %{$self->sv_so_terms()};
@@ -584,7 +611,7 @@ sub variant_exists {
     }
 
     # Type of query
-    my $bracket_query;
+    my $bracket_query = 0;
     if($start_pos != $start_max_pos || $end_pos != $end_min_pos) {
       $bracket_query = 1;
     }
@@ -618,6 +645,18 @@ sub variant_exists {
       if ( ($range_query && uc $ref_allele_string eq uc $ref_allele) ||
            ((uc $ref_allele_string eq uc $ref_allele || ($new_ref && uc $ref_allele_string eq uc $new_ref)) && ($contains_alt || $contains_new_alt)) ) {
         $found = 1;
+
+        # Run VEP for input variant (SNVs and small indels)
+        if(!$range_query && !$bracket_query) {
+          my $vep_consequences = $runner->run_rest($reference_name.' '.$start_pos.' '.$end_pos.' '.$ref_allele.'/'.$alt_allele.' 1');
+          $vf->{'vep_consequence'} = $vep_consequences;
+        }
+        # Run VEP for variants found within region - range query
+        elsif($range_query) {
+          # TODO: calculate consequence for all alt alleles
+          my $vep_consequences = $runner->run_rest($reference_name.' '.$seq_region_start.' '.$seq_region_end.' '.$ref_allele.'/'.$alt_alleles->[0].' 1');
+          $vf->{'vep_consequence'} = $vep_consequences;
+        }
 
         # Checks datasets only for variants that match
         my $datasets_found = $vf->get_all_VariationSets();
@@ -704,6 +743,38 @@ sub variant_exists {
   }
 
   return ($found, $dataset_response);
+}
+
+
+sub configure_vep {
+  my $c = shift;
+  my $assemblyId = shift;
+
+  # $config
+  my $config = $c->config->{'Controller::VEP'};
+  $config->{assembly} = $assemblyId;
+  $config->{database} = 0;
+  $config->{species} = 'homo_sapiens';
+  $config->{format} = 'ensembl';
+  $config->{output_format} = 'rest';
+  $config->{delimiter} = ' ';
+  $config->{domains} = 1;
+  $config->{mane_select} = 1;
+  $config->{uniprot} = 1;
+
+  # VEP plugins to run
+  my $plugins_to_use = {
+    'IntAct' => 'all=1',
+    'Mastermind' => '0,0,1',
+    'GO' => '1',
+    'Phenotypes' => '1',
+    'DisGeNET' => 'disease=1',
+    'CADD' => '1',
+    'EVE' => '1',
+    'SpliceAI' => '1'
+  };
+
+  return ($plugins_to_use, $config);
 }
 
 # Returns the dataset response
@@ -852,9 +923,14 @@ sub get_dataset_allele_response {
     my @var_alt_ids; # variantAlternativeIds (part of the identifiers)
     my @genes; # geneIds (part of MolecularAttributes)
     my @molecular_effects; # molecularEffects (part of MolecularAttributes)
+    my $molecular_interactions; # molecularInteractions (part of MolecularAttributes)
+    my $gene_ontology = [];
     my @clinical; # clinicalInterpretations (part of variantLevelData)
     my %unique_phenotypes;
     my $var;
+    my $disgenet = [];
+    my $frequency = [];
+    my $cadd = [];
 
     if($sv == 1) {
       $var = $variation_feature->structural_variation();
@@ -902,6 +978,19 @@ sub get_dataset_allele_response {
         }
       }
 
+      # Get plugin data from VEP (if available)
+      if($variation_feature->{'vep_consequence'}) {
+        my $vep_consequence_results = get_vep_molecular_attribs($variation_feature->{'vep_consequence'});
+
+        $molecular_interactions = $vep_consequence_results->{molecular_interactions};
+        $gene_ontology = $vep_consequence_results->{gene_ontology};
+        $disgenet = $vep_consequence_results->{disgenet};
+        $cadd = $vep_consequence_results->{cadd};
+
+        # Frequency data from gnomAD
+        $frequency = get_vep_frequency($variation_feature->{'vep_consequence'});
+      }
+
       my $gene_list = $variation_feature->get_overlapping_Genes();
       foreach my $gene (@{$gene_list}) {
         push @genes, $gene->external_name();
@@ -932,14 +1021,15 @@ sub get_dataset_allele_response {
         my $pheno_desc = $pheno_feature->phenotype_description();
         my $ontology_acc = @{$pheno_feature->get_all_ontology_accessions()}[0];
         my $pheno;
-        if($pheno_desc && $ontology_acc) {
+        if($pheno_desc) {
           $pheno->{conditionId} = $pheno_desc;
-          $pheno->{effect}->{id} = $ontology_acc;
+          $pheno->{effect}->{id} = $ontology_acc ? $ontology_acc : '-';
           $pheno->{effect}->{label} = $pheno_desc;
           push @clinical, $pheno if (!$unique_phenotypes{$pheno_desc});
           $unique_phenotypes{$pheno_desc} = 1;
         }
       }
+
     }
 
     # Prepare the result
@@ -950,11 +1040,19 @@ sub get_dataset_allele_response {
 
     my @unique_genes = uniq @genes;
     $result_details->{MolecularAttributes}->{geneIds} = \@unique_genes if (scalar @unique_genes > 0);
+    $result_details->{MolecularAttributes}->{geneOntology} = $gene_ontology if (scalar @{$gene_ontology} > 0);
 
     my @unique_molecular_effects = uniq @molecular_effects;
     $result_details->{MolecularAttributes}->{molecularEffects} = \@unique_molecular_effects if (scalar @unique_molecular_effects > 0);
 
-    $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical;
+    $result_details->{MolecularAttributes}->{molecularInteractions} = $molecular_interactions if (scalar keys %{$molecular_interactions} > 0);
+
+    $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical if (scalar @clinical > 0);
+
+    $result_details->{variantLevelData}->{phenotypicEffects} = $disgenet if (scalar @{$disgenet} > 0);
+    $result_details->{variantLevelData}->{pathogenicityPredictions} = $cadd if (scalar @{$cadd} > 0);
+
+    $result_details->{FrequencyInPopulations}->{frequencies} = $frequency if (scalar @{$frequency} > 0);
 
     push(@results_list, $result_details) if $variation;
   }
@@ -968,6 +1066,128 @@ sub get_dataset_allele_response {
   $ds_response->{'externalUrl'} = \@urls;
 
   return $ds_response;
+}
+
+sub get_vep_frequency {
+  my $vep_consequences = shift;
+
+  my @gnomad_frequency;
+
+  foreach my $consequence (@{$vep_consequences}) {
+    foreach my $variant (@{$consequence->{colocated_variants}}) {
+      foreach my $allele (keys %{$variant->{frequencies}}) {
+        my $frequencies = $variant->{frequencies}->{$allele};
+        foreach my $key (keys %{$frequencies}) {
+          if($key =~ /gnomad/) {
+            my ($gnomad_type, $pop) = $key =~ /(.*)_(.*)/;
+            my $freq_obj;
+            $freq_obj->{alleleFrequency} = $frequencies->{$key};
+            $freq_obj->{allele} = $allele;
+
+            if($gnomad_type) {
+              $pop = $gnomad_pop->{$pop} ? $gnomad_pop->{$pop} : $pop;
+              $gnomad_type =~ s/gnomade/gnomAD exomes/;
+              $gnomad_type =~ s/gnomadg/gnomAD genomes/;
+              $freq_obj->{population} = $gnomad_type . ' ' .$pop;
+            }
+            else {
+              $key =~ s/gnomade/gnomAD exomes/;
+              $key =~ s/gnomadg/gnomAD genomes/;
+              $freq_obj->{population} = $key;
+            }
+
+            push @gnomad_frequency, $freq_obj;
+          }
+        }
+      }
+    }
+  }
+
+  return \@gnomad_frequency;
+}
+
+# Input: vep consequences list
+# Output: hash of molecular interationc and list of gene ontologies
+sub get_vep_molecular_attribs {
+  my $vep_consequences = shift;
+
+  my @gene_ontology;
+  my %molecular_interactions;
+  my @intact_data;
+  my @phenotypes;
+  my %unique_disgenet;
+  my @disgenet_data;
+  my @cadd_scores;
+  my %cadd_unique;
+
+  my %results;
+
+  foreach my $consequence (@{$vep_consequences}) {
+    foreach my $transcript_consequences (@{$consequence->{'transcript_consequences'}}) {
+      # IntAct
+      foreach my $intact (@{$transcript_consequences->{'intact'}}) {
+        push @intact_data, $intact;
+      }
+      $molecular_interactions{'IntAct'} = \@intact_data if(scalar @intact_data > 0);
+
+      # GO
+      if($transcript_consequences->{'go'}) {
+        my @go_terms = split ',', $transcript_consequences->{'go'};
+        foreach my $go (@go_terms) {
+          my ($id, $term) = $go =~ /(.*):(.*)/;
+          my $cons;
+          $cons->{id} = $id;
+          $cons->{label} = $term;
+          push @gene_ontology, $cons;
+        }
+      }
+
+      # DisGeNET
+      if($transcript_consequences->{'disgenet'}) {
+        foreach my $disgenet (@{$transcript_consequences->{'disgenet'}}) {
+          my $key = $disgenet->{score} . '-' . $disgenet->{pmid} . '-' . $disgenet->{diseaseName};
+          if(!$unique_disgenet{$key}) {
+            my $disgenet_obj;
+            $disgenet_obj->{annotatedWith}->{toolName} = 'DisGeNET';
+            $disgenet_obj->{annotatedWith}->{version} = 'v7';
+            $disgenet_obj->{conditionId} = $disgenet->{diseaseName};
+            $disgenet_obj->{evidenceType}->{id} = "isDefinedBy";
+            $disgenet_obj->{evidenceType}->{label} = 'PMID:' . $disgenet->{pmid};
+            $disgenet_obj->{score} = $disgenet->{score};
+            push @disgenet_data, $disgenet_obj;
+            $unique_disgenet{$key} = 1;
+          }
+        }
+      }
+
+      # CADD
+      if($transcript_consequences->{'cadd_phred'} || $transcript_consequences->{'cadd_raw'}) {
+        my $cadd;
+        $cadd->{annotatedWith}->{toolName} = 'Combined Annotation-Dependent Depletion (CADD)';
+        $cadd->{annotatedWith}->{version} = 'v1.6';
+
+        if($transcript_consequences->{'cadd_phred'}) {
+          $cadd->{cadd_phred} = $transcript_consequences->{'cadd_phred'};
+        }
+        if($transcript_consequences->{'cadd_raw'}) {
+          $cadd->{cadd_raw} = $transcript_consequences->{'cadd_raw'};
+        }
+
+        if(!$cadd_unique{$cadd->{cadd_phred}.'_'.$cadd->{cadd_raw}}){
+          $cadd_unique{$cadd->{cadd_phred}.'_'.$cadd->{cadd_raw}} = 1;
+          push @cadd_scores, $cadd;
+        }
+      }
+
+    }
+  }
+
+  $results{molecular_interactions} = \%molecular_interactions;
+  $results{gene_ontology} = \@gene_ontology;
+  $results{disgenet} = \@disgenet_data;
+  $results{cadd} = \@cadd_scores;
+
+  return (\%results);
 }
 
 # Get all datasets that are available in Ensembl Variation
