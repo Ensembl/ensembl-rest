@@ -1151,7 +1151,8 @@ sub get_vep_molecular_attribs {
             $disgenet_obj->{annotatedWith}->{toolName} = 'DisGeNET';
             $disgenet_obj->{annotatedWith}->{version} = 'v7';
             $disgenet_obj->{conditionId} = $disgenet->{diseaseName};
-            $disgenet_obj->{evidenceType} = 'PMID:' . $disgenet->{pmid};
+            $disgenet_obj->{evidenceType}->{id} = "isDefinedBy";
+            $disgenet_obj->{evidenceType}->{label} = 'PMID:' . $disgenet->{pmid};
             $disgenet_obj->{score} = $disgenet->{score};
             push @disgenet_data, $disgenet_obj;
             $unique_disgenet{$key} = 1;
