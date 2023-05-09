@@ -66,14 +66,4 @@ sub find_prediction_transcript {
   return ($species, $object_type, $db_type);
 }
 
-sub find_all_core_object_locations_for_compara {
-  my ($self, $id, $object_type, $species) = @_;
-  my $reg = $self->context->model('Registry');
-
-  my $force_long_lookup = $self->long_lookup();
-
-  $self->context->log->debug(sprintf('Looking for %s with %s in %s', $id, ($object_type || q{?}), ($species || q{?})));
-  return $reg->get_all_core_species_and_object_types($id, $object_type, $species, $force_long_lookup);
-}
-
 1;
