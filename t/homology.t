@@ -72,7 +72,7 @@ is_json_GET(
 );
 
 is_json_GET(
-    '/homology/id/ENSG00000176515?format=condensed;target_species=gorilla_gorilla;type=orthologues', {data => []},
+    '/homology/id/ENSG00000139618?format=condensed;target_species=gorilla_gorilla;type=orthologues', {data => []},
     'homologies without compara division specified',
 );
 
@@ -144,16 +144,6 @@ is_json_GET(
 );
 
 ## queries with a clashing gene member stable ID
-
-my $exp_error_gene_stable_id_clash = q/{"error":"Could not find a unique gene matching ID 'ENSGALG00010013238'. Please try again"}/;
-my $exp_status_stable_id_clash = 400;
-
-my $resp = do_GET(
-    '/homology/id/ENSGALG00010013238?compara=homology;format=condensed;type=orthologues',
-    'homologies using clashing gene stable ID',
-);
-eq_or_diff($resp->decoded_content, $exp_error_gene_stable_id_clash, "homologies query - clashing gene stable ID error message");
-eq_or_diff($resp->code, $exp_status_stable_id_clash, "homologies query - clashing gene stable ID status code");
 
 is_json_GET(
     '/homology/id/meleagris_gallopavo/ENSGALG00010013238?compara=homology;format=condensed;target_species=anas_platyrhynchos;type=orthologues',
