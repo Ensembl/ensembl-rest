@@ -557,6 +557,7 @@ sub features_as_hash {
       $features->{type} = $summary_hash->{type} if defined $summary_hash->{type};
       if (lc($object_type) eq 'transcript') {
         $features->{is_canonical} = $obj->is_canonical;
+        $features->{length} = $obj->length;
       }
       if (lc($object_type) eq 'gene') {
         $features->{canonical_transcript} = $obj->canonical_transcript->stable_id.".".$obj->canonical_transcript->version;
