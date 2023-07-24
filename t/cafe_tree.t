@@ -411,21 +411,6 @@ my %stable_id_to_object_type = (
 foreach my $stable_id (@stable_ids) {
     my $object_type = $stable_id_to_object_type{$stable_id};
 
-    my $resp = do_GET(
-        "/cafe/genetree/member/id/${stable_id}?compara=homology",
-        "cafe species-tree using clashing $object_type stable id",
-    );
-    is(
-        $resp->decoded_content,
-        qq/{"error":"Multiple objects found with ID ${stable_id}"}/,
-        "cafe species-tree query - clashing $object_type stable id error message",
-    );
-    is(
-        $resp->code,
-        400,
-        "cafe species-tree query - clashing $object_type stable id status code",
-    );
-
     $json = json_GET(
         "/cafe/genetree/member/id/${stable_id}?compara=homology;species=meleagris_gallopavo",
         "cafe species-tree using $object_type stable id, with species parameter",

@@ -73,10 +73,13 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
   my $lookup = $c->model('Lookup');
   my $species;
 
-  my $capture_sets = $lookup->find_all_core_object_locations_for_compara($id, 'Gene');
-  if (scalar(@{$capture_sets}) == 1) {
-    $species = $capture_sets->[0][0];
-  } else {
+  try {
+    ($species) = $lookup->find_object_location($id);
+
+    if (!defined $species) {
+        Catalyst::Exception->throw("Stable ID lookup failed for gene '${id}'.");
+    }
+  } catch {
     # if unique gene member not found in stable_id_lookup for some reason
     # (e.g. versioned gene stable ID), try looking it up in compara dbs
     my $param_compara = $c->request->parameters->{compara};
@@ -116,7 +119,7 @@ sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
     } else {
       $c->go('ReturnError', 'custom', ["Could not find any gene matching the ID '${id}' in any database. Please try again"]);
     }
-  }
+  };
 
   $c->stash(stable_ids => [$id], species => $species);
   $c->detach('get_orthologs');
