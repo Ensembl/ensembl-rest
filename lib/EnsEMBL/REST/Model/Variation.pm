@@ -22,7 +22,7 @@ package EnsEMBL::REST::Model::Variation;
 use Moose;
 use Catalyst::Exception qw(throw);
 use Scalar::Util qw/weaken/;
-use Bio::EnsEMBL::Variation::Utils::Constants qw(%OVERLAP_CONSEQUENCES);
+use Bio::EnsEMBL::Variation::Utils::Constants qw(%OVERLAP_CONSEQUENCES %VARIATION_CLASSES);
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
@@ -55,7 +55,11 @@ sub fetch_variation {
   
   my $variation = $vfa->fetch_by_name($variation_id);
   if (!$variation) {
-    Catalyst::Exception->throw("$variation_id not found for $species");
+    # if no variation was found, try to get structural variation
+    my $sva = $c->model('Registry')->get_adaptor($species, 'Variation', 'StructuralVariation');
+    $variation = $sva->fetch_by_name($variation_id);
+
+    Catalyst::Exception->throw("$variation_id frankly not found for $species") unless $variation;
   }
   return $self->to_hash($variation);
 }
@@ -78,7 +82,21 @@ sub fetch_variation_multiple {
 
   my %return = map {$_->name => $self->to_hash($_)} @{$va->fetch_all_by_name_list($variation_ids || [])};
 
-  return \%return;  
+  # get variation IDs that were not reported
+  my $remaining_ids;
+  for my $id (@$variation_ids) {
+    push @$remaining_ids, $id unless grep {$id eq $_} keys %return;
+  }
+
+  # check if remaining IDs are structural variants
+  my %svs;
+  if (@$remaining_ids) {
+    my $sva = $c->model('Registry')->get_adaptor($species, 'Variation', 'StructuralVariation');
+    %svs = map {$_->variation_name => $self->to_hash($_)} @{$sva->fetch_all_by_name_list($remaining_ids || [])};
+    %return = (%return, %svs);
+  }
+
+  return \%return;
 }
 
 sub fetch_variants_pmid {
@@ -145,24 +163,46 @@ sub to_hash {
   my $c = $self->context();
   my $variation_hash;
 
-  $variation_hash->{name} = $variation->name;
+  my $is_sv = $variation->isa('Bio::EnsEMBL::Variation::Variation') ? 0 : 1;
+  my $clinical_signif = $variation->get_all_clinical_significance_states();
+
+  $variation_hash->{name} = $is_sv ? $variation->variation_name : $variation->name;
   $variation_hash->{source} = $variation->source_description;
-  $variation_hash->{ambiguity} = $variation->ambig_code;
-  $variation_hash->{synonyms} = $variation->get_all_synonyms;
   $variation_hash->{failed} = $variation->failed_description if $variation->is_failed;
   $variation_hash->{var_class} = $variation->var_class;
-  $variation_hash->{most_severe_consequence} = $variation->display_consequence;
-  $variation_hash->{MAF} = $variation->minor_allele_frequency;
-  $variation_hash->{minor_allele} = $variation->minor_allele;
-  $variation_hash->{evidence} = $variation->get_all_evidence_values;
-  $variation_hash->{clinical_significance} = $variation->get_all_clinical_significance_states() if @{$variation->get_all_clinical_significance_states()};
+  $variation_hash->{clinical_significance} = $clinical_signif if @$clinical_signif;
   $variation_hash->{mappings} = $self->get_variationFeature_info($variation);
-  $variation_hash->{populations} = $self->get_allele_info($variation) if $c->request->param('pops');
-  $variation_hash->{genotypes} = $self->get_sampleGenotype_info($variation) if $c->request->param('genotypes');
-  $variation_hash->{genotyping_chips} = $self->get_genotypingChip_info($variation) if $c->request->param('genotyping_chips');
   $variation_hash->{phenotypes} = $self->get_phenotype_info($variation) if $c->request->param('phenotypes');
-  $variation_hash->{population_genotypes} = $self->get_populationGenotype_info($variation) if $c->request->param('population_genotypes');
 
+  if ($is_sv) {
+    # structural variation
+    $variation_hash->{copy_number} = $variation->copy_number if $variation->copy_number;
+    $variation_hash->{alias} = $variation->alias;
+    $variation_hash->{validation_status} = $variation->validation_status if $variation->validation_status;
+    $variation_hash->{study} = {
+      'name' => $variation->study->name,
+      'description' => $variation->study->description,
+      'url' => $variation->study->url
+    } if $variation->study;
+
+    # supporting evidence
+    unless ($variation->isa('Bio::EnsEMBL::Variation::SupportingStructuralVariation')) {
+      my $ssvs = $variation->get_all_SupportingStructuralVariants;
+      $variation_hash->{supporting_evidence} = [ map { $self->to_hash($_) } @$ssvs ];
+    }
+  } else {
+    # non-structural variation
+    $variation_hash->{most_severe_consequence} = $variation->display_consequence;
+    $variation_hash->{ambiguity} = $variation->ambig_code;
+    $variation_hash->{synonyms} = $variation->get_all_synonyms;
+    $variation_hash->{MAF} = $variation->minor_allele_frequency;
+    $variation_hash->{minor_allele} = $variation->minor_allele;
+    $variation_hash->{evidence} = $variation->get_all_evidence_values;
+    $variation_hash->{populations} = $self->get_allele_info($variation) if $c->request->param('pops');
+    $variation_hash->{genotypes} = $self->get_sampleGenotype_info($variation) if $c->request->param('genotypes');
+    $variation_hash->{genotyping_chips} = $self->get_genotypingChip_info($variation) if $c->request->param('genotyping_chips');
+    $variation_hash->{population_genotypes} = $self->get_populationGenotype_info($variation) if $c->request->param('population_genotypes');
+  }
   return $variation_hash;
 }
 
@@ -170,7 +210,11 @@ sub get_variationFeature_info {
   my ($self, $variation) = @_;
 
   my @mappings;
-  my $vfs = $variation->get_all_VariationFeatures();
+
+  my $vfs = $variation->isa('Bio::EnsEMBL::Variation::Variation') ?
+    $variation->get_all_VariationFeatures() :
+      $variation->get_all_StructuralVariationFeatures();
+
   foreach my $vf (@$vfs) {
     push (@mappings, $self->vf_as_hash($vf));
   }
@@ -188,8 +232,13 @@ sub vf_as_hash {
   $variation_feature->{seq_region_name} = $vf->seq_region_name;
   $variation_feature->{coord_system} = $vf->coord_system_name;
   $variation_feature->{assembly_name} = $vf->slice->coord_system->version;
-  $variation_feature->{allele_string} = $vf->allele_string;
-  $variation_feature->{ancestral_allele} = $vf->ancestral_allele;
+
+  if ($vf->isa('Bio::EnsEMBL::Variation::VariationFeature')) {
+    $variation_feature->{allele_string} = $vf->allele_string;
+    $variation_feature->{ancestral_allele} = $vf->ancestral_allele;
+  } else {
+    $variation_feature->{genomic_size} = $variation_feature->{end} - $variation_feature->{start} + 1;
+  }
 
   return $variation_feature;
 }
