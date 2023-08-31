@@ -90,7 +90,7 @@ sub fetch_variation_multiple {
 
   # check if remaining IDs are structural variants
   my %svs;
-  if (@$remaining_ids) {
+  if (defined $remaining_ids && @$remaining_ids) {
     my $sva = $c->model('Registry')->get_adaptor($species, 'Variation', 'StructuralVariation');
     %svs = map {$_->variation_name => $self->to_hash($_)} @{$sva->fetch_all_by_name_list($remaining_ids || [])};
     %return = (%return, %svs);
