@@ -294,7 +294,7 @@ lives_ok{$json = json_POST($vep_post,$vep_post_body_invalid,'POST a selection of
 
 # test vep/id
 my $vep_id_get = '/vep/homo_sapiens/id/rs186950277?content-type=application/json';
-$vep_output =
+my $rs186950277_output =
 [{
   allele_string => "G/A/T",
   colocated_variants =>
@@ -342,35 +342,59 @@ $vep_output =
   }];
 
 $json = json_GET($vep_id_get,'GET consequences for Variation ID');
-cmp_bag($json, $vep_output, 'VEP id GET');
+cmp_bag($json, $rs186950277_output, 'VEP id GET');
 
-
-my $vep_id_post = '/vep/homo_sapiens/id';
-my $vep_id_body = '{ "ids" : ["rs186950277", "rs17081232" ]}';
-$vep_output =
+# test vep/id for structural variants
+$vep_id_get = '/vep/homo_sapiens/id/esv93078?content-type=application/json';
+my $esv93078_output =
 [{
-  allele_string => "G/A/T",
-  colocated_variants =>
-  [{
-    'minor_allele_freq' => 0.0014,
-    'frequencies' => {
-      'A' => {
-        'amr' => 0.01,
-        'afr' => 0,
-        'eur' => 0.0013,
-        'asn' => 0
-      }
-    },
-    'end' => 60403074,
-    'strand' => 1,
-    'id' => 'rs186950277',
-    'allele_string' => 'G/A/T',
-    'minor_allele' => 'A',
-    'start' => 60403074
-  }],
-  end => 60403074,
-  id => 'rs186950277',
-  input => 'rs186950277',
+  allele_string => "copy_number_variation",
+  end => 7825340,
+  id => 'esv93078',
+  input => 'esv93078',
+  intergenic_consequences => [
+    {
+      consequence_terms => [
+        'intergenic_variant'
+      ],
+      impact => 'MODIFIER',
+      variant_allele => 'copy_number_variation'
+    }
+  ],
+  most_severe_consequence => 'intergenic_variant',
+  seq_region_name => '8',
+  assembly_name => 'GRCh37',
+  start => 7803891,
+  strand => 1
+  }];
+
+$json = json_GET($vep_id_get,'GET consequences for Variation ID');
+cmp_bag($json, $esv93078_output, 'VEP id GET');
+
+my $rs17081232_output = [{
+  allele_string => 'G/A',
+  colocated_variants => [
+    {
+      'minor_allele_freq' => 0.2443,
+      'frequencies' => {
+        'A' => {
+          'amr' => 0.25,
+          'afr' => 0.45,
+          'eur' => 0.11,
+          'asn' => 0.24
+        }
+      },
+      'end' => 32305409,
+      'strand' => 1,
+      'id' => 'rs17081232',
+      'allele_string' => 'G/A',
+      'minor_allele' => 'A',
+      'start' => 32305409
+    }
+  ],
+  end => 32305409,
+  id => 'rs17081232',
+  input => 'rs17081232',
   intergenic_consequences => [
     {
       consequence_terms => [
@@ -378,60 +402,19 @@ $vep_output =
       ],
       impact => 'MODIFIER',
       variant_allele => 'A'
-    },
-    {
-      consequence_terms => [
-        'intergenic_variant'
-      ],
-      impact => 'MODIFIER',
-      variant_allele => 'T'
     }
   ],
   most_severe_consequence => 'intergenic_variant',
-  seq_region_name => '8',
+  seq_region_name => '4',
   assembly_name => 'GRCh37',
-  start => 60403074,
-  strand => 1,
-  },
-  {
-    allele_string => 'G/A',
-    colocated_variants => [
-      {
-        'minor_allele_freq' => 0.2443,
-        'frequencies' => {
-          'A' => {
-            'amr' => 0.25,
-            'afr' => 0.45,
-            'eur' => 0.11,
-            'asn' => 0.24
-          }
-        },
-        'end' => 32305409,
-        'strand' => 1,
-        'id' => 'rs17081232',
-        'allele_string' => 'G/A',
-        'minor_allele' => 'A',
-        'start' => 32305409
-      }
-    ],
-    end => 32305409,
-    id => 'rs17081232',
-    input => 'rs17081232',
-    intergenic_consequences => [
-      {
-        consequence_terms => [
-          'intergenic_variant'
-        ],
-        impact => 'MODIFIER',
-        variant_allele => 'A'
-      }
-    ],
-    most_severe_consequence => 'intergenic_variant',
-    seq_region_name => '4',
-    assembly_name => 'GRCh37',
-    start => 32305409,
-    strand => 1
-  }];
+  start => 32305409,
+  strand => 1
+}];
+
+my $vep_id_post = '/vep/homo_sapiens/id';
+my $vep_id_body = '{ "ids" : ["rs186950277", "rs17081232", "esv93078" ]}';
+$vep_output =
+[$rs186950277_output->[0], $rs17081232_output->[0], $esv93078_output->[0]];
 
 
 $json = json_POST($vep_id_post,$vep_id_body,'VEP ID list POST');

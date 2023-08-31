@@ -51,6 +51,55 @@ my $base = '/variation/homo_sapiens';
   my $phen_json = json_GET("$base/$id?phenotypes=1", "Phenotype info");
   cmp_deeply($phen_json, $expected_phenotype, "Returning phenotype information");
 
+#Get basic structural variation summary
+  my $id_sv = 'esv93078';
+  my $json_sv = json_GET("$base/$id_sv", 'Variation feature');
+  #is(scalar(@$json), 1, '1 variation feature returned');
+  my $expected_sv = {
+    source => 'Database of Genomic Variants Archive',
+    name => $id_sv,
+    alias => undef,
+    study => {
+      name => "estd59",
+      description => "1000 Genomes Project Consortium - Pilot Project. PMID:20981092 [remapped from build NCBI36]",
+      url => "ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd59_1000_Genomes_Consortium_Pilot_Project",
+    },
+    validation_status => "high quality",
+    var_class => "CNV",
+    mappings => [{
+      assembly_name => "GRCh37", 
+      location => "8:7803891-7825340",
+      strand => 1, 
+      start => 7803891, 
+      end => 7825340, 
+      seq_region_name => "8", 
+      coord_system => "chromosome",
+      genomic_size => 21450
+    }],
+    supporting_evidence => [{
+      alias => undef,
+      name => "essv194300",
+      mappings => [{
+        assembly_name => "GRCh37", 
+        location => "8:7803891-7825340",
+        strand => 1, 
+        start => 7803891, 
+        end => 7825340, 
+        seq_region_name => "8", 
+        coord_system => "chromosome",
+        genomic_size => 21450
+      }],
+      source => "Database of Genomic Variants Archive",
+      study => {
+        name => "estd59",
+        description => "1000 Genomes Project Consortium - Pilot Project. PMID:20981092 [remapped from build NCBI36]",
+        url => "ftp://ftp.ebi.ac.uk/pub/databases/dgva/estd59_1000_Genomes_Consortium_Pilot_Project",
+      },
+      var_class => "loss"
+    }],
+  };
+  cmp_deeply($json_sv, $expected_sv, "Checking the result from the variation endpoint - SV");
+
 # Include genotyping chips information
   $id = 'rs7698608';
   my $expected_variation_3 = {source => 'Variants (including SNPs and indels) imported from dbSNP', name => $id, MAF => '0.448577', minor_allele => 'C', ambiguity => 'M', var_class => 'SNP', synonyms => bag(qw/rs60248177 rs17215092/), evidence => [], most_severe_consequence => '5_prime_UTR_variant', mappings => [{"assembly_name" => "GRCh37", "location"=>"4:103937974-103937974", "strand" => 1, "start" => 103937974, "end" => 103937974, "seq_region_name" => "4", "coord_system" => "chromosome","allele_string"=>"C/A","ancestral_allele" => undef}]};
@@ -100,8 +149,12 @@ my $base = '/variation/homo_sapiens';
    my $pop_genos_json = json_GET("$base/$id?population_genotypes=1", "Population_genotype info");
    cmp_deeply($pop_genos_json, $expected_pop_genos, "Returning population_genotype information");
 
-my $post_data = '{ "ids" : ["rs142276873","rs67521280"]}';
-my $expected_result = { rs142276873 => $expected_variation_1, rs67521280 => $expected_variation_2 };
+my $post_data = '{ "ids" : ["rs142276873","rs67521280","esv93078"]}';
+my $expected_result = {
+  rs142276873 => $expected_variation_1,
+  rs67521280 => $expected_variation_2,
+  esv93078 => $expected_sv
+};
 
 is_json_POST($base,$post_data,$expected_result,"Try to POST list of variations");
 
