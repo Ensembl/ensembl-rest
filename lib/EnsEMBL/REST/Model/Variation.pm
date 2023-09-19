@@ -22,7 +22,7 @@ package EnsEMBL::REST::Model::Variation;
 use Moose;
 use Catalyst::Exception qw(throw);
 use Scalar::Util qw/weaken/;
-use Bio::EnsEMBL::Variation::Utils::Constants qw(%OVERLAP_CONSEQUENCES %VARIATION_CLASSES);
+use Bio::EnsEMBL::Variation::Utils::Constants qw(%OVERLAP_CONSEQUENCES);
 extends 'Catalyst::Model';
 
 with 'Catalyst::Component::InstancePerContext';
@@ -59,7 +59,7 @@ sub fetch_variation {
     my $sva = $c->model('Registry')->get_adaptor($species, 'Variation', 'StructuralVariation');
     $variation = $sva->fetch_by_name($variation_id);
 
-    Catalyst::Exception->throw("$variation_id frankly not found for $species") unless $variation;
+    Catalyst::Exception->throw("$variation_id not found for $species") unless $variation;
   }
   return $self->to_hash($variation);
 }
