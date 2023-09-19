@@ -1,5 +1,5 @@
 1	\N	schema_type	variation
-2	\N	schema_version	110
+2	\N	schema_version	111
 3	\N	patch	patch_73_74_a.sql|schema version
 4	\N	patch	patch_73_74_b.sql|Add doi and UCSC id to publication table
 5	\N	patch	patch_73_74_c.sql|Add clinical_significance to variation_feature table
@@ -140,3 +140,5 @@
 140	\N	patch	patch_109_110_a.sql|schema version
 141	\N	patch	patch_109_110_b.sql|Add DDG2P data_source_attrib to variation_citation
 142	\N	patch	patch_109_110_c.sql|Add new clinical_significance values to variation, variation_feature and structural_variation
+143	\N	patch	patch_110_111_a.sql|schema version
+144	\N	patch	patch_110_111_b.sql|Update transcript_variation primary key
