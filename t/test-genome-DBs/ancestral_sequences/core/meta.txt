@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	111
+2	\N	schema_version	112
 3	\N	patch	patch_77_78_a.sql|schema_version
 4	\N	patch	patch_77_78_b.sql|source_column_increase
 5	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
@@ -80,3 +80,5 @@
 879	\N	patch	patch_109_110_b.sql|Add IS_PAR relationship to link X- and Y-PAR genes
 880	\N	patch	patch_109_110_c.sql|Allow gene id to belong to multiple alt allele groups
 881	\N	patch	patch_110_111_a.sql|schema_version
+882	\N	patch	patch_111_112_a.sql|schema_version
+883	\N	patch	patch_111_112_b.sql|Allow meta_value to be null
