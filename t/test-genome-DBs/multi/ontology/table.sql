@@ -27,7 +27,7 @@ CREATE TABLE `meta` (
   `species_id` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `key_value_idx` (`meta_key`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=59 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `ontology` (
   `ontology_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
