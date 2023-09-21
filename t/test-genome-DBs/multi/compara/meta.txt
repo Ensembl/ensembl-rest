@@ -1,4 +1,4 @@
-166	\N	schema_version	111
+168	\N	schema_version	112
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -133,3 +133,4 @@
 164	\N	patch	patch_109_110_b.sql|case_insensitive_stable_id_again
 165	\N	patch	patch_109_110_c.sql|ncbi_taxa_name_varchar500
 167	\N	patch	patch_110_111_a.sql|schema_version
+169	\N	patch	patch_111_112_a.sql|schema_version
