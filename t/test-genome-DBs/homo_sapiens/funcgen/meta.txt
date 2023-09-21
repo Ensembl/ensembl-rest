@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	110
+2	\N	schema_version	111
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -209,3 +209,4 @@
 784	\N	patch	patch_107_108_b.sql|New epigenome_track table
 785	\N	patch	patch_108_109_a.sql|schema_version
 786	\N	patch	patch_109_110_a.sql|schema_version
+787	\N	patch	patch_110_111_a.sql|schema_version

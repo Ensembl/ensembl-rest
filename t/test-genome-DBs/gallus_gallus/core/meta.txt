@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	110
+2	\N	schema_version	111
 3	\N	patch	patch_65_66_a.sql|schema_version
 4	\N	patch	patch_65_66_b.sql|fix_external_db_id
 5	\N	patch	patch_65_66_c.sql|reorder_unmapped_obj_index
@@ -196,3 +196,4 @@
 447	\N	patch	patch_109_110_a.sql|schema_version
 448	\N	patch	patch_109_110_b.sql|Add IS_PAR relationship to link X- and Y-PAR genes
 449	\N	patch	patch_109_110_c.sql|Allow gene id to belong to multiple alt allele groups
+450	\N	patch	patch_110_111_a.sql|schema_version
