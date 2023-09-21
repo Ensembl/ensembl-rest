@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	111
+2	\N	schema_version	112
 3	\N	patch	patch_59_60_a.sql|schema_version
 4	\N	patch	patch_59_60_b.sql|rename_go_xref_table
 5	\N	patch	patch_59_60_c.sql|QC_fixes
@@ -221,3 +221,5 @@
 1099	\N	patch	patch_109_110_b.sql|Add IS_PAR relationship to link X- and Y-PAR genes
 1100	\N	patch	patch_109_110_c.sql|Allow gene id to belong to multiple alt allele groups
 1101	\N	patch	patch_110_111_a.sql|schema_version
+1102	\N	patch	patch_111_112_a.sql|schema_version
+1103	\N	patch	patch_111_112_b.sql|Allow meta_value to be null

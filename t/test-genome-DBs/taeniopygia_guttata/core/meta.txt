@@ -1,4 +1,4 @@
-1	\N	schema_version	111
+1	\N	schema_version	112
 2	\N	patch	patch_50_51_a.sql|schema_version
 3	\N	patch	patch_50_51_b.sql|protein_feature_hit_name
 4	\N	patch	patch_50_51_c.sql|meta_coord_index
@@ -265,3 +265,5 @@
 1321	\N	patch	patch_109_110_b.sql|Add IS_PAR relationship to link X- and Y-PAR genes
 1322	\N	patch	patch_109_110_c.sql|Allow gene id to belong to multiple alt allele groups
 1323	\N	patch	patch_110_111_a.sql|schema_version
+1324	\N	patch	patch_111_112_a.sql|schema_version
+1325	\N	patch	patch_111_112_b.sql|Allow meta_value to be null
