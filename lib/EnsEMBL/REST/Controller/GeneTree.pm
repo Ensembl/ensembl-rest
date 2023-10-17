@@ -58,19 +58,6 @@ sub get_genetree : Chained('/') PathPart('genetree/id') Args(1) ActionClass('RES
   }
 }
 
-sub get_genetree_by_member_id_GET { }
-
-sub get_genetree_by_member_id : Chained('/') PathPart('genetree/member/id') Args(1) ActionClass('REST') {
-  my ($self, $c, $id) = @_;
-  try {
-    my $gt = $c->model('Lookup')->find_genetree_by_member_id($id);
-    $self->_set_genetree($c, $gt);
-  } catch {
-    $c->go('ReturnError', 'from_ensembl', [qq{$_}]) if $_ =~ /STACK/;
-    $c->go('ReturnError', 'custom', [qq{$_}]);
-  }
-}
-
 sub get_genetree_by_species_member_id_GET { }
 
 sub get_genetree_by_species_member_id : Chained('/') PathPart('genetree/member/id') Args(2) ActionClass('REST') {

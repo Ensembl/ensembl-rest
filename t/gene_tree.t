@@ -126,21 +126,9 @@ is_json_GET(
 );
 
 is_json_GET(
-    '/genetree/member/id/ENSG00000176515?compara=homology;subtree_node_id=100462673',
-    $restricted_RF01299,
-    'Gene-tree (ncRNA) by gene ID pruned to a subtree',
-);
-
-is_json_GET(
     '/genetree/member/id/homo_sapiens/ENSG00000176515?compara=homology;subtree_node_id=100462673',
     $restricted_RF01299,
     'Gene-tree (ncRNA) by species name and gene ID, pruned to a subtree',
-);
-
-is_json_GET(
-    '/genetree/member/id/ENST00000314040?compara=homology;subtree_node_id=100462673',
-    $restricted_RF01299,
-    'Gene-tree (ncRNA) by transcript ID pruned to a subtree',
 );
 
 is_json_GET(
@@ -337,22 +325,6 @@ sub find_leaf {
         return (),
     }
 }
-
-my $json1 = json_GET(
-    '/genetree/member/id/ENSG00000176515?compara=homology&clusterset_id=default',
-    'Gene-tree (ncRNA) by ID. Explicitly require the default clusterset_id',
-);
-is(count_leaves($json1->{tree}), 69, 'Got all the leaves');
-my ($human_leaf) = find_leaf($json1->{'tree'}, 'ENSG00000176515');
-is($human_leaf->{'branch_length'}, '0.1', 'Got the right branch-length');
-
-my $json2 = json_GET(
-    '/genetree/member/id/ENSG00000176515?compara=homology&clusterset_id=ss_it_s16',
-    'Gene-tree (ncRNA) by ID. Alternative clusterset_id',
-);
-is(count_leaves($json2->{tree}), 69, 'Got all the leaves');
-($human_leaf) = find_leaf($json2->{'tree'}, 'ENSG00000176515');
-is($human_leaf->{'branch_length'}, '2.11826733883463e-06', 'Got the right branch-length');
 
 my $json3 = json_GET(
     '/genetree/member/id/homo_sapiens/ENSG00000176515?compara=homology&clusterset_id=default',
@@ -665,16 +637,6 @@ my %stable_id_to_object_type = (
 
 foreach my $stable_id (@stable_ids) {
     my $object_type = $stable_id_to_object_type{$stable_id};
-
-    $json = json_GET(
-        "/genetree/member/id/${stable_id}?compara=homology;species=meleagris_gallopavo;subtree_node_id=1800121321",
-        "gene tree using $object_type stable ID, with species parameter",
-    );
-    eq_or_diff(
-      $json,
-      $bird_subtree,
-      "Got the correct gene tree by $object_type stable ID, with species parameter",
-    );
 
     $json = json_GET(
         "/genetree/member/id/meleagris_gallopavo/${stable_id}?compara=homology;subtree_node_id=1800121321",

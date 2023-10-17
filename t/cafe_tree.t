@@ -229,12 +229,6 @@ is_json_GET(
 );
 
 is_json_GET(
-    '/cafe/genetree/member/id/ENSG00000176515?compara=homology',
-    $cafe_species_tree,
-    'cafe species-tree using MAOA gene stable id ',
-);
-
-is_json_GET(
     '/cafe/genetree/member/id/homo_sapiens/ENSG00000176515?compara=homology',
     $cafe_species_tree,
     'cafe species-tree using species name and MAOA gene stable id',
@@ -410,16 +404,6 @@ my %stable_id_to_object_type = (
 
 foreach my $stable_id (@stable_ids) {
     my $object_type = $stable_id_to_object_type{$stable_id};
-
-    $json = json_GET(
-        "/cafe/genetree/member/id/${stable_id}?compara=homology;species=meleagris_gallopavo",
-        "cafe species-tree using $object_type stable id, with species parameter",
-    );
-    eq_or_diff(
-        sort_json_cafe_tree_children($json),
-        $bird_cafe_tree,
-        "Got the correct cafe species-tree by $object_type stable id, with species parameter",
-    );
 
     $json = json_GET(
         "/cafe/genetree/member/id/meleagris_gallopavo/${stable_id}?compara=homology",
