@@ -68,63 +68,6 @@ sub get_adaptors :Private {
   };
 }
 
-sub fetch_by_ensembl_gene : Chained("/") PathPart("homology/id") Args(1)  {
-  my ( $self, $c, $id ) = @_;
-  my $lookup = $c->model('Lookup');
-  my $species;
-
-  try {
-    ($species) = $lookup->find_object_location($id);
-
-    if (!defined $species) {
-        Catalyst::Exception->throw("Stable ID lookup failed for gene '${id}'.");
-    }
-  } catch {
-    # if unique gene member not found in stable_id_lookup for some reason
-    # (e.g. versioned gene stable ID), try looking it up in compara dbs
-    my $param_compara = $c->request->parameters->{compara};
-    my $reg = $c->model('Registry');
-
-    my $comparas;
-    if ($param_compara) {
-      $comparas = [$reg->get_best_compara_DBAdaptor($species, $param_compara, $self->default_compara())];
-    } else {
-      $comparas = $reg->get_all_DBAdaptors('compara');
-    }
-
-    my %distinct_species;
-    foreach my $compara_db (@{$comparas}) {
-      my $gma = $compara_db->get_GeneMemberAdaptor();
-
-      # If 'MemberAdaptor::fetch_all_by_stable_id' is available, use it..
-      if ($gma->can('fetch_all_by_stable_id')) {
-        foreach my $gene_member (@{$gma->fetch_all_by_stable_id($id)}) {
-          $distinct_species{$gene_member->genome_db->name} = 1;
-        }
-      } else {  # ..otherwise fall back to using 'MemberAdaptor::fetch_by_stable_id_GenomeDB'.
-        foreach my $gdb (@{$compara_db->get_GenomeDBAdaptor()->fetch_all()}) {
-          my $gene_member = $gma->fetch_by_stable_id_GenomeDB($id, $gdb);
-          if (defined $gene_member) {
-            $distinct_species{$gdb->name} = 1;
-          }
-        }
-      }
-    }
-
-    my @matching_species = keys %distinct_species;
-    if (scalar(@matching_species) == 1) {
-      $species = $matching_species[0];
-    } elsif (scalar(@matching_species) > 1) {
-      $c->go('ReturnError', 'custom', ["Could not find a unique gene matching ID '${id}'. Please try again"]);
-    } else {
-      $c->go('ReturnError', 'custom', ["Could not find any gene matching the ID '${id}' in any database. Please try again"]);
-    }
-  };
-
-  $c->stash(stable_ids => [$id], species => $species);
-  $c->detach('get_orthologs');
-}
-
 sub fetch_by_species_ensembl_gene : Chained("/") PathPart("homology/id") Args(2)  {
   my ( $self, $c, $species, $id ) = @_;
 

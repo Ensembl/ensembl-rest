@@ -60,48 +60,42 @@ my $condensed_ortho_ENSG00000139618_gorilla = {
 ## "condensed" homologies with target species
 
 is_json_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_species=gorilla_gorilla;type=orthologues',
-    _get_returned_json('ENSG00000139618', $condensed_ortho_ENSG00000139618_gorilla),
-    '"condensed" homologies with a target species',
-);
-
-is_json_GET(
     '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;target_species=gorilla_gorilla;type=orthologues',
     _get_returned_json('ENSG00000139618', $condensed_ortho_ENSG00000139618_gorilla),
     '"condensed" homologies of human gene with a target species',
 );
 
 is_json_GET(
-    '/homology/id/ENSG00000139618?format=condensed;target_species=gorilla_gorilla;type=orthologues', {data => []},
+    '/homology/id/homo_sapiens/ENSG00000139618?format=condensed;target_species=gorilla_gorilla;type=orthologues', {data => []},
     'homologies without compara division specified',
 );
 
 is_json_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_taxon=9595;type=orthologues',
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;target_taxon=9595;type=orthologues',
     _get_returned_json('ENSG00000139618', $condensed_ortho_ENSG00000139618_gorilla),
     '"condensed" homologies with a target single-species taxon',
 );
 
 is_json_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_taxon=9595;target_species=gorilla_gorilla;type=orthologues',
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;target_taxon=9595;target_species=gorilla_gorilla;type=orthologues',
     _get_returned_json('ENSG00000139618', $condensed_ortho_ENSG00000139618_gorilla),
     '"condensed" homologies with overlapping targets',
 );
 
 $json = json_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_species=pan_troglodytes;target_species=gorilla_gorilla;type=orthologues',
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;target_species=pan_troglodytes;target_species=gorilla_gorilla;type=orthologues',
     '"condensed" homologies with non-overlapping targets',
 );
 is(scalar(@{$json->{data}->[0]->{homologies}}), 2, 'The "target_species" and "target_taxon" arguments are combined');
 
 $json = json_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_taxon=207598;type=orthologues',
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;target_taxon=207598;type=orthologues',
     '"condensed" homologies with an ancestral taxon',
 );
 is(scalar(@{$json->{data}->[0]->{homologies}}), 2, 'Found both species under taxon ID 207598');
 
 $json = json_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=condensed;target_species=ornithorhynchus_anatinus;type=orthologues',
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;target_species=ornithorhynchus_anatinus;type=orthologues',
     '"condensed" homologies with a single target species but one-to-many homologies',
 );
 is(scalar(@{$json->{data}->[0]->{homologies}}), 2, 'We get all the one-to-many homologies even though there is 1 species');
@@ -109,7 +103,7 @@ is(scalar(@{$json->{data}->[0]->{homologies}}), 2, 'We get all the one-to-many h
 
 ## Total number of homologies without a filter
 $json = json_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=condensed;type=orthologues',
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;type=orthologues',
     '"condensed" homologies with no species filter',
 );
 is(scalar(@{$json->{data}->[0]->{homologies}}), 63, 'Got all the homologies');
@@ -130,12 +124,6 @@ my $condensed_ortho_ENSGALG00010013238_duck = {
     'taxonomy_level' => 'Aves',
     'type' => 'ortholog_one2one'
 };
-
-is_json_GET(
-    '/homology/id/ENSGALG00010013238.1?compara=homology;format=condensed;target_species=anas_platyrhynchos;type=orthologues',
-    _get_returned_json('ENSGALG00010013238.1', $condensed_ortho_ENSGALG00010013238_duck),
-    'homologies of gene by versioned stable ID',
-);
 
 is_json_GET(
     '/homology/id/meleagris_gallopavo/ENSGALG00010013238.1?compara=homology;format=condensed;target_species=anas_platyrhynchos;type=orthologues',
@@ -180,13 +168,13 @@ my $full_ortho_ENSG00000139618_gorilla = {
 
 
 is_json_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=full;target_species=gorilla_gorilla;type=orthologues;sequence=none;aligned=0',
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=full;target_species=gorilla_gorilla;type=orthologues;sequence=none;aligned=0',
     _get_returned_json('ENSG00000139618', $full_ortho_ENSG00000139618_gorilla),
     '"full" homologies with a target species and no sequences at all',
 );
 
 $json = json_GET(
-    '/homology/id/ENSG00000139618?target_species=gorilla_gorilla;format=full;type=orthologues;compara=homology;cigar_line=0',
+    '/homology/id/homo_sapiens/ENSG00000139618?target_species=gorilla_gorilla;format=full;type=orthologues;compara=homology;cigar_line=0',
     '"full" homologies with a target taxon (aligned protein)'
 );
 ok(!$json->{data}->[0]->{homologies}->[0]->{source}->{cigar_line}, 'No cigar_line');
@@ -195,7 +183,7 @@ like($json->{data}->[0]->{homologies}->[0]->{target}->{align_seq}, qr/^MPIGSKERP
 ok(!$json->{data}->[0]->{homologies}->[0]->{source}->{seq}, 'No "seq" key since we asked for the alignment');
 
 $json = json_GET(
-    '/homology/id/ENSG00000139618?target_species=gorilla_gorilla;format=full;type=orthologues;compara=homology;aligned=0',
+    '/homology/id/homo_sapiens/ENSG00000139618?target_species=gorilla_gorilla;format=full;type=orthologues;compara=homology;aligned=0',
     '"full" homologies with a target taxon (unaligned protein)'
 );
 ok($json->{data}->[0]->{homologies}->[0]->{source}->{cigar_line}, 'Human cigar_line still there');
@@ -204,7 +192,7 @@ like($json->{data}->[0]->{homologies}->[0]->{source}->{seq}, qr/^MPIGSKER[A-Z]*T
 like($json->{data}->[0]->{homologies}->[0]->{target}->{seq}, qr/^MPIGSKE[A-Z]*ESTR$/, 'Gorilla protein sequence');
 
 $json = json_GET(
-    '/homology/id/ENSG00000139618?target_species=gorilla_gorilla;format=full;type=orthologues;compara=homology;aligned=0;cigar_line=0',
+    '/homology/id/homo_sapiens/ENSG00000139618?target_species=gorilla_gorilla;format=full;type=orthologues;compara=homology;aligned=0;cigar_line=0',
     '"full" homologies with a target taxon (unaligned protein)'
 );
 ok(!$json->{data}->[0]->{homologies}->[0]->{source}->{cigar_line}, 'Human cigar_line has gone');
@@ -212,7 +200,7 @@ ok(!$json->{data}->[0]->{homologies}->[0]->{source}->{align_seq}, 'Human "align_
 ok($json->{data}->[0]->{homologies}->[0]->{source}->{seq}, 'The sequence is still there');
 
 $json = json_GET(
-    '/homology/id/ENSG00000139618?target_species=gorilla_gorilla;format=full;type=orthologues;compara=homology;aligned=0;sequence=cdna',
+    '/homology/id/homo_sapiens/ENSG00000139618?target_species=gorilla_gorilla;format=full;type=orthologues;compara=homology;aligned=0;sequence=cdna',
     '"full" homologies with a target taxon (unaligned transcript sequence)'
 );
 ok($json->{data}->[0]->{homologies}->[0]->{source}->{cigar_line}, 'Human cigar_line still there');
@@ -230,12 +218,6 @@ my $condensed_para_ENSG00000238707 = {
     'species' => 'homo_sapiens',
     'method_link_type' => 'ENSEMBL_PARALOGUES'
 };
-
-is_json_GET(
-    '/homology/id/ENSG00000238707?format=condensed;type=paralogues;compara=homology',
-    _get_returned_json('ENSG00000238707', $condensed_para_ENSG00000238707),
-    '"condensed" paralogues'
-);
 
 is_json_GET(
     '/homology/id/homo_sapiens/ENSG00000238707?format=condensed;type=paralogues;compara=homology',
@@ -295,7 +277,7 @@ my $full_ortho_ENSG00000238707_zebrafish = {
 };
 
 is_json_GET(
-    '/homology/id/ENSG00000238707?target_species=dipodomys_ordii;format=full;type=orthologues;compara=homology',
+    '/homology/id/homo_sapiens/ENSG00000238707?target_species=dipodomys_ordii;format=full;type=orthologues;compara=homology',
     _get_returned_json('ENSG00000238707', $full_ortho_ENSG00000238707_zebrafish),
     'one2one ncRNA orthologue with aligned sequence',
 );
@@ -309,27 +291,27 @@ $full_ortho_ENSG00000238707_zebrafish->{target}->{seq} =~ s/-//g;
 delete $full_ortho_ENSG00000238707_zebrafish->{target}->{align_seq};
 
 is_json_GET(
-    '/homology/id/ENSG00000238707?target_species=dipodomys_ordii;format=full;aligned=0;type=orthologues;compara=homology',
+    '/homology/id/homo_sapiens/ENSG00000238707?target_species=dipodomys_ordii;format=full;aligned=0;type=orthologues;compara=homology',
     _get_returned_json('ENSG00000238707', $full_ortho_ENSG00000238707_zebrafish),
     'one2one ncRNA orthologue with unaligned sequence (but still a cigar_line)',
 );
 
 # sequence=cdna still works for ncRNAs
 is_json_GET(
-    '/homology/id/ENSG00000238707?target_species=dipodomys_ordii;format=full;aligned=0;type=orthologues;compara=homology;sequence=cdna',
+    '/homology/id/homo_sapiens/ENSG00000238707?target_species=dipodomys_ordii;format=full;aligned=0;type=orthologues;compara=homology;sequence=cdna',
     _get_returned_json('ENSG00000238707', $full_ortho_ENSG00000238707_zebrafish),
     'one2one ncRNA orthologue with unaligned sequence (but still a cigar_line)',
 );
 
 # sequence=protein is ignored for ncRNAs
 is_json_GET(
-    '/homology/id/ENSG00000238707?target_species=dipodomys_ordii;format=full;aligned=0;type=orthologues;compara=homology;sequence=protein',
+    '/homology/id/homo_sapiens/ENSG00000238707?target_species=dipodomys_ordii;format=full;aligned=0;type=orthologues;compara=homology;sequence=protein',
     _get_returned_json('ENSG00000238707', $full_ortho_ENSG00000238707_zebrafish),
     'one2one ncRNA orthologue with unaligned sequence (but still a cigar_line)',
 );
 
 $xml = orthoxml_GET(
-    '/homology/id/ENSG00000238707?target_species=dipodomys_ordii;type=orthologues;compara=homology',
+    '/homology/id/homo_sapiens/ENSG00000238707?target_species=dipodomys_ordii;type=orthologues;compara=homology',
     'orthoxml with 1 target species',
 );
 subtest 'OrthoXML file', sub {
@@ -369,7 +351,7 @@ subtest 'OrthoXML file', sub {
 };
 
 $xml = orthoxml_GET(
-    '/homology/id/ENSG00000139618?compara=homology;format=condensed;type=orthologues',
+    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;type=orthologues',
     'orthoxml with many homologies',
 );
 subtest 'OrthoXML file', sub {

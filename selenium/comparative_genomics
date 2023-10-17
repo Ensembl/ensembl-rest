@@ -28,11 +28,6 @@
 </tr>
 <tr>
 	<td>clickAndWait</td>
-	<td>link=GET genetree/member/id/:id</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
 	<td>link=GET genetree/member/id/:species/:id</td>
 	<td></td>
 </tr>
@@ -49,11 +44,6 @@
 <tr>
 	<td>open</td>
 	<td>http://${CurrentEnvironment}/</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=GET homology/id/:id</td>
 	<td></td>
 </tr>
 <tr>
