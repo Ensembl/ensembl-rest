@@ -331,7 +331,7 @@ my $json3 = json_GET(
     'Gene-tree (ncRNA) by species and ID. Explicitly require the default clusterset_id',
 );
 is(count_leaves($json3->{tree}), 69, 'Got all the leaves (query by species and gene ID)');
-($human_leaf) = find_leaf($json3->{'tree'}, 'ENSG00000176515');
+my ($human_leaf) = find_leaf($json3->{'tree'}, 'ENSG00000176515');
 is($human_leaf->{'branch_length'}, '0.1', 'Got the right branch-length (query by species and gene ID)');
 
 my $json4 = json_GET(
