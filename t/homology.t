@@ -104,12 +104,6 @@ is(scalar(@{$json->{data}->[0]->{homologies}}), 2, 'We get all the one-to-many h
 ## Total number of homologies without a filter
 $json = json_GET(
     '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;type=orthologues',
-    '"condensed" homologies with no species filter',
-);
-is(scalar(@{$json->{data}->[0]->{homologies}}), 63, 'Got all the homologies');
-
-$json = json_GET(
-    '/homology/id/homo_sapiens/ENSG00000139618?compara=homology;format=condensed;type=orthologues',
     '"condensed" homologies of human gene with no species filter',
 );
 is(scalar(@{$json->{data}->[0]->{homologies}}), 63, 'Got all the homologies of human gene');
