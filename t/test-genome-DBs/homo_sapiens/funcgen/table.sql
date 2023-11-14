@@ -192,7 +192,7 @@ CREATE TABLE `chance` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `data_file` (
-  `data_file_id` int(10) unsigned NOT NULL,
+  `data_file_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `table_id` int(10) unsigned NOT NULL,
   `table_name` varchar(32) NOT NULL,
   `path` varchar(255) NOT NULL,
@@ -221,7 +221,7 @@ CREATE TABLE `epigenome_track` (
   `epigenome_track_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `epigenome_id` int(10) unsigned NOT NULL,
   `feature_type_id` int(10) unsigned NOT NULL,
-  `data_file_id` int(10) unsigned DEFAULT NULL,
+  `data_file_id` int(10) unsigned NOT NULL,
   `track_type` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`epigenome_track_id`),
   KEY `et_index` (`epigenome_id`,`feature_type_id`)
@@ -401,7 +401,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=790 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM AUTO_INCREMENT=791 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
