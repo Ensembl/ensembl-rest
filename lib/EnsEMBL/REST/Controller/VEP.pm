@@ -441,7 +441,7 @@ sub _configure_plugins {
           push @params, $param;
         }
         # CADD - check if species is pig and provide appropriate file based on that
-        elsif(lc $module eq 'CADD' && $c->stash->{species} eq "sus_scrofa"){
+        elsif(lc $module eq 'cadd' && $c->stash->{species} eq "sus_scrofa"){
           next unless $param =~ /^snv_pig=/;
 
           my $param_aux = $param;
