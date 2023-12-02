@@ -450,6 +450,22 @@ sub _configure_plugins {
 
           push @params, $param;
         }
+        elsif(lc $module eq 'cadd' && ($user_config->{$module} eq "snv_indels" || $user_config->{$module} eq "1")){
+          next unless ($param =~ /^snv=/ || $param =~ /^indels=/);
+          push @params, $param;
+        }
+        elsif(lc $module eq 'cadd' && $user_config->{$module} eq "snv"){
+          next unless ($param =~ /^snv=/);
+          push @params, $param;
+        }
+        elsif(lc $module eq 'cadd' && $user_config->{$module} eq "indels"){
+          next unless ($param =~ /^indels=/);
+          push @params, $param;
+        }
+        elsif(lc $module eq 'cadd' && $user_config->{$module} eq "sv"){
+          next unless ($param =~ /^sv=/);
+          push @params, $param;
+        }
         # other params, such as file paths, get passed from the config
         else {
           push @params, $param;
