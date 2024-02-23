@@ -143,7 +143,7 @@ jsonp=1
     taxon_nameish=Homo%25
     target_taxon=10090
     target_ancestral_taxon=9526
-    target_species=cow
+    target_species=bos_taurus
     
     ontology=GO
     ontology_term_id=GO:0005667
