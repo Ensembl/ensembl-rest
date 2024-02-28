@@ -220,3 +220,4 @@
 1098	\N	patch	patch_109_110_a.sql|schema_version
 1099	\N	patch	patch_109_110_b.sql|Add IS_PAR relationship to link X- and Y-PAR genes
 1100	\N	patch	patch_109_110_c.sql|Allow gene id to belong to multiple alt allele groups
+1101	\N	patch	patch_109_110_d.sql|Extend meta_key length to 64 - allow NULL in meta_value
