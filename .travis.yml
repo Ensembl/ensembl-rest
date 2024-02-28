@@ -4,6 +4,7 @@ language: "perl"
 
 perl:
   - '5.26'
+  - '5.38'
 
 services:
   - mysql
@@ -23,7 +24,7 @@ matrix:
   exclude:
   - perl: '5.26'
     env: COVERALLS=false
-  - perl: '5.14'
+  - perl: '5.38'
     env: COVERALLS=true
 
 before_install:
@@ -49,10 +50,9 @@ before_install:
 
 install:
     - export PERL5LIB=$PERL5LIB:$PWD/bioperl-live
-    - cpanm -v --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
-    - cpanm -v --installdeps --with-recommends --notest .
-    - cpanm -n Devel::Cover::Report::Coveralls
-    - cpanm DBD::SQLite
+    - cpanm --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
+    - cpanm --installdeps --with-recommends --notest .
+    - cpanm -n Devel::Cover::Report::Coveralls DBD::SQLite
     - cp travisci/MultiTestDB.conf.travisci t/MultiTestDB.conf
     - mysql -u root -h localhost -e 'GRANT ALL PRIVILEGES ON *.* TO "travis"@"%"'
 
