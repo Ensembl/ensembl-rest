@@ -30,13 +30,13 @@ before_install:
     - export ENSEMBL_BRANCH='main'
     - export ENSEMBL_VER=$(echo $TRAVIS_BRANCH | grep -P -o '(?<=version[\W_]|fix[\W_]|release[\W_])(\d+)')
     - if [[ $ENSEMBL_VER =~ [0-9]+ ]]; then ENSEMBL_BRANCH="release/$ENSEMBL_VER"; fi
-    - git clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-test
-    - git clone --depth 1 --branch $ENSEMBL_BRANCH ensembl
-    - git clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-compara
-    - git clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-variation
-    - git clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-vep
-    - git clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-funcgen
-    - git clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-io
+    - git clone --depth 1 --branch $ENSEMBL_BRANCH https://github.com/Ensembl/ensembl-test
+    - git clone --depth 1 --branch $ENSEMBL_BRANCH https://github.com/Ensembl/ensembl
+    - git clone --depth 1 --branch $ENSEMBL_BRANCH https://github.com/Ensembl/ensembl-compara
+    - git clone --depth 1 --branch $ENSEMBL_BRANCH https://github.com/Ensembl/ensembl-variation
+    - git clone --depth 1 --branch $ENSEMBL_BRANCH https://github.com/Ensembl/ensembl-vep
+    - git clone --depth 1 --branch $ENSEMBL_BRANCH https://github.com/Ensembl/ensembl-funcgen
+    - git clone --depth 1 --branch $ENSEMBL_BRANCH https://github.com/Ensembl/ensembl-io
     - git clone -b release-1-6-924 --depth 1 https://github.com/bioperl/bioperl-live.git
     - git clone --branch 1.3.2 --depth 1 https://github.com/samtools/htslib.git
     - cd htslib
