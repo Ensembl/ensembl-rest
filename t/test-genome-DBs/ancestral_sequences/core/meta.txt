@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	112
+2	\N	schema_version	113
 3	\N	patch	patch_77_78_a.sql|schema_version
 4	\N	patch	patch_77_78_b.sql|source_column_increase
 5	\N	patch	patch_77_78_c.sql|Change unmapped_reason_id from smallint to int
@@ -82,3 +82,5 @@
 881	\N	patch	patch_110_111_a.sql|schema_version
 882	\N	patch	patch_111_112_a.sql|schema_version
 883	\N	patch	patch_111_112_b.sql|Allow meta_value to be null
+884	\N	patch	patch_112_113_a.sql|schema_version
+885	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null
