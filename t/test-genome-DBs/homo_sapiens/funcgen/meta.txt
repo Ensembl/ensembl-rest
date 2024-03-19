@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	112
+2	\N	schema_version	113
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -213,3 +213,4 @@
 788	\N	patch	patch_111_112_a.sql|schema_version
 789	\N	patch	patch_111_112_b.sql|fix data_file_id length
 790	\N	patch	patch_111_112_c.sql|set data_file_id to not null auto increment
+791	\N	patch	patch_112_113_a.sql|schema_version
