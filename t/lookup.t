@@ -109,7 +109,7 @@ $full_response = {
   %{$condensed_response},
   Parent => 'ENSG00000176515', start => 1080164, end => 1105181, strand => 1, version => 1, seq_region_name => '6', assembly_name => 'GRCh37',
   biotype => 'protein_coding', display_name => 'AL033381.1-201', logic_name => 'ensembl', source => 'ensembl',
-  is_canonical => 1, length => 3435, gencode_primary => 0,
+  is_canonical => 1, length => 3435,
 };
 cmp_deeply(json_GET("/lookup/$basic_id",'lookup transcript'), $full_response, 'Full response contains all Transcript information');
 
@@ -151,7 +151,7 @@ $full_response = {
   %{$condensed_response},
   Parent => 'ENSG00000164379', start => 1312675, end => 1314992, strand => 1, version => 2, seq_region_name => '6', assembly_name => 'GRCh37',
   biotype => 'protein_coding', display_name => 'FOXQ1-001', logic_name => 'ensembl_havana_transcript', source => 'ensembl',
-  is_canonical => 1, length => 2318, gencode_primary => 1,
+  is_canonical => 1, length => 2318,
 };
 cmp_deeply(json_GET("/lookup/$basic_id",'lookup transcript'), $full_response, 'Full response contains all Transcript information');
 
