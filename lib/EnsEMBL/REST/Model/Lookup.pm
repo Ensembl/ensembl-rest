@@ -515,6 +515,7 @@ sub features_as_hash {
       if (lc($object_type) eq 'transcript') {
         $features->{is_canonical} = $obj->is_canonical;
         $features->{length} = $obj->length;
+        $features->{gencode_primary} = $obj->gencode_primary; # boolean value for having GENCODE Primary attrib
       }
       if (lc($object_type) eq 'gene') {
         $features->{canonical_transcript} = $obj->canonical_transcript->stable_id.".".$obj->canonical_transcript->version;
