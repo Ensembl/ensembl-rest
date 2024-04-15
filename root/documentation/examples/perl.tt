@@ -54,7 +54,7 @@ if(length $response->{content}) {
   print "\n";
 }
 [% ELSE %]
-print "$response->{status} $response->{reason}\n";
+print "$response->{content}\n";
 [% END -%]
 [% END %]
 </pre>
