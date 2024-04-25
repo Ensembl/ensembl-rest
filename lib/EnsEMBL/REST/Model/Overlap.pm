@@ -160,7 +160,15 @@ sub to_hash {
   my ($self, $features, $feature_type) = @_;
   my @hashed;
   foreach my $feature (@{$features}) {
-    my $hash = $feature->summary_as_hash();
+
+    my $hash;
+    
+    if (lc($feature_type)  eq 'regulatory') {
+      $hash = $feature->summary_as_hash_2(); 
+    } else {
+      $hash = $feature->summary_as_hash();
+    }
+  
     foreach my $key (@KNOWN_NUMERICS) {
       my $v = $hash->{$key};
       $hash->{$key} = ($v*1) if defined $v;
