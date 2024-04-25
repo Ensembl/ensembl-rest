@@ -172,7 +172,7 @@ jsonp=1
     cds_coordinates=1..1000
     translation_coordinates=100..300
 
-    regulation_id=ENSR00000060894
+    regulation_id=ENSR00001137252
 
     phenotype_region=9:22125500-22136000
 
