@@ -34,7 +34,7 @@ use Bio::EnsEMBL::Utils::Scalar qw/wrap_array/;
 
 has 'allowed_features' => ( isa => 'HashRef', is => 'ro', lazy => 1, default => sub {
   return {
-    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory motif array_probe other_regulatory band mane/
+    map { $_ => 1 } qw/gene transcript cds exon repeat simple misc variation somatic_variation structural_variation somatic_structural_variation constrained regulatory motif band mane/
   };
 });
 
@@ -419,14 +419,6 @@ sub regulatory {
   return $adaptor->fetch_all_by_Slice($slice);
 }
 
-sub other_regulatory {
-  my ($self, $slice) = @_;
-  my $c       = $self->context();
-  my $species = $c->stash->{species};
-  my $adaptor = $c->model('Registry')->get_adaptor($species, 'funcgen', 'ExternalFeature');
-  return $adaptor->fetch_all_by_Slice($slice);
-}
-
 sub motif {
   my ($self, $slice) = @_;
   my $c       = $self->context;
@@ -434,27 +426,6 @@ sub motif {
   my $mfa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'motiffeature') ||
    Catalyst::Exception->throw("No adaptor found for species $species, object MotifFeature and DB funcgen");
   return $mfa->fetch_all_by_Slice($slice);
-}
-
-
-sub array_probe {
-  my $self    = shift;
-  my $slice   = shift;
-  my $c       = $self->context;
-  my $species = $c->stash->{species};
-  my @array_names  = map {lc($_)} @{wrap_array($c->request->parameters->{array})};
-  my $pfa     = $c->model('Registry')->get_adaptor($species, 'funcgen', 'probefeature') ||
-   Catalyst::Exception->throw("No adaptor found for species $species, object ProbeFeature and DB funcgen");
-
-  if (scalar @array_names > 0) {
-    my $aa      = $c->model('Registry')->get_adaptor($species, 'funcgen', 'array') ||
-     Catalyst::Exception->throw("No adaptor found for species $species, object Array and DB funcgen");
-    my @arrays  = map {$aa->fetch_by_name_vendor($_) } @array_names;
-    return $pfa->fetch_all_by_Slice_Arrays($slice, \@arrays);
-  }
-  else {
-    return $pfa->fetch_all_by_Slice($slice);
-  }
 }
 
 sub simple {
