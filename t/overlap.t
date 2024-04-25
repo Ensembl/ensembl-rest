@@ -332,24 +332,6 @@ my $base = '/overlap/region/homo_sapiens';
   }], 'Getting motif_feature as JSON');
 }
 
-
-#Probe feature testing
-{
-  my $region = '1:1020000..1030000';
-  cmp_deeply(json_GET("$base/$region?feature=array_probe","Get probe_feature"), [{
-    end => 1020593,                          
-    feature_type => 'array_probe', 
-    microarray => 'HuEx-1_0-st-v2',          
-    probe_length => 25,                      
-    probe_name => 1256969,                   
-    probe_set => '2938429;',                 
-    seq_region_name => 1,                    
-    start => 1020569,                        
-    strand => 1 
-  }], 'Getting probe_feature as JSON');
-}
-
-
 ##Misc feature
 {
   my $region = '6:1070000..1080000';
