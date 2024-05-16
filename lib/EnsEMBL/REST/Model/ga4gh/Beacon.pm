@@ -1082,7 +1082,6 @@ sub get_vep_frequency {
             my ($gnomad_type, $pop) = $key =~ /(.*)_(.*)/;
             my $freq_obj;
             $freq_obj->{alleleFrequency} = $frequencies->{$key};
-            $freq_obj->{allele} = $allele;
 
             if($gnomad_type) {
               $pop = $gnomad_pop->{$pop} ? $gnomad_pop->{$pop} : $pop;
@@ -1111,7 +1110,7 @@ sub get_vep_frequency {
 sub get_vep_molecular_attribs {
   my $vep_consequences = shift;
 
-  my @gene_ontology;
+  my %gene_ontology;
   my %molecular_interactions;
   my @intact_data;
   my @phenotypes;
@@ -1132,13 +1131,11 @@ sub get_vep_molecular_attribs {
 
       # GO
       if($transcript_consequences->{'go'}) {
-        my @go_terms = split ',', $transcript_consequences->{'go'};
-        foreach my $go (@go_terms) {
-          my ($id, $term) = $go =~ /(.*):(.*)/;
+        foreach my $go (@{$transcript_consequences->{'go'}}) {
           my $cons;
-          $cons->{id} = $id;
-          $cons->{label} = $term;
-          push @gene_ontology, $cons;
+          $cons->{id} = $go->{'go_term'};
+          $cons->{label} = $go->{'description'};
+          $gene_ontology{$go->{'go_term'}} = $cons if !$gene_ontology{$go->{'go_term'}};
         }
       }
 
@@ -1182,8 +1179,10 @@ sub get_vep_molecular_attribs {
     }
   }
 
+  my @gene_ontology_list = values %gene_ontology;
+
   $results{molecular_interactions} = \%molecular_interactions;
-  $results{gene_ontology} = \@gene_ontology;
+  $results{gene_ontology} = \@gene_ontology_list;
   $results{disgenet} = \@disgenet_data;
   $results{cadd} = \@cadd_scores;
 
