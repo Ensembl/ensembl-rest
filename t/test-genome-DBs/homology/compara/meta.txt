@@ -91,3 +91,4 @@
 122	\N	patch	patch_110_111_a.sql|schema_version
 124	\N	patch	patch_111_112_a.sql|schema_version
 126	\N	patch	patch_112_113_a.sql|schema_version
+127	\N	patch	patch_112_113_b.sql|meta_key_64

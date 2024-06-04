@@ -199,5 +199,6 @@
 450	\N	patch	patch_110_111_a.sql|schema_version
 451	\N	patch	patch_111_112_a.sql|schema_version
 452	\N	patch	patch_111_112_b.sql|Allow meta_value to be null
-453	\N	patch	patch_112_113_a.sql|schema_version
-454	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null
+453	\N	patch	patch_111_112_c.sql|Extend meta_key length to 64
+454	\N	patch	patch_112_113_a.sql|schema_version
+455	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null

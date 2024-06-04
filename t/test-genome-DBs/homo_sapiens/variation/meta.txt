@@ -143,4 +143,7 @@
 143	\N	patch	patch_110_111_a.sql|schema version
 144	\N	patch	patch_110_111_b.sql|Update transcript_variation primary key
 145	\N	patch	patch_111_112_a.sql|schema version
-146	\N	patch	patch_112_113_a.sql|schema_version
+146	\N	patch	patch_111_112_b.sql|Allow meta_value to be null
+147	\N	patch	patch_111_112_c.sql|Extend meta_key length to 64
+148	\N	patch	patch_112_113_a.sql|schema version
+149	\N	patch	patch_112_113_b.sql|Update meta_key length
