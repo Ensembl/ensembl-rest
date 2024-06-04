@@ -82,5 +82,6 @@
 881	\N	patch	patch_110_111_a.sql|schema_version
 882	\N	patch	patch_111_112_a.sql|schema_version
 883	\N	patch	patch_111_112_b.sql|Allow meta_value to be null
-884	\N	patch	patch_112_113_a.sql|schema_version
-885	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null
+884	\N	patch	patch_111_112_c.sql|Extend meta_key length to 64
+885	\N	patch	patch_112_113_a.sql|schema_version
+886	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null

@@ -223,5 +223,6 @@
 1101	\N	patch	patch_110_111_a.sql|schema_version
 1102	\N	patch	patch_111_112_a.sql|schema_version
 1103	\N	patch	patch_111_112_b.sql|Allow meta_value to be null
-1104	\N	patch	patch_112_113_a.sql|schema_version
-1105	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null
+1104	\N	patch	patch_111_112_c.sql|Extend meta_key length to 64
+1105	\N	patch	patch_112_113_a.sql|schema_version
+1106	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null
