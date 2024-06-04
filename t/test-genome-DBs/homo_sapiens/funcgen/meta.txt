@@ -214,3 +214,4 @@
 789	\N	patch	patch_111_112_b.sql|fix data_file_id length
 790	\N	patch	patch_111_112_c.sql|set data_file_id to not null auto increment
 791	\N	patch	patch_112_113_a.sql|schema_version
+792	\N	patch	patch_112_113_b.sql|fix_compatibility_issues
