@@ -303,16 +303,16 @@ my $base = '/overlap/region/homo_sapiens';
 {
   my $region = '1:76429380..76430144';
   cmp_deeply(json_GET("$base/$region?feature=regulatory", 'Get regulatory_feature'), [{
-    id => 'ENSR00000105157',                   
-    bound_end => 76430144,                     
-    bound_start => 76429380,                   
-    description => 'Open chromatin region',
-    end => 76430144,                           
-    feature_type => 'regulatory',              
-    seq_region_name => 1,                      
-    source => 'Regulatory_Build',              
-    start => 76429380,                         
-    strand => 0 
+    id => 'ENSR00000105157',
+    extended_end => 76430144,        
+    extended_start => 76429380,
+    description => 'open_chromatin_region',
+    end => 76430144,
+    feature_type => 'regulatory',
+    seq_region_name => 1,
+    source => 'Ensembl',
+    start => 76429380,
+    strand => 0
   }], 'Getting regulatory_feature as JSON');
 }
 
@@ -566,5 +566,6 @@ $base = '/overlap/translation';
   $json = json_GET("$base/$region?feature=somatic_structural_variation", "Retrieving somatic_structural_variation");
   is(scalar(@{$json}), 1, '1 somatic structural variation feature overlaps input region');
 }
+
 
 done_testing();
