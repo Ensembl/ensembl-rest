@@ -184,6 +184,11 @@ sub to_hash {
     if (lc($feature_type) eq 'gene') {
       $hash->{canonical_transcript} = $feature->canonical_transcript->stable_id.".".$feature->canonical_transcript->version;
     }
+    if (lc($feature_type) eq 'protein_feature') {
+      if (defined($hash->{description}) && !$hash->{description}) {
+        $hash->{description} = $feature->{$feature_type}->{hdescription} if defined($feature->{$feature_type}->{hdescription});
+      }
+    }
     push(@hashed, $hash);
   }
   return \@hashed;
