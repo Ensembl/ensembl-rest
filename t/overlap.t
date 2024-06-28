@@ -543,6 +543,46 @@ $base = '/overlap/translation';
   eq_or_diff($json->[0], $expected, 'Checking that the overlap is at the expected location');
 }
 
+# Check that the correct description is returned
+{
+  my $id = 'ENSP00000371073';
+  cmp_deeply(json_GET("$base/$id?type=smart", 'Ensembl Smart domains'), [{
+    cigar_string => '',
+    type => 'Smart',
+    translation_id => 725227,
+    start => 33,
+    description => 'plcx_3',
+    interpro => '',
+    end => 202,
+    align_type => undef,
+    Parent => 'ENST00000381657',
+    feature_type => 'protein_feature',
+    hit_start => 1,
+    hseqname => 'SM00148',
+    seq_region_name => 'ENSP00000371073',
+    id => 'SM00148',
+    hit_end => 182
+  }], 'Protein feature description displayed for \'Smart\' type');
+
+  cmp_deeply(json_GET("$base/$id?type=pfam", 'Ensembl Pfam domains'), [{
+    feature_type => 'protein_feature',
+    hit_start => 24,
+    align_type => undef,
+    translation_id => 725227,
+    cigar_string => '',
+    start => 84,
+    seq_region_name => 'ENSP00000371073',
+    Parent => 'ENST00000381657',
+    hit_end => 120,
+    interpro => 'IPR000001',
+    hseqname => 'PF00388',
+    id => 'PF00388',
+    type => 'Pfam',
+    description => 'Kringle',
+    end => 183
+  }], 'Interpro description displayed for \'Pfam\' type');
+}
+
 # Test retrieving variation features where no variation db exists
 {
   my $base = '/overlap/region/meleagris_gallopavo';
@@ -566,6 +606,5 @@ $base = '/overlap/translation';
   $json = json_GET("$base/$region?feature=somatic_structural_variation", "Retrieving somatic_structural_variation");
   is(scalar(@{$json}), 1, '1 somatic structural variation feature overlaps input region');
 }
-
 
 done_testing();

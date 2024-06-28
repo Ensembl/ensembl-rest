@@ -177,7 +177,7 @@ is_json_GET(
   my $expected = [{ name => 'GO', description => undef, release => undef, display_name => 'GO' }];
   is_json_GET('/info/external_dbs/homo_sapiens?filter=GO', $expected, 'Checking GO filtering works');
   my $xref_external_dbs_json = json_GET('info/external_dbs/homo_sapiens?feature=xref', 'Get the xref external dbs hash');
-  is(scalar(@{$xref_external_dbs_json}), 38, 'Ensuring we have the right number of xref external_dbs available');
+  is(scalar(@{$xref_external_dbs_json}), 39, 'Ensuring we have the right number of xref external_dbs available');
 
   action_bad_regex('/info/external_dbs/wibble', qr/Could not fetch adaptor for species .+/, 'Bogus species means error message');
 }
