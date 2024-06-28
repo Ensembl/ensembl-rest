@@ -564,9 +564,6 @@ $base = '/overlap/translation';
     hit_end => 182
   }], 'Protein feature description displayed for \'Smart\' type');
 
-  use Data::Dumper;
-  my $json = json_GET("$base/$id?type=pfam", 'Ensembl Pfam domains');
-  print Dumper $json;
   cmp_deeply(json_GET("$base/$id?type=pfam", 'Ensembl Pfam domains'), [{
     feature_type => 'protein_feature',
     hit_start => 24,
