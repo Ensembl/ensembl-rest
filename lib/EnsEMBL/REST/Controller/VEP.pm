@@ -42,6 +42,7 @@ has valid_user_params => (
   default => sub { return {
     map {$_ => 1} (qw/
     gencode_basic
+    gencode_primary
     refseq
     merged
 
