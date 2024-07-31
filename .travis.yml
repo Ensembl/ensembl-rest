@@ -25,7 +25,7 @@ matrix:
   - perl: '5.26'
     env: COVERALLS=false
   - perl: '5.40'
-    env: COVERALLS=true
+    env: COVERALLS=true COVERALLS_REPO_TOKEN=${{secret.COVERALLS_REPO_TOKEN}}
 
 before_install:
     - git clone --depth 1 https://github.com/Ensembl/ensembl-git-tools.git
