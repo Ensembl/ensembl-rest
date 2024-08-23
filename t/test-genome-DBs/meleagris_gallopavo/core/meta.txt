@@ -1,5 +1,5 @@
 1	\N	schema_type	core
-2	\N	schema_version	113
+2	\N	schema_version	114
 3	\N	patch	patch_59_60_a.sql|schema_version
 4	\N	patch	patch_59_60_b.sql|rename_go_xref_table
 5	\N	patch	patch_59_60_c.sql|QC_fixes
@@ -226,3 +226,4 @@
 1104	\N	patch	patch_111_112_c.sql|Extend meta_key length to 64
 1105	\N	patch	patch_112_113_a.sql|schema_version
 1106	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null
+1107	\N	patch	patch_113_114_a.sql|schema_version
