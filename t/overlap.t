@@ -304,13 +304,13 @@ my $base = '/overlap/region/homo_sapiens';
   my $region = '1:76429380..76430144';
   cmp_deeply(json_GET("$base/$region?feature=regulatory", 'Get regulatory_feature'), [{
     id => 'ENSR00000105157',
-    extended_end => 76430144,        
-    extended_start => 76429380,
-    description => 'open_chromatin_region',
+    bound_end => 76430144,
+    bound_start => 76429380,
+    description => 'Open chromatin region',
     end => 76430144,
     feature_type => 'regulatory',
     seq_region_name => 1,
-    source => 'Ensembl',
+    source => 'Regulatory_Build',
     start => 76429380,
     strand => 0
   }], 'Getting regulatory_feature as JSON');
