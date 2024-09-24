@@ -52,6 +52,7 @@ before_install:
     - make prefix=$ENSDIR/share/htslib install
     - export HTSLIB_DIR=$(pwd -P)
     - cd $ENSDIR/ensembl-variation/C_code/
+    - make
     - make install
     - cd $TRAVIS_BUILD_DIR
 
