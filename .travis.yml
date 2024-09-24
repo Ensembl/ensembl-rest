@@ -1,62 +1,63 @@
 language: perl
 
-dist:
-  - focal
+dist: focal
 
 services:
   - mysql
 
 perl:
   - '5.26'
-  - '5.30'
+  - '5.32'
 
 addons:
   apt:
     packages:
-    - unzip
+      - libbz2-dev
+      - libcurl4-gnutls-dev
+      - libexpat1-dev
+      - liblzma-dev
+      - libmysqlclient-dev
+      - libpng-dev
 
 env:
-  - COVERALLS=true COVERALLS_REPO_TOKEN=${{secret.COVERALLS_REPO_TOKEN}}
-  - COVERALLS=false
+  global:
+    - ENSDIR=$TRAVIS_BUILD_DIR/..
+    - ENSEMBL_BRANCH='main'
+    - PATH=$PATH:$ENSDIR/ensembl-git-tools/bin
+    - HTSLIB_DIR=$ENSDIR/htslib
+    - PERL5LIB=$TRAVIS_BUILD_DIR/../bioperl-live
+  jobs:
+    - COVERALLS=true COVERALLS_REPO_TOKEN=${{secret.COVERALLS_REPO_TOKEN}}
+    - COVERALLS=false
 
 matrix:
   exclude:
   - perl: '5.26'
     env: COVERALLS=false
-  - perl: '5.30'
+  - perl: '5.32'
     env: COVERALLS=true COVERALLS_REPO_TOKEN=${{secret.COVERALLS_REPO_TOKEN}}
 
 before_install:
+    - cd $ENSDIR
+    - git clone -b release-1-6-924 --depth 1 https://github.com/bioperl/bioperl-live.git
     - git clone --depth 1 https://github.com/Ensembl/ensembl-git-tools.git
     - export PATH=$PWD/ensembl-git-tools/bin:$PATH
-    - export ENSEMBL_BRANCH='main'
-    - export SECONDARY_BRANCH='main' # for VEP only as may branch late sometimes
-    - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
     - if [[ $TRAVIS_BRANCH =~ ^release\/[0-9]+$ ]]; then export ENSEMBL_BRANCH=$TRAVIS_BRANCH; fi
-    - echo "ENSEMBL_BRANCH=$ENSEMBL_BRANCH"
+    - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH api
     - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-test
-    - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH ensembl
-    - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-compara
-    - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-variation
-    - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH --secondary_branch $SECONDARY_BRANCH ensembl-vep
-    - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-funcgen
-    - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH ensembl-io
-    - git clone -b release-1-6-924 --depth 1 https://github.com/bioperl/bioperl-live.git
-    - git clone --branch 1.13 --depth 1 https://github.com/samtools/htslib.git
+    # VEP may branch late sometimes
+    - git-ensembl --clone --depth 1 --branch $ENSEMBL_BRANCH --secondary_branch main ensembl-vep
+    - git clone --branch 1.13 --recurse-submodules --shallow-submodules https://github.com/samtools/htslib.git
     - cd htslib
-    - git submodule update --init --recursive
-    - make
+    - make prefix=$ENSDIR/share/htslib install
     - export HTSLIB_DIR=$(pwd -P)
-    - cd ..
-    - cd ensembl-variation/C_code/
-    - make
-    - cd ../../
+    - cd $ENSDIR/ensembl-variation/C_code/
+    - make install
+    - cd $TRAVIS_BUILD_DIR
 
 install:
-    - export PERL5LIB=$PERL5LIB:$PWD/bioperl-live
-    - cpanm -v --sudo --installdeps --with-recommends --notest --cpanfile ensembl/cpanfile .
+    - cpanm -v --sudo --installdeps --with-recommends --notest --cpanfile ../ensembl/cpanfile .
     - cpanm -v --sudo --installdeps --with-recommends --notest .
-    - cpanm -n --sudo Devel::Cover::Report::Coveralls JSON
     - cp travisci/MultiTestDB.conf.travisci t/MultiTestDB.conf
     - mysql -u root -h localhost -e 'GRANT ALL PRIVILEGES ON *.* TO "travis"@"%"'
     - mysql -u root -h localhost -e 'SET GLOBAL local_infile=1'

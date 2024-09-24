@@ -72,3 +72,5 @@ test_requires 'Plack::Test';
 test_requires 'Net::CIDR::Lite';
 test_requires 'Test::Time::HiRes';
 test_requires 'Test::Warnings';
+test_requires 'Devel::Cover';
+test_requires 'Devel::Cover::Report::Coveralls';
