@@ -1,4 +1,4 @@
-170	\N	schema_version	113
+173	\N	schema_version	114
 2	\N	schema_type	compara
 3	\N	patch	patch_71_72_a.sql|schema_version
 4	\N	patch	patch_71_72_b.sql|new member_production_counts table
@@ -136,3 +136,4 @@
 169	\N	patch	patch_111_112_a.sql|schema_version
 171	\N	patch	patch_112_113_a.sql|schema_version
 172	\N	patch	patch_112_113_b.sql|meta_key_64
+174	\N	patch	patch_113_114_a.sql|schema_version
