@@ -1,16 +1,17 @@
 #!/bin/bash
 
-export PERL5LIB=$PWD/bioperl-live:$PWD/ensembl-test/modules:$PWD/ensembl/modules:$PWD/ensembl-compara/modules:$PWD/ensembl-variation/modules:$PWD/ensembl-vep/modules:$PWD/ensembl-funcgen/modules:$PWD/ensembl-io/modules:$PWD/lib
+export PERL5LIB=$PERL5LIB:$ENSDIR/ensembl-test/modules:$ENSDIR/ensembl/modules:$ENSDIR/ensembl-compara/modules:$ENSDIR/ensembl-variation/modules:$ENSDIR/ensembl-vep/modules:$ENSDIR/ensembl-funcgen/modules:$ENSDIR/ensembl-io/modules:$TRAVIS_BUILD_DIR/lib
+
 export TEST_AUTHOR=$USER
 
-export PATH=$PATH:$PWD/htslib:$PWD/ensembl-variation/C_code
+export PATH=$PATH:$ENSDIR/share/htslib/bin:$ENSDIR/ensembl-variation/bin
 export SKIP_TESTS=""
 
 echo "Running test suite"
 if [ "$COVERALLS" = 'true' ]; then
-  PERL5OPT='-MDevel::Cover=+ignore,bioperl,+ignore,ensembl-test' perl $PWD/ensembl-test/scripts/runtests.pl -verbose t $SKIP_TESTS
+  perl $ENSDIR/ensembl-test/scripts/runtests.pl -verbose t $SKIP_TESTS
 else
-  perl $PWD/ensembl-test/scripts/runtests.pl t $SKIP_TESTS
+  perl $ENSDIR/ensembl-test/scripts/runtests.pl t $SKIP_TESTS
 fi
 
 rt=$?
