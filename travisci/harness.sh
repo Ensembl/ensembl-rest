@@ -4,7 +4,7 @@ export PERL5LIB=$PERL5LIB:$ENSDIR/ensembl-test/modules:$ENSDIR/ensembl/modules:$
 
 export TEST_AUTHOR=$USER
 
-export PATH=$PATH:$ENSDIR/share/htslib/bin:$ENSDIR/ensembl-variation/bin
+export PATH=$PATH:$ENSDIR/share/htslib/bin:$ENSDIR/ensembl-variation/C_code
 export SKIP_TESTS=""
 
 echo "Running test suite"
