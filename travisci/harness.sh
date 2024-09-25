@@ -9,7 +9,7 @@ export SKIP_TESTS=""
 
 echo "Running test suite"
 if [ "$COVERALLS" = 'true' ]; then
-  perl $ENSDIR/ensembl-test/scripts/runtests.pl -verbose t $SKIP_TESTS
+  PERL5OPT='-MDevel::Cover' perl $ENSDIR/ensembl-test/scripts/runtests.pl t $SKIP_TESTS
 else
   perl $ENSDIR/ensembl-test/scripts/runtests.pl t $SKIP_TESTS
 fi
