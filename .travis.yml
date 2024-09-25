@@ -22,7 +22,7 @@ addons:
 env:
   global:
     - ENSDIR=$TRAVIS_BUILD_DIR/..
-    - ENSEMBL_BRANCH='main'
+    - ENSEMBL_BRANCH='release/114'
     - PATH=$PATH:$ENSDIR/ensembl-git-tools/bin
     - HTSLIB_DIR=$ENSDIR/htslib
     - PERL5LIB=$TRAVIS_BUILD_DIR/../bioperl-live
