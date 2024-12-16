@@ -768,7 +768,6 @@ sub configure_vep {
     'Mastermind' => '0,0,1',
     'GO' => '1',
     'Phenotypes' => '1',
-    'DisGeNET' => 'disease=1',
     'CADD' => '1',
     'EVE' => '1',
     'SpliceAI' => '1'
@@ -928,7 +927,6 @@ sub get_dataset_allele_response {
     my @clinical; # clinicalInterpretations (part of variantLevelData)
     my %unique_phenotypes;
     my $var;
-    my $disgenet = [];
     my $frequency = [];
     my $cadd = [];
 
@@ -984,7 +982,6 @@ sub get_dataset_allele_response {
 
         $molecular_interactions = $vep_consequence_results->{molecular_interactions};
         $gene_ontology = $vep_consequence_results->{gene_ontology};
-        $disgenet = $vep_consequence_results->{disgenet};
         $cadd = $vep_consequence_results->{cadd};
 
         # Frequency data from gnomAD
@@ -1049,7 +1046,6 @@ sub get_dataset_allele_response {
 
     $result_details->{variantLevelData}->{clinicalInterpretations} = \@clinical if (scalar @clinical > 0);
 
-    $result_details->{variantLevelData}->{phenotypicEffects} = $disgenet if (scalar @{$disgenet} > 0);
     $result_details->{variantLevelData}->{pathogenicityPredictions} = $cadd if (scalar @{$cadd} > 0);
 
     $result_details->{FrequencyInPopulations}->{frequencies} = $frequency if (scalar @{$frequency} > 0);
@@ -1114,8 +1110,6 @@ sub get_vep_molecular_attribs {
   my %molecular_interactions;
   my @intact_data;
   my @phenotypes;
-  my %unique_disgenet;
-  my @disgenet_data;
   my @cadd_scores;
   my %cadd_unique;
 
@@ -1136,24 +1130,6 @@ sub get_vep_molecular_attribs {
           $cons->{id} = $go->{'go_term'};
           $cons->{label} = $go->{'description'};
           $gene_ontology{$go->{'go_term'}} = $cons if !$gene_ontology{$go->{'go_term'}};
-        }
-      }
-
-      # DisGeNET
-      if($transcript_consequences->{'disgenet'}) {
-        foreach my $disgenet (@{$transcript_consequences->{'disgenet'}}) {
-          my $key = $disgenet->{score} . '-' . $disgenet->{pmid} . '-' . $disgenet->{diseaseName};
-          if(!$unique_disgenet{$key}) {
-            my $disgenet_obj;
-            $disgenet_obj->{annotatedWith}->{toolName} = 'DisGeNET';
-            $disgenet_obj->{annotatedWith}->{version} = 'v7';
-            $disgenet_obj->{conditionId} = $disgenet->{diseaseName};
-            $disgenet_obj->{evidenceType}->{id} = "isDefinedBy";
-            $disgenet_obj->{evidenceType}->{label} = 'PMID:' . $disgenet->{pmid};
-            $disgenet_obj->{score} = $disgenet->{score};
-            push @disgenet_data, $disgenet_obj;
-            $unique_disgenet{$key} = 1;
-          }
         }
       }
 
@@ -1183,7 +1159,6 @@ sub get_vep_molecular_attribs {
 
   $results{molecular_interactions} = \%molecular_interactions;
   $results{gene_ontology} = \@gene_ontology_list;
-  $results{disgenet} = \@disgenet_data;
   $results{cadd} = \@cadd_scores;
 
   return (\%results);
