@@ -765,7 +765,6 @@ sub configure_vep {
   # VEP plugins to run
   my $plugins_to_use = {
     'IntAct' => 'all=1',
-    'Mastermind' => '0,0,1',
     'GO' => '1',
     'Phenotypes' => '1',
     'CADD' => '1',
