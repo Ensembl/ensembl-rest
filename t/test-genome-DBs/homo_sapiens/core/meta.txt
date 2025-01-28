@@ -1,5 +1,5 @@
 1775	1	xref.timestamp	2012-09-03 21:14:58
-1	\N	schema_version	114
+1	\N	schema_version	115
 2	\N	patch	patch_52_53_a.sql|schema_version
 3	\N	patch	patch_52_53_b.sql|external_db_type_enum
 4	\N	patch	patch_52_53_c.sql|identity_xref_rename
@@ -274,3 +274,4 @@
 1888	\N	patch	patch_112_113_a.sql|schema_version
 1889	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null
 1890	\N	patch	patch_113_114_a.sql|schema_version
+1891	\N	patch	patch_114_115_a.sql|schema_version

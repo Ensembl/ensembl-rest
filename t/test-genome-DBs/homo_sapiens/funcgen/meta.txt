@@ -1,5 +1,5 @@
 1	1	schema_type	funcgen
-2	\N	schema_version	114
+2	\N	schema_version	115
 3	\N	patch	patch_88_89_a.sql|schema_version
 4	\N	patch	patch_88_89_b.sql|Created probe_seq table
 5	\N	patch	patch_88_89_c.sql|created probe_feature_transcript table
@@ -216,3 +216,4 @@
 791	\N	patch	patch_112_113_a.sql|schema_version
 792	\N	patch	patch_112_113_b.sql|fix_compatibility_issues
 793	\N	patch	patch_113_114_a.sql|schema_version
+794	\N	patch	patch_114_115_a.sql|schema_version
