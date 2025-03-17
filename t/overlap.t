@@ -310,7 +310,7 @@ my $base = '/overlap/region/homo_sapiens';
     end => 76430144,
     feature_type => 'regulatory',
     seq_region_name => 1,
-    source => 'Regulatory_Build',
+    source => 'Ensembl',
     start => 76429380,
     strand => 0
   }], 'Getting regulatory_feature as JSON');
