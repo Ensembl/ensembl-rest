@@ -149,3 +149,4 @@
 149	\N	patch	patch_112_113_b.sql|Update meta_key length
 150	\N	patch	patch_113_114_a.sql|schema_version
 151	\N	patch	patch_114_115_a.sql|schema_version
+152	\N	patch	patch_114_115_b.sql|Add column DNA_type to phenotype_feature

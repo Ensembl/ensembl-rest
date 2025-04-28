@@ -186,7 +186,7 @@ CREATE TABLE `meta` (
   PRIMARY KEY (`meta_id`),
   UNIQUE KEY `species_key_value_idx` (`species_id`,`meta_key`,`meta_value`),
   KEY `species_value_idx` (`species_id`,`meta_value`)
-) ENGINE=MyISAM AUTO_INCREMENT=152 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM AUTO_INCREMENT=153 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `meta_coord` (
   `table_name` varchar(40) NOT NULL,
@@ -239,12 +239,14 @@ CREATE TABLE `phenotype_feature` (
   `seq_region_start` int(11) unsigned DEFAULT NULL,
   `seq_region_end` int(11) unsigned DEFAULT NULL,
   `seq_region_strand` tinyint(4) DEFAULT NULL,
+  `DNA_type` enum('Germline','Somatic') DEFAULT NULL,
   PRIMARY KEY (`phenotype_feature_id`),
   KEY `phenotype_idx` (`phenotype_id`),
   KEY `object_idx` (`object_id`,`type`),
   KEY `type_idx` (`type`),
   KEY `pos_idx` (`seq_region_id`,`seq_region_start`,`seq_region_end`),
-  KEY `source_idx` (`source_id`)
+  KEY `source_idx` (`source_id`),
+  KEY `dna_type_idx` (`DNA_type`)
 ) ENGINE=MyISAM AUTO_INCREMENT=6758521 DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `phenotype_feature_attrib` (
