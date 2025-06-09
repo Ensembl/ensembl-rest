@@ -190,7 +190,7 @@ sub to_hash {
       }
     }
     if (lc($feature_type) eq 'regulatory') {
-      next if ($hash->{description} eq 'Epigenetically modified accessible region');
+      next if (!defined $hash->{description});
     }
     push(@hashed, $hash);
   }
