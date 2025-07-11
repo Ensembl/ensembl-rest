@@ -273,3 +273,4 @@
 1385028	53	v@somewhere.com
 1384971	535	NM_033260.4
 1384971	576	GENCODE primary
+1384971	584	Ensembl Canonical Extended
