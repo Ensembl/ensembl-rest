@@ -1,4 +1,4 @@
-1	\N	schema_version	115
+1	\N	schema_version	116
 2	\N	patch	patch_50_51_a.sql|schema_version
 3	\N	patch	patch_50_51_b.sql|protein_feature_hit_name
 4	\N	patch	patch_50_51_c.sql|meta_coord_index
@@ -272,3 +272,4 @@
 1328	\N	patch	patch_112_113_b.sql|Ensure meta_value is not null
 1329	\N	patch	patch_113_114_a.sql|schema_version
 1330	\N	patch	patch_114_115_a.sql|schema_version
+1331	\N	patch	patch_115_116_a.sql|schema_version
