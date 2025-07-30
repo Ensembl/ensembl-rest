@@ -374,6 +374,7 @@ sub _include_user_params {
   $vep_params{plugins} = $plugin_config if $plugin_config;
   my $custom_config = $self->_configure_customs($c,\%tmp_vep_params,\%vep_params);
   $vep_params{custom} = $custom_config if $custom_config;
+  $vep_params{custom_suppress_filter} = 1;
 
   return \%vep_params;
 }
