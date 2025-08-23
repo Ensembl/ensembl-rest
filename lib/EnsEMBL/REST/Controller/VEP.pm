@@ -451,6 +451,13 @@ sub _configure_plugins {
 
           push @params, $param;
         }
+        elsif(lc $module eq 'cadd' && $c->stash->{species} eq "Gallus_gallus_GCA_000002315.5"){
+          next unless $param =~ /^snv_chicken_rjf=/;
+
+          my $param_aux = $param;
+          $param_aux =~ s/snv_chicken_rjf=//;
+          $param = 'snv=' . $param_aux;
+        }
         elsif(lc $module eq 'cadd' && ($user_config->{$module} eq "snv_indels" || $user_config->{$module} eq "1")){
           next unless ($param =~ /^snv=/ || $param =~ /^indels=/);
           push @params, $param;
