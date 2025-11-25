@@ -455,11 +455,22 @@ sub _configure_plugins {
 
           push @params, $param;
         }
+        # CADD - check if species is chicken and provide appropriate file based on that
         elsif(lc $module eq 'cadd' && $c->stash->{species} eq "gallus_gallus_gca000002315v5"){
           next unless $param =~ /^snv_chicken_rjf=/;
 
           my $param_aux = $param;
           $param_aux =~ s/snv_chicken_rjf=//;
+          $param = 'snv=' . $param_aux;
+
+          push @params, $param;
+        }
+        # CADD - check if species is turkey and provide appropriate file based on that
+        elsif(lc $module eq 'cadd' && $c->stash->{species} eq "meleagris_gallopavo"){
+          next unless $param =~ /^snv_turkey=/;
+
+          my $param_aux = $param;
+          $param_aux =~ s/snv_turkey=//;
           $param = 'snv=' . $param_aux;
 
           push @params, $param;
