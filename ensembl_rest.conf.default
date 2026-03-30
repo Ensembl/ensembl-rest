@@ -160,7 +160,7 @@ jsonp=1
     compara_species_set_group=mammals
     compara_compact=1
 
-    dbnsfp_readme=https://download.genos.us/dbnsfp/release/dbNSFP5.2c.readme.txt
+    dbnsfp_readme=https://drive.google.com/file/d/15F_oYAc5ow9eGTs0jUndqFOE8VGkOBZU/view?usp=drive_link
  
     genetree_stable_id=ENSGT00390000003602
     compara_gene_stable_id=ENSG00000173786
