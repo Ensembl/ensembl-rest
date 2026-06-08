@@ -110,7 +110,7 @@ jsonp=1
     gene_stable_id_5=ENSG00000009950
     transcript_stable_id=ENST00000288602
     transcript_stable_id_2=ENST00000513398
-    exon_stable_id=ENSE00001154485
+    exon_stable_id=ENSE00001544494
     translation_stable_id=ENSP00000288602
 
     vcf=21  26960070  rs116645811 G A . . .
